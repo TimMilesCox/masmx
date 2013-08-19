@@ -1,0 +1,38 @@
+	$include	"elf32_be.def"
+	$include	"ppc32elf.def"
+
+
+$(0)
+	elf32_ehdr	EM_PPC
+	$section_names
+	$sections
+
+
+
+
+
+	$include,$binary	"../result.txo/input.txo"
+$(0)
+
+__section_size(2)	$set	$($text)
+__section_size(3)	$set	$($rela_text)
+__section_size(4)	$set	$($data)
+__section_size(5)	$set	$($rela_data)
+__section_size(6)	$set	$($bss)
+__section_size(7)	$set	$($sdata)
+__section_size(8)	$set	$($comment)
+__section_size(9)	$set	$($shstrtab)
+__section_size(10)	$set	$($symtab)
+__section_size(11)	$set	$($strtab)
+
+__section_offset(2)	$set	$
+__section_offset(3)	$set	__section_offset(2)+__section_size(2)
+__section_offset(4)	$set	__section_offset(3)+__section_size(3)
+__section_offset(5)	$set	__section_offset(4)+__section_size(4)
+__section_offset(6)	$set	__section_offset(5)+__section_size(5)
+__section_offset(7)	$set	__section_offset(6)+__section_size(6)
+__section_offset(8)	$set	__section_offset(7)+__section_size(7)
+__section_offset(9)	$set	__section_offset(8)+__section_size(8)
+__section_offset(10)	$set	__section_offset(9)+__section_size(9)
+__section_offset(11)	$set	__section_offset(10)+__section_size(10)
+

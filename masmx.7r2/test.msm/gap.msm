@@ -1,0 +1,7 @@
+VORZAHL $set	1
+ZAHL	$set	5
+label$_
+?	$do	VORZAHL,label(?)
+
+?	$do	ZAHL,label$(ZAHL+1-?)	+	label$(?)
+

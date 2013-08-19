@@ -1,0 +1,482 @@
+;******************************************************************************
+;
+; File     : I2C_EE.ASM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains the I2C driver for any serial EEPROM driver
+;            which is equivalent to PCF8582 (8bit addr) or 24C65 (13bit addr)
+;
+; System   : 80C537
+;
+; History  :
+;   Date     Who Ver  Comments
+;
+; Note     : Both I2C_Write and I2C_Read are callable from interrupt since
+;            interrupts are turned off during bus access, and F0/F1 are
+;            saved (PUSH PSW) by all interrupt routines that may use I2C.
+;******************************************************************************
+
+;***********
+; Prototypes
+;***********
+
+;ACC,B I2C_Read (R1 slave, DPTR data, F0 i2cline, F1 i2cmode)
+;ACC,B I2C_Read8 (R1 slave, DPTR data, F0 i2cline)
+;ACC,B I2C_Read13 (R1 slave, DPTR data, F0 i2cline)
+;ACC I2C_Write (R1 slave, DPTR data, F0 i2cline, F1 i2cmode)
+;ACC I2C_Write8 (R1 slave, DPTR data, F0 i2cline)
+;ACC I2C_Write13 (R1 slave, DPTR data, F0 i2cline)
+
+;********************
+; Variables + Defines
+;********************
+
+I2C_SDA0        EQU     P3.4
+I2C_SCL0        EQU     P3.5
+I2C_SDA1        EQU     P3.4
+I2C_SCL1        EQU     P3.5
+
+;******************************************************************************
+;
+; Function:     I2C_SetClock
+; Input:        F0=I2C line to use
+; Output:       None
+; Preserved:    All
+; Destroyed:    None
+; Description:
+;   Internal routine to fire the I2C clock line
+;
+;******************************************************************************
+
+I2C_SetClock:
+	JB      F0,I2C_SC2
+	SETB    I2C_SCL0
+	JMP     I2C_Terminate
+I2C_SC2:
+	SETB    I2C_SCL1
+	JMP     I2C_Terminate
+
+;******************************************************************************
+;
+; Function:     I2C_ClrClock
+; Input:        F0=I2C line to use
+; Output:       None
+; Preserved:    All
+; Destroyed:    None
+; Description:
+;   Internal routine to clear the I2C clock line
+;
+;******************************************************************************
+
+I2C_ClrClock:
+	JB      F0,I2C_CC2
+	CLR     I2C_SCL0
+	JMP     I2C_Terminate
+I2C_CC2:
+	CLR     I2C_SCL1
+	JMP     I2C_Terminate
+
+;******************************************************************************
+;
+; Function:     I2C_SetData
+; Input:        F0 = i2c line to use
+; Output:       None
+; Preserved:    All
+; Destroyed:    None
+; Description:
+;   Internal routine to fire the i2c data line
+;
+;******************************************************************************
+
+I2C_SetData:
+	JB      F0,I2C_SD2
+	SETB    I2C_SDA0
+	JMP     I2C_Terminate
+I2C_SD2:
+	SETB    I2C_SDA1
+	JMP     I2C_Terminate
+
+;******************************************************************************
+;
+; Function:     I2C_ClrData
+; Input:        F0 = i2c line to use
+; Output:       None
+; Preserved:    All
+; Destroyed:    None
+; Description:
+;   Internal routine to clear the i2c data line
+;
+;******************************************************************************
+
+I2C_ClrData:
+	JB      F0,I2C_CD2
+	CLR     I2C_SDA0
+	JMP     I2C_Terminate
+I2C_CD2:
+	CLR     I2C_SDA1
+	JMP     I2C_Terminate
+
+;******************************************************************************
+;
+; Function:     I2C_OutData
+; Input:        F0 = i2c line to use
+;               C = bit to output
+; Output:       None
+; Preserved:    All
+; Destroyed:    None
+; Description:
+;   Internal routine to output the bit stored in C to the i2c data line
+;
+;******************************************************************************
+
+I2C_OutData:
+	JB      F0,I2C_OD2
+	MOV     I2C_SDA0,C
+	RET
+I2C_OD2:
+	MOV     I2C_SDA1,C
+	RET
+
+;******************************************************************************
+;
+; Function:     I2C_InData
+; Input:        F0 = i2c line to use
+; Output:       C = bit read
+; Preserved:    All
+; Destroyed:    None
+; Description:
+;   Internal routine to input a bit from the i2c data line
+;
+;******************************************************************************
+
+I2C_InData:
+	JB      F0,I2C_ID2
+	MOV     C,I2C_SDA0
+	RET
+I2C_ID2:
+	MOV     C,I2C_SDA1
+	RET
+
+;******************************************************************************
+;
+; Function:     I2C_Terminate
+; Input:        None
+; Output:       None
+; Preserved:    All
+; Destroyed:    None
+; Description:
+;   Internal routine to slow down all the above routines to a rate which makes
+;   them work on a 12MHz processor.
+;
+;******************************************************************************
+
+I2C_Terminate:
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	RET
+
+;******************************************************************************
+;
+; Function:     I2C_WriteByte
+; Input:        A = byte to write
+; Output:       None
+; Preserved:    ?
+; Destroyed:    ?
+; Description:
+;   Outputs the byte in ACC to the I2C bus
+;
+;******************************************************************************
+
+I2C_WriteByte:
+	MOV     R3,#08H
+I2C_WBloop:
+	RLC     A
+	CALL    I2C_OutData             ; Clock 8 bits out
+	CALL    I2C_SetClock
+	CALL    I2C_ClrClock
+	DJNZ    R3,I2C_WBloop
+	RET
+
+;******************************************************************************
+;
+; Function:     I2C_ReadByte
+; Input:        None
+; Output:       A=byte read
+; Preserved:    ?
+; Destroyed:    ?
+; Description:
+;   Outputs the byte in ACC to the I2C bus
+;
+;******************************************************************************
+
+I2C_ReadByte:
+	MOV     R3,#08H
+	CLR     A
+I2C_RBloop:
+	CALL    I2C_InData              ; Clock in 8
+	RLC     A                       ; data bits
+	CALL    I2C_SetClock
+	CALL    I2C_ClrClock
+	DJNZ    R3,I2C_RBloop
+	RET
+
+;******************************************************************************
+;
+; Function:     I2C_Write
+; Input:        R1 = slave address
+;               DPTR = internal data address
+;               B = data
+;               F0 = I2C line to use (0=main, 1=ext)
+;               F1 = I2C addressing to use (0=13bit, 1=8bit)
+; Output:       A = 00h if Ok, 0FFh if not Ok
+; Preserved:    R0-6,DPTR
+; Destroyed:    R3
+; Description:
+;   Writes a byte to the specified I2C device.
+;
+;******************************************************************************
+
+I2C_Write8:
+	SETB    F1
+	JMP     I2C_Write
+
+I2C_Write13:
+	CLR     F1
+	JMP     I2C_Write
+
+I2C_Wnoack:
+	CALL    I2C_ClrClock
+	MOV     A,#0FFh
+	JMP     I2C_Wdone
+
+I2C_Write:
+	CALL    SYS_DisableInts         ; Exclusive access to I2C bus
+	CALL    I2C_ClrData             ; Start
+	CALL    I2C_ClrClock
+
+	MOV     A,R1                    ; Set up ACC.0 with the slave
+	CLR     C                       ; address and a 0 for write
+	RLC     A
+	CALL    I2C_WriteByte
+
+	CALL    I2C_SetData             ; Set for acknowledge
+	CALL    I2C_SetClock            ; from slave
+	CALL    I2C_InData
+	JC      I2C_Wnoack
+	CALL    I2C_ClrClock
+
+	JB      F1,I2C_Wskiphigh        ; skip high word if 8 bit address
+	MOV     A,DPH                   ; Set up ACC
+	CALL    I2C_WriteByte           ; with word address (1)
+	CALL    I2C_SetData             ; Set for acknowledge
+	CALL    I2C_SetClock            ; from slave
+	CALL    I2C_InData
+	JC      I2C_Wnoack
+	CALL    I2C_ClrClock
+
+I2C_Wskiphigh:
+	MOV     A,DPL                   ; Set up ACC
+	CALL    I2C_WriteByte           ; with word address (0)
+
+	CALL    I2C_SetData             ; Set for acknowledge
+	CALL    I2C_SetClock            ; from slave
+	CALL    I2C_InData
+	JC      I2C_Wnoack
+	CALL    I2C_ClrClock
+
+	MOV     A,B                     ; Set up ACC
+	CALL    I2C_WriteByte           ; with data
+
+	CALL    I2C_SetData             ; Set for acknowledge
+	CALL    I2C_SetClock            ; from slave
+	CALL    I2C_InData
+	JC      I2C_Wnoack
+	CLR     A
+	CALL    I2C_ClrClock
+
+I2C_Wdone:
+	CALL    I2C_ClrData
+	CALL    I2C_SetClock
+	CALL    I2C_SetData             ; stop
+	PUSHACC                 ; 10ms write delay
+	MOV A,#0                ; 256 x 68 NOPS should do
+writedelayloop:
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+;***
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+;***
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	DJNZ ACC,writedelayloop
+	CALL    SYS_EnableInts
+	POP ACC
+	RET
+
+;******************************************************************************
+;
+; Function:     I2C_Read
+; Input:        R1 = Slave address
+;               DPTR = data address
+;               F0 = I2C line to use (0=main, 1=ext)
+;               F1 = I2C addressing to use (0=13bit, 1=8bit)
+; Output:       A = 00h if Ok, 0FFh if not Ok
+;               B = data if Ok
+; Preserved:    R0-6,DPTR
+; Destroyed:    R3
+; Description:
+;   Reads a byte from the specified I2C device.
+;
+;******************************************************************************
+
+I2C_Read8:
+	SETB    F1
+	JMP     I2C_Read
+
+I2C_Read13:
+	CLR     F1
+	JMP     I2C_Read
+
+I2C_Read:
+	CALL    SYS_DisableInts         ; Exclusive access to I2C bus
+	CALL    I2C_ClrData             ; Start
+	CALL    I2C_ClrClock
+	MOV     A,R1                    ; Set up ACC.0
+	CLR     C                       ; with 0 for write
+	RLC     A
+	CALL    I2C_WriteByte
+
+	CALL    I2C_SetData             ; Set for acknowledge
+	CALL    I2C_SetClock            ; from slave
+	CALL    I2C_InData
+	JC      I2C_Rnoack
+	CALL    I2C_ClrClock
+
+	JB      F1,I2C_Rskiphigh        ; skip high addr if Read8
+	MOV     A,DPH                   ; Set up ACC
+	CALL    I2C_WriteByte           ; with word address (1)
+
+	CALL    I2C_SetData             ; Set for acknowledge
+	CALL    I2C_SetClock            ; from slave
+	CALL    I2C_InData
+	JC      I2C_Rnoack
+	CALL    I2C_ClrClock
+I2C_Rskiphigh:
+	MOV     A,DPL                   ; Set up ACC
+	CALL    I2C_WriteByte           ; with word address (0)
+
+	CALL    I2C_SetData             ; Set for acknowledge
+	CALL    I2C_SetClock            ; from slave
+	CALL    I2C_InData
+	JC      I2C_Rnoack
+	CALL    I2C_ClrClock
+
+	CALL    I2C_SetClock
+	CALL    I2C_ClrData             ; Start
+	CALL    I2C_ClrClock
+
+	MOV     A,R1                    ; Set up ACC.0
+	SETB    C                       ; with 1 for read
+	RLC     A
+	CALL    I2C_WriteByte
+
+	CALL    I2C_SetData             ; Set for acknowledge
+	CALL    I2C_SetClock            ; from slave
+	CALL    I2C_InData
+	JC      I2C_Rnoack
+	CALL    I2C_ClrClock
+
+	CALL    I2C_ReadByte
+	MOV     B,A
+
+	CALL    I2C_SetData             ; No acknowledge
+	CALL    I2C_SetClock            ; to slave
+	CALL    I2C_ClrClock
+	CLR     A                       ; Clear ACC for ok read
+
+I2C_Rdone:
+	CALL    I2C_ClrData
+	CALL    I2C_SetClock
+	CALL    I2C_SetData             ; Stop
+	CALL    SYS_EnableInts
+	RET
+
+I2C_Rnoack:
+	CALL    I2C_ClrClock
+	MOV     A,#0FFh
+	JMP     I2C_Rdone
+
+;***************************** End Of I2C_EE.ASM *******************************
+
+

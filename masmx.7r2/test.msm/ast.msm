@@ -1,0 +1,15 @@
+	$word	32
+
+$(4:040000)
+
+ast1	$branch
+axil	$res	1
+twig	$res	1
+x	$do	12,leaf(x)	$res	1
+	+	011111111
+	$root
+
+ast2	$branch
+x	$do	6,blossom(x)	$res	1
+	+	022222222	
+	$root

@@ -1,0 +1,9 @@
+        $list           0
+        $include        "ppc64map.def"
+        $list           2
+	$plist		5
+	$include,"$binary"	scale8
+.$(.data::*0x00444400000e0000)
+"$base(1)"	$set	00444400000fc000
+	$include,$binary "../result.txo/gfar.txo"
+	$store		"../test.o3/scale6"

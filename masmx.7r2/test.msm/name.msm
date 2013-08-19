@@ -1,0 +1,9 @@
+__registers_by_name	$set	1	
+        $include        "../aside.dem/ppc_603.def"
+
+from    .equ    $ee84
+to      .equ    0xc008
+
+        lwz     r6, from
+        stb     r6, to(r14)
+        blr

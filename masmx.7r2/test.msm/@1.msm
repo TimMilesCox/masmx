@@ -1,0 +1,13 @@
+ $word 8
+ $awidth 16
+dw* $proc
+v $do dw(1), + dw(1, v), dw(1, v)/*8:d
+ $end
+@* $func
+ $note @
+ $return $(1)
+ $end
+$(1:0800)
+$(0:0400)
+ dw @, 0c00, @
+ $end

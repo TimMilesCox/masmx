@@ -1,0 +1,12 @@
+gnarl* $proc
+granule $set 1*/gnarl(1, 1)
+ $res ($+granule-1**-granule)-$
+ $end
+
+$(3:03000)
+
+ $res 5
+ gnarl 3
+woodbits + 1.5
+ gnarl 3
+ $end

@@ -1,0 +1,12 @@
+p       $proc
+jpad$*  $name
+loop    $do     p(),	tuple	p(loop)
+	$do	8-loop,	fret	0
+	$end
+
+p	$proc
+tuple*	$name    
+target  $equf   p(1)
+        $snap   2
+        j       target
+        $end

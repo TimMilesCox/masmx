@@ -1,0 +1,10 @@
+	$word		32
+	$quantum	8
+
+$(4:1024)
+yasimi*	+	yadont
+	$list	0
+yadont*	+	yasimi
+
+	
+

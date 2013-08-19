@@ -1,0 +1,14 @@
+__relocatable	$set	1
+	$include	"../aside.dem/ppc_603.def"	.	"ppc_64.def"
+#$(1:*4)
+$(.text)
+fireup*
+	bl	liftoff
+	+	_four_cares:d
+	+	_three_cares:d
+	+	_two_cares:d
+	+	_one_care:d
+liftoff*
+	mfsr	lr, 3
+	blr
+	$end	fireup

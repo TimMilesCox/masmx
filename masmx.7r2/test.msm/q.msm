@@ -1,0 +1,4 @@
+__registers_by_name	$set	1
+        $include "../aside.dem/ppc_603.def"
+ADDRESS $equ    4094
+        lwz     r6, ADDRESS(R31)

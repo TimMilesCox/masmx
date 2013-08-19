@@ -1,0 +1,17 @@
+$(3:*4:03000)
+taste1* $blank  $
+	$trace,1	$t(taste1)
+	$trace,1	taste1
+$(4:04000)
+taste1
+taste2* $blank  $
+	$trace,1	$t(taste2)
+	$trace,1	taste2
+$(3)
+taste2
+$(0:64)
+	+	taste1
+	+	$r(taste1),$rel($r(taste1))
+        +       taste2
+	+	$r(taste2),$rel($r(taste2))
+	$end

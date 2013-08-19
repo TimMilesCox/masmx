@@ -1,0 +1,38 @@
+p*      $proc
+        +       p(1,#1)*/22++p(1,*1)*/21;
+              ++p(1,1:1)*/16;  
+              ++p(1,1:2):s
+        +       p(1,#2)*/22++p(1,*2)*/21;
+              ++p(1,1:2)*/16;  
+              ++p(1,1:1):s
+        $end
+q*      $proc
+        +       q(1,#1)*/22++q(1,*1)*/21;
+              ++q(1,1)*/16; 
+              ++q(1,1):s
+        $end
+        $lterm  '|'
+        $sterm  '.'
+
+	$text	/sp@-/sp@_minus/
+        $text   /sp@+/sp@_plus/
+.        $text   /sp@*/sp@_by/
+
+$(0:32)
+sp      $equ    7
+sp@     $equ    sp++16
+sp@_minus	$equ	15++64
+sp@_plus	$equ	15++32
+
+        p       sp.sp@
+        p       *sp.sp@
+        p       #sp.sp@
+        p       #sp+.sp@+
+        p       sp.sp@
+        p       sp-.sp@-
+        
+        q       sp@
+        q       *sp@
+        q       #sp@
+        q       #sp@+
+        q       sp@-

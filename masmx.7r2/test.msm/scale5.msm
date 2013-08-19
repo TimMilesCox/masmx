@@ -1,0 +1,23 @@
+__giant	$set	1
+	$include	"../aside.dem/ppc64map.def"
+	$list		2
+	$include,"$void" "../result.txo/langobar.txo"
+	$list		2
+	$include,$binary "../result.txo/visobar.txo"
+
+. ......................................
+. scally3 is incremented onto scally2
+. ......................................
+.	$include,$binary	"scally2"
+. ......................................
+. scally4 is incremented onto scally3
+. ......................................
+.       $include,$binary        "scally3"
+. ......................................
+. all three of them together = scally4
+. ......................................
+        $include,$binary        ../result.txo/scally4
+	$include,$binary	../result.txo/gworser
+	$store		"../test.o3/scale5"
+	$end		fireup
+

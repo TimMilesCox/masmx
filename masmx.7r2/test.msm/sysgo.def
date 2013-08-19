@@ -1,0 +1,33 @@
+xr	$equ	r+128
+xk      $equ    k+128
+xx      $equ    x+128
+xy      $equ    y+128
+xa      $equ    a+128
+xb      $equ    b+128
+xsp     $equ   sp+128
+xdp     $equ   dp+128
+
+
+"$REG_SAVE" $equ 4096+64
+"$ABT"	$equ	4096+192
+"$bdisave6_7" $equ $abt+70
+"$state_part" $equ $reg_save-4
+abs$garauntee $equ $state_part-1
+"$tdes"	$equ	$state_part-2
+
+lrs*	$proc
+save	$set	lrs(1, 1)
+	la, i	128
+	lb	xsp
+	sa	xsp
+frame	$do	32, qpush	save+128-frame*4
+	sb	xsp
+	$end
+
+srs*	$proc
+save	$set	srs(1, 1)
+	lb	xsp
+	z	xsp
+frame	$do	32, qpop	save+frame*4-4
+	sb	xsp
+	$end

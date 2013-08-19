@@ -1,0 +1,13 @@
+$(4:*8:1024,14)
+allyoobl
+allwibl*	$equ	$
+awobl		$equ	$
+ambubl*
+$(8:*8:2048,15)
+wollybooble*	$equ	$
+	+	allyoobl
+	+	wollybooble
+	+	allwibl
+	+	awobl
+	+	ambubl
+	$end

@@ -1,0 +1,14 @@
+        $word   16
+        $quantum 8
+        $awidth 32
+        $floating_point 32
+        $characteristic 8
+        $characteristic,64 12
+        $characteristic,80 16
+$(2:*8:256)        
+one     +1.5
+two     +1.75:q
+three   +15.0pe-1
+four    -100.0
+	+100.0
+five    +33:p*+20000

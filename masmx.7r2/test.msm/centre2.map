@@ -1,0 +1,6 @@
+
+	$include	"map_ppc.def"
+$(0:*4)
+	$include,$binary	"soso.txo"
+        $include,$binary        "factor.txo"
+

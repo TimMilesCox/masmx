@@ -1,0 +1,79 @@
+. ..................................................................
+.  UDP Read a datagram off the queue from one IP IF. 
+.  Use the necessity for checksumming as an opportunity to
+.  reassemble physically and release IP's dual-ported device
+.  buffers. Leave the data distributed 16-bits per computer
+.  word as in the dual-ported buffers. Some upper protocols
+.  prefer it that way, such as XDR-RPC presentation. 
+.
+.  Upper protocols wanting the data packed into 24-bit computer
+.  words will use the RECEIVE and  SEND socket calls.
+.  IP has set TRANSPORT to address the first non-ip-header word,
+.  and COUNT to equal IP datagram length minus IP header length,
+.  both exclusive of any data replicated in an earlier datagram
+.  fragment.
+.
+.                     IP's input datagram descriptor
+.                     ______________________________
+.
+.          23                                                  0
+.          ______________________________________________________
+.  Word 0  | next IP datagram in TProQ  [descriptor address]--->|
+.          |____________________________________________________|
+.  Word 1  | data in NW device buffer   [buffer address]------->|
+.          |____________________________________________________|
+.  Word 2  | datagram in device buffer  [address, not offset]-->|
+.          |____________________________________________________|
+.  Word 3  | transport part of datagram [address, not offset]-->|
+.          |____________________________________________________|
+.  Word 4  |      net count of transport part in octets         |
+.          |____________________________________________________|
+.  Word 5  |                 Interface Index                    |
+.          |____________________________________________________|
+.
+.  When the device buffer is given back to IP (proc IP$SELL), the
+.  hardware is advised that the buffer in dual-ported device memory,
+.  is free for further input ,possibly consolidated if adjacent to free heap,
+.  and the detached descriptor, which is in system memory,
+.  goes on a free chain.
+.
+.
+.
+.            TCP Input/Output Segment Descriptor,
+.            UDP Input Datagram Descriptor, and
+.            Transaction Repeat Output UDP Datagram Descriptor
+.            _________________________________________________
+.
+.
+.          23                                                  0
+.          ______________________________________________________
+.  Word 0  | next datagram/seg in PortQ [descriptor address]--->|
+.          |____________________________________________________|
+.  Word 1  |                 Interface Index                    |
+.          |____________________________________________________|
+.  Word 2  |  0000  0000  |   Bits 31:16 of Remote IP Address   |
+.          |________ _____|_____________________________________|
+.  Word 3  |  0000  0000  |   Bits 15:0  of Remote IP Address   |
+.          |____________________________________________________|
+.  Word 4  |  0000  0000  |   TCP Output Repeat IP Datagram ID  |
+.          |____________________________________________________|
+.  Word 5  | Datagram/Seg Address [buffer address in NW complex]|
+.          |____________________________________________________|
+.  Word 6  | Octet Offset in Segment [integer offset in bytes]  |
+.          |____________________________________________________|
+.  Word 7  |          Octet Count in Datagram/Segment           |
+.          |____________________________________________________|
+.
+.  These fields are not all used by UDP, but the descriptor is uniform
+.  for all transport message buffers, both input and saved output.  
+.
+.  This is because buffers which are released not adjacent to free
+.  heap top 
+.
+.  hardware is advised that the buffer is free for further input,
+.  and the detached descriptor goes on a free chain.
+.
+.
+.
+. .................................................................
+

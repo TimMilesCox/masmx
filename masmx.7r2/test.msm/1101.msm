@@ -1,0 +1,25 @@
+	$include        "1101.def"
+	$plist  7
+first   $equf   word2, a3, 3
+second  $equf   word1, x11, 9
+
+	sa      a3, word2, a3, 2
+	sa      a2, first
+	sa      a4, second,x11
+	sa      a5, first,,10
+	sa, 7   a6, first
+	la      a2, $v(strudel)
+$(0)
+	+       1.5
+	-       1.5d
+word1   $res    1
+word2   $res    1
+	-       0
+	-       1
+	-       2
+	-       3
+	+       0-0
+	+       0-1
+	+       0-2
+	+       0-3
+

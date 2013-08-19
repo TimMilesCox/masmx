@@ -1,0 +1,8 @@
+mv ../../rta.doc/test.msm/ppc_603.def .
+mv ../../rta.doc/test.msm/ppc_603p.def .
+mv ../../rta.doc/test.msm/ppc_603x.def .
+mv ../../rta.doc/test.msm/ppc_64.def .
+mv ../../rta.doc/test.msm/ppc_64_p.def .
+mv ../../rta.doc/test.msm/ppc_elf.def .
+mv ../../rta.doc/test.msm/ppc_mul.def .
+

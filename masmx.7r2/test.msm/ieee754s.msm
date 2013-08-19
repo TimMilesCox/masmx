@@ -1,0 +1,41 @@
+        $word   32
+
+	$floating_point	192
+	$characteristic	24
+
+fieee754_32 $form 1, 8, 23
+
+p       $proc
+ieee754_32* $name 0
+
+tag     $set	p(1,1)
+sign    $set    tag/*191
+        
+        $if     sign
+tag     $set    ^tag        
+        $endif
+
+characteristic $set (((tag/*183)**128)++((tag/*168)**127))-2
+mantissa $set   (tag+(1*/143))/*144
+        . bb 166..144 -> bb 22..0. Normalising Bit 167 Truncated
+        
+        fieee754_32 sign, characteristic, mantissa 
+        $end
+
+
+
+$(0:0)
+        ieee754_32 1.5
+        ieee754_32 1.0
+        ieee754_32 1.5e6
+        ieee754_32 1.0e6
+        ieee754_32 1.5e-6
+        ieee754_32 1.0e-6
+        ieee754_32 1.5e10
+        ieee754_32 1.0e10
+        ieee754_32 1.5e-10
+        ieee754_32 1.0e-10
+        ieee754_32 1.5e30
+        ieee754_32 1.0e30
+        ieee754_32 1.5e-30
+        ieee754_32 1.0e-30

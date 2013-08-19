@@ -1,0 +1,53 @@
+ $set_option "a"
+ $word  32
+ $byte  8
+ $quantum 8
+ $awidth  32:64
+
+jumbo*	$proc
+*	+	jumbo(1,1)
+	$end
+
+$(0:080000000/lit)
+i$	$form	8, 56
+
+p	$proc
+add*	$name	1
+load*	$name	2
+store*	$name	3
+jump*	$name	4
+
+	i$	p(0,0), p(1,1)
+	$end
+
+	$set_option	"a"
+
+$(2:02000)
+everywhere	+	(somewhere), (quickly)d
+there		+	(quickly)
+somewhere	$res	1
+$(0)
+	load	lit(-2)
+	add	(4)
+	store	somewhere
+	jump	(quickly:s)
+$(0/lot)
+quickly
+	load	somewhere
+	add	(99)
+	jump	slightly
+yes + 99
+no - 99
+stingo	jumbo	101
+ + (yes)
+ + (no)
+ + lit(yes)
+ + lit(no)
+
+verrilie jumbo	99
+surely	jumbo	100
+	+	stingo:d
+	+	verrilie:d
+	+	surely:d
+	+	stingo+verrilie
+	+	stingo+90

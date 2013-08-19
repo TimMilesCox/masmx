@@ -1,0 +1,3 @@
+	$include	"critical.def"
+x $do HOW_MANY,n(HOW_MANY-x+1) $res n(x)+1-n(x)
+ $end

@@ -1,0 +1,18 @@
+Led1    EQU     OpenCollOut2
+Led2    EQU     OpenCollOut3
+Led3    EQU     OpenCollOut4
+Led4    EQU     OpenCollOut5
+
+LED_Led1On:     ret
+LED_Led1Flash:  ret
+LED_Led1Off:    ret
+LED_Led2On:     ret
+LED_Led2Flash:  ret
+LED_Led2Off:    ret
+LED_Led3On:     ret
+LED_Led3Flash:  ret
+LED_Led3Off:    ret
+LED_Led4On:     ret
+LED_Led4Flash:  ret
+LED_Led4Off:    ret
+LED_ServiceLeds: ret

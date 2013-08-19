@@ -1,0 +1,54 @@
+qb2i*   $proc
+index   $do     qb2i(0, 2),	qb2,qb2i(0, 2)	qb2i(1)
+	$end
+
+qb2*	$proc
+        $if     qb2(1, 3)
+column  $set    qb2(1, 3)-2+index
+        $else
+column  $set    index-1
+        $endif
+
+input   $equf   qb2(1, 1)+column/3, qb2(1, 2), column///3+1
+        table$  qb2(0, 2), index-1
+        la      input
+
+        $if     index>1
+        ab      table
+        $else
+        lb      table
+        $endif
+        
+        $end
+
+table$* $proc
+        $if     table$(1, 1)-table$(1, 2)=6
+table*  $equf   hundred_thousands-030, a
+        $elseif table$(1, 1)-table$(1, 2)=5
+table*  $equf   ten_thousands-030, a
+        $elseif table$(1, 1)-table$(1, 2)=4
+table*  $equf   thousands-030, a
+        $elseif table$(1, 1)-table$(1, 2)=3
+table*  $equf   hundreds-030, a
+        $elseif table$(1, 1)-table$(1, 2)=2
+table*  $equf   tens_units-030, a, t2
+        $elseif table$(1, 1)-table$(1, 2)=1
+table*  $equf   tens_units-030, a, t1
+        $else
+        $flag   Byte Count Out of Range for Integer Conversion
+        $endif
+        $end
+
+$(64:256)
+hundred_thousands
+yy        $do     10,     +       100000*yy-100000
+ten_thousands
+yy        $do     10,     +       10000*yy-10000
+thousands
+yy        $do     10,     +       1000*yy-1000
+hundreds
+yy        $do     10,     +       100*yy-100
+tens_units
+yy        $do     10,     +       yy-1, 10*yy-10, 0
+
+$(0)

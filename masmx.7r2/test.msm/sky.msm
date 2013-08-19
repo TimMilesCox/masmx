@@ -1,0 +1,20 @@
+array   $equ    3*/90        
+
+zuzu*	$proc
+arena(turu)* $equ  array+262144*turu-262144
+part1(turu)* $equ  arena(turu)
+part2(turu)* $equ  arena(turu)+80
+part3(turu)* $equ  arena(turu)+128
+yuhu       $do     90,;
+partx(turu,yuhu)* $equ part3(turu)+64+yuhu*8-8
+       
+        $end
+
+turu	$do	50,	zuzu
+
+        +       arena(5)q
+        +       part1(5)q
+        +       part2(5)q
+        +       part3(5)q
+        +       partx(5,8)q
+        +       partx(4,16)q

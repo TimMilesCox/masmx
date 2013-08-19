@@ -1,0 +1,170 @@
+
+
+TIM_CalcVirtualQueueTime:
+
+	 CALL   CTRL_UpdateTime   ; 
+
+	IF      THEATRE
+	call    THEATRE_IfGrandEntrance         ; Shows price key?
+	jnz     TIM_CVQTnotMuchTheatre
+	mov     dptr,#theatre_shows             ; shows loaded?
+	movx    a,@dptr
+	jnz     TIM_CVQTTheatre
+TIM_CVQTnotMuchTheatre:
+	jmp     TIM_CVQTnotTheatre
+TIM_CVQTTheatre
+	mov     dptr,#theatre_realtime          ; read time of next show
+	movx    a,@dptr
+	mov     b,a
+	inc     dptr
+	movx    a,@dptr
+	qanbx   ctrl_queuetimelength            ; subtract qtimeL
+	qanbx   theatre_window                  ; subtract doorshut time
+						; and that's VQT!
+						; now subtract ordinal mins
+						; realtime
+	push    acc                             ; save upper VQT        SP+1
+	push    b                               ;      lower VQT        SP+2
+	mov     dptr,#timebuffer
+	movx    a,@dptr                         ; read actual xxxx xHHH
+	anl     a,#7                            ; isolate bb2..0
+	push    acc                             ; save                  SP+3
+	swap    a                               ; 0hhh 0000
+	mov     b,a                             ;
+	inc     dptr                            ; read hhMM MMMM
+	movx    a,@dptr
+	push    acc                             ;                       SP+4
+	swap    a                               ;
+	anl     a,#0Ch                          ; 0000 hh00
+	orl     a,b                             ; 0hhh hh00
+	cpl     a
+	setB    c
+	pop     b                               ; hhMM MMMM             SP+3
+	addc     a,b                            ; ie subtract
+	cpl     a                               ; turn into subtract word
+	mov     b,a
+	pop     acc                             ; 0000 0hhh             SP+2
+	mov     r0,sp                           ; ->lower minutes VQT on stack
+	addc    a,#255                          ; subtract extended
+	cpl     a                               ; turn into upper subtract wd
+	push    acc                             ; save                  SP+3
+	mov     a,b                             ; lower subtract word
+	setB    C                               ;
+	addc     a,@r0                          ; subtract from lower minutes
+	mov     b,a                             ; of VQT                SP+2
+	pop     acc                             ; get upper minutes subtrahend
+	dec     r0                              ; upper minutes VQT
+	addc    a,@r0                           ; subtract
+	dec     sp                              ;                       SP+1
+	dec     sp                              ;                       SP+0
+	jnb     acc.7,TIM_CVQTnoUflow           ; if all that subtracting
+	push    acc                             ; pulled us back
+	mov     a,#160                          ; thru midnight,
+	add     a,b                             ; Just add 24*60 minutes
+	mov     b,a                             ; (=1440=05A0)
+	pop     acc
+	addc    a,#5
+TIM_CVQTnoUflow:                                
+
+	rl      a                               ; now separate to
+	rl      a                               ; 000H HHHH 00MM MMMM
+	mov     r3,a                            ;     in R3    and R4 
+	mov     a,b                             ; pull back hhMM MMMM
+	anl     a,#63                           ; isolate minutes
+	mov     r4,a                            ; into destination
+	mov     a,b                             ; retrieve  hhMM MMMM
+	rl      a
+	rl      a
+	anl     a,#3                            ;           0000 00HH
+	orl     a,r3                            ;           000H HHHH 
+	mov     r3,a                            ; ->  destination
+	rl      a
+	rl      a                               ;     0HHH HH00   add 4*hours
+	add     a,r4                            ;    +00MM MMMM   to minutes
+	mov     r4,a                            ;     _________
+TIM_CVQT_Dminute:                               ; carry any whole hours
+	add     a,#-60                          
+	jnc     TIM_CVQT_WithinMinutes
+	mov     r4,a
+	inc     r3
+	jmp     TIM_CVQT_Dminute
+TIM_CVQT_WithinMinutes:
+
+	ret
+
+TIM_CVQTnotTheatre:
+	ENDIF
+
+	 MOV    DPTR,#ctrl_periodahead
+	 CALL   MTH_LoadOp1Word
+TIM_DDTcarryon1:
+	 MOV    DPTR,#ctrl_periodlength
+	 CALL   MTH_LoadOp2Word
+
+	IF MINUTES_AHEAD EQ 0
+	 CALL   MTH_Multiply32by16       
+	ENDIF
+
+	 MOV    R0,#mth_operand2
+	 CALL   MTH_ClearOperand
+	 MOV    mth_op2ll,#60
+	 CALL   MTH_Divide32by16
+	 MOV    R3,mth_op1ll
+
+	MOV     A,mth_op2ll
+	PUSHACC
+
+	MOV     DPTR,#timebuffer        ;
+	MOVX    A,@DPTR                 ; get the current hours
+	ANL     A,#07h                  ;
+	RL      A                       ;
+	RL      A                       ;
+	MOV     B,A                     ;
+	INC     DPTR                    ;
+	MOVX    A,@DPTR                 ;
+	RL      A                       ;
+	RL      A                       ;
+	ANL     A,#03h                  ;
+	ORL     A,B                     ;
+	MOV     B,#60
+	MUL     AB
+
+	MOV     R0,#mth_operand1
+	CALL    MTH_ClearOperand
+	MOV     mth_op1ll,A
+	MOV     mth_op1lh,B
+
+	MOV     R0,#mth_operand2
+	CALL    MTH_ClearOperand
+	MOV     DPTR,#timebuffer+1
+	MOVX    A,@DPTR
+	ANL     A,#03Fh
+	MOV     mth_op2ll,A
+	CALL    MTH_AddWords
+
+	MOV     DPTR,#ctrl_periodlength
+	CALL    MTH_LoadOp2Word
+	CALL    MTH_Divide32by16
+	MOV     R0,#mth_operand1
+	CALL    MTH_ClearOperand
+	POP     mth_op1ll
+
+	CALL    MTH_CompareWords
+	JNZ     TIM_DDTcarryon
+	CALL    MTH_TestGTWord
+	JC      TIM_DDTcarryon
+	DEC     R3
+	MOV     A,mth_op1ll
+	ADD     A,#60
+	MOV     mth_op1ll,A
+
+TIM_DDTcarryon:
+	CALL    MTH_SubWords
+	MOV     R4,mth_op1ll
+	RET
+
+
+
+;
+;*************************************************************
+	END     ;************ TIME.ASM *************

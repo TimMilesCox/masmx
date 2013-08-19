@@ -1,0 +1,10 @@
+$(4:0400)
+exported*
+        +       10
+$(5:*:0500)
+relocatable*
+just_a_value*   $equ    99
+        +       unsatisfied, really
+        +       exported, relocatable
+$(0)
+$(5)

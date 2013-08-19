@@ -1,0 +1,13 @@
+$(2:*16)
+start2  $res    32    
+last2   +       99
+$(3:*16)
+start3  $res    32    
+last3   +       99
+$(0:0)
+        +       last3+10
+        +       10+last2
+        +       last2-10
+        +       last2-start2
+        +       last3-start2
+        +       100*100

@@ -1,0 +1,7 @@
+	$list		0
+__relocatable $set	1
+	$include	"../aside.dem/ppc_603.def"
+	$list		2
+	$include	idle.s
+	$store		idle.txo
+

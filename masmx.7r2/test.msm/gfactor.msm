@@ -1,0 +1,11 @@
+__giant		$set	1
+__relocatable	$set	1
+	$include	"../aside.dem/ppc_64.def"
+	$include	../aside.dem/enter64.def
+	$list		2
+__litseg $set           36
+$(__litseg:*8,r30/__literal)
+__base36
+	$include	gfactor.s
+	$store		gfactor
+	.align		3

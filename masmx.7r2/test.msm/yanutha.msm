@@ -1,0 +1,7 @@
+	$include "8051_3r1.def"
+stri*	macro
+        DB	'soamething  '
+	db	1,2,3,4
+        macend
+	db	'yanutha'
+	stri

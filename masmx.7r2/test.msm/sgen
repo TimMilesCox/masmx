@@ -1,0 +1,31 @@
+rm	*.txo
+../masmx soso	$1
+../masmx factor $1
+../masmx zactor	zactor $1
+../masmx map1	$1
+../masmx map2   $1
+../masmx map3   $1
+../masmx map4   $1 -j
+../masmx map5   $1
+../masmx map6   $1
+../masmx gsoso	$1
+../masmx gfactor $1
+../masmx gzactor $1
+../masmx map7   $1
+../masmx map8   $1
+../masmx map9   $1
+../masmx map10  $1
+diff -w -s ../../masmx3r2.was/map.dem/image1.txo image1.txo
+diff -w -s ../../masmx3r2.was/map.dem/image2.txo image2.txo
+diff -w -s ../../masmx3r2.was/map.dem/image3.txo image3.txo
+diff -w -s ../../masmx3r2.was/map.dem/rel4.txo rel4.txo
+diff -w -s ../../masmx3r2.was/map.dem/image5.txo image5.txo
+diff -w -s ../../masmx3r2.was/map.dem/image6.txo image6.txo
+diff -w -s ../../masmx3r2.was/map.dem/gsoso.txo gsoso.txo
+diff -w -s ../../masmx3r2.was/map.dem/gfactor.txo gfactor.txo
+diff -w -s ../../masmx3r2.was/map.dem/gzactor.txo gzactor.txo
+diff -w -s ../../masmx3r2.was/map.dem/image7.txo image7.txo
+diff -w -s ../../masmx3r2.was/map.dem/image8.txo image8.txo
+diff -w -s ../../masmx3r2.was/map.dem/image9.txo image9.txo
+diff -w -s ../../masmx3r2.was/map.dem/image10.txo image10.txo
+

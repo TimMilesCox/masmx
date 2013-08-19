@@ -1,0 +1,30 @@
+tree*   $proc
+*       $tree
+part1   $res    tree(1,1)
+part2   $res    tree(1,1)
+        $root
+        $end
+
+array   $equ    5*/92
+
+vlbank*	$proc
+
+pointer	$set	array+(times-1)*6*1024*1024
+
+$(50::*pointer)
+
+label1(times)* tree      48
+label2(times)* tree      48
+label3(times)*        
+label4(times)*
+        $end
+
+times	$do	4,	vlbank
+
+$(0:256)        
+        +       label2(4)
+        +       label2(4):part2
+
+pointer	$set	1024*1024-1024
+
+$(50:1024:*pointer)

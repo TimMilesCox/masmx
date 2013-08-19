@@ -1,0 +1,316 @@
+;******************************************************************************
+;
+; File     : MANAGER.ASM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains everything relating to manager configurations
+;            and manager priceplug formats.
+;
+; System   : 80C537
+;
+; History  :
+;   Date     Who Ver  Comments
+;
+;******************************************************************************
+
+;******************************************************************************
+;
+;                                 CHUNK_MANAGER
+;
+;******************************************************************************
+
+MAN_TOTAL_SIZE EQU (5+2+1+1+1+1+1+1+6+1+1+1+1+1+1+1+1+1+(6*21)+1+2+14+1+1+1+1+1+17)
+
+; MAN_MISC bit defs
+MAN_AUTOFLUSH           EQU 1
+MAN_DECLARETAKINGS      EQU 2
+MAN_BCDLASTTKT          EQU 8
+MAN_BCDNUMABOVE         EQU 16
+MAN_BCDNUMEXCL          EQU 32
+MAN_CASHTEND            EQU 64
+MAN_CASHTENDCHECK       EQU 128
+
+; MAN_MISC2 bit defs
+MAN_USETKTCTRL          EQU 1
+MAN_INHIBITPOWERUPMSG   EQU 2
+
+; MAN RECEIPT bit defs
+MAN_OPRMANRECEIPT       EQU 1
+MAN_OPRANYRECEIPT       EQU 2
+MAN_RECEIPTVATNO        EQU 32
+MAN_BCDRECEIPT          EQU 64
+MAN_AUTORECEIPT         EQU 128
+
+; MAN_EXTPRTCTRL bit defs
+MAN_EXT_POWERUP         EQU 1
+MAN_EXT_RECEIPT         EQU 2
+MAN_EXT_VOID            EQU 4
+MAN_EXT_AUDIT           EQU 8
+MAN_EXT_SPOTCHECK       EQU 16
+MAN_EXT_WAYBILL         EQU 32
+
+;*** Manager Configuration Chunk ***
+
+ppg_chunk_manager:      VAR 2
+ppg_chunk_man_id:       VAR 1
+ppg_chunk_man_size:     VAR 2
+
+man_currencystr:        VAR 2
+man_currencyformat:     VAR 1
+man_issuemethod:        VAR 1
+man_wayflags:           VAR 1
+man_drawerenable:       VAR 1
+man_drawersense:        VAR 1
+man_mancashup:          VAR 1
+man_filler:             VAR 6 ; digits/dot/just/str in unpacked form...temp
+man_custdispctrl:       VAR 1
+man_cardctrl:           VAR 1
+man_backlighttime:      VAR 1
+man_voidctrl:           VAR 1
+man_voidtime:           VAR 1
+man_voidcount:          VAR 1
+man_cutterctrl:         VAR 1
+man_tktdelay:           VAR 1
+man_misc:               VAR 1 ; bit 0 : autoflush
+			      ; bit 1 : declaretakings
+			      ; bit 2 : reserved
+			      ; bit 3 : 1=bcdlasttkt
+			      ; bit 4 : 1=bcdnum above barcode
+			      ; bit 5 : 1=exclude bcdnum from barcode
+			      ; bit 6 : used by something
+			      ; bit 7 : used by something
+man_cd_poweron_line1:   VAR 21
+man_cd_poweron_line2:   VAR 21
+man_cd_idle_line1:      VAR 21
+man_cd_idle_line2:      VAR 21
+man_cd_poweroff_line1:  VAR 21
+man_cd_poweroff_line2:  VAR 21
+
+man_receiptctrl:        VAR 1
+man_trxgrouplimit:      VAR 2
+man_vatno:              VAR 14
+man_misc2:              VAR 1 ; bit 0,1 : used by something
+			      ; bit 2   : extra feed after waybill
+
+man_custdisptype:       VAR 1
+man_dateformat:         VAR 1
+man_extprtenable:       VAR 1
+man_extprtctrl:         VAR 1
+
+; Tony's additions
+man_language:           VAR 1
+
+man_reserved:           VAR 18
+
+	IF USE_SLAVE
+;******************************************************************************
+;
+;                              CHUNK_SLAVEMANAGER
+;
+;******************************************************************************
+
+ppg_chunk_slavemanager: VAR 2
+ppg_chunk_slaveman_id:  VAR 1
+ppg_chunk_slaveman_size:        VAR 2
+ppg_chunk_slaveman_data: VAR MAN_TOTAL_SIZE-5
+	ENDIF
+
+;******************************************************************************
+;
+; Function:     PPG_ClearChunkManager
+; Input:        ?
+; Output:       ?
+; Preserved:    ?
+; Destroyed:    ?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+PPG_ClearChunkManager:
+	CLR     A
+	MOV     DPTR,#ppg_chunk_man_id
+	MOVX    @DPTR,A
+	RET
+
+	IF USE_SLAVE
+;******************************************************************************
+;
+; Function:     PPG_ClearChunkSlaveManager
+; Input:        ?
+; Output:       ?
+; Preserved:    ?
+; Destroyed:    ?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+PPG_ClearChunkSlaveManager:
+	CLR     A
+	MOV     DPTR,#ppg_chunk_slaveman_id
+	MOVX    @DPTR,A
+	RET
+	ENDIF
+
+;******************************************************************************
+;
+; Function:     MAN_ManagerMenu
+; Input:        ?
+; Output:       ?
+; Preserved:    ?
+; Destroyed:    ?
+; Description:
+;   etc
+;
+;******************************************************************************
+	IF DT5
+	ELSE
+man_manmenu:
+
+ IF THEATRE
+ IF USE_UPLOAD
+ DB 26  ; remove clear ticket/shift on rs485 linked systems
+ ELSE
+ DB 28
+ ENDIF
+ ELSE
+ IF USE_UPLOAD
+ DB 25  ; remove clear ticket/shift on rs485 linked systems
+ ELSE
+ IF PAPER
+ DB 27
+ ELSE
+ DB 18
+ ENDIF
+ ENDIF
+ ENDIF
+
+ DB '=====Manager Menu====='
+ DW 0
+
+ DB 'Initialise Database   '
+ DW CTRL_DMS_Init
+
+ DB 'Change Minutes Ahead  '
+ DW CTRL_AlterPeriodAdvance
+ DB 'Minimum Minutes Ahead '
+ DW CTRL_AlterMinimumAdvance
+
+ IF THEATRE
+ DB 'Moindre Pieces Avant  '
+ DW THEATRE_MinimumShows
+ ENDIF
+
+ DB 'Tickets per Period    '
+ DW CTRL_ChangeTickets
+ DB 'Period Length         '
+ DW CTRL_ChangePeriod
+ DB 'Queue Time Length     '
+ DW CTRL_ChangeQueueTimeLength
+ DB 'Ride Booking Interval '
+ dw CTRL_ChangeMinterval
+ DB 'Number of Slaves      '
+ DW CTRL_ChangeDTCount
+ DB 'Set Transmit Delay    '
+ DW CTRL_ChangeTXDelay
+ DB 'Set Receive Delay     '
+ DW CTRL_ChangeRXDelay
+ db 'Poll Head Tolerance   '
+ dw CTRL_ChangeHeadTolerance
+ db 'Poll Tail Tolerance   '
+ dw CTRL_ChangeTailTolerance
+ IF     PAPER
+ DB 'Audit Roll            '
+ DW AUD_SelectAudit
+ DB 'Spot Check            '
+ DW SPT_SpotCheck
+ ENDIF
+ 
+ DB 'Set Date              '
+ DW TIM_ChangeDate
+ DB 'Set Time              '
+ DW TIM_ChangeTime
+ 
+ IF     PAPER
+
+ DB 'Set Print Intensity   '
+ DW PRT_SetPrintIntensity
+ DB 'Set Print Quality     '
+ DW PRT_SetPrintQuality
+ DB 'Set Perforation Offset'
+ DW PRT_SetPerfOffset
+ DB 'Set Black Mark Size   '
+ DW PRT_SetPerfLineSize
+ DB 'Clear Audit Memory    '
+ DW AUD_ManagerCleardown
+ 
+ ENDIF
+ 
+ IF USE_UPLOAD
+ ELSE
+ 
+ IF  PAPER
+ DB 'Reset Ticket Number   '
+ DW TKT_ManagerCleardown
+ DB 'Reset Shift Number    '
+ DW SHF_ManagerCleardown
+ ENDIF
+
+ DB 'Set LED Display Addr  '
+ DW CTRL_Changeldspaddr
+ ENDIF
+ 
+ IF     PAPER
+ DB 'DDS Diagnostics       '
+ DW DIA_Diagnostics
+ DB 'Demo Ticketing Loop   '
+ DW TEST_LoopTickets
+ ENDIF
+
+MAN_ManagerMenu:
+	CLR     kbd_managerkey          ; disable last option
+
+	CALL    MNU_NewMenu             ; if the ZERO key is held
+	MOV     R7,#0                   ; down, let the user into
+MAN_MMtestdiags:                        ; the DDS diagnostics screen
+	MOV     R0,#20                  ; and the demo ticket mode
+	CALL    delay100us              ;
+	CALL    KBD_ScanKeyboard        ;
+	CJNE    A,#1,MAN_MMloop         ;
+	DJNZ    R7,MAN_MMtestdiags      ;
+
+	SETB    kbd_managerkey          ; activate last option
+MAN_MMloop:
+	MOV     DPTR,#man_manmenu
+	CALL    MNU_LoadMenuCODE
+	JB      kbd_managerkey,MAN_MMdiags
+
+	MOV     DPTR,#buffer+1024       ; two less entry in
+	MOVX    A,@DPTR                 ; this menu
+	DEC     A                       ;
+	DEC     A
+	MOVX    @DPTR,A                 ;
+
+MAN_MMdiags:
+	CALL    MNU_SelectMenuOption
+	JNB     ACC.7,MAN_MMloop
+	call    LCD_CLear
+	CLR     A
+	CLR     kbd_managerkey
+	RET
+	ENDIF
+
+;****************************** End Of MANAGER.ASM ****************************
+
+	End
+
+
+
+
+
+
+

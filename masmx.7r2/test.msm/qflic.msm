@@ -1,0 +1,13 @@
+	$list		0
+	$include	"../aside.dem/map_ppc.def"
+	$list		2
+$(1:010000)
+	$include,$binary	../result.txo/risobar
+	$include,$binary	../result.txo/scale22		$(1)
+        $include,$binary        ../result.txo/scale23         $(1)
+        $include,$binary        ../result.txo/scale24         $(1)
+$(3:030000)
+        $include,$binary        ../result.txo/scale22         $(3)
+        $include,$binary        ../result.txo/scale23         $(3)
+        $include,$binary        ../result.txo/scale24         $(3)
+

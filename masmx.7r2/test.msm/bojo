@@ -1,0 +1,22 @@
+# rm zoto2.txo
+# rm tojo2.txo
+# rm noso2.txo
+# rm mojo2.txo
+# rm joso2.txo
+# rm doso2.txo
+# rm agito2.txo
+../masmx zoto ../test.o3/zoto	$1
+../masmx mojo ../test.o3/mojo	$1
+../masmx tojo.map ../test.o3/tojo	$1
+../masmx noso ../test.o3/noso	$1
+../masmx doso.map ../test.o3/doso	$1
+../masmx joso.map ../test.o3/joso	$1
+../masmx agito.map ../test.o3/agito	$1
+# diff -w zoto.txo zoto2.txo
+# diff -w mojo.txo mojo2.txo
+# diff -w tojo.txo tojo2.txo
+# diff -w noso.txo noso2.txo
+# diff -w doso.txo doso2.txo
+# diff -w joso.txo joso2.txo
+# diff -w agito.txo agito2.txo
+

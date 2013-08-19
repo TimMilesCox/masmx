@@ -1,0 +1,8 @@
+rm abs/*
+../../masm7a master abs/master
+../../imx abs/master.txo abs/master.hex
+../../masm7x master abs/aside
+../../imx abs/aside.txo abs/aside.hex
+diff -w 2r1.hex abs/master.hex
+cmp abs/master.hex abs/aside.hex
+

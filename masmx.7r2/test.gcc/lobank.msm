@@ -1,0 +1,10 @@
+	$include	"ppc_603.def"
+
+p*	$proc
+"_primary_p(index, 1)"**
+	blr
+	$end
+
+$(0:0x1000)
+index	$do	8,	p	one two three four five six seven eight
+

@@ -1,0 +1,6 @@
+        $word   32
+        $quantum 8
+        $byte   8
+label_descriptor $form  8, 8, 16, 4, 60   
+
+     label_descriptor 7,0,-10,3,"@LABEL1"

@@ -1,0 +1,10 @@
+ 	$quote	''''
+
+	$word 32
+	$quantum 8
+$(5:050000)
+index	$do	9,	+	100-index
+'unconventional \ rough { label'
+	$res 12
+	+	'unconventional \ rough { label'
+	$end

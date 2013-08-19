@@ -1,0 +1,14 @@
+$(0:64)
+yes(1,1)
+yes(1,5)
+yes(1,7)
+yes(1,9)
+no(2,1)
+no(2,7)
+
+yes(1):sir $res 1
+no(2):sir $res 1
+  $set_option "l"
+  + yes(1):sir
+  + no(2):sir
+  $end

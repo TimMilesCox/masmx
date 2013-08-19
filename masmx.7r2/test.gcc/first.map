@@ -1,0 +1,7 @@
+        $list           0
+        $include        "../test.map/map_ppc.def"
+        $list           1
+$(0:*4)
+	$include,$binary	"vitest.txo"
+	$include,$binary	"vitest2.txo"
+	$store		interm

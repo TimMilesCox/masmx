@@ -1,0 +1,5 @@
+        $include        "map1.def"
+$(3:0c000)
+        $include,$binary "../result.txo/joso.txo"
+        $end    mojo
+

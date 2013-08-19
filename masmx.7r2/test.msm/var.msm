@@ -1,0 +1,8 @@
+        $include        "8051_3r1.def"
+        jmp     here
+        jmp     there?
+buffer1 var     1024
+buffer2 var     512
+here    mov     dptr, #buffer1
+there?  mov     dptr, #buffer2
+

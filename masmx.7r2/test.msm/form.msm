@@ -1,0 +1,5 @@
+        $word   16
+descriptor $form 1, 1, 14, 2, 3, 3, 24
+
+        descriptor 1,,384, 2, 4, 4, 262144+100
+        descriptor  ,,200, 3, 6, 6, 262144+99

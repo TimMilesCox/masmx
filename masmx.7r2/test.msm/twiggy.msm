@@ -1,0 +1,10 @@
+$(3:03000)
+uhu $tree
+twig $res 1
+leaf $res 2
+ $root
+
+$(4:04000)
+ + uhu:leaf
+ + uhu:twig
+ $end

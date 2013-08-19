@@ -1,0 +1,17 @@
+        $word   32
+        $quantum 8
+
+line_up* $proc
+granule $set    line_up(1,1)    
+        $res    ($+granule-1**-granule)-$
+        $end
+
+$(12:0780000)
+first_buffer    $res    17
+        line_up 4
+second_buffer   $res    19
+        line_up 4
+end_buffers
+        +       first_buffer
+        +       second_buffer
+        +       end_buffers

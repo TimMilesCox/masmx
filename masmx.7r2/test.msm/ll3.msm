@@ -1,0 +1,8 @@
+$(0:*8:040/$00)
+f*      $func        
+        $return -f(1,1)
+        $end
+
+        +       trimgo, $00(f(16), trimgo)
+        $res    35
+trimgo  +       4095

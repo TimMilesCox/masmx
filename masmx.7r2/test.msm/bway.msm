@@ -1,0 +1,25 @@
+.	$word	8
+.	$awidth	16
+
+db*      $proc
+
+	$if	1
+
+?	$do	db(1),	"":db(1, ?)
+
+	$else
+
+	$space
+	$i	""
+v       $do     db(1 ),	;
+        $i	:db(1,v)
+        $free
+
+	$endif
+
+        $end
+
+        $res    10
+        "":      1: 2: "3333333333": 4: '5'
+        "abcdef":;
+        128:255:0:255

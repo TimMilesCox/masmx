@@ -1,0 +1,33 @@
+$(0:64)
+steady
+$(1::4096)
+growth
+$(2::8192,15)
+alice
+angora	$equ	$
+$(3:*8:64)
+chloris
+$(4:*8:64,2)
+adonis
+demeter
+$(5:256:*0FFFC00000000)
+largely
+$(6::*0FFFA00000000,12)
+astronomical*
+$(5::*0FFFE00000000)
+moreso
+$(7::07000)
+some
+$(7::08000)
+	+	$a(steady)
+        +       $a(growth)
+        +       $a(alice)
+        +       $a(angora)
+        +       $a(chloris)
+        +       $a(adonis)
+        +       $a(demeter)
+        +       largely
+        +       astronomical
+        +       moreso
+        +       some+07000
+

@@ -1,0 +1,433 @@
+;************************************************************************
+;       DDSDMS.ASM      Tim 28iv2000 ************************************
+;************************************************************************
+;*********************** The DDS Database Management System             *
+;************************************************************************
+
+
+DMS_AREAS               EQU     16  ; 4 for 1Mbit; 16 for 4Mbits
+DMS_INITIALPERCENT      EQU     50
+DMS_PRIME_EXTENTS       EQU     DMS_AREAS*DMS_INITIALPERCENT/100
+
+				    ; DMSCALC = 1 Sums Even Bytes on the Area
+				    ;               and Odd Bytes on the Page
+DMS_CALC                EQU     2   ; DMSCALC = 2 Sums Even Bytes on the Page
+				    ;               and Odd Bytes on the Area
+
+DMS_PAGE_SIZE           EQU     256
+DMS_PAGE_INSERT_POINTER EQU     0
+DMS_HASH_CHAIN_HEAD     EQU     1
+DMS_NEXT_CALC_PAGE      EQU     2
+DMS_PAGE_INSERT_POINT   EQU     4
+
+DMS_RECORD_SIZE         EQU     12
+
+DMS_HASH_CHAIN_LOC      EQU     0
+DMS_HASHLOC             EQU     2
+
+
+;************************************************************************
+;       DMS_Store:      Sets dms_dbk to the address of the target record*
+;                       Inserts the record if it was not there.         *
+;                       Location is Hash.                               *
+;                       Input Hash Image is in prt_field_str.           *
+;                       Input Hash Image Length is in prt_field_len.    *                       
+;                       Assumed Hash Key Location in Record is CONSTANT.*
+;                       Refine that later if there is any reason.       *
+;                       Assumed size of all records is a CONSTANT.      *
+;                       Refine that later if there is any reason.       *
+;                       Only failure scenario is if a record can neither*
+;                       be retrieved nor inserted (i.e. no space left). *
+;                       In this case dms_dbk is zeroed to indicate that *
+;                       the currently based memory bank may have become *
+;                       unmatched with previous dms_dbk.                *
+;************************************************************************
+
+DMS_Store:
+	mov     dms_status,#0
+	mov     dms_area,#0
+	mov     dms_page,#0
+	mov     dms_slot,#0
+	mov     b,prt_field_len
+	mov     r0,#prt_field_str
+DMS_HashL:
+	mov     a,@r0
+	
+	IF      DMS_CALC EQ 1
+	xrl     dms_area,a
+	ENDIF
+	
+	IF      DMS_CALC EQ 2
+	xrl     dms_page,a
+	ENDIF
+	
+	inc     r0
+	djnz    b,DMS_HashR
+	jmp     DMS_Locate
+DMS_HashR:
+	mov     a,@r0
+	
+	IF      DMS_CALC EQ 1
+	xrl     dms_page,a
+	ENDIF
+	
+	IF      DMS_CALC EQ 2
+	xrl     dms_area,a
+	ENDIF
+	
+	inc     r0
+	djnz    b,DMS_HashL
+DMS_Locate:
+	
+	IF      DMS_INITIALPERCENT EQ 50
+	anl     dms_area,#DMS_AREAS/2-1
+	ELSE
+	IF      DMS_INITIALPERCENT EQ 25
+	anl     dms_area,#DMS_AREAS/4-1
+	ELSE
+	mov     a,dms_area              ; Modulo Prime Extents
+	mov     b,#DMS_PRIME_EXTENTS
+	div     ab
+	mov     dms_area,b              ; Remainder
+	ENDIF
+	ENDIF
+	
+	orl     dms_page,#128           ; MS Half of Address Space
+DMS_Sample1:        
+	mov     dptr,#0                 ; Extended XRAM Selector Register
+	mov     a,dms_area              
+	movx    @dptr,a                  
+DMS_Sample2:        
+	mov     dph,dms_page
+	mov     dpl,#DMS_PAGE_INSERT_POINTER
+	movx    a,@dptr
+	jnz     DMS_PageFormatFound
+	mov     a,#DMS_PAGE_INSERT_POINT ; The Designated Entry Point
+	movx    @dptr,a                 ; Is Not Formatted Yet
+	clr     a                       
+	inc     dptr                    
+	movx    @dptr,a                 ; Zero the IntraPage Hash Chain Head
+	inc     dptr
+	movx    @dptr,a                 ; Zero the OverFlow Page Pointer
+	inc     dptr
+	movx    @dptr,a
+
+DMS_PageFormatFound:
+	mov     dpl,#DMS_HASH_CHAIN_HEAD
+DMS_Search:
+	movx    a,@dptr                 ; Read Calc Chain Forward Pointer
+	jz      DMS_Insert              ; The Record Does Not Yet Exist
+	cjne    a,#255,DMS_TestEqual    ; Chain Extends to an Overflow Page
+DMS_NextCalcPage:
+	mov     dpl,#DMS_NEXT_CALC_PAGE ; Read the Calc Chain Overflow Area
+	
+	movx    a,@dptr
+	mov     dms_area,a
+	
+	inc     dptr
+	movx    a,@dptr                 ; Read the Calc Chain Overflow Page
+	mov     dms_page,a
+	
+	jmp     DMS_Sample1
+
+DMS_TestEqual:
+	mov     b,a                     ; reserve the start address
+	add     a,DMS_HASHLOC
+	mov     dpl,a
+	mov     r7,prt_field_len
+	mov     r0,#prt_field_str
+DMS_TestCycle:
+	movx    a,@dptr
+	xrl     a,@r0
+	inc     dptr
+	inc     r0
+	jnz     DMS_NotEqual
+	djnz    r7,DMS_TestCycle
+DMS_Equal:        
+	mov     dms_slot,b
+	ret
+
+DMS_NotEqual:
+	mov     a,b                     ; Record Pointer
+
+	IF      DMS_HASH_CHAIN_LOC
+	add     a,#DMS_HASH_CHAIN_LOC
+	ENDIF
+					; Address of
+	mov     dpl,a                   ; Calc Chain Forward Pointer 
+	jmp     DMS_Search
+
+DMS_Insert:
+
+	mov     dms_candidate_area,#DMS_PRIME_EXTENTS
+					; in case of jump to PageOverFlow
+
+	mov     b,dpl                   ; address of the Void Pointer
+
+	mov     dpl,#DMS_PAGE_INSERT_POINTER
+	movx    a,@dptr
+	add     a,#DMS_RECORD_SIZE      ; must fit with 1 byte to spare
+	jc      DMS_PageOverFlow        ; so that insert pointer does not
+	movx    @dptr,a                 ; carry and refill the page
+
+	add     a,#-DMS_RECORD_SIZE     ; This is the New Record Pointer   
+	mov     dms_slot,a
+	mov     dpl,b                   ; set the Pointer in Prior
+	movx    @dptr,a
+	
+	mov     dpl,a                   ; Now Prime the Record
+	clr     a
+	mov     b,#DMS_RECORD_SIZE
+DMS_Prime:
+	movx    @dptr,a
+	inc     dptr
+	djnz    b,DMS_Prime
+
+	mov     a,dms_slot              ; And Insert the Calc Key
+	add     a,#DMS_HASHLOC
+	mov     dpl,a
+	mov     b,prt_field_len
+	mov     r0,#prt_field_str
+DMS_SetKey:        
+	mov     a,@r0
+	movx    @dptr,a
+	inc     r0
+	inc     dptr
+	djnz    b,DMS_SetKey
+	
+	ret
+
+DMS_PageOverFlow:                       ; Find an UnFormatted OverFlow Page
+	mov     a,dms_candidate_area
+	cjne    a,#DMS_AREAS,DMS_TryThisArea
+	mov     dms_status,#255
+	mov     dms_area,a
+	mov     dms_page,#255
+	ret
+
+DMS_TryThisArea:
+	mov     dptr,#0
+	movx    @dptr,a
+	mov     dph,#128
+	mov     dpl,#DMS_PAGE_INSERT_POINTER
+DMS_TryThisPage:
+	movx    a,@dptr
+	jz      DMS_ChainOverFlowPage
+	inc     dph
+	mov     a,dph
+	jnz     DMS_TryThisPage
+	inc     dms_candidate_area
+	jmp     DMS_PageOverFlow
+
+DMS_ChainOverFlowPage:        
+	mov     dms_candidate_page,dph  ; Save New Page #
+	
+	mov     a,dms_area              ; Old Area Code
+	mov     dptr,#0                 ; Select Old Area
+	movx    @dptr,a
+	mov     dph,dms_page            ; Select Old Page
+	mov     dpl,#DMS_NEXT_CALC_PAGE ; Write Forward Pointer in Old Page
+
+	mov     a,dms_candidate_area    ; New Area Code
+	mov     dms_area,a
+	movx    @dptr,a
+	
+	inc     dptr                    ;
+	mov     a,dms_candidate_page    ; New Page #
+	movx    @dptr,a
+
+	mov     dms_page,a
+	mov     dpl,b                   ; # Forward Pointer in Last Record
+	mov     a,#255                  ; Seal it off
+	movx    @dptr,a
+		
+	jmp     DMS_Sample1             ; Base and Format the OverFlow Page
+
+
+;************************************************************************
+;       DMS_RField      Read a Field from Current Record to mth_operand *
+;       Inputs:         A=Displacement of Field in DMS Record           *
+;                       B=Count                                         *
+;       DMS_RFieldX     R0=Alternative IRAM Destination Address         * 
+;************************************************************************
+
+DMS_RField:
+	mov     r0,#mth_op1ll   
+DMS_RFielfX:        
+	add     a,dms_slot
+	mov     dpl,a
+	mov     dph,dms_page
+DMS_RFieldL:        
+	movx    a,@dptr
+	mov     @r0,a
+	inc     r0
+	inc     dptr
+	djnz    b,DMS_RFieldL
+	ret
+
+;************************************************************************
+;       DMS_WField      Write a Field from mth_operand to Current Record*
+;       Inputs:         A=Displacement of Field in DMS Record           *
+;                       B=Count                                         *
+;       DMS_WFieldX     R0=Alternative IRAM Source Address              * 
+;************************************************************************
+
+DMS_WField:
+	mov     r0,#mth_op1ll
+DMS_WFieldX:
+	add     a,dms_slot
+	mov     dpl,a
+	mov     dph,dms_page
+DMS_WFieldL:
+	mov     a,@r0
+	movx    @dptr,a
+	inc     dptr
+	inc     r0
+	djnz    b,DMS_WFieldL
+	ret
+
+
+;************************************************************************
+;       DMS_Init        Set All DMS Pages in Initial State              *
+;                       Both Primary and OverFlow Pages                 * 
+;************************************************************************
+
+DMS_Init:
+	mov     dms_area,#DMS_AREAS
+DMS_InitL1:
+	dec     dms_area
+	mov     a,dms_area
+	jb      acc.7,DMS_InitZ
+	mov     dptr,#0
+	movx    @dptr,a
+	mov     dph,255
+	mov     dpl,#DMS_PAGE_INSERT_POINTER
+DMS_InitL2:
+	clr     a
+	movx    @dptr,a
+	dec     dph
+	mov     a,dph
+	jb      acc.7,DMS_InitL2
+	jmp     DMS_InitL1
+DMS_InitZ:
+	clr     dms_status
+	clr     dms_area
+	clr     dms_page
+	clr     dms_slot
+	ret
+
+	
+
+;************************************************************************
+;       DMS_Analyse     Transmit Loaded Pages of Database to PC         *
+;                       Preceded by Area and Page Codes                 * 
+;************************************************************************
+
+DMS_Analyse:        
+	clr     a
+	mov     dms_area,a
+DMS_AL1:        
+	mov     dptr,#0
+	movx    @dptr,a
+	mov     dms_page,#128
+DMS_AL2:
+	mov     dph,dms_page
+	mov     dpl,#DMS_PAGE_INSERT_POINTER
+	movx    a,@dptr
+	jz      DMS_AVoidP
+	mov     r0,#prt_field_str
+	mov     @r0,#ANSII_DLE
+	inc     r0
+	mov     @r0,#ANSII_STX
+	inc     r0
+	mov     @r0,dms_area
+	inc     r0
+	mov     @r0,dms_page
+	inc     r0
+	mov     @r0,#ANSII_ACK
+	inc     r0
+	mov     @r0,#ANSII_ETX
+	mov     prt_field_len,#6
+	call    EXAR_FTVX
+	mov     dph,dms_page
+	mov     dpl,#0
+	movx    a,@dptr
+	mov     r7,a  
+	call    EXAR_FTX
+DMS_AVoidP:
+	inc     dms_page
+	mov     a,dms_page
+	jnz     DMS_AL2
+	inc     dms_area
+	mov     a,dms_area
+	cjne    a,#DMS_AREAS,DMS_AL1
+	ret
+	
+
+;************************************************************************
+;       DMS_NextPage    Transmit Next Loaded Page of Database to PC     *
+;                       Preceded by Area and Page Codes                 * 
+;                       One-Line StateLess Version of DMS_Analyse       *
+;                       "Previous" Area is in A                         *
+;                       "Previous" Page is in B                         *
+;                       i.e. for Start, A = 0, B = 127                  *
+;************************************************************************
+
+DMS_NextPage:        
+	anl     a,#DMS_AREAS-1
+	mov     dms_area,a
+	mov     dms_page,b
+	mov     dptr,#0
+	movx    @dptr,a                 ; Base the Start Area
+	jmp     DMS_NVoidP
+DMS_NPL1:        
+	mov     dptr,#0
+	movx    @dptr,a
+	mov     dms_page,#128
+DMS_NPL2:
+	mov     dph,dms_page
+	mov     dpl,#DMS_PAGE_INSERT_POINTER
+	movx    a,@dptr
+	jz      DMS_NVoidP
+	mov     r0,#prt_field_str
+	mov     @r0,#ANSII_DLE
+	inc     r0
+	mov     @r0,#ANSII_STX
+	inc     r0
+	mov     @r0,dms_area
+	inc     r0
+	mov     @r0,dms_page
+	inc     r0
+	mov     @r0,#ANSII_ACK
+	inc     r0
+	mov     @r0,#ANSII_ETX
+	mov     prt_field_len,#6
+	call    EXAR_FTVX
+	mov     dph,dms_page
+	mov     dpl,#0
+	movx    a,@dptr
+	mov     r7,a  
+	call    EXAR_FTX
+	ret                             ; Return When You Have Sent One
+
+DMS_NVoidP:
+	inc     dms_page
+	mov     a,dms_page
+	jb      acc.7,DMS_NPL2
+	inc     dms_area
+	mov     a,dms_area
+	cjne    a,#DMS_AREAS,DMS_NPL1
+	ret
+	
+	End
+
+
+
+
+
+
+
+
+
+
+

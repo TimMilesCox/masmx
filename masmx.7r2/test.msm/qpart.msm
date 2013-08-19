@@ -1,0 +1,4 @@
+	$include	"ppc64map.def"
+	$list   2               
+	$include,$binary ../result.txo/langobar
+	$include,$binary ../result.txo/visobar

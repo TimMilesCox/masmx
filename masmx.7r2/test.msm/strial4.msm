@@ -1,0 +1,2 @@
+	$list	0
+x $do 100,y $do 100,z $do 100,n(x,y,z) + n(x,y,z)

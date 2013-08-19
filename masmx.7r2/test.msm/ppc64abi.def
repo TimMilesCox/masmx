@@ -1,0 +1,69 @@
+
+p	$proc
+"$map"*	$name
+	$sterm	':'
+p	$proc
+word*	$name
+parts	$set	p(1,1:)
+"$data"	$set,"$binary"	p(1,1:parts)
+
+column	$set	"$bits"
+
+part	$do	parts-1,	relocate	p(1, 1:part)
+	$load,"$bits"	"$data"
+	$end
+
+p	$proc
+relocate* $name
+
+
+label1	$pushrel	p(1,1)
+
+__ltype	$equ,"$function"	"$t"
+	$if	__ltype(label1)="$equf"
+
+v	$pushrel,"$long_absolute"	p(1,1)
+
+bits    $set    label1\2
+scale   $set    label1\3
+offset  $set    label1\4
+descant $set    label1\5
+
+limit   $set    1*/bits
+mask    $set    limit-1
+unmask  $set    ^(mask*/scale)
+
+	$if	scale!=column
+sum*	$set	0
+column*	$set	scale
+	$endif
+
+sum*	$set	v+sum
+
+	$if	descant<0
+
+field	$set	sum+offset
+	$info,"$range_check"	field
+field	$set	(field*/descant)**mask
+
+	$else
+
+field	$set	sum+(("$data"/*scale)**mask)
+
+	$info,"$range_check"	field
+
+	$endif
+
+
+"$data"* $set	(field*/scale)++("$data"**unmask)
+
+	$else
+	$flag	label1 is not an $equf
+	$endif
+
+	$end
+
+index	$do	p(),	word	p(index, 1)
+	$sterm	'.'
+	$end
+

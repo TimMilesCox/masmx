@@ -1,0 +1,32 @@
+f       $form   8, 16
+p       $proc
+load*   $name
+        f       10, p(1, 1)
+        $end
+
+toprec* $proc
+*       $tree
+one     midrec   toprec(1, 1), toprec(1, 2)
+two     midrec   toprec(1, 3), toprec(1, 4)
+        $snap    1
+        $root
+        $end
+
+midrec* $proc
+*       $tree
+first   +       midrec(1, 1)
+second  +       midrec(1, 2)
+        $root
+        $end
+
+$(1:256)
+        $plist  8
+struct1 toprec  5, 6, 7, 8
+scalar1 +       99
+struct2 toprec  9, 10, 11, 12
+scalar2 +       100
+$(0:0)
+.        load    second
+        load    struct1:one:second 
+        load    struct2:two:first
+        load    another_one

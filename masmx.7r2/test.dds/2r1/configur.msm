@@ -1,0 +1,1115 @@
+; File CONTROL.ASM
+
+;Ticketing Controller
+
+USE_FAST_METHOD         EQU 0
+
+;global variables
+MAX_DTS         EQU 9
+FAIL_HYSTERISIS EQU 1
+
+bDT             VAR 1
+bLastDT         VAR 1
+bHour           VAR 1
+bMinute         VAR 1
+
+ctrl_head_tolerance VAR 1
+ctrl_tail_tolerance VAR 1
+
+		IF      DMS
+ctrl_minterval  VAR     1
+		ELSE
+alton_salenode  VAR 1   ;audit buffer
+		ENDIF
+
+DUAL_POLL_POLICY        EQU 0
+
+NODE_TABLE_SIZE         EQU (1+4+1+1+1)
+NODE_OFFSET             EQU 0
+SALES_OFFSET            EQU 1
+FAILING_OFFSET          EQU 5
+TSC_TIMEOUTS_OFFSET     EQU 6
+LAST_MESSAGE_OFFSET     EQU 7
+
+nodetable       VAR (NODE_TABLE_SIZE * MAX_DTS)
+
+
+nodes:          DB 0    ; actual node numbers (zero required for spacing)
+		DB 30,31,32,33,34,35,36,37,38
+
+; DT polling state machine states
+DTS_WTSGRQ      EQU 0           ; MUST be ZERO!!
+DTS_WTSTPI      EQU 1
+DTS_WTSTSD      EQU 2
+
+; status values for bStatus
+TSRS_AF         EQU 0           ; alton fail
+TSRS_OK         EQU 2           ; okay
+
+; status values for bStatus
+TSCS_TF         EQU 4           ; transmit TPI failed
+TSCS_OK         EQU 5           ; okay
+TSCS_FAIL       EQU 6           ; TSC received reported print failure
+
+; status of TSC status byte
+TSC_FAIL        EQU 0
+TSC_OKAY        EQU 1
+TSC_ATICKET     EQU 1           ; Ticket type returned from slave in TSC.
+TSC_BTICKET     EQU 2
+TSC_CTICKET     EQU 3
+TSC_DTICKET     EQU 4
+
+POLLINFO_TABLE_SIZE     EQU (1+1+1+1)
+STATE_OFFSET            EQU 0
+MSGID_OFFSET            EQU 1
+FAIL_HYSTERISIS_OFFSET  EQU 2
+TICKET_PRINT_SKIP       EQU 3   ; May not be needed any more
+
+pollinfotable   VAR (MAX_DTS * POLLINFO_TABLE_SIZE)
+
+bStatus                 VAR     1
+ctrl_ticketsperperiod   VAR     2
+ctrl_periodlength       VAR     2
+ctrl_period             VAR     2
+ctrl_periodahead        VAR     2
+ctrl_periodcount        VAR     2
+ctrl_queuetimelength    VAR     1
+ctrl_minimumahead       VAR     1
+theatre_forward VAR     1
+;
+; These word variables are the total count of tickets issued on all slaves
+; by the master, for a given ticket type. They are read by the HOST via the
+; RTC command, and reset to zero by the CTC command. They are incremented
+; when a SLAVE returns a valid Ticket Sale Confirmation packet to the MASTER.
+;
+ctrl_atktcount          VAR     2       ; 16 bit counter - A ticket.
+ctrl_btktcount          VAR     2       ; B ticket (invalid ticket).
+ctrl_ctktcount          VAR     2
+ctrl_dtktcount          VAR     2       ; thumb ticket
+ctrl_etktcount          VAR     2       ; emergency ticket
+ctrl_tkttype            VAR     1       ; Ticket type (A,B,C,D,E) returned in TSC.
+;
+ctrl_ldspaddr           VAR     1       ; LED display base address
+;
+; The following bytes are used in SYSTEM.ASM and HOST.ASM, to maintain the
+; watchdog functions. host_watch is the status of the 8 possible card readers
+; the HOST is servicing, from the WATCH packet received by the MASTER.
+; host_tickcount is the MASTER's own watchdog counter, checking the connection
+; between HOST and MASTER. If it reaches zero, the HOST is not communicating
+; with the MASTER properly. It is decremented in [SYSTEM.ASM]SYS_tick, and
+; reset in HOST only when a valid WATCH packet is received.
+; 
+host_watch              VAR     1       ; Watchdog HOST status byte (see HOST.ASM)
+host_tickcount          VAR     1       ; HOST watchdog counter and flag byte
+;
+;***************************************************************
+; LED display units have a device address (0 to 255). This code allows the
+; operator to set the base address - there are two displays, at n and n+1
+msg_newldspaddr:        DB 18,'New LED disp addr?'
+msg_ldspaddr:           DB 'LED disp addr is '
+
+CTRL_Changeldspaddr:
+	CALL    CTRL_Getldspaddr
+	CALL    CTRL_Displayldspaddr
+
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newldspaddr
+	CALL    LCD_DisplayStringCODE
+	MOV     A,#21
+	CALL    LCD_GotoXY
+
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#(64+19)
+	MOV     R7,#3
+	CALL    NUM_GetNumber
+	JZ      CTRL_CLDAabort
+	MOV     A,mth_op1ll
+	MOV     DPTR,#ctrl_ldspaddr
+	MOVX    @DPTR,A
+	CALL    CTRL_Writeldspaddr
+
+CTRL_CLDAabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CALL    CTRL_Getldspaddr
+	CLR     A
+	RET
+
+CTRL_Writeldspaddr:
+	MOV     DPTR,#ctrl_ldspaddr
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_ldspaddr
+	CALL    I2C_Write8
+	RET
+
+CTRL_Displayldspaddr:
+	MOV     DPTR,#msg_ldspaddr
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#17
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPTR,#ctrl_ldspaddr
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     DPSEL,#1
+	MOV     DPTR,#buffer+17
+	MOV     R5,#3
+	CALL    NUM_NewFormatDecimalB
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#20
+	CALL    LCD_DisplayStringXRAM
+	RET
+
+CTRL_Getldspaddr:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_ldspaddr
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     DPTR,#ctrl_ldspaddr
+	MOVX    @DPTR,A
+	RET
+;
+;***************************************************************
+
+msg_newtxdelay: DB 13,'New TX Delay?'
+msg_txdelay:    DB 'TX Delay Is '
+
+CTRL_ChangeTXDelay:
+	CALL    CTRL_GetTXDelay
+	CALL    CTRL_DisplayTXDelay
+
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newtxdelay
+	CALL    LCD_DisplayStringCODE
+	MOV     A,#20
+	CALL    LCD_GotoXY
+
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#82
+	MOV     R7,#3
+	CALL    NUM_GetNumber
+	JZ      CTRL_CTXDabort
+	MOV     ctrl_txdelay,mth_op1ll
+	CALL    CTRL_WriteTXDelay
+
+CTRL_CTXDabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CALL    CTRL_GetTXDelay
+	CLR     A
+	RET
+
+CTRL_WriteTXDelay:
+	MOV     B,ctrl_txdelay
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_txdelay
+	CALL    I2C_Write8
+	RET
+
+CTRL_DisplayTXDelay:
+	MOV     DPTR,#msg_txdelay
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#12
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPSEL,#1
+	MOV     DPTR,#buffer+12
+	MOV     R5,#3
+	MOV     B,ctrl_txdelay
+	CALL    NUM_NewFormatDecimalB
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#15
+	CALL    LCD_DisplayStringXRAM
+	RET
+
+CTRL_GetTXDelay:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_txdelay
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     ctrl_txdelay,A
+	RET
+
+;***************************************************************
+
+msg_newrxdelay: DB 13,'New RX Delay?'
+msg_rxdelay:    DB 'RX Delay Is '
+
+CTRL_ChangeRXDelay:
+	CALL    CTRL_GetRXDelay
+	CALL    CTRL_DisplayRXDelay
+
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newrxdelay
+	CALL    LCD_DisplayStringCODE
+	MOV     A,#20
+	CALL    LCD_GotoXY
+
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#82
+	MOV     R7,#3
+	CALL    NUM_GetNumber
+	JZ      CTRL_CRXDabort
+	MOV     ctrl_rxdelay,mth_op1ll
+	CALL    CTRL_WriteRXDelay
+
+CTRL_CRXDabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CALL    CTRL_GetRXDelay
+	CLR     A
+	RET
+
+CTRL_WriteRXDelay:
+	MOV     B,ctrl_rxdelay
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_rxdelay
+	CALL    I2C_Write8
+	RET
+
+CTRL_DisplayRXDelay:
+	MOV     DPTR,#msg_rxdelay
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#12
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPSEL,#1
+	MOV     DPTR,#buffer+12
+	MOV     R5,#3
+	MOV     B,ctrl_rxdelay
+	CALL    NUM_NewFormatDecimalB
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#15
+	CALL    LCD_DisplayStringXRAM
+	RET
+
+CTRL_GetRXDelay:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_rxdelay
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     ctrl_rxdelay,A
+	RET
+
+;***************************************************************
+
+msg_newheadtolerance: DB 21,'New Packet Head Time?'
+msg_tolerance:    DB 'Tolerance Is'
+
+CTRL_ChangeHeadTolerance:
+	CALL    CTRL_GetHeadTolerance
+	CALL    CTRL_DisplayHeadTolerance
+
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newheadtolerance
+	CALL    LCD_DisplayStringCODE
+	MOV     A,#20
+	CALL    LCD_GotoXY
+
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#64+21
+	MOV     R7,#3
+	CALL    NUM_GetNumber
+	JZ      CTRL_CHTabort
+	mov     dptr,#ctrl_head_tolerance
+	mov     a,mth_op1ll
+	MOVx    @dptr,a
+	CALL    CTRL_WriteHeadTolerance
+
+CTRL_CHTabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CALL    CTRL_GetHeadTolerance
+	CLR     A
+	RET
+
+CTRL_WriteHeadTolerance:
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_headtolerance
+	CALL    I2C_Write8
+	RET
+
+CTRL_DisplayHeadTolerance:
+	MOV     DPTR,#msg_tolerance
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#13
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPSEL,#1
+	mov     dptr,#ctrl_head_tolerance
+	movx    a,@dptr
+	MOV     DPTR,#buffer+13
+	MOV     R5,#3
+	MOV     B,a
+	CALL    NUM_NewFormatDecimalB
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#16
+	CALL    LCD_DisplayStringXRAM
+	RET
+
+CTRL_GetHeadTolerance:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_headtolerance
+	CALL    I2C_Read8
+	MOV     A,B
+	mov     dptr,#ctrl_head_tolerance
+	MOVx    @dptr,A
+	RET
+
+;***************************************************************
+
+msg_newtailtolerance: DB 21,'New Packet Tail Time?'
+
+CTRL_ChangeTailTolerance:
+	CALL    CTRL_GetTailTolerance
+	CALL    CTRL_DisplayTailTolerance
+
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newtailtolerance
+	CALL    LCD_DisplayStringCODE
+	MOV     A,#20
+	CALL    LCD_GotoXY
+
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#64+21
+	MOV     R7,#3
+	CALL    NUM_GetNumber
+	JZ      CTRL_CTTabort
+	mov     dptr,#ctrl_tail_tolerance
+	mov     a,mth_op1ll
+	MOVx    @dptr,a
+	CALL    CTRL_WriteTailTolerance
+
+CTRL_CTTabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CALL    CTRL_GetTailTolerance
+	CLR     A
+	RET
+
+CTRL_WriteTailTolerance:
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_tailtolerance
+	CALL    I2C_Write8
+	RET
+
+CTRL_DisplayTailTolerance:
+	MOV     DPTR,#msg_tolerance
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#13
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPSEL,#1
+	mov     dptr,#ctrl_tail_tolerance
+	movx    a,@dptr
+	MOV     DPTR,#buffer+13
+	MOV     R5,#3
+	MOV     B,a
+	CALL    NUM_NewFormatDecimalB
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#16
+	CALL    LCD_DisplayStringXRAM
+	RET
+
+CTRL_GetTailTolerance:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_tailtolerance
+	CALL    I2C_Read8
+	MOV     A,B
+	mov     dptr,#ctrl_tail_tolerance
+	MOVx    @dptr,A
+	RET
+
+
+;***************************************************************
+
+msg_newtpp:     DB 17,'Tickets / Period?'
+msg_tpp:        DB 'Currently '
+
+CTRL_ChangeTickets:
+	CALL    CTRL_GetTPP
+	CALL    CTRL_DisplayTPP
+
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newtpp
+	CALL    LCD_DisplayStringCODE
+	MOV     A,#20
+	CALL    LCD_GotoXY
+
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#82
+	MOV     R7,#5
+	CALL    NUM_GetNumber
+	JZ      CTRL_CTabort
+CTRL_ChangeTicketsDirect:
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_StoreWord
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_DecWord
+	CALL    CTRL_WriteTPP
+
+CTRL_CTabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CALL    CTRL_GetTPP
+	CLR     A
+	RET
+
+CTRL_WriteTPP:
+	MOV     DPTR,#ctrl_ticketsperperiod
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_tpp
+	CALL    I2C_Write8
+	MOV     DPTR,#ctrl_ticketsperperiod+1
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_tpp+1
+	CALL    I2C_Write8
+	CALL    ACT_TPPzeroed   ; If TPP=0, set act_tppzero TRUE else FALSE.
+	RET
+
+CTRL_DisplayTPP:
+	MOV     DPTR,#msg_tpp
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#10
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPSEL,#1
+	MOV     DPTR,#buffer+10
+	MOV     R5,#5
+	MOV     DPSEL,#0
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_IncWord
+	CALL    NUM_NewFormatDecimal16
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_DecWord
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#15
+	CALL    LCD_DisplayStringXRAM
+	RET
+
+CTRL_GetTPP:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_tpp
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     DPTR,#ctrl_ticketsperperiod
+	MOVX    @DPTR,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_tpp+1
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     DPTR,#ctrl_ticketsperperiod+1
+	MOVX    @DPTR,A
+;       CALL    SND_Warning
+	RET
+
+;***************************************************************
+
+msg_newpa:      DB 16,'Minutes Advance?'
+msg_pa:         DB 'Currently '
+
+CTRL_AlterPeriodAdvance:
+	CALL    CTRL_GetPA
+	CALL    CTRL_DisplayPA
+
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newpa
+	CALL    LCD_DisplayStringCODE
+	MOV     A,#20
+	CALL    LCD_GotoXY
+;
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#82
+	MOV     R7,#5
+	CALL    NUM_GetNumber
+	JZ      CTRL_APAabort
+;
+CTRL_AlterPADirect:
+
+	mov     a,mth_op1lh
+	mov     b,mth_op1ll
+	qanbx   ctrl_minimumahead
+	jc      CTRL_APAgoForIt
+	movx    a,@dptr
+	mov     mth_op1ll,a
+	mov     mth_op1lh,#0
+CTRL_APAgoForIt:
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_StoreWord
+	CALL    CTRL_CorrectAdvance
+	CALL    CTRL_WritePA            ; Save new value to E2ROM
+;
+CTRL_APAabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CLR     A
+	RET
+
+CTRL_DisplayPA:
+	MOV     DPTR,#msg_pa
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#10
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPSEL,#1
+	MOV     DPTR,#buffer+10
+	MOV     R5,#5
+	MOV     DPSEL,#0
+	MOV     DPTR,#ctrl_periodahead
+	CALL    NUM_NewFormatDecimal16
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#15
+	CALL    LCD_DisplayStringXRAM
+	RET
+
+CTRL_GetPA:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_periodahead
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     DPTR,#ctrl_periodahead
+	MOVX    @DPTR,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_periodahead+1
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     DPTR,#ctrl_periodahead+1
+	MOVX    @DPTR,A
+	RET
+;
+CTRL_WritePA:
+	MOV     DPTR,#ctrl_periodahead
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_periodahead
+	CALL    I2C_Write8
+	MOV     DPTR,#ctrl_periodahead+1
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_periodahead+1
+	CALL    I2C_Write8
+	RET
+
+;***************************************************************
+
+msg_newma:      DB 18,'Min.Minutes Ahead?'
+msg_ma:         DB 'Currently '
+
+CTRL_AlterMinimumAdvance:
+	CALL    CTRL_GetMA
+	CALL    CTRL_DisplayMA
+;
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newma
+	CALL    LCD_DisplayStringCODE
+	MOV     A,#21
+	CALL    LCD_GotoXY
+
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#82
+	MOV     R7,#3
+	CALL    NUM_GetNumber
+	JZ      CTRL_AMAabort
+CTRL_AlterMADirect:
+	MOV     DPTR,#ctrl_minimumahead
+	CALL    MTH_StoreByte
+	CALL    CTRL_CorrectAdvance
+	CALL    CTRL_WriteMA            ; Save new value to E2ROM
+;
+CTRL_AMAabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CLR     A
+	RET
+
+CTRL_DisplayMA:
+	MOV     DPTR,#msg_ma
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#10
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPSEL,#1
+	MOV     DPTR,#buffer+10
+	MOV     R5,#3
+	MOV     DPSEL,#0
+	MOV     DPTR,#ctrl_minimumahead
+	CALL    NUM_NewFormatDecimal8
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#13
+	CALL    LCD_DisplayStringXRAM
+	RET
+;
+CTRL_GetMA:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_minimumahead
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     DPTR,#ctrl_minimumahead
+	MOVX    @DPTR,A
+	RET
+;
+CTRL_WriteMA:
+	MOV     DPTR,#ctrl_minimumahead
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_minimumahead
+	CALL    I2C_Write8
+	RET
+;***************************************************************
+
+
+msg_newpl:      DB 14,'Period Length?'
+msg_pl:         DB 'Currently '
+
+CTRL_ChangePeriod:
+	CALL    CTRL_GetPL
+	CALL    CTRL_DisplayPL
+
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newpl
+	CALL    LCD_DisplayStringCODE
+	MOV     A,#20
+	CALL    LCD_GotoXY
+
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#82
+	MOV     R7,#5
+	CALL    NUM_GetNumber
+	IF      MINUTES_AHEAD
+	jnz     ctrl_ChangePeriodDirect
+	JMP     CTRL_CPabort
+	ELSE
+	JZ      CTRL_CPabort
+	ENDIF
+CTRL_ChangePeriodDirect:
+
+	IF      MINUTES_AHEAD
+
+;       * find and save the current period leading edge (an ordinal minute)
+
+	push    mth_op1ll               ; new period length
+	push    mth_op1lh
+
+	call    CTRL_CalcCurrentPeriod  ; must be up to date and under old PL
+
+	mov     dptr,#ctrl_period       ; ordinal minute/Period Length
+	movx    a,@dptr                 ; load from little-endian in XRAM
+	inc     dptr
+	mov     b,a
+	movx    a,@dptr                 ; to big-endian in AB
+
+
+	qm168   ctrl_periodlength       ; compute start-minute of current
+					; period on old granularity (pl)
+
+
+	pop     mth_op1lh               ; restore the new period length
+	pop     mth_op1ll               ; and let old software store it
+
+	push    acc                     ; save leading edge of current
+	push    b                       ; period on old granularity (pl)
+
+	ENDIF                           ; let old software do its stuff
+
+
+	MOV     DPTR,#ctrl_periodlength
+	CALL    MTH_StoreWord
+	CALL    CTRL_WritePL
+
+	IF      MINUTES_AHEAD
+
+;       * Find and save the new period leading edge (another ordinal minute).
+;       * Subtract the old-granularity period start minute
+;       * from the new-granularity period start minute, and subtract the
+;       * result from the period ahead, which is an integer of minutes.
+
+;       * If the start-minute of the current period has retarded, subtracting
+;       * the negative result from the period advance compensates the queue
+;       * time forwards to stay the same.
+
+;       * If the start-minute of the current period has advanced, subtracting
+;       * the positive result from the period advance compensates the queue
+;       * time backwards to stay the same.
+
+	call    CTRL_CalcCurrentPeriod  ; under the new PL gives a
+					; different number in ctrl_period
+
+	pop     mth_op2ll               ; get back the start-minute
+	pop     mth_op2lh               ; of current period (old PL)
+
+	mov     dptr,#ctrl_period       ; pick up the new period number
+	movx    a,@dptr                 ; from little-endian in XRAM
+	inc     dptr
+	mov     b,a
+	movx    a,@dptr                 ; to big endian in AB
+
+
+	qm168   ctrl_periodlength       ; compute the start minute
+					; of current period, new granularity
+
+	qdanIR  mth_op2ll               ; subtract from it the start minute
+					; of current period, old granularity
+
+	qdans   ctrl_periodahead        ; subtract the result of that from
+					; minutes ahead
+
+	ENDIF
+	     
+CTRL_CPabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CALL    CTRL_GetPL
+	CLR     A
+	RET
+
+CTRL_WritePL:
+	MOV     DPTR,#ctrl_periodlength
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_pl
+	CALL    I2C_Write8
+	MOV     DPTR,#ctrl_periodlength+1
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_pl+1
+	CALL    I2C_Write8
+	RET
+
+CTRL_DisplayPL:
+	MOV     DPTR,#msg_pl
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#10
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPSEL,#1
+	MOV     DPTR,#buffer+10
+	MOV     R5,#5
+	MOV     DPSEL,#0
+	MOV     DPTR,#ctrl_periodlength
+	CALL    NUM_NewFormatDecimal16
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#15
+	CALL    LCD_DisplayStringXRAM
+	RET
+
+CTRL_GetPL:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_pl
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     DPTR,#ctrl_periodlength
+	MOVX    @DPTR,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_pl+1
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     DPTR,#ctrl_periodlength+1
+	MOVX    @DPTR,A
+	RET
+
+;***************************************************************
+
+msg_newqtl:     DB 18,'Queue Time Length?'
+msg_qtl:        DB 'Currently '
+
+CTRL_ChangeQueueTimeLength:
+	CALL    CTRL_GetQTL
+	CALL    CTRL_DisplayQTL
+
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newqtl
+	CALL    LCD_DisplayStringCODE
+;       MOV     A,#22
+;       CALL    LCD_GotoXY
+
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#84
+	MOV     R7,#3
+	CALL    NUM_GetNumber
+	JZ      CTRL_CQTLabort
+CTRL_ChangeQTLDirect:
+	MOV     DPTR,#ctrl_queuetimelength
+	CALL    MTH_StoreByte
+	CALL    CTRL_WriteQTL
+
+CTRL_CQTLabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CALL    CTRL_GetQTL
+	CLR     A
+	RET
+
+CTRL_WriteQTL:
+	MOV     DPTR,#ctrl_queuetimelength
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_qtl
+	CALL    I2C_Write8
+	RET
+
+CTRL_DisplayQTL:
+	MOV     DPTR,#msg_qtl
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#10
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPSEL,#1
+	MOV     DPTR,#buffer+10
+	MOV     R5,#3
+	MOV     DPSEL,#0
+	MOV     DPTR,#ctrl_queuetimelength
+	CALL    NUM_NewFormatDecimal8
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#13
+	CALL    LCD_DisplayStringXRAM
+	RET
+
+CTRL_GetQTL:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_qtl
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     DPTR,#ctrl_queuetimelength
+	MOVX    @DPTR,A
+	RET
+
+;***************************************************************
+
+msg_newmintl:   DB 18,' Booking Interval?'
+msg_mintl:        DB 'Currently '
+
+CTRL_ChangeMinterval:
+	CALL    CTRL_GetMINTL
+	CALL    CTRL_DisplayMINTL
+
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newmintl
+	CALL    LCD_DisplayStringCODE
+;       MOV     A,#22
+;       CALL    LCD_GotoXY
+
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#84
+	MOV     R7,#3
+	CALL    NUM_GetNumber
+	JZ      CTRL_CMINTLabort
+CTRL_ChangeMINTLDirect:
+	MOV     DPTR,#ctrl_minterval
+	CALL    MTH_StoreByte
+	CALL    CTRL_WriteMINTL
+
+CTRL_CMINTLabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CALL    CTRL_GetMINTL
+	CLR     A
+	RET
+
+CTRL_WriteMINTL:
+	MOV     DPTR,#ctrl_minterval
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_mintl
+	CALL    I2C_Write8
+	RET
+
+CTRL_DisplayMINTL:
+	MOV     DPTR,#msg_mintl
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#10
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPSEL,#1
+	MOV     DPTR,#buffer+10
+	MOV     R5,#3
+	MOV     DPSEL,#0
+	MOV     DPTR,#ctrl_minterval
+	CALL    NUM_NewFormatDecimal8
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#13
+	CALL    LCD_DisplayStringXRAM
+	RET
+
+CTRL_GetMINTL:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_mintl
+	CALL    I2C_Read8
+	MOV     A,B
+	MOV     DPTR,#ctrl_minterval
+	MOVX    @DPTR,A
+	RET
+
+;***************************************************************
+
+msg_newdtcount: DB 13,'New DT Count?'
+msg_dtcount:    DB 'DT count Is '
+
+CTRL_ChangeDTCount:
+	CALL    CTRL_GetDTCount
+	CALL    CTRL_DisplayDTCount
+
+	MOV     A,#64
+	CALL    LCD_GotoXY
+	MOV     DPTR,#msg_newdtcount
+	CALL    LCD_DisplayStringCODE
+	MOV     A,#20
+	CALL    LCD_GotoXY
+
+	MOV     DPSEL,#0
+	MOV     DPTR,#buffer
+	MOV     B,#82
+	MOV     R7,#3
+	CALL    NUM_GetNumber
+	JZ      CTRL_CDTCabort
+	MOV     ctrl_dtcount,mth_op1ll
+	CALL    CTRL_WriteDTCount
+
+CTRL_CDTCabort:
+	CALL    LCD_Clear
+	SETB    tim_timerupdate
+	CALL    CTRL_GetDTCount
+	CLR     A
+
+	MOV     DPTR,#bDT
+	CLR     A
+	MOVX    @DPTR,A
+	MOV     DPTR,#bLastDT
+	MOV     A,ctrl_dtcount
+	DEC     A
+	MOVX    @DPTR,A
+
+	CALL    CTRL_InitDTtable
+	RET
+
+CTRL_WriteDTCount:
+	MOV     B,ctrl_dtcount
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_dtCount
+	CALL    I2C_Write8
+	RET
+
+CTRL_DisplayDTCount:
+	MOV     DPTR,#msg_dtcount
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#12
+	CALL    MEM_CopyCODEtoXRAMsmall
+	MOV     DPSEL,#1
+	MOV     DPTR,#buffer+12
+	MOV     R5,#3
+	MOV     B,ctrl_dtcount
+	CALL    NUM_NewFormatDecimalB
+
+	CALL    LCD_Clear
+	MOV     DPTR,#buffer
+	MOV     R7,#15
+	CALL    LCD_DisplayStringXRAM
+	RET
+
+CTRL_GetDTCount:
+	MOV     R1,#EE_SLAVE
+	MOV     DPTR,#EE_dtcount
+	CALL    I2C_Read8
+	MOV     A,B
+	CJNE    A,#MAX_DTS+1,CTRL_GDTCmaybeokay
+CTRL_GDTCisnotokay:
+	MOV     ctrl_dtcount,#MAX_DTS
+	CALL    CTRL_WriteDTCount
+	RET
+CTRL_GDTCmaybeokay:
+	JNC     CTRL_GDTCisnotokay
+	MOV     ctrl_dtcount,A
+	RET
+
+msg_dms_init DB 19, 'Initialise DataBase'
+msg_dms_go   DB 14, ' OK or CANcel '
+CTRL_DMS_Init:
+	call    LCD_Clear
+	mov     a,#0
+	call    LCD_GoToXY
+	mov     dptr,#msg_dms_init
+	call    LCD_DisplayStringCode
+	mov     a,#64
+	call    LCD_GoToXY
+	mov     dptr,#msg_dms_go
+	call    LCD_DisplayStringCode
+	call    KBD_OKorCancel
+	jz      CTRL_DMS_Dont
+	call    DMS_Init
+CTRL_DMS_Dont:
+	call    LCD_Clear
+	clr     a
+	ret
+
+	END

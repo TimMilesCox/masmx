@@ -1,0 +1,8 @@
+	$include	"critical.def"
+x       $do     HOW_MANY*3,n(x)
+y       $do     HOW_MANY*2,o(y)
+z	$do	HOW_MANY,p(z)
+        +       n()
+        +       o()
+        +       p()
+        $end

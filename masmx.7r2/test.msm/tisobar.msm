@@ -1,0 +1,9 @@
+fireup*	bl	liftoff
+	+	_four_cares:d
+	+	_three_cares:d
+	+	_two_cares:d
+	+	_one_care:d
+liftoff*
+	mfsr	lr, 3
+	blr
+	$end	fireup

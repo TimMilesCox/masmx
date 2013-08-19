@@ -1,0 +1,11 @@
+	$list		0
+__giant	$set		1
+	$include	"../aside.dem/ppc_603.def"
+	$include	"mppc64.def"
+	$include,"$void" "../result.txo/langobar.txo"
+$(1::*0x0044440000080000)
+	$list		2
+	$include	"tisobar.msm"
+	$store		"../test.o3/scale4.txo"
+	$end		fireup
+

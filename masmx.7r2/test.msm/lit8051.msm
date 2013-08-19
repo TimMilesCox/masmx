@@ -1,0 +1,11 @@
+        $include        "8051_3r1.def"
+        $set_option     'a'
+        
+        mov     dptr,#('A Long String of Text'.10)
+        mov     r1,#80h
+again   clr     a
+        movc    a,@a+dptr
+        mov     @r1, a
+        inc     r1
+        inc     dptr
+        cjne    a,#10,again

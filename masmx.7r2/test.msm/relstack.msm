@@ -1,0 +1,25 @@
+$(3:*8)
+one	$res	1
+two	$res	1
+three	$res	1
+
+first	$equf	one, two, three
+second	$equf	bozo, two, three
+third	$equf	four, five, akimbo
+
+fourth	$equf	nineteen, twenty, twenty1
+fifth	$equf	kwazulu, forty, more
+sixth	$equf	ndabaninghi, ninety, fifty, insanity, outrage, discredible
+seventh	$equf	dratful, weaselsome, notquitenice, again, abit, wobbly
+eighth	$equf	one, two, away, naughtiness, frivelsome, oh, no
+ninth	$equf	three, three, three, three, three, three
+tenth	$equf	ninth+ninth
+eleventh $equf
+
+	+	first, second, third
+	+	fourth, fifth, sixth
+	+	seventh, eighth, ninth
+	+	ninth, ninth, ninth
+	+	tenth, eighth, tenth
+
+	$end

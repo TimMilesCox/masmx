@@ -1,0 +1,8 @@
+	$list		0
+	$include	"../aside.dem/map_ppc.def"
+	$list		2
+$(0:*4)
+	$include,$binary	../result.txo/risobar
+	$include,$binary	../result.txo/scale22
+	$store			"../test.o3/scale_x2"
+	

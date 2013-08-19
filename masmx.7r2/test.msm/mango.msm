@@ -1,0 +1,15 @@
+p       $proc
+now     $do     3
+then(now)* $tree
+this*   $equ    now    
+        $root
+        $endo
+        $end
+
+times   $do     3
+here(times) $tree
+this(times) $equ  times  
+        $root
+        $endo
+
+        p

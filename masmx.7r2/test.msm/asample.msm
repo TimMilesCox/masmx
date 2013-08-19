@@ -1,0 +1,7 @@
+aa      $equ    99
+string* $proc
+do      $do     string(1), "":string(1, do)	.	:
+        ""
+        $end
+
+        string "2aa"

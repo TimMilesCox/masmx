@@ -1,0 +1,12 @@
+__giant	$set		1
+
+	$include	"map_ppc.def"
+
+$(1::*000A000000064000)
+$(3::*000B000000064000)
+$(5::*000B800000064000)
+$(6::*000C000000064000)
+	$include,$binary	soso
+	$include,$binary	factor
+
+	$store			image15

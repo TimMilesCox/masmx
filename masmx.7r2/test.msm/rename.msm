@@ -1,0 +1,36 @@
+i       $form    8, 16
+
+p       $proc
+load*   $name   7
+        i       $n, p(1,1)
+        $end
+
+f*      $func	*
+        $if     $t(f(1,1))=0
+"f(1,1)"*** v      f(1,1)
+        $endif
+        $return f(1,1)
+        $end
+
+v*      $proc   $(2)
+*       $set    $
+        +       $(62)
+        w       v(1,1)
+        $end
+
+b       $form   24, 24, 48
+
+w*      $proc   $(62)
+        b       100,,"w(1,1)"
+        $end
+
+$(2:02000)        
+$(62:62*4096)
+$(0:64)
+.        i       7, f(bezumba)
+        load    f(akimbo)
+.        +       -1, f(akimbo)d
+        load    f(akimbo)
+        load    f(azoguozo)
+        load    f(azoguozo)
+

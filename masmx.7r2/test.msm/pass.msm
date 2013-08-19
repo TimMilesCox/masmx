@@ -1,0 +1,8 @@
+pass*	$proc	*
+"pass(1, 1)"*
+*	+	99
+	$end
+$(64:256)
+
+wonder	pass	wonderful
+

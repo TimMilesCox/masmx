@@ -1,0 +1,124 @@
+	$word	16
+	$awidth	16:32
+
+instruction$ $form	4, 12
+
+p	$proc
+store*	$name	0
+load*	$name	1
+or*	$name	2
+and*	$name	3
+xor*	$name	4
+stago*	$name	5
+add*	$name	6
+skip2if* $name	7
+shiftl*	$name	8
+shiftr*	$name	9
+rotl*	$name	10
+rotr*	$name	11
+pushi*	$name	12
+loadi*	$name	13
+push*	$name	14
+pop*	$name	15
+
+	instruction$ $n, p(1, 1)
+
+	$end
+
+nowhere	$equ	0
+sp	$equ	1
+
+near	$equ	0
+far	$equ	1
+
+base1	$equ	17
+base2	$equ	18
+base3	$equ	19
+
+	$set_option	"a"
+
+code	$equ	0
+data1	$equ	1
+data2	$equ	2
+data3	$equ	3
+
+
+d	$form	16, 32
+
+p*	$proc	$(data3)
+*	d	p(1,1), "p(1,1)"
+	$end
+
+v*	$func	*
+	$do	$t("v(1,1)$")=0,;
+"v(1,1)$"** p	v(1,1)
+	$return	"v(1,1)$"
+	$end
+
+$(data1:1024:7*1024)
+
+operand	+	'ab'
+
+$(data2:2048:8*1024)
+
+extra	+	08080:s
+
+$(data3:3072:9*1024)
+
+something
+	+	0101
+
+something_else
+	+	05f5f
+
+$(code::4*1024)
+
+entrypoint*
+
+	loadi	1024
+	store	sp
+
+	push	(7*1024)
+	pop	base1
+	push	(8*1024)
+	pop	base2
+	push	(9*1024)
+	pop	base3
+
+	push	(application)
+	push	(5)
+	stago	far
+	
+
+$(code::5*1024)
+
+application
+
+	load	operand
+	push	(subroutine)
+	push	(6)
+	stago	far
+
+	pop	nowhere
+	pop	nowhere
+
+	push	v(exit)
+	push	(0)
+	stago	far
+
+	
+$(code::6*1024)
+
+subroutine
+	add	extra
+	pushi	around
+	stago	near
+
+	pop	nowhere
+	stago	far
+
+around	rotr	8
+	or	something
+	and	something_else
+	stago	near
+

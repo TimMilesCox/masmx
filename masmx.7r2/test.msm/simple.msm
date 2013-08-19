@@ -1,0 +1,17 @@
+        $res    4
+one(9)  $res    4
+       +       one
+        +       one()
+	+	one(8)
+        +       one(1)
+        +       one(2)
+        +       one(3)
+        +       one()
+one(1)
+	$do	$o('k'),one(2)
+one(8,1)
+one(8,2)
+one(8,3)
+one(8,4)
+        +       two(7)
+	+	one

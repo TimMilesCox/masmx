@@ -1,0 +1,12 @@
+	$word	32
+	$byte	8
+	$quantum 8
+	$awidth	32
+	$include	"map4.def"
+$(1:040004400)
+.factor	$set	030003200
+.adjustment $set 040003400
+	$include,$binary "../result.txo/soso.txo"
+	$include,$binary "../result.txo/factor.txo"
+.factor $set    030003200
+.adjustment $set 040003400

@@ -1,0 +1,5 @@
+	$include	"map_ppc.def"
+$(1:*4)
+	$include,$binary	"../result.txo/ce5.txo"
+	$include,$binary	"../result.txo/wolverine.txo"
+

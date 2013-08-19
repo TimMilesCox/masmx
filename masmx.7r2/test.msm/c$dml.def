@@ -1,0 +1,9 @@
+temp1   $equ    6
+temp2   $equ    7
+data    $equ    8
+counter$1 $equ    9
+pointer$_counter$ $equ 10
+pointer$ $equ   10
+counter$ $equ   11
+tally$  $equ    12
+list$   $equ    13

@@ -1,0 +1,6 @@
+        $include        "8051_3r1.def"
+
+froward $equ    2048
+first_buffer VAR        froward
+        +       @+99
+second_buffer VAR 16

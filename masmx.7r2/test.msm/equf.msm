@@ -1,0 +1,12 @@
+        $word   32
+p*      $proc
+        +       p(1, 1):S
+        +       p(1, 2):s
+        +       p(1, 3)s
+        +       p(1, 4)s
+        +       p(1, *1)s
+        +       p(1, *4)s
+        $end
+
+laBEL   $equf   5, 4, 3, *2
+        p       label

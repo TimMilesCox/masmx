@@ -1,0 +1,5 @@
+	$list		0
+	$include	../aside.dem/ppc_603.def
+	$list		2
+	$include	predikat.s
+

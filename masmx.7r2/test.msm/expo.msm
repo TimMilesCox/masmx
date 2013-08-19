@@ -1,0 +1,5 @@
+$(4:64)
+kangaroo*	+	wombat
+tucker*		$equ	kangaroo+8
+didgeridoo*	$equf	tucker,15
+		$end

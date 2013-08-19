@@ -1,0 +1,16 @@
+        $include        "../aside.dem/ppc_64.def"
+
+SEGMENT $set    0x00FFFC0000000000
+$(48::*SEGMENT:,r15)
+part1   +       2048*2048d
+part2   +       100d
+part3   $res    2048*2048-16
+
+$(0:3*65536)
+start   bl      loaded      
+        +       SEGMENT
+loaded  mfspr   r15, LR
+        ld      r15,,r15
+        ld      r3, part1
+        ld      r4, part2
+        ld      r5, part3

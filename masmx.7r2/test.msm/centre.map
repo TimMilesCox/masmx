@@ -1,0 +1,12 @@
+
+	$include	"map5.def"
+$(1:*4)
+	$include,$binary	"../result.txo/soso.txo"	$(1)
+        $include,$binary        "../result.txo/factor.txo"      $(1)
+	$include,$binary	"../result.txo/soso.txo"	$(3)
+	$include,$binary	"../result.txo/factor.txo"	$(3)
+	$include,$binary	"../result.txo/soso.txo"	$(5)
+	$include,$binary	"../result.txo/factor.txo"	$(5)
+	$include,$binary	"../result.txo/soso.txo"	$(6)
+	$include,$binary	"../result.txo/factor.txo"	$(6)
+

@@ -1,0 +1,15 @@
+
+p	$proc
+connection* $name
+*	$tree
+socket	$socket
+window_ack +	0d
+rwindow_rack +	0d
+sequence +	0d
+defer	$dq
+data	$dq
+await	$dq
+awack	$dq
+pool	$mbank
+	$end
+

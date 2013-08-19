@@ -1,0 +1,1195 @@
+;******************************************************************************
+;
+; File     : HOST.ASM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains the CASE statement that analyses the type of
+; packet sent by the HOST, and processes it. Some support routines have been
+; moved to a separate module, HOST2.ASM
+;
+; System   : 80C537
+;
+; History  :
+;   Date        Who     Ver     Comments
+; 04/08/99      RS      1.35    Split file due to size constraints
+;
+; Notes    :
+;
+; HOST <-> MASTER packet format
+; -----------------------------
+;
+; All packets are of the form:
+;
+; <DLE><STX><CHKL><CHKH><LEN>data
+;
+; where
+;   DLE is char 16
+;   STX is char 2
+;   CHK is 16bit checksum covering all bytes from LEN onwards
+;   LEN is 8bit length covering all bytes from CHKL onwards
+;   data is variable length, format given below
+;
+; The packet is binary, so after the <DLE><STX>, all other DLEs are
+; duplicated on transmission and stripped on reception.
+;
+; The data formats all start with a packet type byte followed by
+; any appropriate data bytes for that type of packet. The description
+; of all available packets are:
+;
+  
+; +=============================+====+===+==============================+
+; | NAME + description          |Type|DIS| PayLoad Description          |                                 
+; +---------------------------------------------------------------------+
+; |                             |    |NEY| (Tx/Rx as viewed by HOST)    |
+; +---------------------------------------------------------------------+
+; | ERR                         |  1 |   | Rx: None                     |
+; | error                       |    |   | Not used by Disney           |
+; +---------------------------------------------------------------------+
+; | ACK                         |  2 |   | Rx: None                     |
+; | acknowledge                 |    |   | Not used by Disney           |
+; +---------------------------------------------------------------------+
+; | RTPP                        | 10 | RT| Tx: None                     |
+; | # of tickets to be issued   |    |   | Rx: 16 bit tickets per period|
+; | per period                  |    |   |                              |
+; +---------------------------------------------------------------------+
+; | RPA                         | 11 | RM| Tx: None                     |
+; | read period advance         |    |   | Rx: 16 bit period advance    |
+; +---------------------------------------------------------------------+
+; | RMA                         | 12 | RV| Tx: None                     |
+; | read minimum advance        |    |   | Rx: 8 bit minimum advance    |
+; +---------------------------------------------------------------------+
+; | RPL                         | 13 | RW| Tx: None                     |
+; | read period length          |    |   | Rx: 16 bit period length     |
+; +---------------------------------------------------------------------+
+; | RQTL                        | 14 | RR| Tx: None                     |
+; | read queue time length      |    |   | Rx: 8 bit queue time length  |
+; +---------------------------------------------------------------------+
+; | RACT                        | 15 | RC| Tx: None                     |
+; | read attraction close time  |    |   | Rx: 8 bit: hours (0-23)      |
+; |                             |    |   |     8 bit: minutes (0-59)    |
+; +---------------------------------------------------------------------+
+; | RTC                         | 16 | RI| Tx: None                     |
+; | read ticket counts since    |    |   | Rx: 8bit: no. of ticket types|
+; | last CTC command            |    |   |   then, for each type:       |
+; |                             |    |   |     16 bit: ticket count     |
+; +---------------------------------------------------------------------+
+; | WATCHDOG                    | 17 |   | Tx: 8 bits Card reader status|
+; | current HOST/SLAVE config   |    |   | Rx: ACK / NAK                |
+; +---------------------------------------------------------------------+
+; | WTPP                        | 20 | WT| Tx: 16 bit:                  |
+; | write # tickets per period  |    |   | new tickets per period.      |
+; +---------------------------------------------------------------------+
+; | WPA                         | 21 | WM| Tx: 16 bit: period advance   |
+; | write period advance        |    |   |     in minutes               |
+; +---------------------------------------------------------------------+
+; | WMA                         | 22 | WV| Tx: 8 bit: minimum advance   |
+; | write minimum advance       |    |   |                              |
+; +---------------------------------------------------------------------+
+; | WPL                         | 23 | WW|Tx: 16 bit: new period length |
+; | write period length         |    |   |                              |
+; +---------------------------------------------------------------------+
+; | WQTL                        | 24 | WR| Tx: 8 bit: queue time length |
+; | write queue time length     |    |   |                              |
+; +---------------------------------------------------------------------+
+; | WACT                        | 25 | WC| Tx: 8 bit: hours (0-23)      |
+; | write attraction close time |    |   |     8 bit: minutes (0-59)    |
+; +---------------------------------------------------------------------+
+; | WCT                         | 26 | WC| Tx: 8 bit: hours (0-23)      |
+; | write current time into RTC |    |   |     8 bit: minutes (0-59)    |
+; +---------------------------------------------------------------------+
+; | WCD                         | 27 | WC| Tx: 8 bit: year (0-99)       |
+; | write current date into RTC |    |   |     8 bit: month (1-12)      |
+; |                             |    |   |     8 bit: day (1-31)        |
+; +---------------------------------------------------------------------+
+; | RTI                         | 30 |NEW| Tx: None                     |
+; | read tickets issued for this|    |   | Rx: 16 bit: tickets issued   |
+; | current period              |    |   |      (this period)           |
+; +---------------------------------------------------------------------+
+; | RVQT                        | 31 |NEW| Tx: None                     |
+; | read virtual queue time.    |    |   | Rx: 8 bit: hours (0-23)      |
+; | (Absolute time as shown     |    |   |     8 bit: minutes (0-59)    |
+; |  on ticket.)                |    |   |                              |
+; +---------------------------------------------------------------------+
+; | RS                          | 32 | RS| Tx: None                     |
+; | read status                 |    |   | Rx: 8 bit: master status     |
+; |                             |    |   |     8 bit: slave count       |
+; |                             |    |   |      then, for each slave:   |
+; |                             |    |   |     16 bit: slave status     |
+; |                             |    |   |status codes: 0=ok,1=fail,    |
+; |                             |    |   |2=paperout (4=paper low,8=    |
+; |                             |    |   |cutter jam,16 & 32 head temp) |
+; +---------------------------------------------------------------------+
+; | CTC                         | 33 |NEW| Tx: None                     |
+; | Clear ticket counts         |    |   | Rx: ACK / NAK, echo CTC      |
+; |                             |    |   |command if data is zeroed     |
+; +---------------------------------------------------------------------+
+; | RTB                         | 34 |NEW| Tx: None                     |
+; | Read Trace Buffer           |    |Tim| Rx: Trace Buffer,            |
+; |                             |    |4x99     which is then restarted. |
+; |                             |    |   |     Contains all Rx chars    |
+; |                             |    |   |     up to 256 since last RTB |
+; |                             |    |   |______________________________|
+; |                             |    |   | *optional assembly inclusion |
+; |                             |    |   | *this message is implemented |
+; |                             |    |   |  if trace buffer is.         |
+; +---------------------------------------------------------------------+
+; Issuing a "read" packet returns a packet of the same type with the
+; parameters requested. Issuing a "write" returns an <ACK><ETX> couplet.
+; Any; unrecognised and illegal packets return an <NAK><ETX> couplet.
+; Any 16bit parameters are little-endian.
+; NOTE: the following description is for internal use only - the Disney
+; packet structure is similar, but uses ASCII codes and a different layout.
+;----------------------------------------------------------------------
+; For example, to read the tickets per period, issue an RTPP packet:
+; <016><002><014><000><004><010>
+; and you will receive an RTPP packet with data (eg, TPP=4350):
+; <016><002><030><001><006><010><254><016>
+;----------------------------------------------------------------------
+; The equivalent Disney packet sent from the HOST is <DLE><STX>040AC5.
+; The MASTER responds with <ACK><ETX> to acknowledge receipt of a good
+; (valid) packet, then returns <DLE><STX>080A10FEA5. The HOST then sends
+; <ACK><ETX> to indicate it has received the packet OK.
+;
+; It is not recommended that the master be polled from the host at a
+; fast rate as this will slow down the master/slave network.
+;
+;******************************************************************************
+;
+;             H o s t   < - >   M a s t e r   I n t e r f a c e
+
+HOST_PKT_ERROR  EQU 1   ; error
+HOST_PKT_ACK    EQU 2   ; acknowledge
+
+HOST_PKT_RTPP   EQU 10  ; read tickets per period
+HOST_PKT_RPA    EQU 11  ; read period advance
+HOST_PKT_RMA    EQU 12  ; read minimum advance
+HOST_PKT_RPL    EQU 13  ; read period length
+HOST_PKT_RQTL   EQU 14  ; read queue time length
+HOST_PKT_RACT   EQU 15  ; read attraction closing time
+HOST_PKT_RTC    EQU 16  ; read ticket counts
+HOST_PKT_WATCH  EQU 17  ; watchdog packet
+
+HOST_PKT_WTPP   EQU 20  ; write tickets per period
+HOST_PKT_WPA    EQU 21  ; write period advance
+HOST_PKT_WMA    EQU 22  ; write minimum advance
+HOST_PKT_WPL    EQU 23  ; write period length
+HOST_PKT_WQTL   EQU 24  ; write queue time length
+HOST_PKT_WACT   EQU 25  ; write attraction closing time
+HOST_PKT_WCT    EQU 26  ; write current time into RTC
+HOST_PKT_WCD    EQU 27  ; write current data into RTC
+
+HOST_PKT_RTI    EQU 30  ; read tickets issued
+HOST_PKT_RVQT   EQU 31  ; read virtual queue time
+HOST_PKT_RS     EQU 32  ; read status
+HOST_PKT_CTC    EQU 33  ; clear ticket counts
+
+
+HOST_PKT_THL1   EQU     34      ; Theatre Host Load 1
+HOST_PKT_THL2   EQU     35      ; Theatre Host Load 2
+
+HOST_PKT_DATE   EQU     36
+HOST_PKT_TIME   EQU     37
+
+HOST_PKT_WMIN   EQU     38
+HOST_PKT_RMIN   EQU     39
+
+HOST_PKT_OPEN   EQU     40
+
+
+HOST_PKT_SIF    EQU     48      ; Renitialise (Hopefully) Serial Channel
+
+HOST_PKT_DBI    EQU     60      ; DataBase Initialise
+HOST_PKT_DBD    EQU     61      ; Send Initialisation DateTime to Host
+HOST_PKT_DBP    EQU     62      ; Upline Next DMS Page
+HOST_PKT_DBA    EQU     63      ; Upline DMS Analysis
+
+HOST_PKT_RTB    EQU 64  ; read trace buffer [optional assembly inclusion]
+
+HOST_PKT_NODE1  EQU 65  ; send to node
+HOST_PKT_NODE2  EQU 66  ; send to node and convey response to host
+
+HOST_ProcessHostCommand:
+	call    HOST_Receive
+	jc     HOST_goforit
+	jmp     HOST_PHCnopkt2  ; None, skip processing.
+HOST_goforit:
+	MOV     DPTR,#host_buffer+2             ; get packet length into B
+	MOVX    A,@DPTR                         ; and packet type into A
+	CLR     C
+	SUBB    A,#3
+	MOV     B,A                             ;
+	INC     DPTR                            ;
+	MOVX    A,@DPTR                         ;
+
+
+	CJNE    A,#HOST_PKT_RTPP,HOST_PHCnotrtpp; branch as per packet type
+
+;****************************************
+; HOST_PKT_RTPP - Read Tickets Per Period
+;****************************************
+	MOV     A,B                             ; make sure HOST_PKT_RTPP
+	CJNE    A,#1,HOST_PHCerror2             ; is a 1 byte packet
+
+	CALL    HOST_ping
+	MOV     DPTR,#host_buffer+4             ; transmit RTPP with data
+	CALL    MEM_SetDest                     ;
+	MOV     DPTR,#ctrl_ticketsperperiod     ;
+	CALL    MTH_IncWord                     ;
+	CALL    MEM_SetSource                   ;
+	MOV     R7,#2                           ;
+	CALL    MEM_CopyXRAMtoXRAMsmall         ;
+	MOV     DPTR,#ctrl_ticketsperperiod     ;
+	CALL    MTH_DecWord                     ;
+	MOV     DPTR,#host_buffer+3             ;
+	MOV     R7,#3                           ; Packet len-3
+	JMP     HOST_PHCtransmit                ;
+
+HOST_PHCnotrtpp:
+	CJNE    A,#HOST_PKT_WTPP,HOST_PHCnotwtpp
+
+;*****************************************
+; HOST_PKT_WTPP - Write Tickets Per Period
+;*****************************************
+	MOV     A,B                             ; make sure HOST_PKT_WTPP
+	CJNE    A,#3,HOST_PHCerror2             ; is a 3 byte (CMD + 16bit)  packet
+
+	MOV     DPTR,#host_buffer+4             ; store data
+	CALL    MTH_LoadOp1Word                 ;
+	CALL    CTRL_ChangeTicketsDirect        ;
+	JMP     HOST_PHCack                     ; issue response
+
+HOST_PHCnotwtpp:
+	CJNE    A,#HOST_PKT_RPA,HOST_PHCnotrpa
+
+;***********************************
+; HOST_PKT_RPA - Read Period Advance
+;***********************************
+	MOV     A,B                             ; make sure HOST_PKT_RPA
+	CJNE    A,#1,HOST_PHCerror2             ; is a 1 byte packet
+
+	CALL    HOST_ping
+	MOV     DPTR,#host_buffer+4             ; transmit RPA with data
+	CALL    MEM_SetDest                     ;
+	MOV     DPTR,#ctrl_periodahead          ;
+	CALL    MEM_SetSource                   ;
+	MOV     R7,#2                           ;
+	CALL    MEM_CopyXRAMtoXRAMsmall         ;
+	MOV     DPTR,#host_buffer+3             ;
+	MOV     R7,#3                           ;
+	JMP     HOST_PHCtransmit                ;
+;
+HOST_PHCnopkt2:
+	LJMP    HOST_PHCnopkt                   ; extend SJMP range
+
+HOST_PHCnotrpa:
+	CJNE    A,#HOST_PKT_WPA,HOST_PHCnotwpa
+
+;************************************
+; HOST_PKT_WPA - Write Period Advance
+;************************************
+	MOV     A,B                             ; make sure HOST_PKT_WPA
+	CJNE    A,#3,HOST_PHCerror2             ; is a 3 byte packet
+
+	MOV     DPTR,#host_buffer+4             ; store data
+	CALL    MTH_LoadOp1Word                 ;
+	CALL    CTRL_AlterPADirect              ;
+	JMP     HOST_PHCack                     ; issue response
+
+;***
+HOST_PHCerror2:
+	LJMP    HOST_PHCerror                   ; extend SJMP range
+;***
+
+HOST_PHCnotwpa:
+	CJNE    A,#HOST_PKT_RMA,HOST_PHCnotrma
+
+;************************************
+; HOST_PKT_RMA - Read Minimum Advance
+;************************************
+	MOV     A,B                             ; make sure HOST_PKT_RMA
+	CJNE    A,#1,HOST_PHCerror2             ; is a 1 byte packet
+
+	CALL    HOST_ping
+	MOV     DPTR,#host_buffer+4             ; transmit RMA with data
+	CALL    MEM_SetDest
+	MOV     DPTR,#theatre_forward
+	CALL    MEM_SetSource
+	MOV     R7,#1
+	CALL    MEM_CopyXRAMtoXRAMsmall
+	MOV     DPTR,#host_buffer+3
+	MOV     R7,#2
+	JMP     HOST_PHCtransmit
+
+HOST_PHCnotrma:
+	CJNE    A,#HOST_PKT_WMA,HOST_PHCnotwma
+
+;*************************************
+; HOST_PKT_WMA - Write Minimum Advance
+;*************************************
+	MOV     A,B                             ; make sure HOST_PKT_WMA
+	CJNE    A,#2,HOST_PHCerror2             ; is a 2 byte packet
+
+	MOV     DPTR,#host_buffer+4             ; store data
+	CALL    MTH_LoadOp1Byte                 ;
+	IF      THEATRE
+	CALL    THEATRE_AlterSADirect              ;
+	ENDIF
+	JMP     HOST_PHCack                     ; issue response
+
+HOST_PHCnotwma:
+	CJNE    A,#HOST_PKT_RPL,HOST_PHCnotrpl
+
+;**********************************
+; HOST_PKT_RPL - Read Period Length
+;**********************************
+	MOV     A,B                             ; make sure HOST_PKT_RPL
+	CJNE    A,#1,HOST_PHCerror2             ; is a 1 byte packet
+
+	CALL    HOST_ping
+	MOV     DPTR,#host_buffer+4             ; transmit RPL with data
+	CALL    MEM_SetDest
+	MOV     DPTR,#ctrl_periodlength
+	CALL    MEM_SetSource
+	MOV     R7,#2
+	CALL    MEM_CopyXRAMtoXRAMsmall
+	MOV     DPTR,#host_buffer+3
+	MOV     R7,#3
+	JMP     HOST_PHCtransmit
+
+HOST_PHCnotrpl:
+	CJNE    A,#HOST_PKT_WPL,HOST_PHCnotwpl
+
+;***********************************
+; HOST_PKT_WPL - Write Period Length
+;***********************************
+	MOV     A,B                             ; make sure HOST_PKT_WPL
+	CJNE    A,#3,HOST_PHCerror2             ; is a 3 byte packet
+
+	MOV     DPTR,#host_buffer+4             ; store data
+	CALL    MTH_LoadOp1Word                 ;
+	CALL    CTRL_ChangePeriodDirect         ;
+	JMP     HOST_PHCack                     ; issue response
+
+HOST_PHCnotwpl:
+	CJNE    A,#HOST_PKT_RQTL,HOST_PHCnotrqtl
+
+;***************************************
+; HOST_PKT_RQTL - Read Queue Time Length
+;***************************************
+	MOV     A,B                             ; make sure HOST_PKT_RQTL
+	CJNE    A,#1,HOST_PHCerror3             ; is a 1 byte packet
+
+	CALL    HOST_ping
+	MOV     DPTR,#host_buffer+4             ; transmit RQTL with data
+	CALL    MEM_SetDest                     ;
+	MOV     DPTR,#ctrl_queuetimelength      ;
+	CALL    MEM_SetSource                   ;
+	MOV     R7,#1                           ;
+	CALL    MEM_CopyXRAMtoXRAMsmall         ;
+	MOV     DPTR,#host_buffer+3             ;
+	MOV     R7,#2                           ;
+	JMP     HOST_PHCtransmit                ;
+
+HOST_PHCnotrqtl:
+	CJNE    A,#HOST_PKT_WQTL,HOST_PHCnotwqtl
+
+;****************************************
+; HOST_PKT_WQTL - Write Queue Time Length
+;****************************************
+	MOV     A,B                             ; make sure HOST_PKT_WQTL
+	CJNE    A,#2,HOST_PHCerror3             ; is a 2 byte packet
+
+	MOV     DPTR,#host_buffer+4             ; store data
+	CALL    MTH_LoadOp1Byte                 ;
+	CALL    CTRL_ChangeQTLDirect            ;
+	JMP     HOST_PHCack                     ; issue response
+
+HOST_PHCnotwqtl:
+	CJNE    A,#HOST_PKT_RTI,HOST_PHCnotrti
+
+;*************************************************
+; HOST_PKT_RTI - Read Tickets Issued (this period)
+;*************************************************
+	MOV     A,B                             ; make sure HOST_PKT_RTI
+	CJNE    A,#1,HOST_PHCerror3             ; is a 1 byte packet
+
+	CALL    HOST_ping
+	MOV     DPTR,#host_buffer+4             ; transmit RTI with data
+	CALL    MEM_SetDest
+	MOV     DPTR,#ctrl_periodcount
+	CALL    MEM_SetSource
+	MOV     R7,#2
+	CALL    MEM_CopyXRAMtoXRAMsmall
+	MOV     DPTR,#host_buffer+3
+	MOV     R7,#3
+	JMP     HOST_PHCtransmit
+
+;***
+HOST_PHCerror3:
+	LJMP    HOST_PHCerror                   ; extend SJMP range
+;***
+
+HOST_PHCnotrti:
+	CJNE    A,#HOST_PKT_RVQT,HOST_PHCnotrvqt
+
+;****************************************
+; HOST_PKT_RVQT - Read Virtual Queue Time
+;****************************************
+	MOV     A,B                             ; make sure HOST_PKT_RVQT
+	CJNE    A,#1,HOST_PHCerror3             ; is a 1 byte packet
+
+;       CALL    HOST_ping
+	CALL    TIM_CalcVirtualQueueTime        ; calculate virtual queue
+	MOV     DPTR,#timebuffer                ; time from the system
+	MOVX    A,@DPTR                         ; time in timebuffer and
+	ANL     A,#7                            ; the offset in R3:R4
+	INC     DPTR                            ;
+	RL      A                               ;
+	RL      A                               ;
+	MOV     B,A                             ;
+	MOVX    A,@DPTR                         ;
+	ANL     A,#0C0h                         ;
+	RL      A                               ;
+	RL      A                               ;
+	ORL     A,B                             ;
+	MOV     R5,A                            ; store hours for later
+	MOVX    A,@DPTR                         ; get the minutes
+	ANL     A,#63                           ;
+	ADD     A, R4                           ; add extra minutes
+	CJNE    A, #60,HOST_PHCminchk           ; check for carry
+HOST_PHCminchk:
+	JC      HOST_PHCminok                   ;
+	INC     R5                              ; add an hour
+	SUBB    A, #60                          ; correct minutes
+HOST_PHCminok:
+	PUSHACC                                 ; save minutes
+	MOV     A, R5                           ;
+	ADD     A, R3                           ; add extra hours
+	CJNE    A, #24, HOST_PHChourchk         ; check for carry
+HOST_PHChourchk:
+	JC      HOST_PHChourok                  ;
+	SUBB    A, #24                          ; correct hour
+HOST_PHChourok:
+	; HOURS in ACC
+	; MINS on the stack
+	MOV     DPTR,#host_buffer+4             ; store virtual queue
+	MOVX    @DPTR,A                         ; time in packet data
+	INC     DPTR                            ;
+	POP     ACC                             ;
+	MOVX    @DPTR,A                         ;
+	MOV     DPTR,#host_buffer+3             ;
+	MOV     A,#HOST_PKT_RVQT                ; transmit RVQT packet
+	MOVX    @DPTR,A                         ;
+	MOV     R7,#3                           ;
+	JMP     HOST_PHCtransmit                ;
+;***
+HOST_PHCerror6:
+	LJMP    HOST_PHCerror                   ; extend SJMP range
+;***
+
+HOST_PHCnotrvqt:
+	CJNE    A,#HOST_PKT_RS,HOST_PHCnotrs
+
+;**************************
+; HOST_PKT_RS - Read Status
+;**************************
+	MOV     A,B                             ; make sure HOST_PKT_RS
+	CJNE    A,#1,HOST_PHCerror6             ; is a 1 byte packet
+
+	CALL    HOST_ping
+	MOV     DPSEL,#0                        ; being formatting
+
+
+
+	IF      THEATRE
+
+
+	call    THEATRE_IfGrandEntrance
+	jz      HOST_PHCThisIsATheatre
+	mov     a,#20h
+	jmp     HOST_PHCorItIsnt
+HOST_PHCThisIsATheatre:
+	mov     dptr,#theatre_shows             ; total from THL packets
+	movx    a,@dptr
+	jnz     HOST_PHCHasTable
+	mov     a,#40h
+	jmp     HOST_PHCOrHasnt
+HOST_PHCHasTable:
+	clr     a
+HOST_PHCOrHasnt:
+HOST_PHCOrItIsnt:
+	mov     dptr,#host_buffer+4
+
+	ELSE
+
+	MOV     DPTR,#host_buffer+4             ; response packet
+	CLR     A                               ; insert MASTER status
+
+	ENDIF
+
+	MOVX    @DPTR,A                         ; for now, zero = OK
+	INC     DPTR                            ;
+
+	MOV     A,ctrl_dtcount                  ; insert slave count
+	MOVX    @DPTR,A                         ;
+	INC     DPTR                            ;
+
+	MOV     R5,#0                           ; for all defined slaves
+HOST_PHCloop:
+	MOV     DPSEL,#1                        ; store a byte in the
+	MOV     DPTR,#nodetable                 ; message buffer where
+	MOV     B,R5                            ; the byte value is
+	MOV     A,#NODE_TABLE_SIZE              ; 0 = slave ok
+	MUL     AB                              ; 1 = slave fail
+	CALL    AddABtoDPTR                     ; 2 = slave paper out
+	MOV     A,#FAILING_OFFSET               ; Later add a bit that
+	CALL    AddAtoDPTR                      ; shows "paper low"
+	MOVX    A,@DPTR                         ;
+	MOV     DPSEL,#0                        ;
+	MOVX    @DPTR,A                         ;
+	INC     DPTR                            ;
+
+	INC     R5                              ; move onto next
+	MOV     A,R5                            ; slave
+	CJNE    A,ctrl_dtcount,HOST_PHCchklim   ;
+	JMP     HOST_PHCloopdone                ;
+HOST_PHCchklim:                                 ;
+	JC      HOST_PHCloop                    ;
+HOST_PHCloopdone:                               ;
+
+	MOV     DPTR,#host_buffer               ; finish off packet
+	MOV     A,#HOST_PKT_RS                  ; and transmit
+	MOVX    @DPTR,A                         ;
+
+	MOV     A,ctrl_dtcount                  ;
+	ADD     A,#3                            ;
+	MOV     R7,A                            ;
+	JMP     HOST_PHCtransmit                ;
+
+HOST_PHCnotrs:
+	CJNE    A,#HOST_PKT_WATCH,HOST_PHCnotwatch
+
+;**************************
+; HOST_PKT_WATCH - Watchdog
+;**************************
+; For the moment, the watchdog packet from HOST simply triggers a ping
+; <ACK><ETX> and resets the watchdog counter. Later it may return status
+; data about the 8 slaves, but see pkt type HOST_PKT_RS above, as this
+; does a much better job.
+;
+	MOV     A,B                     ; make sure HOST_PKT_WATCH
+	CJNE    A,#2,HOST_PHCerror4     ; is a 2 databyte (CMD + 8bit) packet
+;
+	MOV     A,#HOST_TIMEOUT
+	MOV     DPTR,#host_tickcount    ; Reload the watchdog counter
+	MOVX    @DPTR,A
+;
+	MOV     DPTR,#host_buffer+4     ; store data (for processing later)
+	MOVX    A,@DPTR
+	MOV     DPTR,#host_watch
+	MOVX    @DPTR,A
+;       
+	JMP     HOST_Ping       ; issue ping response (for speed)
+;
+HOST_TIMEOUT    EQU     34      ; No. of system ticks before HOST watchdog trips
+; (16 system ticks per second) - currently set for just over two seconds (34).
+;
+HOST_PHCnotwatch:
+	CJNE    A,#HOST_PKT_RACT,HOST_PHCnotract
+;*********************************************
+; HOST_PKT_RACT - Read Attraction Closing Time
+;*********************************************
+;
+	MOV     A,B                     ; make sure HOST_PKT_RACT
+	CJNE    A,#1,HOST_PHCerror4     ; is a 1 databyte (CMD) packet
+;
+	CALL    HOST_ping               ; <ACK><ETX>
+;
+	MOV     DPTR,#act_attclosetimelh        ; mins:hrs
+	MOVX    A,@DPTR
+	MOV     B,A
+	INC     DPTR
+	MOVX    A,@DPTR                 ; A:B = hrs:mins
+	
+	MOV     DPTR,#host_buffer+4     ; transmit ACT
+	MOVX    @DPTR,A
+	INC     DPTR
+	MOV     A,B
+	MOVX    @DPTR,A                 ; in xmit buffer as hrs:mins
+;
+	MOV     DPTR,#host_buffer+3
+	MOV     R7,#3
+	JMP     HOST_PHCtransmit
+
+;***
+HOST_PHCerror4:
+	LJMP    HOST_PHCerror                   ; extend SJMP range
+;***
+
+HOST_PHCnotract:
+	CJNE    A,#HOST_PKT_WACT,HOST_PHCnotwact
+
+;**********************************************
+; HOST_PKT_WACT - Write Attraction Closing Time
+;**********************************************
+	MOV     A,B                     ; make sure HOST_PKT_WACT is a
+	CJNE    A,#3,HOST_PHCerror4     ; 3 byte (CMD, Hrs, Mins) packet
+
+	MOV     DPTR,#host_buffer+4     ; store data
+	MOVX    A,@DPTR                 ; hours
+	MOV     B,A
+	INC     DPTR
+	MOVX    A,@DPTR                 ; minutes
+; To do comparison for closing, save the ACT low:high (little-endian)
+	MOV     DPTR,#act_attclosetimelh        ; store minutes
+	MOVX    @DPTR,A
+	INC     DPTR
+	push    acc                     ; T,23xj99   save minutes
+	MOV     A,B                     ; now hours
+	MOVX    @DPTR,A
+	mov     b,#60                   ; T,23xj99   compute ordinal minutes
+	mul     ab                      ;            hours*60
+	mov     r0,sp                   ;            +minutes on stack
+	add     a,@r0
+	dec     sp                      ;            clear stack
+	mov     dptr,#act_attclosetime  ;
+	movx    @dptr,a                 ;            write ordinal minutes
+	mov     a,b                     ;            carry into MSB
+	addc    a,#0
+	inc     dptr                    ;            write MSB of
+	movx    @dptr,a                 ;            ordinal minutes
+	setb    tim_timerupdate         ; 4x99
+;
+	JMP     HOST_PHCack             ; issue response
+
+
+HOST_PHCnotwact:
+	CJNE    A,#HOST_PKT_RTC,HOST_PHCnotrtc
+
+;**********************************
+; HOST_PKT_RTC - Read Ticket Counts
+;**********************************
+;
+HOST_COUNTS     EQU     5               ; No. of ticket types being counted.
+	MOV     A,B                     ; make sure HOST_PKT_RACT
+	CJNE    A,#1,HOST_PHCerror4     ; is a 1 databyte (CMD) packet
+;
+	CALL    HOST_ping               ; <ACK><ETX>
+;
+	MOV     DPTR,#host_buffer+4
+	MOV     A,#HOST_COUNTS
+	MOVX    @DPTR,A                 ; 5 counts being sent (for now).
+
+	INC     DPTR                    ; Start of counts table in buffer
+	CALL    MEM_SetDest
+	MOV     DPTR,#ctrl_atktcount    ; Counts table in XRAM
+	CALL    MEM_SetSource
+	MOV     R7,#HOST_COUNTS*2       ; Copy 10 bytes (5 words)-not hardcoded.
+	CALL    MEM_CopyXRAMtoXRAMsmall
+;
+	MOV     DPTR,#host_buffer+3
+	MOV     R7,#(HOST_COUNTS*2)+2   ; CMD, counts no.(5) and 5 2-byte counts
+;
+	JMP     HOST_PHCtransmit
+
+HOST_PHCnotrtc:
+	CJNE    A,#HOST_PKT_CTC,HOST_PHCnotctc
+
+;***********************************
+; HOST_PKT_CTC - Clear ticket counts
+;***********************************
+;
+	MOV     A,B                     ; make sure HOST_PKT_CTC
+	CJNE    A,#1,HOST_PHCerror5     ; is a 1 databyte (CMD) packet
+; Currently 4 ticket counts, each 16 bit words (unsigned).
+; Currently 5 ticket counts, T,14x99
+	MOV     DPTR,#ctrl_atktcount    ; First entry in counts table.
+	MOV     R7,#(HOST_COUNTS*2)     ; 8 bytes = 4 counts
+	CLR     A
+;
+HOST_PHCCTCloop:
+	MOVX    @DPTR,A                 ; Write a zero
+	INC     DPTR                    ; Next byte
+	DJNZ    R7,HOST_PHCCTCloop      ; Loop
+;
+	JMP     HOST_Ping               ; issue ping (for speed)
+;
+HOST_PHCnotctc:
+	CJNE    A,#HOST_PKT_WCT,HOST_PHCnotwct
+
+;***********************************
+; HOST_PKT_WCT - Write current time
+;***********************************
+;
+	MOV     A,B                     ; make sure HOST_PKT_WCT
+	CJNE    A,#3,HOST_PHCerror5     ; is a 3 databyte (CMD + 8bit + 8bit) packet
+;
+	CALL    TIM_StopCounting        ; Stop the RT clock
+	MOV     DPTR,#host_buffer+5     ; Minutes
+	MOVX    A,@DPTR
+	CALL    BINtoBCD
+
+	MOV     B,A                     ; write minutes into RTC
+	MOV     R1,#RTC_SLAVE
+	MOV     DPTR,#003h
+	CALL    I2C_Write8
+
+	MOV     DPTR,#host_buffer+4     ; Hours
+	MOVX    A,@DPTR
+	CALL    BINtoBCD
+
+	MOV     B,A                     ; write hours into RTC
+	MOV     R1,#RTC_SLAVE
+	MOV     DPTR,#004h
+	CALL    I2C_Write8
+
+	MOV     R1,#RTC_SLAVE           ; reset seconds to zero
+	MOV     DPTR,#002h
+	MOV     B,#000h
+	CALL    I2C_Write8
+
+	CALL    TIM_StartCounting       ; Restart the RT clock
+
+	JMP     HOST_Ping               ; issue ping (for speed)
+;***
+HOST_PHCerror5:
+	LJMP    HOST_PHCerror           ; extend SJMP range
+;***
+;
+HOST_PHCnotwct:
+	CJNE    A,#HOST_PKT_WCD,HOST_PHCnotwcd
+;***********************************
+; HOST_PKT_WCD - Write current date
+;***********************************
+;
+	MOV     A,B                     ; make sure HOST_PKT_WCD
+
+	CJNE    A,#4,HOST_PHCerror5     ; is a 4 databyte (CMD + 3*(8bit)) packet
+;
+	CALL    HOST_SetDate
+;
+	JMP     HOST_Ping               ; issue ping (for speed)
+;
+;*********************************
+; Insertion point for new commands
+;*********************************
+HOST_PHCnotwcd:
+
+	IF      HOST_BUFFER_TRACE
+
+	cjne    a,#HOST_PKT_RTB,HOST_PHCnotrtb
+	call    HOST_Ping
+	mov     dptr,#host_trace_intracursor
+	movx    a,@dptr
+;        inc     a
+;        inc     a
+	mov     r7,a
+;        mov     a,#-1
+	clr     a
+	movx    @dptr,a
+;        inc     dptr
+;        mov     a,#HOST_PKT_RTB
+;        movx    @dptr,a
+
+	mov     dptr,#host_trace_b
+HOST_RTBLOOP:
+	movx    a,@dptr
+	call    com_txcharCOM1
+	inc     dptr
+	djnz    r7,HOST_RTBLOOP
+	jmp     HOST_Ping
+
+;        jmp     HOST_PHCTransmit
+
+HOST_PHCnotrtb:
+
+	ENDIF
+	IF REMOTE_MONITOR
+	cjne    a,#HOST_PKT_NODE1,HOST_PHCnotNode1
+
+	inc     dptr
+	movx    a,@dptr
+	mov     r6,a                    ; target node
+	inc     dptr
+	movx    a,@dptr
+	mov     r7,a                    ; length
+	inc     dptr                    ; ->command
+	call    rs485_TransmitPacket
+
+	jmp     HOST_Ping
+
+HOST_PHCnotNode1:
+	cjne    a,#HOST_PKT_NODE2,HOST_PHCnotNode2
+
+	inc     dptr
+	movx    a,@dptr
+
+	jnz     HOST_PHCremoteNode
+	call    DMON_Local
+	jz      HOST_PHCnotNode2
+	jmp     HOST_PHCTransmit
+HOST_PHCremoteNode:
+
+	mov     r6,a                   ; target node
+	inc     dptr
+	movx    a,@dptr
+	mov     r7,a                   ; length
+	inc     dptr                   ; ->command
+	call    rs485_TransmitPacket
+
+	call    HOST_Ping
+
+	call    NET_ReceivePacketVEx
+;        call    NET_ReceivePacketEx
+	jz      HOST_PHCnotNode2
+
+	mov     dpsel,#0
+	push    dph
+	push    dpl
+	mov     dptr,#buffer+2          ; we want the length
+	movx    a,@dptr
+	mov     dpsel,#1
+	push    dph
+	push    dpl
+	mov     dptr,#host_buffer+3
+	add     a,#4    ; 
+	mov     r7,a      
+	mov     b,a
+	mov     a,#HOST_PKT_NODE1
+	jmp     H_Cdown1
+H_Cloop0:
+	mov     dpsel,#0
+	movx    a,@dptr
+	inc     dptr
+	mov     dpsel,#1
+H_Cdown1:
+	movx    @dptr,a
+	inc     dptr
+	djnz    b,H_Cloop0
+
+	pop     dpl
+	pop     dph
+	mov     dpsel,#0
+	pop     dpl
+	pop     dph
+
+	jmp     HOST_PHCTransmit
+HOST_PHCnotNode2:
+	ENDIF
+;
+
+	IF      THEATRE
+
+	cjne    a,#HOST_PKT_THL1,HOST_PHCnotTheatre1
+	mov     dpsel,#0
+	mov     dptr,#host_buffer+4
+	mov     dpsel,#1
+	push    dph
+	push    dpl
+	mov     dptr,#theatre_openT
+	dec     b                       ; we don't copy the message type
+HOST_PHCTheatre1L:
+	mov     dpsel,#0
+	movx    a,@dptr
+	inc     dptr
+	mov     dpsel,#1
+	movx    @dptr,a
+	inc     dptr
+	djnz    b,HOST_PHCTheatre1L
+
+	call    THEATRE_BaseTime
+
+	IF      THEATRE_ZLOAD
+	clr     a
+	mov     dptr,#theatre_cursor
+	movx    @dptr,a
+	ENDIF
+
+	mov     dptr,#theatre_shows     ; turn the show count
+	movx    a,@dptr                 ; into a high index
+	mov     b,#3
+	mul     ab
+	movx    @dptr,a
+
+
+	push    acc
+
+	mov     dptr,#theatre_show      ; first table row
+	add     a,dpl
+	mov     dpl,a
+	clr     a
+	addc    a,dph
+	mov     dph,a
+
+	mov     a,#3                    ; put a dummy entry
+	movx    @dptr,a                 ; on the end of the table
+	clr     a
+	inc     dptr
+	movx    @dptr,a
+	inc     dptr
+	movx    @dptr,a
+
+	pop     acc                     ; retrieve the show high index
+
+
+	jz      HOST_NoTheatreSwitch
+
+
+	call    THEATRE_IfGrandEntrance
+	jnz     HOST_NoTheatreSwitch
+
+
+
+	call    THEATRE_DayStart
+
+
+HOST_NoTheatreSwitch:
+
+	pop     dpl
+	pop     dph
+	mov     dpsel,#0
+	jmp     HOST_PING
+HOST_PHCnotTheatre1:
+
+	cjne    a,#HOST_PKT_THL2,HOST_PHCnotTheatre2
+	mov     dpsel,#0
+	mov     dptr,#host_buffer+4
+	movx    a,@dptr                 ; # extra shows
+	inc     dptr
+	push    acc                     ; cache the #
+	mov     dpsel,#1
+	push    dph
+	push    dpl
+	mov     dptr,#40*3+theatre_show ; 2nd half of table
+	dec     b                       ; we don't copy the message type
+	dec     b                       ; or # extra shows
+HOST_PHCTheatre2L:
+	mov     dpsel,#0
+	movx    a,@dptr
+	inc     dptr
+	mov     dpsel,#1
+	movx    @dptr,a
+	inc     dptr
+	djnz    b,HOST_PHCTheatre2L
+
+	mov     a,#3                    ; put a dummy entry
+	movx    @dptr,a                 ; on the end of the table
+	clr     a
+	inc     dptr
+	movx    @dptr,a
+	inc     dptr
+	movx    @dptr,a
+
+	pop     dpl
+	pop     dph
+	mov     dpsel,#0
+	mov     dptr,#theatre_shows
+
+	pop     acc                     ; retrieve the # extra shows
+	mov     b,#3                    ; turn the count into a high index
+	mul     ab
+
+	IF      THEATRE_IDEMPOTENT EQ 0 ; if idempotent, the new count 
+	mov     b,a                     ; is the new absolute total, else
+	movx    a,@dptr                 ; message 2 contains an increment
+	add     a,b
+	ENDIF
+
+	movx    @dptr,a
+
+	call    THEATRE_IfGrandEntrance
+	jz      HOST_NoSecondEntrance
+	call    THEATRE_DayStart
+HOST_NoSecondEntrance:
+
+	jmp     HOST_PING
+HOST_PHCnotTheatre2:
+	cjne    a,#HOST_PKT_OPEN,HOST_PHCnotOpenT
+	mov     a,#-1
+	add     a,b
+	jz      HOST_PHCtisOpenT
+	jmp     HOST_PHCError5
+HOST_PHCtisOpenT:
+	clr     a
+	mov     dptr,#act_closed
+	movx    @dptr,a
+	mov     dptr,#act_tppzero
+	movx    @dptr,a
+	call    THEATRE_IfGrandEntrance
+	jnz     HOST_PHCopenRides       
+	mov     dptr,#theatre_cursor    ; Accumulator is Zero
+	movx    @dptr,a
+	call    THEATRE_DayStart
+HOST_PHCopenRides:
+	jmp     HOST_PING
+HOST_PHCnotOpenT:
+	cjne    a,#HOST_PKT_WMIN,HOST_PHCnotWMin
+	mov     a,#-2
+	add     a,b
+	jz      HOST_PHCtisWMin
+	jmp     HOST_PHCError5
+HOST_PHCtisWMin:
+	mov     dptr,#host_buffer+4
+	movx    a,@dptr
+	mov     mth_op1ll,a
+	call    CTRL_AlterMADirect
+	jmp     HOST_PING
+HOST_PHCnotWMin:
+	CJNE    A,#HOST_PKT_RMIN,HOST_PHCnotrmin
+
+;*************************************
+; HOST_PKT_RMIN - Read Minimum Advance
+;*************************************
+
+	mov     a,#-1
+	add     A,B                             ; make sure HOST_PKT_RMA
+	jz      HOST_PHCitisRMin
+	jmp     HOST_PHCerror2                  ; is a 1 byte packet
+HOST_PHCitisRMin:
+	CALL    HOST_ping
+	MOV     DPTR,#host_buffer+4             ; transmit RMA with data
+	CALL    MEM_SetDest
+	MOV     DPTR,#ctrl_minimumahead
+	CALL    MEM_SetSource
+	MOV     R7,#1
+	CALL    MEM_CopyXRAMtoXRAMsmall
+	MOV     DPTR,#host_buffer+3
+	MOV     R7,#2
+	JMP     HOST_PHCtransmit
+
+HOST_PHCnotrmin:
+
+	ENDIF
+
+	cjne    a,#HOST_PKT_SIF,HOST_PHCnotSIF
+	call    EXAR_Start
+	jmp     HOST_Ping
+HOST_PHCnotSIF:
+	
+	IF      DMS
+	cjne    a,#HOST_PKT_DBP,HOST_PHCnotDBP
+	mov     dptr,#host_buffer+4
+	movx    a,@dptr
+	inc     dptr
+	mov     b,a
+	movx    a,@dptr
+	xch     a,b
+	call    DMS_NextPage
+	jmp     HOST_Ping
+
+HOST_PHCnotDBP:
+	cjne    a,#HOST_PKT_DBA,HOST_PHCnotDBA
+	call    DMS_Analyse
+	jmp     HOST_Ping
+HOST_PHCnotDBA:
+	cjne    a,#HOST_PKT_DBI,HOST_PHCnotDBI
+	call    DMS_Init
+	jmp     HOST_Ping
+HOST_PHCnotDBI:
+	cjne    a,#HOST_PKT_DBD,HOST_PHCnotDBD
+	call    HOST_Ping
+	call    DMS_Schema
+	mov     a,#4
+	mov     b,#4
+	call    DMS_RField
+	mov     r7,#4
+	mov     r0,#dms_rda0
+	mov     dptr,#host_buffer+4
+HOST_PHCDBDL:
+	mov     a,@r0
+	movx    @dptr,a
+	inc     r0
+	inc     dptr
+	djnz    r7,HOST_PHCDBDL
+	mov     r7,#5
+	jmp     HOST_PHCtransmit
+HOST_PHCnotDBD:
+	ENDIF
+
+
+HOST_PHCerror:
+;**********************************
+; Unknown or badly formatted packet
+;**********************************
+	JMP     HOST_ErrPing    ; transmit Disney error (<NAK><ETX>)
+
+HOST_PHCnopkt:
+	RET
+
+HOST_PHCtransmit:
+	CALL    HOST_TransmitPacket
+
+HOST_PHCack:                    ; transmit Disney ACK (<ACK><ETX>)
+	JMP     HOST_Ping
+;
+;******************************************************************************
+;
+; Function:     HOST_SetDate
+; Input:        host_buffer contains a valid WCD packet 
+; Output:       RTC date updated.
+; Preserved:    ?
+; Destroyed:    DPTR
+; Description:  This routine updates the Real-Time Clock (RTC) with the date
+;               sent from the HOST via the WCD packet.
+;
+; Calls:        [TIME.ASM]TIM_StopCounting, [I2C.ASM]I2C_Write8, BINtoBCD
+;
+; Uses:         host_buffer, RTC_SLAVE, man_dateformat, 1 stack byte
+;
+; Called in:    Local module
+;
+; Written by : Robert Sneddon           1 June 1999
+;******************************************************************************;
+; The date format (month/day/year (US) or day/month/year (European)) doesn't matter
+; here, as the data in the buffer is YYMMDD. The display routines can worry about
+; the format.
+;
+HOST_SetDate:
+	CALL    TIM_StopCounting        ; Stop the clock, for the moment.
+;
+	MOV     DPTR,#host_buffer+4     ; Year
+	MOVX    A,@DPTR
+	PUSHACC
+	MOV     R1,#RTC_SLAVE           ; store year in RTC
+	MOV     DPTR,#010h              ; in location 010h
+	MOV     B,A
+	CALL    I2C_Write8
+
+	POP     ACC                     ; store year mod 4
+	ANL     A,#3                    ; in location 011h
+	PUSHACC
+	MOV     DPTR,#011h
+	MOV     B,A
+	MOV     R1,#RTC_SLAVE
+	CALL    I2C_Write8
+;
+	MOV     DPTR,#host_buffer+5     ; Month
+	MOVX    A,@DPTR
+	CALL    BINtoBCD
+	MOV     B,A                     ; Write months into RTC
+	MOV     DPTR,#06h
+	MOV     R1,#RTC_SLAVE
+	CALL    I2C_Write8
+;
+;??? comment which two fields are being ORed here
+	POP     ACC
+	RR      A
+	RR      A
+	PUSHACC
+;
+	MOV     DPTR,#host_buffer+6     ; Day
+	MOVX    A,@DPTR
+	CALL    BINtoBCD
+	POP     B
+	ORL     A,B
+	MOV     B,A                     ; Write days
+	MOV     DPTR,#05h
+	MOV     R1,#RTC_SLAVE
+	CALL    I2C_Write8
+	CALL    TIM_StartCounting
+	RET
+;
+;********************************************************************

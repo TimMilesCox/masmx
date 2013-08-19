@@ -1,0 +1,20 @@
+p       $proc   $(2)
+vector* $NAME
+"P(1,1):e"***
+        + "p(1,1):e"
+        $end
+
+f       $func	*
+"$v"*   $name
+        $if     $t("f(1,1):e")=0
+"f(1,1)"**  $equ  $(2)   
+        vector  f(1,1)
+        $endif
+        $return f(1,1)
+        $end
+        
+$(2:02000)        
+$(1:64)
+        +       -1, $v(yes):d
+        +       -2, $v(always):d
+	+	-3, $v(yes):d

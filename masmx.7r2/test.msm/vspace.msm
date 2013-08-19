@@ -1,0 +1,6 @@
+these*  $proc
+this(times)*	$equ 1024*1024*1024*1024*times   
+first(times)*   $equ    this(times)+1
+second(times)*  $equ    this(times)+2
+        $end
+times	$do	100,	these

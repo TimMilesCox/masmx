@@ -1,0 +1,336 @@
+;************************************************************************
+;*       File EXAR2550.ASM                                              *
+;*       Tim, 17ij2000                                                  *
+;*       Runs Dual UART EXAR ST16C2550                                  *
+;*                                                                      *
+;*       Clever people beware: IO registers mapped in XRAM page zero    *
+;*                             address space                            *
+;*                             can only be accessed with a 16-bit       *
+;*                             address [@dptr].                         *
+;*                             If you use an 8-bit address [@r0, @r1]   *
+;*                             with the MOVX instruction, you get       *
+;*                             something else, maybe XRAM page zero,    *
+;*                             or something else determined by Port P2  * 
+;************************************************************************
+
+;        align   VAR,ToPage
+;xcom1_buffer: VAR 256   ; Input Buffer
+
+
+XCOM1   EQU     192     ; XRAM Locations of UART register sets
+XCOM2   EQU     128
+
+RHR     EQU     0       ; Receive  Holding Register (Brim of FIFO)
+THR     EQU     0       ; Transmit Holding Register (Cusp of FIFO)
+
+IER     EQU     1       ; Interrupt Enable Register
+IER_Rx  EQU     1       ; Receive Interrupt Enable
+IER_MODEST EQU  8       ; Modem Status Interrupt Enable
+IER_RLS EQU     4       ; Receive Line Status Interrupt Enable
+
+ISR     EQU     2       ; Interrupt Status Register
+ISR_Rx  EQU     1       ; Data in RHR/FIFO
+
+FCR     EQU     2       ; FIFO Control Register
+FCR_Ena EQU     1       ; Enable Rx/Tx FIFOs
+FCR_RSr EQU     2       ; Reset Rx FIFO
+FCR_RSt EQU     4       ; Reset Tx FIFO
+
+LCR     EQU     3       ; Line Control Register
+LCR_DLE EQU     128     ; Divisor Latch Enable for BaudRate Generator
+LCR_8   EQU     3       ; 8-Bit Word, No Parity, 1 Stop Bit
+
+MCR     EQU     4       ; Modem Control Register
+MCR_IEN EQU     8       ; Enable Interrupts
+MCR_DTR EQU     1
+MCR_RTS EQU     2
+
+LSR     EQU     5       ; Line Status Register
+LSR_RDR EQU     0       ; Data In Receive FIFO
+LSR_XOK EQU     6       ; Room In Transmit FIFO/Serialiser
+
+MSR     EQU     6       ; Modem Status Register
+
+SPR     EQU     7       ; Scratch Pad Register
+
+BDLLow  EQU     0       ; BaudRate Divisor Latch Low
+BDLHigh EQU     1       ; BaudRate Divisor Latch High
+
+U9600   EQU     0
+L9600   EQU     12
+
+EXAR_Start:                     ; INITIAL SETTINGS Channel 1
+        mov     dptr,#XCOM1+LCR ; set the Baud Rate
+        mov     a,#LCR_DLE      ; Address the Baud Rate Registers
+        movx    @dptr,a
+
+        mov     dptr,#XCOM1+BDLLow
+        mov     a,#L9600
+        movx    @dptr,a
+        inc     dptr
+        mov     a,#U9600
+        movx    @dptr,a
+
+        mov     dptr,#XCOM1+LCR
+        mov     a,#LCR_8        ; 8 Data Bits, No Parity, 1 Stop Bit
+        movx    @dptr,a         ; And don't address the Baud Rate Registers
+
+        mov     dptr,#XCOM1+FCR ;
+        mov     a,#FCR_RSr OR FCR_RSt OR FCR_Ena
+                                ; reset & Enable FIFOs, Trigger Level = 1
+        movx    @dptr,a         ;
+
+        mov     dptr,#XCOM1+IER
+        mov     a,#IER_Rx OR IER_MODEST OR IER_RLS ; enable Receive Interrupt
+        movx    @dptr,a
+
+        mov     dptr,#XCOM1+MCR ; enable all interrupts
+        mov     a,#MCR_IEN      ; OR MCR_DTR OR MCR_RTS
+        movx    @dptr,a
+        
+                                ; INITIAL SETTINGS Channel 2
+        mov     dptr,#XCOM2+LCR ; set the Baud Rate
+        mov     a,#LCR_DLE      ; Address the Baud Rate Registers
+        movx    @dptr,a
+
+        mov     dptr,#XCOM2+BDLLow
+        mov     a,#L9600
+        movx    @dptr,a
+        inc     dptr
+        mov     a,#U9600
+        movx    @dptr,a
+
+        mov     dptr,#XCOM2+LCR
+        mov     a,#LCR_8        ; 8 Data Bits, No Parity, 1 Stop Bit
+        movx    @dptr,a         ; And don't address the Baud Rate Registers
+
+        mov     dptr,#XCOM2+FCR ;
+        mov     a,#FCR_RSr OR FCR_RSt OR FCR_Ena
+                                ; reset & Enable FIFOs, Trigger Level = 1
+        movx    @dptr,a         ;
+
+        mov     dptr,#XCOM2+IER
+        mov     a,#IER_Rx OR IER_MODEST OR IER_RLS ; enable Receive Interrupt
+        movx    @dptr,a
+
+        mov     dptr,#XCOM1+MCR ; enable all interupts
+        mov     a,#MCR_IEN ;OR MCR_DTR OR MCR_RTS
+        movx    @dptr,a
+        
+        clr     xcom1_Full
+        clr     A
+        mov     xcom1_write_cursor,A
+        mov     xcom1_read_cursor,A
+
+        setB    EX1
+        setB    IT1
+
+        ret
+
+
+EXAR_RxInt:                             ; RECEIVE INTERRUPT
+        push    PSW                     ; This is CALLed from another ISR,
+        push    ACC                     ; so the return is RET, not RETI
+        push    DPH
+        push    DPL
+EXAR_RxIL:
+        jb      xcom1_Full,EXAR_RxIX    ; Buffer Full, don't service the FIFO
+        mov     dptr,#XCOM1+LSR         ; Is there data on COM1 input FIFO?
+        movx    a,@dptr
+        jnb     acc.0,EXAR_RxIX         ; No more so exit
+        mov     dpl,#XCOM1+RHR          ; Yes
+        movx    a,@dptr                 ; Read
+        mov     dph,#xcom1_buffer SHR 8 ; Find Place in Circular Input Buffer
+        mov     dpl,xcom1_write_cursor  ; By Means of the Running Cursor
+        movx    @dptr,a                 ; Write the Data to XRAM
+        inc     xcom1_write_cursor      ; Advance the Input Cursor
+        mov     a,xcom1_read_cursor     ; If write starts to equal read
+        cjne    a,xcom1_write_cursor,EXAR_RxIL
+        setB    xcom1_Full              ; Stop reading from FIFO to XRAM
+        jmp     EXAR_RxIL               ; Is there any more?
+EXAR_RxIX:
+        
+BUGLE2  EQU     0        
+        IF      BUGLE2
+        push    b
+        push    acc
+        swap    a
+        call    hexchar    
+        mov     b,a
+        call    LCD_BugA
+        pop     acc
+        push    acc
+        call    hexchar
+        mov     b,a
+        call    LCD_BugB
+        pop     acc
+        pop     b
+        ENDIF
+        
+        pop     DPL
+        pop     DPH
+        pop     ACC
+        pop     PSW
+        RET                             ; Not RETI. This was called from
+                                        ; another ISR
+
+        IF      SERIAL_FASTREL
+
+EXAR_FIFO_DEPTH EQU     16
+ANSII_DLE       EQU     16
+ANSII_STX       EQU     2
+ANSII_ACK       EQU     6
+ANSII_ETX       EQU     3
+
+EXAR_FTX:
+        mov     a,r7
+        jz      EXAR_FTXX
+        mov     r0,#prt_field_str       ; cache the framing bytes
+        mov     @r0,#ANSII_DLE
+        inc     r0
+        mov     @r0,#ANSII_STX
+        inc     r0
+        mov     prt_field_len,#EXAR_FIFO_DEPTH
+        mov     b,#EXAR_FIFO_DEPTH-2
+        add     a,#-EXAR_FIFO_DEPTH+2   ; followed by up to (FIFO-2) bytes
+        mov     r7,a                    ; which will nearly always be
+        jc      EXAR_FTXL1              ; the packet
+        add     a,#EXAR_FIFO_DEPTH-2    ; and will follow 
+        mov     b,a
+        add     a,#2
+        jmp     EXAR_FTXS               ; this path
+EXAR_FTXL:
+        mov     r0,#prt_field_str       ; use the printer IRAM locations
+        mov     prt_field_len,#EXAR_FIFO_DEPTH  ; A Lot, Maybe
+        mov     b,#EXAR_FIFO_DEPTH      ;
+        add     a,#-EXAR_FIFO_DEPTH     ; A Lot, Really?
+        mov     r7,a                    ; Remember how much more
+        jc      EXAR_FTXL1              ; Really a lot
+        add     a,#EXAR_FIFO_DEPTH      ; No: flip count back thru zero
+        mov     b,a                     ; Count for XRAM->IRAM Xfer
+EXAR_FTXS:        
+        mov     prt_field_len,a         ; Count for IRAM->UART Xfer
+        mov     r7,#0                   ; And No More After
+EXAR_FTXL1:
+        movx    a,@dptr                 ; read packet data
+        inc     dptr                    ; address next byte
+        mov     @r0,a                   ; write IRAM cache while UART FIFO
+        inc     r0                      ; transmits the previous 16
+        djnz    b,EXAR_FTXL1            ; or the previous packet
+        push    dph
+        push    dpl
+        mov     dptr,#XCOM1+LSR         ; Fix Gaze on UART Status 
+EXAR_FTXL2:
+        movx    a,@dptr                 ; Read UART Status
+        jnb     acc.6,EXAR_FTXL2        ; Until We Agree With It
+        mov     r0,#prt_field_str       ; Address Line of Data in IRAM
+        mov     dptr,#xcom1+THR         ; Fix Gaze on Cusp of Xmit FIFO
+EXAR_FTXL3:
+        mov     a,@r0                   ; Read IRAM
+        movx    @dptr,a                 ; write UART
+        inc     r0                      ; Increment IRAM Address
+        djnz    prt_field_len,EXAR_FTXL3; 
+        pop     dpl
+        pop     dph
+        mov     a,r7                    ; Loop Control: any data still to go?
+        jnz     EXAR_FTXL               ; Yes
+EXAR_FTXX:
+        ret                             ; No
+
+
+EXAR_FTVX:
+        mov     dptr,#XCOM1+LSR
+EXAR_FTVX1:        
+        movx    a,@dptr
+        jnb     acc.6,EXAR_FTVX1
+        mov     r0,#prt_field_str
+        mov     dptr,#XCOM1+THR
+EXAR_FTVX2:
+        mov     a,@r0
+        inc     r0
+        movx    @dptr,a
+        djnz    prt_field_len,EXAR_FTVX2
+        ret
+
+HOST_Ping:
+        mov     dptr,#XCOM1+LSR
+        movx    a,@dptr
+        jnb     acc.6,HOST_Ping
+        mov     dptr,#XCOM1+THR
+        mov     a,#HOST_ACK
+        movx    @dptr,a
+        mov     a,#HOST_ETX
+        movx    @dptr,a
+        ret
+
+HOST_ErrPing:
+        mov     dptr,#XCOM1+LSR
+        movx    a,@dptr
+        jnb     acc.6,HOST_ErrPing
+        mov     dptr,#XCOM1+THR
+        mov     a,#HOST_NAK
+        movx    @dptr,a
+        mov     a,#HOST_ETX
+        movx    @dptr,a
+        ret
+
+        ELSE
+
+EXAR_Tx:                                ; SINGLE BYTE TRANSMIT SUBROUTINE
+        push    DPH                     ; Calling Routine is almost certainly 
+        push    DPL                     ; traversing an output buffer with DP.
+        push    ACC                     ; Save the data for a moment
+        mov     dptr,#XCOM1+LSR         ; Is there space in the Output
+        movx    a,@dptr                 ; FIFO/Serialiser?
+        jb      acc.6,EXAR_TxY          ; Yes: Write Data to FIFO
+        pop     ACC                     ; data of stack
+        pop     DPL                     ; user pointer off stack
+        pop     DPH
+        setB    C                       ; Overflow: Data Not on FIFO
+        ret
+EXAR_TxY:
+        pop     ACC                     ; Data off Stack
+        mov     dptr,#XCOM1+THR         ; write to Transmit Holding Register
+        movx    @dptr,a
+        pop     DPL
+        pop     DPH
+        clr     C                       ; Not Overflow: Data Accepted by FIFO
+        ret
+
+EXAR_TxL:                               ; LOCKED TRANSMIT FOR SINGLE-THREAD
+        call    EXAR_Tx                 ; SYSTEMS
+        jc      EXAR_TxL                ; No: Poll Again
+        ret
+        
+        ENDIF
+
+EXAR_Read1:                             ; USER ROUTINE TO READ SERIAL INPUT
+        mov     a,xcom1_read_cursor
+        jb      xcom1_Full,EXAR_Read1Y  ; Buffer Full, so do it
+        cjne    a,xcom1_write_cursor,EXAR_Read1Y ; Buffer Not Empty, so do it
+        clr     C                       ; Status No Data
+        ret
+EXAR_Read1Y:
+        push    DPH                     ; User is certainly scanning a buffer
+        push    DPL                     ; using dptr, so save/restore it
+        mov     dpl,a                   ; i.e. buffer read_cursor
+        mov     dph,#xcom1_buffer SHR 8 ;
+        movx    a,@dptr                 ; so read some data at last
+        pop     DPL
+        pop     DPH
+        inc     xcom1_read_cursor       ; Next In
+        clr     xcom1_Full              ; not full now if it was
+        setB    C                       ; Status Data (in case UART is
+        ret                             ; capable of delivering zero bytes)
+
+        END
+
+
+
+
+
+
+
+
+
+
