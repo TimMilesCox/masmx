@@ -1,21 +1,45 @@
-Preliminary	masmx.7r1	Distribution 01 March 2012
+Preliminary	masmx.7r2	Distribution 01 March 2012
 ___________	_________	__________________________
+
+
+
+        _________________________________________________
+        |       Copyright Tim Cox, 2012			|
+        |                                               |
+        |       This document describes the masmx.7r2   |
+        |        target-independent meta-assembler      |
+        |                                               |
+        |       The masmx.7r2 meta-assembler is free    |
+        |       software licensed with the GNU General  |
+        |       Public Licence Version 3                |
+        |                                               |
+        |       The same licence encompasses all        |
+        |       accompanying software and documentation |
+        |                                               |
+        |       The full licence text is included with  |
+        |       these materials                         |
+        |                                               |
+        |       See also the licensing notice at the    |
+        |       foot of this document                   |
+        |_______________________________________________|
+
+
 
 
 Status of Delivered Documents
 _____________________________
 
 
-Documents in this directory masmx.7r1/doc are:
+Documents in this directory masmx.7r2/doc are:
 
-	masmx.7r1/doc/masmx.html
+	masmx.7r2/doc/masmx.html
 
-	masmx.7r1/doc/masmx.txt
+	masmx.7r2/doc/masmx.txt
 
 	this release note
 
 masmx.html and masmx.txt contain the same information. They are the
-complete user manual for masmx.7r1
+complete user manual for masmx.7r2
 
 This is a preliminary distribution and binaries for some developer
 platforms are for logistic reasons not yet tested
@@ -40,7 +64,7 @@ ____________________________
 	Linux Platforms
 	_______________
 
-	UBUNTU Linux / ix86		pending
+	UBUNTU Linux / ix86		DELIVERED IN THIS PACKAGE
 
 	DEBIAN Linux / ix86		pending
 
@@ -91,3 +115,31 @@ __________
 
 For assistance contact masmx@gmx.ch
          Telephone +41 78 629 86 11
+
+_______________________________________________________________________________________
+
+
+LICENCE NOTE
+
+    Copyright Tim Cox, 2012
+    TimMilesCox@gmx.ch
+
+    This document describes the masmx.7r2 target-independent meta-assembler.
+
+    masmx.7r2 is free software. It is licensed
+    under the GNU General Public Licence Version 3
+
+    You can redistribute it and/or modify masmx.7r2
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    masmx.7r2 is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with masm.7r2.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+
+
