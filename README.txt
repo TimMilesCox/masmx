@@ -70,6 +70,13 @@ which contains
 
         doc/    hosts/  targets/
 
+The ready-made binaries are in
+
+	hosts/ubuntu.x86
+	hosts/osx.x86
+	hosts/osx.ppc
+	hosts/win32
+
 hosts contains the binaries and targets contains some macro language
 for target architectures
 
