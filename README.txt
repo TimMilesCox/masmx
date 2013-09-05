@@ -40,6 +40,7 @@ masmx.7r2 runs from shell commmand lines
 masmx.7r2 macro language can understand source code syntaxes meant
 for other assemblers
 
+This is the freeware code tree
 masmx.7r2 documentation and downloads are at http://timmilescox.github.io/masmx
 
 
