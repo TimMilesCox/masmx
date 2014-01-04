@@ -1,0 +1,769 @@
+;******************************************************************************
+;
+; File     : LEDDISP.ASM
+;
+; Author   : Robert Sneddon
+;
+; Project  : XQ10 queue ticket system
+;
+; Contents : 	This file contains the code to drive the big LED displays for
+;		the Disney system, via Port 2 on an unmodified DT10.
+;		This uses the Tx line only - there is no traffic on the Rx line.
+;		The Mux is used to switch serial port 1 between the two connectors
+;		(Port 1 and Port 2) on the DT10 box. This must be switched back
+;		afterwards, and should be used as infrequently as possible.
+;
+; System   : 80C537
+;
+; History  :
+;   Date     Who Ver  Comments
+;******************************************************************************
+;
+LDSPsize	EQU	5	; Current number of digits on large LED display
+ldsp_dispbuffer	VAR	LDSPsize
+;
+ldsp_QAbuffer	VAR	4	; Old Queue At display time (ASCII HHMM)
+ldsp_QUbuffer	VAR	2	; Queue Until display time (hrs:mins)
+ldsp_notalwaysblank VAR 1
+
+COMPLEX_DISPLAY EQU 0
+
+        IF      COMPLEX_DISPLAY
+ldsp_uline db   27, 'l', 1, 1, '   Tickets For '
+ldsp_lline db   27, 'l', 1, 2, '   Valid Until '
+ldsp_close db   27, '[H Attraction Closed  For Further Bookings'
+        ENDIF
+
+
+
+;
+;******************************************************************************
+;
+; Function:	LDSP_DispTime
+; Input:	DPTR -> buffer with text to be displayed. B = 0 or 1 for display 0
+;		or display 1
+; Output:	
+; Preserved:	
+; Destroyed:	DPTR, A
+; Description:  Puts the first five ASCII characters pointed to by DPTR out
+;		Port 2 on the DT10 box, to the Data Displays Co. 5-digit display
+;		unit, with appropriate control characters front and back.
+;		 The data sent out should look like "12:34", representing the
+;		Ride Time that will be printed on the next ticket out the machine.
+;		This uses the multiplexer and serial channel 1, normally used by
+;		the HOST-MASTER link.
+;		Disney plan 2 displays, with adjacent addresses. B is used to
+;		select which display will be written to, offset from the first
+;		display (set by the E2ROMed value ctrl_ldspaddr, input from Manager
+;		menu option).
+;		Protocol:
+; 		[Command]	CHR$(40h), CHR$(30h + display address)
+;		[Text]		CHR$(2), CHR$(30h + location on display)
+;		[Data]		n bytes of ASCII text
+;		[EOSequence]	CHR$(3)
+;
+; Calls:	[SBUS.ASM]SBS_WriteSB1,[COMMS.ASM]COM_TxCharCOM1,COM_DefaultSerialMux
+;
+; Uses:		[IRAMbit]com_selab
+;
+; Called in:	[DT.ASM]DT_Loop
+;
+; Written by : Robert Sneddon		15 July 1999
+;******************************************************************************
+;
+LDSP_DispTime:
+	PUSHB
+
+        IF      VT10 EQ 0
+	CLR	com_selab	; Switch Mux to connect COM1 to Port 2
+	CALL	SBS_WriteSB1
+        ENDIF
+
+        IF      COMPLEX_DISPLAY ; T,x99
+        pop     acc
+        mov     b,#19
+        pushdpl
+        pushdph
+        mov     dptr,#ldsp_uline
+        jz      LDSP_RightLines
+        mov     dptr,#ldsp_lline
+LDSP_RightLines:
+        mov     a,#0
+        movc    a,@a+dptr
+        call    COM_TxCharCOM1
+        inc     dptr
+        djnz    b,LDSP_RightLines
+        pop     dph
+        pop     dpl
+        ELSE
+;
+; Send display header
+	MOV	A,#'@'		; Start of command sequence
+	CALL	COM_TxCharCOM1
+	PUSHDPL
+	PUSHDPH
+	MOV	DPTR,#ctrl_ldspaddr	; Display address no. is programmable
+	MOVX	A,@DPTR
+	POP	DPH
+	POP	DPL
+	CLR	C
+	ADD	A,#30H		; Parameter = address number + 30h
+	POP	B
+	ADD	A,B		; Display zero or display one (addr or addr+1)
+	CALL	COM_TxCharCOM1
+	MOV	A,#2		; Text start command
+	CALL	COM_TxCharCOM1
+	MOV	A,#'0'		; Location of text write on display (far left)
+	CALL	COM_TxCharCOM1
+
+        ENDIF
+;
+; Now send 5 bytes, starting at (*DPTR)
+	MOVX	A,@DPTR
+	INC	DPTR
+	CALL	COM_TxCharCOM1		; This section is done in-line to save
+	MOVX	A,@DPTR			; a few microseconds
+	INC	DPTR
+	CALL	COM_TxCharCOM1
+	MOVX	A,@DPTR
+	INC	DPTR
+	CALL	COM_TxCharCOM1
+	MOVX	A,@DPTR
+	INC	DPTR
+	CALL	COM_TxCharCOM1
+	MOVX	A,@DPTR
+	INC	DPTR
+	CALL	COM_TxCharCOM1
+;
+; Send display message terminator
+	MOV	a,#3
+	CALL	COM_TxCharCOM1
+
+        IF      VT10 EQ 0
+;
+; Switch Mux back to default (COM1 to Port 1)
+	SETB	com_selab		; default serial 1 to 1A
+        CALL	SBS_WriteSB1
+        ENDIF
+
+;
+	RET
+;
+;******************************************************************************
+; Function:	LDSP_QUtime
+; Input:	None.
+; Output:	t2buffer contains hh:mm QU time (absolute)
+; Preserved:	B
+; Destroyed:	?
+; Description:  Calculates the "Queue Until" time, that will be displayed on the
+;		second Data Displays unit. This is the same as the value printed
+;		on the bottom of the ticket.
+;
+; Calls:	Various maths routines, TIM_AddTimes, TIM_UnpackTime
+;
+; Uses:		t1buffer, t2buffer, bMinute, bHour, ctrl_queuetimelength
+;
+; Called in:	
+;
+; Written by : Robert Sneddon		20 July 1999
+;******************************************************************************
+;
+
+        IF      MINUTES_AHEAD EQ 0
+
+LDSP_QUTime:
+	PUSHACC
+	PUSHDPL
+	PUSHDPH
+;                                        ; only put it back if necessary
+;        CALL    CTRL_TicketTime         ; set up ticket time data here!
+;        CALL    ctrl_CALCcurrentperiod   ; 4x99
+;
+	MOV	DPTR,#bMinute		; get the additional minutes
+	MOVX	A,@DPTR
+	CALL	MTH_LoadOp1Acc		; bMinute
+	MOV	DPTR,#ctrl_queuetimelength
+	MOVX	A,@DPTR
+	CALL	MTH_LoadOp2Acc
+	CALL	MTH_AddWords		; op1.w = bMinute+bLength
+	MOV	A,#60
+	CALL	MTH_LoadOp2Acc
+	CALL	MTH_Divide32by16	; op1 = (bMinute+bLength)/60
+					; op2 = (bMinute+bLength)%60
+	MOV	A,mth_op2ll		; A now has QU offset minutes
+	MOV	DPTR,#t2buffer+1
+	MOVX	@DPTR,A
+;
+	MOV	DPTR,#bHour
+	MOVX	A,@DPTR
+	CALL	MTH_LoadOp2Acc
+	CALL	MTH_AddWords		; op1.b = (bHour+(bMinute+bLength)/60)
+	MOV	A,mth_op1ll
+	CJNE	A,#24,LDSP_QUTnot24
+LDSP_QUThourwrap:
+	CLR	C
+	SUBB	A,#24
+	JMP	LDSP_QUThourok
+LDSP_QUTnot24:
+	JNC	LDSP_QUThourwrap
+LDSP_QUThourok:
+; A now has QU hours
+	MOV	DPTR,#t2buffer
+	MOVX	@DPTR,A			; t1buffer now has QU offset in hh:mm
+;
+
+	MOV	DPTR,#timebuffer	; time from the system
+	CALL	TIM_UnpackTime		; Current time (hh:mm) in t1buffer
+	CALL	TIM_AddTimes		; QU absolute time in t2buffer
+;
+
+	POP	DPH
+	POP	DPL
+	POP	ACC
+	RET
+
+        ENDIF
+
+;
+;******************************************************************************
+; Function:	LDSP_FormatTime
+; Input:	t2buffer contains hh:mm time, DPTR - > 5-char buffer in XRAM
+; Output:
+; Preserved:	None
+; Destroyed:	DPTR, A, B
+; Description:  Converts the time in t2buffer into a 5 char string pointed to
+;		by DPTR, in the form "hh:mm". A leading 0 in the hours will
+;		be replaced by a blank, and hours 13-23 will be converted
+;		to 1-11 (pm implicit) to match the ticket printout.
+;
+; Calls:	Various maths routines, TIM_AddTimes, TIM_UnpackTime
+;
+; Uses:		t2buffer 
+;
+; Called in:	
+;
+; Written by : Robert Sneddon		20 July 1999
+;******************************************************************************
+;
+LDSP_FormatTime:
+	MOV	DPTR,#t2buffer
+	MOVX	A,@DPTR			; Hours
+	CJNE	A,#13,LDSP_FTampm	; Check for after-noon
+;
+LDSP_FT12hrclock:
+	CLR	C			; After 12, convert to p.m.
+	SUBB	A,#12
+	JMP	LDSP_FThourok
+;
+LDSP_FTampm:
+	JNC	LDSP_FT12hrclock
+;
+LDSP_FThourok:
+	MOV	DPTR,#ldsp_dispbuffer
+	CALL	BinToBCD
+	CALL	BCDToASCII
+;
+	MOV	A,#':'			; output a ":"
+	MOVX	@DPTR,A
+;
+	MOV	DPTR,#t2buffer+1
+	MOVX	A,@DPTR			; Minutes
+	MOV	DPTR,#ldsp_dispbuffer+3
+	CALL	BinToBCD
+	CALL	BCDToASCII
+; If 1st digit = "0", convert to space
+	MOV	DPTR,#ldsp_dispbuffer
+	MOVX	A,@DPTR
+	CJNE	A,#'0',LDSP_FTnotzero	; Skip if not zero, else...
+	MOV	A,#' '			; Replace with <blank>
+	MOVX	@DPTR,A
+LDSP_FTnotzero:
+	RET
+;
+;******************************************************************
+; Function:	LDSP_QUDisplay
+; Input:	B-> display (0 or 1)
+; Output:	None
+; Preserved:	?
+; Destroyed:	?
+; Description:  Calculate Queue Until time, and display it on the 2nd LED
+;		This is only done if the time has changed.
+;
+; Calls:	[LOCAL] LDSP_QUtime, LDSP_FormatTime, LDSP_Disptime
+;
+; Uses:		ldsp_dispbuffer
+;
+; Called in:	
+;
+; Written by : Robert Sneddon		21 July 1999
+;*****************************************************************
+;
+
+        IF      MINUTES_AHEAD EQ 0
+
+LDSP_QUDisplay:
+        CALL    LDSP_QUtime             ; "Queue Until" time in t2buffer
+	CALL	LDSP_CompareQUTimes	; Any change from currently displayed?
+	JZ	LDSP_QUDend
+;
+	CALL	LDSP_UpdateQUbuffer	; Save new QU time data
+	CALL	LDSP_FormatTime		; Convert to ASCII in ldsp_dispbuffer
+	MOV	DPTR,#ldsp_dispbuffer
+	MOV	A,#1
+	MOV	B,A			; Second display (no. n+1)
+	CALL	LDSP_Disptime
+;
+LDSP_QUDend:
+	RET
+
+        ENDIF
+
+;
+;******************************************************************
+; Function:	LDSP_QADisplay
+; Input:	buffer = 
+; Output:	None
+; Preserved:	?
+; Destroyed:	?
+; Description:  Calculate Queue At time, and display it on the 1st LED
+;		This is only done if the time has changed.
+;
+; Calls:	[LOCAL]LDSP_Disptime, LDSP_CompareQATimes, LDSP_UpdateQAbuffer
+;		[TIME.ASM]TIM_24hr12hr
+;
+; Uses:		ldsp_dispbuffer
+;
+; Called in:	
+;
+; Written by : Robert Sneddon		28 July 1999
+;*****************************************************************
+;
+LDSP_QADisplay:
+	CALL	LDSP_CompareQATimes	; Any change from currently displayed?
+	JZ	LDSP_QADend
+;
+        CALL    LDSP_UpdateQAbuffer     ; Save new QA time data -and QU
+; Bodge City - check the first two characters of the buffer, to convert the
+; time from a 24-hr clock format to a 12-hour clock format.
+	MOV	DPTR,#buffer
+	CALL	TIM_24hr12hr
+	CLR	A
+	MOV	B,A			; First display (no. n)
+	CALL	LDSP_Disptime
+
+
+                                        ; and second (QU) display
+                                        ; always and automatically
+                                        ;
+	CALL	LDSP_FormatTime		; Convert to ASCII in ldsp_dispbuffer
+	MOV	DPTR,#ldsp_dispbuffer
+	MOV	A,#1
+	MOV	B,A			; Second display (no. n+1)
+	CALL	LDSP_Disptime
+LDSP_QADend:
+	RET
+;
+;******************************************************************
+; Function:	LDSP_BlankDisplay
+; Input:	B-> display (0 or 1)
+; Output:	None
+; Preserved:	A, R7, B, DPTR
+; Destroyed:	
+; Description:  Writes spaces into an LED display, to switch it "off"
+;
+; Calls:	
+;
+; Uses:		LDSPsize, ldsp_dispbuffer
+;
+; Called in:	
+;
+; Written by : Robert Sneddon		21 July 1999
+;*****************************************************************
+;
+LDSP_BlankDisplay:
+        IF      COMPLEX_DISPLAY
+
+        push    acc
+        push    b
+        push    dph
+        push    dpl
+        mov     stackcheck,sp
+        jb      stackcheck7,LDSP_BlankDSome
+        jmp     DT_ColdBoot
+LDSP_BlankDSome:
+
+        IF      VT10 EQ 0
+        clr     com_selab
+        call    SBS_WriteSB1
+        ENDIF
+
+        mov     b,#43
+        mov     dptr,#ldsp_close
+LDSP_BlankDLoop:
+        mov     a,#0
+        movc    a,@a+dptr
+        call    COM_TxCharCOM1
+        inc     dptr
+        djnz    b,LDSP_BlankDLoop
+
+        IF      VT10 EQ 0
+        setb    com_selab
+        call    SBS_WriteSB1
+        ENDIF
+
+        pop     dpl
+        pop     dph
+        pop     b
+        pop     acc
+
+        ELSE
+
+	PUSHACC
+	MOV	A,R7
+	PUSHACC
+	PUSHB
+	PUSHDPL
+	PUSHDPH
+;
+	MOV	DPTR,#ldsp_dispbuffer	; Display buffer
+	MOV	A,#' '			; Space char to put in buffer
+	MOV	R7,#LDSPsize		; No. of chars to write
+;
+LDSP_BDloop:
+	MOVX	@DPTR,A
+	INC	DPTR
+	DJNZ	R7,LDSP_BDloop
+;
+	MOV	DPTR,#ldsp_dispbuffer
+	CALL	LDSP_DispTime
+;
+	POP	DPH
+	POP	DPL
+	POP	B
+	POP	ACC
+	MOV	R7,A
+	POP	ACC
+
+        ENDIF
+	RET
+;
+;*****************************************************************
+; Function:	LDSP_CompareQUTimes
+; Input:	
+; Output:	None
+; Preserved:	B
+; Destroyed:	A, DPTR
+; Description:  Compare the value for QU in t2buffer with the saved value
+;		If not the same, set A > 0 else A = 0
+;
+; Calls:	None
+;
+; Uses:		t2buffer, ldsp_QUbuffer
+;
+; Called in:	
+;
+; Written by : Robert Sneddon		26 July 1999
+;*****************************************************************
+;
+LDSP_CompareQUTimes:
+	PUSHB
+	MOV	DPTR,#t2buffer+1	; Compare minutes first (most likely)
+	MOVX	A,@DPTR
+	MOV	B,A
+	MOV	DPTR,#ldsp_QUbuffer+1
+	MOVX	A,@DPTR
+	CLR	C
+	CJNE	A,B,LDSP_CQUTnomatch
+;
+	MOV	DPTR,#t2buffer		; Compare hours
+	MOVX	A,@DPTR
+	MOV	B,A
+	MOV	DPTR,#ldsp_QUbuffer
+	MOVX	A,@DPTR
+	CLR	C
+	CJNE	A,B,LDSP_CQUTnomatch
+;
+; Fall-through - buffer contents match
+	CLR	A
+	POP	B
+	RET
+;	
+LDSP_CQUTnomatch:
+	MOV	A,#1
+	POP	B
+	RET
+;
+;*****************************************************************
+; Function:	LDSP_CompareQATimes
+; Input:	buffer => current QA time, ldsp_QAbuffer = old time.
+; Output:	A TRUE iff both times do not match
+; Preserved:	B
+; Destroyed:	A, DPTR
+; Description:  Compare the value for newQA with the old time
+;		If not the same, set A > 0 else A = 0
+;		These values are ASCII, not binary. Buffer is
+;		in the for HH:MM, and the old time is HHMM.
+;
+; Calls:	None
+;
+; Uses:		buffer, ldsp_QAbuffer
+;
+; Called in:	
+;
+; Written by : Robert Sneddon		26 July 1999
+;*****************************************************************
+;
+LDSP_CompareQATimes:
+	PUSHB
+	MOV	DPTR,#buffer+4
+	MOVX	A,@DPTR
+	MOV	B,A
+	MOV	DPTR,#ldsp_QAbuffer+3
+	MOVX	A,@DPTR
+	CJNE	A,B,LDSP_CQATnomatch	; Compare minute units
+;
+	MOV	DPTR,#buffer+3
+	MOVX	A,@DPTR
+	MOV	B,A
+	MOV	DPTR,#ldsp_QAbuffer+2
+	MOVX	A,@DPTR
+	CJNE	A,B,LDSP_CQATnomatch	; Compare minutes tens
+;
+	MOV	DPTR,#buffer+1
+	MOVX	A,@DPTR
+	MOV	B,A
+	MOV	DPTR,#ldsp_QAbuffer+1
+	MOVX	A,@DPTR
+	CJNE	A,B,LDSP_CQATnomatch	; Compare hours units
+;
+	MOV	DPTR,#buffer
+	MOVX	A,@DPTR
+	MOV	B,A
+	MOV	DPTR,#ldsp_QAbuffer
+	MOVX	A,@DPTR
+	CJNE	A,B,LDSP_CQATnomatch	; Compare hours tens
+; Fall-through - buffer contents match
+	POP	B
+	CLR	A
+	RET
+;	
+LDSP_CQATnomatch:
+	POP	B
+	MOV	A,#1
+	RET
+;
+;*****************************************************************
+; Function:	LDSP_UpdateQUbuffer
+; Input:	t2buffer -> new time data (hrs:mins)
+; Output:	ldsp_QUbuffer -> new time data (hrs:mins)
+; Preserved:	B
+; Destroyed:	A, DPTR
+; Description:  Update the "old QU" buffer with the new info
+;
+; Calls:	None
+;
+; Uses:		t2buffer, ldsp_QUbuffer
+;
+; Called in:	
+;
+; Written by : Robert Sneddon		26 July 1999
+;*****************************************************************
+;
+LDSP_UpdateQUbuffer:
+	PUSHACC
+	PUSHDPL
+	PUSHDPH
+	MOV	DPTR,#t2buffer
+	MOVX	A,@DPTR
+	MOV	DPTR,#ldsp_QUbuffer
+	MOVX	@DPTR,A
+	MOV	DPTR,#t2buffer+1
+	MOVX	A,@DPTR
+	MOV	DPTR,#ldsp_QUbuffer+1
+	MOVX	@DPTR,A
+	POP	DPH
+	POP	DPL
+	POP	ACC
+	RET
+;
+;*****************************************************************
+; Function:	LDSP_UpdateQAbuffer
+; Input:	buffer = new time data (ASCII HH:MM)
+; Output:	ldsp_QAbuffer = new time data (ASCII HHMM)
+; Preserved:	DPTR,A
+; Destroyed:	None
+; Description:  Update the "old QA" buffer with the new QA time
+;
+; Calls:	None
+;
+; Uses:		ldsp_QAbuffer
+;
+; Called in:	[TIME.ASM]
+;
+; Written by : Robert Sneddon		26 July 1999
+;*****************************************************************
+;
+LDSP_UpdateQAbuffer:
+	PUSHACC
+        push    B
+	PUSHDPL
+	PUSHDPH
+;
+	MOV	DPTR,#buffer
+	MOVX	A,@DPTR
+	MOV	DPTR,#ldsp_QAbuffer
+	MOVX	@DPTR,A
+
+        anl     a,#15                           ; upper HH * 10.  T17xj99
+        mov     b,#10
+        mul     ab
+        mov     b,a                             ; save
+
+;
+	MOV	DPTR,#buffer+1
+	MOVX	A,@DPTR
+	MOV	DPTR,#ldsp_QAbuffer+1
+	MOVX	@DPTR,A
+;
+        anl     a,#15                          ; + lower HH
+        add     a,b
+        mov     dptr,#t2buffer                 ;   write
+        movx    @dptr,a
+
+
+	MOV	DPTR,#buffer+3
+	MOVX	A,@DPTR
+	MOV	DPTR,#ldsp_QAbuffer+2
+	MOVX	@DPTR,A
+;
+                                              ; upper MM * 10
+        anl     a,#15
+        mov     b,#10
+        mul     ab
+        mov     b,a                           ; aside
+
+	MOV	DPTR,#buffer+4
+	MOVX	A,@DPTR
+	MOV	DPTR,#ldsp_QAbuffer+3
+	MOVX	@DPTR,A
+;
+        anl     a,#15                        ; + lower MM
+        add     a,b
+        mov     dptr,#ctrl_queuetimelength   ; + QTL
+        mov     b,a                          ; aside
+        movx    a,@dptr                      ; 
+        add     a,b                          ; add to MM
+
+        mov     b,a                          ; aside
+        mov     dptr,#t2buffer               ; re-read hours
+        movx    a,@dptr                      ; 
+        push    acc                          ; save hours            SP+1
+        jnc     LDSP_QUtimeInRange1          ; total minutes > 255?
+        pop     acc                          ; if so add 4 to hours  SP+0
+        add     a,#4
+        push    acc                          ; and save again        SP+1
+        mov     a,#16                        ; and 16 to minutes
+        add     a,b
+        mov     b,a                          ; and aside again
+LDSP_QUtimeInRange1:                         ;                   SP is +1
+        mov     a,#-60                       ; now adjust minutes
+        add     a,b
+        jnc     LDSP_QUtimeInRange2          ; until < 60        SP is +1
+        mov     b,a                          ; adding an hour each time
+        pop     acc                          ; hours up              SP+0
+        add     a,#1                         ; hours +
+        push    acc                          ; hours down            SP+1
+        jmp     LDSP_QUtimeInRange1          
+
+LDSP_QUtimeInRange2:                         ;                   SP is +1
+        
+        pop     acc                          ; hours up              SP+0
+LDSP_QUtimeInRange3:
+        movx    @dptr,a                      ; store then decrement until
+        add     a,#-24
+        jc      LDSP_QUtimeInRange3
+
+        inc     dptr
+        mov     a,b                          ; and minutes across
+        movx    @dptr,a
+
+                                   
+	POP	DPH
+	POP	DPL
+        pop     b
+	POP	ACC
+
+
+
+	RET
+;
+;*****************************************************************
+;
+; Function:	LDSP_ACTBlank
+; Input:	act_closed TRUE or FALSE and act_tppzero TRUE or FALSE
+; Output:	A > 0 if act_closed or act_tppzero TRUE.
+; Preserved:	B, DPTR
+; Destroyed:	?
+; Description:  Test two flags, and if either is TRUE, blank the displays.
+;
+; Calls:	LDSP_BlankDisplay
+;
+; Uses:		act_closed, act_tppzero
+;
+; Called in:	[TIME.ASM]
+;
+; Written by : Robert Sneddon		26 July 1999
+;*****************************************************************
+LDSP_ACTBlank:
+	PUSHB
+	PUSHDPL
+	PUSHDPH
+	MOV	DPTR,#act_closed
+	MOVX	A,@DPTR
+	JNZ	LDSP_ACTBblank
+	MOV	DPTR,#act_tppzero
+	MOVX	A,@DPTR
+	JZ	LDSP_ACTBnoblank
+; Fall-through - Attraction Closed. Blank the displays.
+LDSP_ACTBblank:
+
+;       *********T,9ix99*************************
+                                               ;*
+        mov     dptr,#ldsp_notalwaysblank      ;*
+        movx     a,@dptr                       ;*
+        dec     a                              ;*
+        movx    @dptr,a                        ;*
+        jnz     LDSP_ACTBnoblank ; Really output blanks 1 pass out of 256
+                                 ; and always return nonzero in A
+                                               ;*
+;       ***************************************;*
+
+	CLR	A
+	MOV	B,A			; Display 0.
+	CALL	LDSP_BlankDisplay
+	INC	A			; Display 1.
+	MOV	B,A
+	CALL	LDSP_BlankDisplay
+; Reset the values in the display buffers
+	MOV	DPTR,#ldsp_QAbuffer
+	MOV	A,#99		; Null time value for Queue At display
+	MOVX	@DPTR,A
+	INC	DPTR
+	MOVX	@DPTR,A		; (99:99) => display will be updated on 1st cycle.
+	MOV	DPTR,#ldsp_QUbuffer
+	MOV	A,#'9'		; Null time value for Queue Until display
+	MOVX	@DPTR,A
+	INC	DPTR
+	MOVX	@DPTR,A
+	INC	DPTR
+	MOVX	@DPTR,A
+	INC	DPTR
+	MOVX	@DPTR,A		; ("9999") => display will be updated on 1st cycle.
+;
+LDSP_ACTBnoblank:
+	POP	DPH
+	POP	DPL
+	POP	B
+	RET
+;
+	END	;***** LEDDISP.ASM *****

@@ -1,0 +1,7 @@
+MASMX 7r2Z
+3/do32.msm
+*EOF*
+  :                            1         $word	32
+*EOF*
+:$(00):00000000:00002710 
+do32.msm: object code 90045 bytes: 0 errors: 0 undefined labels

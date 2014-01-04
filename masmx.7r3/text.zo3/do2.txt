@@ -1,0 +1,12 @@
+MASMX 7r2Z
+3/do2.msm
+*EOF*
+                                        $do     3,	;
+                                        +       44,	;
+00:000000 00002C000063        +3                 99:d
+00:000002 00002C000063        +3 
+00:000004 00002C000063        +3 
+  :                            4 
+*EOF*
+:$(00):000000:000006 
+do2.msm: object code 76 bytes: 0 errors: 0 undefined labels

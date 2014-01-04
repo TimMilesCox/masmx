@@ -1,0 +1,11 @@
+MASMX 7r2Z
+3/overlaid.msm
+Error: overlaid.msm Line 9: ONE may not be restated
+Error: overlaid.msm Line 10: TWO may not be restated
+Error: overlaid.msm Line 11: THREE may not be restated
+Error: overlaid.msm Line 18: ONE may not be restated
+Error: overlaid.msm Line 19: TWO may not be restated
+Error: overlaid.msm Line 20: THREE may not be restated
+Error: overlaid.msm Line 23: ONE may not be restated
+Error: overlaid.msm Line 24: TWO may not be restated
+Error: overlaid.msm Line 25: THREE may not be restated

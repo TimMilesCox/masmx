@@ -1,0 +1,2 @@
+MASMX 7r2
+Error: app2.msm Line 0: app2.msm file missing

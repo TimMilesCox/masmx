@@ -1,0 +1,7 @@
+MASMX 7r2
+3/forgot.msm
+Error: forgot.msm Line 1: $do count,image
+Error: forgot.msm Line 2: $do count,image
+Error: forgot.msm Line 3: $do count,image
+Error: forgot.msm Line 4: $do count,image
+*EOF*

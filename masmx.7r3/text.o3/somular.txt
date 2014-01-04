@@ -1,0 +1,14 @@
+MASMX 7r2
+3/somular.msm
+*EOF*
+  :                            1 $(0:64)
+  :                            2 	$set_option	"j"
+  :                            3 label(1)
+  :                            4 times   $do     8,label(1,times)       $res    1
+  :                            5 times $do 5,label(2,1,times) $res 1
+  :                            6 label(1,1,1)
+00:00004D 000000              +7 	+	label(99)
+00:00004E 000001              +8 	+	label()
+*EOF*
+:$(00):000040:00004F 
+somular.msm: object code 51 bytes: 0 errors: 0 undefined labels

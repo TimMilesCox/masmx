@@ -1,0 +1,9 @@
+	$include	"../aside.dem/ppc_603.def"
+athing	$set	0x000003fc000a0000
+$(0::*athing)
+_one_care*	blr
+_two_cares*	blr
+_three_cares*	blr
+_four_cares*	blr
+$(3::*0x000003fc000e0000)
+factor1*	+	99

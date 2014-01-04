@@ -1,0 +1,23 @@
+MASMX 7r2
+3/big.msm
+*EOF*
+  :                            1 high    $equ    3*/90
+  :                            2 
+  :                            3 struttura*	$proc
+  :                            4 tree(times)*	$equ     high+1024*1024*(times-1)
+  :                            5 
+                                leaves  $do     2,;
+  :                            7 leaf(times,leaves)* $equ     tree(times)+64*(leaves-1)
+  :                            8 . leaf(times,leaves) $equ     tree(times)+64*$d
+  :                            9         $end
+  :                            10 
+  :                            11 times	$do	2,	struttura
+00:000000 0C0000000000000000000040
+                              +12         +       leaf(1,2)
+00:000004 0C0000000000000000100000
+                              +13         +       leaf(2,1)
+  :                            14 
+  :                            15 
+*EOF*
+:$(00):000000:000008 
+big.msm: object code 87 bytes: 0 errors: 0 undefined labels

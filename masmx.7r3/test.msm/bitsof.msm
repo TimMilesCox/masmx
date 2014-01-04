@@ -1,0 +1,12 @@
+oojit*	$proc        
+        $end
+
+        $res    80
+begin
+        +       99
+        oojit
+        +       101
+        +       102
+        $end     begin
+
+

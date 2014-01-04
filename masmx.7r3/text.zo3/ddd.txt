@@ -1,0 +1,7 @@
+MASMX 7r2Z
+3/ddd.msm
+*EOF*
+00:000000 00007E              +1         +       $directive
+*EOF*
+:$(00):000000:000001 
+ddd.msm: object code 44 bytes: 0 errors: 0 undefined labels

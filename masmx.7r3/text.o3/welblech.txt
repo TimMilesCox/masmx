@@ -1,0 +1,46 @@
+MASMX 7r2
+3/welblech.msm
+*EOF*
+  :                            1 p	$proc
+  :                            2 yooz*	$name
+  :                            3 *	$tree
+  :                            4 yo*	$branch
+  :                            5 	+	7
+  :                            6 	+	8
+  :                            7 	+	9
+  :                            8 	$root
+  :                            9 ho*	$branch
+  :                            10 	+	12
+  :                            11 	$root
+  :                            12 	$root
+  :                            13 	$end
+  :                            14 
+  :                            15 $(6:06000)
+  :                            16 well $tree
+  :                            17 switch $res 1
+  :                            18 blech $branch
+06:006001 000001              +19 up + 1
+06:006002 000007              +20 halfway yooz
+06:006003 000008              +20 
+06:006004 000009              +20 
+06:006002 00000C              +20 
+06:006005 000063              +21 down	+	99
+  :                            22  $root
+  :                            23 
+  :                            24 fest	$branch
+06:006001 000002              +25 left	+	2
+06:006002 000007              +26 centre	yooz
+06:006003 000008              +26 
+06:006004 000009              +26 
+06:006002 00000C              +26 
+06:006005 000064              +27 right	+	100
+  :                            28 	$root
+  :                            29 	$root
+  :                            30 
+06:006006 006002              +31 	+	well:blech:halfway:ho
+06:006007 006002              +32 	+	well:fest:centre:yo
+06:006008 006005              +33 	+	well:blech:down
+06:006009 006001              +34 	+	well:fest:left
+*EOF*
+:$(06):006000:00600A 
+welblech.msm: object code 215 bytes: 0 errors: 0 undefined labels

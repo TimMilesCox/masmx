@@ -1,0 +1,20 @@
+f       $form   8, 16
+v*      $func	*
+        $if     $t(v(1,1))=0
+"v(1,1)"** x       v(1,1)
+        $endif
+        $return v(1,1)
+        $end
+x*      $proc   $(2)
+*       +       "$x(1, 1)"
+        $end
+p*      $proc
+        f       p(1,1), p(1, 2)
+        $end
+$(2:02000)
+$(0:64)
+        
+        p       11, v(plippo)
+        p       10, v(plippo)
+        p       44, v(rippo)
+        f       8, v(plippo)

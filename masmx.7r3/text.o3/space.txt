@@ -1,0 +1,12 @@
+MASMX 7r2
+3/space.msm
+*EOF*
+  :                            1 $(0:64)
+  :                            2 tree    $tree
+00:000040 000040              +3 branch  +       branch
+  :                            4         $root
+00:000041 000040              +5         +       tree:branch
+  :                            6 branch
+*EOF*
+:$(00):000040:000042 
+space.msm: object code 51 bytes: 0 errors: 0 undefined labels

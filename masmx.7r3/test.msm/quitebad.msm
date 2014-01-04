@@ -1,0 +1,8 @@
+	$include	"8051_3r1.def"
+
+	mov	dptr, #mcgrongle
+
+mcgringle	var	vastaway
+mcgrongle	var	4
+
+vastaway	$equ	4096

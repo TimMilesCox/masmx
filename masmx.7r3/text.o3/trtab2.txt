@@ -1,0 +1,7 @@
+MASMX 7r2
+3/trtab2.msm
+*EOF*
+  :                            1 $(0)
+*EOF*
+:$(00):000000:0003E8 
+trtab2.msm: object code 7037 bytes: 0 errors: 0 undefined labels

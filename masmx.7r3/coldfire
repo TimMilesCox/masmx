@@ -1,0 +1,9 @@
+pushd ../smaragd.68k
+rm ./*.txo
+../masmx coldfire -wy
+../masmx coldfir@ -wy
+diff -w -s yield.txo yield@.txo
+cp yield.txo ../test.o3
+cp yield@.txo ../test.o3
+popd
+

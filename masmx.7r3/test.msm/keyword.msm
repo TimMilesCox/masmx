@@ -1,0 +1,36 @@
+
+	$word	16
+
+var*    $proc	$(1)
+*       $res    var(1,1)
+        $end
+
+.
+.
+
+align*	$proc
+	$if	($t(align(1,1))=$proc)**(align(1,1)=var)
+granule $set	align(1, 2)
+	var	granule-($(1)**granule-1)
+	$else
+granule $set	align(1, 1)
+ 	$do	granule-($**granule-1),	-	1
+	$endif
+	$end
+
+$(1:1024) .	variables
+$(0:256) .	invariables
+ 
+	$do 5,	-	4
+
+firstly var	21
+	align	var, 8
+secondly var	4
+
+	align	8
+	+	99
+	+	firstly
+	+	secondly
+
+
+	$end

@@ -1,0 +1,28 @@
+MASMX 7r2Z
+3/stringli.msm
+*EOF*
+  :                            1 	$byte   8
+  :                            2 	$data_code  'a':0d1,0d2
+00:000000 0000D1D26364        +3 	+'abcd'
+00:000002 000000              +4 	+"abcd"
+  :                            5 	$byte   7
+00:000003 000000000000000000000000
+                              +6 	+       "abcd":q
+00:000007 000000000000000000000000
+                              +7 	-       "abcd":q
+00:00000B FFFFFFFFFFFFFFFFFFFFFFFF
+                              +8 	^       "abcd":q
+Note: stringli.msm Line 9: trailing zero bits in last data word of string
+00:00000F A34B1E440800        +9 	"abcd"
+  :                            10 	$byte   6
+  :                            11 	$ascii
+  :                            12 .	$space
+                                		"ab":;
+                                		5:;
+00:000011 862164966000        +15 		"def"
+  :                            16 .	$free
+00:000013 000000              +17 	+       "abcd"
+00:000014 000014              +18 label   +       label
+*EOF*
+:$(00):000000:000015 
+stringli.msm: object code 230 bytes: 0 errors: 1 undefined labels

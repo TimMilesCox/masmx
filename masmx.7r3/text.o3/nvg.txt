@@ -1,0 +1,13 @@
+MASMX 7r2
+3/nvg.msm
+*EOF*
+  :                            1 f       $func
+  :                            2         $res    4
+  :                            3         $return -8
+  :                            4         $end
+  :                            5 
+00:000000 000000000000        +6         +       $, f:d
+00:000002 000000000002        +7         +       f, $:d
+*EOF*
+:$(00):000000:000004 
+nvg.msm: object code 95 bytes: 0 errors: 1 undefined labels

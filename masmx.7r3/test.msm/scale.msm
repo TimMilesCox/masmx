@@ -1,0 +1,13 @@
+	$list		0
+	$include	"../aside.dem/ppc_603.def"	.	"ppc_64.def"
+	$include	"absomap.def"
+	$list		2
+#$(0::*)
+	$include,"$void" "../result.txo/langobar.txo"
+$(0::*0x00444400000e0000)
+__giant	$set		1
+	$list		2
+	$include	"tisobar.msm"
+	$store		"../test.o3/scale"
+	$end		fireup
+

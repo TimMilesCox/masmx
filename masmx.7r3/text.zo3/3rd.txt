@@ -1,0 +1,51 @@
+MASMX 7r2Z
+3/3rd.msm
+*EOF*
+Error: 3rd.msm Line 1: external value RAM may not be used in this context
+  :                            1 $(ram)
+  :                            2 times   $do     30,space3(times)        $res    4*times
+Error: 3rd.msm Line 3: external value STATIC may not be used in this context
+  :                            3 $(static)
+00:000744 000000              +4 times   $do     24,p3(times)            +       space3(times)
+00:000745 000004              +4 
+00:000746 00000C              +4 
+00:000747 000018              +4 
+00:000748 000028              +4 
+00:000749 00003C              +4 
+00:00074A 000054              +4 
+00:00074B 000070              +4 
+00:00074C 000090              +4 
+00:00074D 0000B4              +4 
+00:00074E 0000DC              +4 
+00:00074F 000108              +4 
+00:000750 000138              +4 
+00:000751 00016C              +4 
+00:000752 0001A4              +4 
+00:000753 0001E0              +4 
+00:000754 000220              +4 
+00:000755 000264              +4 
+00:000756 0002AC              +4 
+00:000757 0002F8              +4 
+00:000758 000348              +4 
+00:000759 00039C              +4 
+00:00075A 0003F4              +4 
+00:00075B 000450              +4 
+Error: 3rd.msm Line 5: external value TEXT may not be used in this context
+  :                            5 $(text)
+Error: 3rd.msm Line 6: external value STRING3 may not be used in this context
+00:00075C 000000              +6         +       $string("string3")
+00:00075D 000744              +7 times   $do     12,d3(times)            +       p3(times)
+00:00075E 000745              +7 
+00:00075F 000746              +7 
+00:000760 000747              +7 
+00:000761 000748              +7 
+00:000762 000749              +7 
+00:000763 00074A              +7 
+00:000764 00074B              +7 
+00:000765 00074C              +7 
+00:000766 00074D              +7 
+00:000767 00074E              +7 
+00:000768 00074F              +7 
+*EOF*
+:$(00):000000:000769 
+3rd.msm: object code 307 bytes: 4 errors: 0 undefined labels

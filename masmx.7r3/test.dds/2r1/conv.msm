@@ -1,0 +1,696 @@
+;******************************************************************************
+;
+; File     : CONV.ASM
+;
+; Author   : Robert Sneddon
+; Project  : XQ10 Master code
+;
+; Contents : This file contains the conversion modules between DDS and WDW
+;            type packets on the HOST-MASTER comms link. Label prefixes are
+;            "HOST_" as these routines rightly belong in HOST.ASM, but the
+;            file is getting a bit large. In addition, a couple of small
+;            routines that return <ACK>s to the Disney system are here to
+;            make some space in HOST.ASM
+;
+; Global:       HOST_Disney_DDS_Convert
+;               HOST_DDS_Disney_Convert
+;               HOST_ErrPing
+;               HOST_Ping
+;
+; System   : 80C537
+;
+; History  :
+;   Date        Who     Ver     Comments
+; 25/06/99      RS      1.24    Added special code for RTC packet (multiple 16bits)
+; 25/06/99      RS      1.24    Moved ping routines out of HOST.ASM and into here
+;******************************************************************************
+;
+; Function:     HOST_Disney_DDS_Convert
+; Input:        Disney buffer with packet from host computer
+; Output:       buffer with DDS-style packet
+; Preserved:    R6
+; Destroyed:    
+; Description:  Convert a Disney buffer to a DDS buffer. On entry, the
+;               interrupt-driven serial receive routine has filled a
+;               buffer (host_buffer) with ASCII characters. On exit,
+;               the bytes have been shuffled and converted to binary,
+;               the preferred data type for DDSnet-style handling.
+;               The Disney packet length is for all the bytes, not
+;               including the length. The DDS PKT length includes the
+;               length byte. The formula for DDS length, given the
+;               Disney length, is DDSlen = ((Disneylen-4) / 2) + 4.
+;               05/06/99 - special case processing required for 16-bit
+;               data fields in buffer. DDS is 2-byte little-endian,
+;               WDW is 4 byte ASCII big-endian. Scream. Packet types
+;               affected are 20, 21, 23.
+;
+; Calls:        [MATHS.ASM]MTH_ClearOperand, [MATHS.ASM]MTH_StoreWord,
+;               [MATHS.ASM]MTH_AddWords, HOST_ASCII_Bin
+;
+; Uses:         host_buffer, disney_buffer, mth_operand1, R6,
+;               host_ddsbuffptr, host_wdwbuffptr 
+;
+; Called in:    Local module
+;
+; Written by : Robert Sneddon           1 June 1999
+;******************************************************************************
+;
+HOST_Disney_DDS_Convert:
+	MOV     A,R6                    ; Save R6 explicitly
+	PUSHACC
+;
+	CALL    HOST_DisDDS_concmd      ; Command byte
+	CALL    HOST_DisDDS_conlen      ; Packet length
+;
+	CLR     C
+	SUBB    A,#4                    ; no. of data bytes
+	JZ      HOST_DisDDS_Nodata      ; If no data, skip forward to CRC
+	MOV     R6,A                    ; Data bytes counter (DDS length)
+	CALL    HOST_Dis_DDS_Con16bitdata       ; Check for 16-bit data
+	JNZ     HOST_DisDDS_Nodata      ; 16-bits dealt with, skip forward to CRC
+;
+; using IRAM bytes here to hold index into buffers, for the DPL trick.
+	MOV     host_ddsbuffptr,#4      ; Skip the 2 chksums and length bytes
+	MOV     host_wdwbuffptr,#4      ; Skip the length and cmd chars
+;
+HOST_DisDDS_L1:
+	MOV     DPTR,#disney_buffer
+	MOV     DPL,host_wdwbuffptr     ; Disney (WDW) pkt pointer
+
+	IF      VT10
+	call    HOST_Hex2Bin
+	ELSE
+	CALL    HOST_ASCII_Bin
+	INC     DPTR                    ; Point at next ASCII pair
+	ENDIF
+
+	MOV     host_wdwbuffptr,DPL     ; Save current Disney pointer
+;
+	MOV     DPTR,#host_buffer
+	MOV     DPL,host_ddsbuffptr     ; Current DDS pointer restored
+	MOVX    @DPTR,A                 ; Write the byte into DDS buffer
+	INC     DPTR
+	MOV     host_ddsbuffptr,DPL     ; Save current DDS pointer
+;
+	DJNZ    R6,HOST_DisDDS_L1
+;
+HOST_DisDDS_Nodata:
+	CALL    HOST_DisDDS_CRC         ; Redo the CRC
+;
+	POP     ACC
+	MOV     R6,A
+	RET
+
+HOST_DisDDS_conlen:
+; Convert packet length bytes WDW->DDS. Returns length in A.
+	MOV     DPTR,#disney_buffer     ; 1st 2 bytes are pkt length (in bytes)
+
+	IF      HOST_LENGTH_ENCODING_DECIMAL
+	movx    a,@dptr
+	anl     a,#15
+	mov     b,#10
+	mul     ab
+	mov     b,a
+	inc     dptr
+	movx    a,@dptr
+	anl     a,#15
+	add     a,b
+	ELSE
+
+	IF      VT10
+	call    HOST_Hex2Bin
+	ELSE
+	CALL    HOST_ASCII_Bin
+	INC     DPTR                    ; Point at next ASCII pair
+	ENDIF
+
+	ENDIF
+
+	CLR     C
+	SUBB    A,#4                    ; Convert Disney pkt len to DDS len
+	RRC     A                       ; Assumes carry clear after SUBB
+	ADD     A,#4                    ; DDSlen = ((Disneylen-4) / 2) + 4
+	MOV     DPTR,#host_buffer+2     ; DDS pkt length
+	MOVX    @DPTR,A
+	RET
+;
+HOST_DisDDS_concmd:
+; Convert command bytes WDW->DDS. Returns cmd value in A.
+	MOV     DPTR,#disney_buffer+2   ; 2nd 2 bytes are command
+
+	IF      VT10
+	call    HOST_Hex2Bin
+	ELSE
+	CALL    HOST_ASCII_Bin
+	INC     DPTR                    ; Point at next ASCII pair
+	ENDIF
+
+	MOV     DPTR,#host_buffer+3     ; DDS command byte
+	MOVX    @DPTR,A
+	RET
+;
+HOST_DisDDS_CRC:
+; Now redo the CRC bytes in the DDS buffer. For the moment (01/06/99) this
+; simply reconstitutes the CRC from the packet contents. The DDS packet
+; checksum is a simple addition of everything except the checksum itself.
+;
+	MOV     DPTR,#host_buffer+2
+	MOVX    A,@DPTR         ; Get length of packet data
+	CLR     C
+	SUBB    A,#2            ; Remove checksum digits from consideration
+	MOV     R6,A
+;
+	MOV     R0,#mth_operand1
+	CALL    MTH_ClearOperand        ; clear 16-bit accumulator for checksum
+;
+HOST_DisDDS_L2:
+	MOVX    A,@DPTR
+	INC     DPTR
+	CALL    MTH_LoadOp2Acc          ; 16-bits, top 8 bits zero.
+	CALL    MTH_AddWords
+	DJNZ    R6,HOST_DisDDS_L2
+;
+	MOV     DPTR,#host_buffer       ; Point at CRC pkt location
+	CALL    MTH_StoreWord           ; Write 16-bits value into packet.
+	RET
+;
+;******************************************************************************
+;
+; Function:     HOST_Dis_DDS_Con16bitdata
+; Input:        Disney buffer with packet from host computer.
+; Output:       DDS buffer with DDS-style data, A > 0 if 16 bit.
+; Preserved:    ?
+; Destroyed:    A,DPTR
+; Description:  This routine does the special case processing required for
+;               16-bitdata fields in DISNEY_buffer. DDS is 2-byte little-endian,
+;               WDW is 4 byte ASCII big-endian. Packet types affected are 20, 21, 23.
+;               When this is called, the cmd byte has been converted, and
+;               is in place in host_buffer
+;
+; Calls:        HOST_ASCII_Bin
+;
+; Uses:         host_buffer, disney_buffer, HOST_PKT_WTPP, HOST_PKT_WPA, HOST_PKT_WPL
+;
+; Called in:    HOST_Disney_DDS_Convert
+;
+; Written by : Robert Sneddon           6 June 1999
+;******************************************************************************
+;
+HOST_Dis_DDS_Con16bitdata:
+; First check to see if this is a special-case (16-bit) packet.
+	MOV     DPTR,#host_buffer+3             ; command byte
+	MOVX    A,@DPTR
+	CJNE    A,#HOST_PKT_WTPP,HOST_DDDSC16_L1        ; Type 20
+	JMP     HOST_DDDSC16_True                       
+HOST_DDDSC16_L1:
+	CJNE    A,#HOST_PKT_WPA,HOST_DDDSC16_L2         ; Type 21
+	JMP     HOST_DDDSC16_True                       
+HOST_DDDSC16_L2:
+	CJNE    A,#HOST_PKT_WPL,HOST_DDDSC16_L3         ; Type 23
+	JMP     HOST_DDDSC16_True                       
+HOST_DDDSC16_L3:
+	CLR     A                               ; "8-bit data" flag
+	RET
+;
+HOST_DDDSC16_True:
+; this is a special-case WDW packet. As of 06/06/99 these are all of the
+; form (ASCII)<len><len><cmd><cmd><data><data><data><data>, with only
+; one 16-bit data entry. If this changes, this code will need changing too.
+	MOV     DPTR,#disney_buffer+6           ; Last 2 ASCII chars
+
+	IF      VT10
+	call    HOST_Hex2Bin
+	ELSE
+	CALL    HOST_ASCII_Bin
+	INC     DPTR                    ; Point at next ASCII pair
+	ENDIF
+
+; DDS format is (BIN)<chkl><chkh><len><cmd><datal><datah>
+	MOV     DPTR,#host_buffer+4             ; data low byte
+	MOVX    @DPTR,A
+	MOV     DPTR,#disney_buffer+4           ; First 2 ASCII chars
+
+	IF      VT10
+	call    HOST_Hex2Bin
+	ELSE
+	CALL    HOST_ASCII_Bin
+	INC     DPTR                    ; Point at next ASCII pair
+	ENDIF
+
+	MOV     DPTR,#host_buffer+5             ; data high byte
+	MOVX    @DPTR,A
+;
+	MOV     A,#1                            ; "16-bit data" flag
+	RET
+;
+;******************************************************************************
+;
+; Function:     HOST_DDS_Disney_Convert
+; Input:        DDS buffer with packet from MASTER computer
+; Output:       buffer with Disney-style packet
+; Preserved:    R6
+; Destroyed:    ?
+; Description:  Convert a DDS buffer to a Disney buffer. On entry, the
+;               MASTER has built a packet in DDS format. This must be
+;               rebuilt into ASCII format for transmission to the HOST.
+;               The Disney packet length is for all the bytes, not
+;               including the length. The DDS PKT length includes the
+;               length byte. The formula for Disney length, given the
+;               DDS length, is Disneylen = ((DDSlen-4) * 2) + 4.
+;               05/06/99 - special case processing required for 16-bit
+;               data fields in buffer. DDS is 2-byte little-endian,
+;               WDW is 4 byte ASCII big-endian. Scream. Packet types
+;               affected are 10, 11, 13, 30.
+;
+; Calls:        Bin_To_Hex
+;
+; Uses:         host_buffer, disney_buffer, mth_operand1, R6
+;
+; Called in:    Local module
+;
+; Written by : Robert Sneddon           2 June 1999
+;******************************************************************************
+;
+HOST_DDS_Disney_Convert:
+	MOV     A,R6                    ; Save R6 explicitly
+	PUSHACC
+;
+	CALL    HOST_DDSDis_concmd      ; Convert cmd byte.
+	CALL    HOST_DDSDis_conlen      ; Convert pkt length, return in A
+	PUSHACC                         ; Save the packet length for CRC
+;
+	CLR     C
+	SUBB    A,#4
+	JZ      HOST_DDSDis_Nodata      ; If no data, skip forward to CRC
+	MOV     R6,A                    ; Data bytes counter (DDS length)
+	CALL    HOST_DDS_Dis_Con16bitdata       ; Check for 16-bit data
+	JNZ     HOST_DDSDis_Nodata      ; 16-bits dealt with, skip forward to CRC
+; Fall-through - 8 bit data to be processed.
+	MOV     host_ddsbuffptr,#4      ; Skip the 2 chksums, length & cmd byte
+	MOV     host_wdwbuffptr,#4      ; Skip the length & cmd chars for WDW
+;
+HOST_DDSDis_L1:
+	MOV     DPTR,#host_buffer
+	MOV     DPL,host_ddsbuffptr     ; Current DDS pointer restored
+	MOVX    A,@DPTR                 ; This byte to be converted
+
+	MOV     DPTR,#disney_buffer
+	MOV     DPL,host_wdwbuffptr     ; Disney (WDW) pkt pointer
+; We have a DDS data byte in A, and DPTR points to the location in
+; disney_buffer where two ASCII chars should be written.
+	CALL    BinToHex
+	MOV     host_wdwbuffptr,DPL     ; Save pointer at next ASCII pair
+	INC     host_ddsbuffptr         ; Point at next byte in DDS buffer
+
+	DJNZ    R6,HOST_DDSDis_L1
+;
+HOST_DDSDis_Nodata:
+	POP     ACC                     ; Recover packet length
+	CALL    HOST_DDSDis_CRC
+;
+	POP     ACC
+	MOV     R6,A
+	RET
+;
+HOST_DDSDis_concmd:
+; Convert command bytes DDS->WDW.
+	MOV     DPTR,#host_buffer+3     ; 3rd byte is cmd
+	MOVX    A,@DPTR
+	MOV     DPTR,#disney_buffer+2   ; 2nd/3rd bytes are cmd
+	CALL    BinToHex
+	RET
+;
+HOST_DDSDis_conlen:
+; Convert packet length byte DDS->WDW. Returns length in A.
+;       CALL    HOST_DebugCR
+;       CALL    HOST_Debug5
+;       CALL    HOST_DebugCR
+	MOV     DPTR,#host_buffer+2     ; 2nd byte is pkt length
+	MOVX    A,@DPTR
+	CLR     C
+	SUBB    A,#4                    ; Convert DDS pkt len to Disney len
+	RL      A                       ; Assumes carry clear after SUBB
+	ADD     A,#4                    ; Disneylen = ((DDSlen-4) * 2) + 4
+	PUSHACC
+	MOV     DPTR,#disney_buffer     ; 1st 2 bytes are packet length
+	CALL    BinToHex
+;       CALL    HOST_DebugCR
+;       CALL    HOST_Debug6
+;       CALL    HOST_DebugCR
+	POP     ACC
+	RET
+;
+HOST_DDSDis_CRC:
+; Redo the CRC byte in the Disney buffer. The Disney packet checksum is a
+; single byte, an addition of all data bytes except the checksum itself.
+; Of course, it is recorded as 2 bytes of ASCII...
+;
+	MOV     R6,A
+	MOV     DPTR,#disney_buffer     ; Point at first byte to be chksummed
+	CLR     A
+	MOV     B,A                     ; B is chksum counter
+;
+HOST_DDSDis_L2:
+	MOVX    A,@DPTR                 ; Get ASCII byte
+	INC     DPTR
+	ADD     A,B                     ; Add counter to acc
+	MOV     B,A                     ; save result to counter
+	DJNZ    R6,HOST_DDSDis_L2
+;
+; Fall-through - B = chksum count, DPTR -> chksum location.
+	MOV     A,B
+	CALL    BinToHex        ; A written into buffer as 2 ASCII chars
+;       CALL    HOST_DebugCR
+;       CALL    HOST_Debug6
+;       CALL    HOST_DebugCR
+	RET
+;
+;******************************************************************************
+;
+; Function:     HOST_DDS_Dis_Con16bitdata
+; Input:        DDS buffer with packet from MASTER.
+; Output:       Disney buffer with Disney-style data, A > 0 if 16 bit.
+;               If no data in packet
+; Preserved:    ?
+; Destroyed:    A,DPTR
+; Description:  This routine does the special case processing required for
+;               16-bit data fields in host_buffer. DDS is 2-byte little-endian,
+;               WDW is 4 byte ASCII big-endian. Packet types affected are:
+;               HOST_PKT_RTPP   EQU 10  ; read tickets per period
+;               HOST_PKT_RPA    EQU 11  ; read period advance
+;               HOST_PKT_RPL    EQU 13  ; read period length
+;               HOST_PKT_RTI    EQU 30  ; read tickets issued
+;               HOST_PKT_RTC    EQU 16  ; read ticket counts
+;               When this is called, the cmd byte has been converted, and
+;               is in place in host_buffer
+;
+; Calls:        HOST_ASCII_Bin
+;
+; Uses:         host_buffer, disney_buffer, HOST_PKT_WTPP, HOST_PKT_WPA, HOST_PKT_WPL
+;
+; Called in:    HOST_DDS_Disney_Convert
+;
+; Written by : Robert Sneddon           6 June 1999
+;******************************************************************************
+;
+HOST_DDS_Dis_Con16bitdata:
+; First check to see if this is a special-case (16-bit data) packet.
+	MOV     DPTR,#host_buffer+3                     ; 3rd byte is cmd byte
+	MOVX    A,@DPTR
+;
+	CJNE    A,#HOST_PKT_RTPP,HOST_DDisC16_L1        ; Type 10
+	JMP     HOST_DDisC16_True
+;
+HOST_DDisC16_L1:
+	CJNE    A,#HOST_PKT_RPA,HOST_DDisC16_L2         ; Type 11
+	JMP     HOST_DDisC16_True
+;
+HOST_DDisC16_L2:
+	CJNE    A,#HOST_PKT_RPL,HOST_DDisC16_L3         ; Type 13
+	JMP     HOST_DDisC16_True
+;
+HOST_DDisC16_L3:
+	CJNE    A,#HOST_PKT_RTI,HOST_DDisC16_L4         ; Type 30
+	JMP     HOST_DDisC16_True
+;
+HOST_DDisC16_L4:
+	CJNE    A,#HOST_PKT_RTC,HOST_DDisC16_L5         ; Type 16
+	JMP     HOST_DDisC16_True2                      ; Special
+;
+HOST_DDisC16_L5:
+	CLR     A                               ; "8-bit data" flag
+	RET
+;
+HOST_DDisC16_True:
+; this is a special-case DDS packet. As of 06/06/99 these are all of the
+; form (BIN)<chkl><chkh><len><cmd><datal><datah>, with only one 16-bit
+; data entry. If this changes, this code will need changing too.
+; WDW format is (ASCII)<len><len><cmd><cmd><data><data><data><data>
+	MOV     DPTR,#host_buffer+4             ; data low byte
+	MOVX    A,@DPTR
+	MOV     DPTR,#disney_buffer+6           ; Last 2 ASCII chars
+	CALL    BinToHex
+	MOV     DPTR,#host_buffer+5             ; data high byte
+	MOVX    A,@DPTR
+	MOV     DPTR,#disney_buffer+4           ; First 2 ASCII chars
+	CALL    BinToHex
+;
+	MOV     A,#1                            ; "16-bit data" flag
+	RET
+;
+HOST_DDisC16_True2:
+; this is another special-case packet. As of 26/06/99 this consists of
+; a single 8-bit number (n), and n 16-bit numbers. The current value
+; of n is 4. If this changes, this code will need changing too.
+; DDS: (BIN)<chkl><chkh><len><cmd><n>[<data1l><data1h>...<datanl><datanh>]
+; WDW: (ASCII)<lenh><lenl><cmdh><cmdl><nh><nl>[<data><data>...<data>]
+; Convert n first.
+
+
+CAPABLE_OF_WRITING_SOFTWARE EQU 1               ; T,14x99
+
+	IF      CAPABLE_OF_WRITING_SOFTWARE     ; T,14x99
+						; T,14x99
+	mov     dpsel,#0                        ; T,14x99
+	push    dph                             ; T,14x99
+	push    dpl                             ; T,14x99
+	mov     dpsel,#1                        ; T,14x99
+	push    dph                             ; T,14x99
+	push    dpl                             ; T,14x99
+
+	MOV     DPTR,#host_buffer+4             ; number of counters
+	MOVX    A,@DPTR
+	inc     dptr
+
+	mov     dpsel,#0
+	MOV     DPTR,#disney_buffer+4           ; 2 ASCII chars
+
+	push    acc                             ; save # fields
+	CALL    BinToHex                        ; autoincrement is 2
+
+
+	pop     acc                             ; T,14x99 counter
+
+Ho_ho_2Troo:                                    ; T,14x99
+	push    acc                             ; T,14x99 save repeat count
+	mov     dpsel,#1
+	movx    a,@dptr ; LSB                   ; T,14x99
+	inc     dptr                            ; T,14x99 
+	mov     b,a                             ; T,14x99
+	movx    a,@dptr ; MSB                   ; T,14x99
+	inc     dptr                            ; T,14x99
+						; T,14x99
+	mov     dpsel,#0                        ; T,14x99
+	call    bintohex                        ; T,14x99
+	mov     a,b                             ; T,14x99
+	call    bintohex                        ; T,14x99
+	pop     acc                             ; T,14x99
+	dec     acc                             ; T,14x99
+	jnz     Ho_ho_2troo                     ; T,14x99
+						; T,14x99
+	mov     dpsel,#1                        ; T,14x99
+	pop     dpl                             ; T,14x99
+	pop     dph                             ; T,14x99
+	mov     dpsel,#0                        ; T,14x99
+	pop     dpl                             ; T,14x99
+	pop     dph                             ; T,14x99
+						; T,14x99
+	ELSE                                    
+
+
+	MOV     DPTR,#host_buffer+5             ; data low byte
+	MOVX    A,@DPTR
+	MOV     DPTR,#disney_buffer+8           ; Last 2 ASCII chars
+	CALL    BinToHex
+	MOV     DPTR,#host_buffer+6             ; data high byte
+	MOVX    A,@DPTR
+	MOV     DPTR,#disney_buffer+6           ; First 2 ASCII chars
+	CALL    BinToHex
+;
+	MOV     DPTR,#host_buffer+7             ; data low byte
+	MOVX    A,@DPTR
+	MOV     DPTR,#disney_buffer+12          ; Last 2 ASCII chars
+	CALL    BinToHex
+	MOV     DPTR,#host_buffer+8             ; data high byte
+	MOVX    A,@DPTR
+	MOV     DPTR,#disney_buffer+10          ; First 2 ASCII chars
+	CALL    BinToHex
+;
+	MOV     DPTR,#host_buffer+9             ; data low byte
+	MOVX    A,@DPTR
+	MOV     DPTR,#disney_buffer+16          ; Last 2 ASCII chars
+	CALL    BinToHex
+	MOV     DPTR,#host_buffer+10            ; data high byte
+	MOVX    A,@DPTR
+	MOV     DPTR,#disney_buffer+14          ; First 2 ASCII chars
+	CALL    BinToHex
+;
+	MOV     DPTR,#host_buffer+11            ; data low byte
+	MOVX    A,@DPTR
+	MOV     DPTR,#disney_buffer+20          ; Last 2 ASCII chars
+	CALL    BinToHex
+	MOV     DPTR,#host_buffer+12            ; data high byte
+	MOVX    A,@DPTR
+	MOV     DPTR,#disney_buffer+18          ; First 2 ASCII chars
+	CALL    BinToHex
+;
+
+	ENDIF
+
+	MOV     A,#1                            ; "16-bit data" flag
+	RET
+;******************************************************************************
+;
+; Function:     HOST_Disney_Chksum
+; Input:        disney_buffer has a complete packet
+; Output:       A = 0 if no error, or > 0 if error.
+; Preserved:    None
+; Destroyed:    B, R7, C, DPTR
+; Description:  This calculates the Disney packet checksum, and compares it
+;               against the value sent in the packet itself. The checksum
+;               is the accumulated sum of the hex values of each byte MOD 256.
+;
+; Calls:        HOST_ASCII_Bin
+;
+; Uses:         disney_buffer
+;
+; Called in:    [HOST.ASM]HOST_Rx
+;
+; Written by : Robert Sneddon           5 June 1999
+;******************************************************************************
+HOST_Disney_Chksum:
+	PUSHB
+	MOV     DPTR,#disney_buffer     ; Point to 1st. byte in packet buffer
+
+	IF      HOST_LENGTH_ENCODING_DECIMAL
+
+	movx    a,@dptr
+	anl     a,#15
+	mov     b,#10
+	mul     ab
+	mov     b,a
+	inc     dptr
+	movx    a,@dptr
+	anl     a,#15
+	add     a,b
+
+	ELSE
+
+
+	IF      VT10
+	call    HOST_Hex2Bin
+	ELSE
+	CALL    HOST_ASCII_Bin
+	INC     DPTR                    ; Point at next ASCII pair
+	ENDIF
+
+
+	ENDIF
+
+	MOV     R7,A                    ; No. of bytes in packet (excluding length).
+	CLR     A
+	MOV     B,A
+	CLR     C
+	MOV     DPTR,#disney_buffer
+; Checksum is length + cmd + data bytes. This is the same number of bytes as
+; length, which does not include the checksum. Useful, that.
+HOST_DChk1:
+	MOVX    A,@DPTR
+	ADD     A,B                     ; Add buffer byte to running total.
+	MOV     B,A
+	INC     DPTR
+	DJNZ    R7,HOST_DChk1   
+; Checksum in B, DPTR -> checksum bytes in Disney buffer.
+
+	IF      VT10
+	call    HOST_Hex2Bin
+	ELSE
+	CALL    HOST_ASCII_Bin
+	INC     DPTR                    ; Point at next ASCII pair
+	ENDIF
+
+	CLR     C
+	SUBB    A,B
+	POP     B       
+	RET     ; 0 = OK, >0 = error
+
+
+
+	IF      SNOT
+
+
+
+
+;
+;******************************************************************************
+; Function:     HOST_Ping
+; Input:        ?
+; Output:       ?
+; Preserved:    B
+; Destroyed:    A
+; Description:   Send a ping back to the Disney HOST machine, usually in
+;               response to a packet having been sent by the HOST.
+;
+; Calls:        COM_TxChar
+;
+; Uses:         B
+;
+; Called in:    HOST.ASM
+;
+; Written by : Robert Sneddon           3 June 1999
+;******************************************************************************
+HOST_Ping:
+	PUSHB                           ; Save stuff
+	MOV     B,#COM_COM1
+;
+	MOV     A,#HOST_ACK             ; transmit a HOST_ACK
+	CALL    COM_TxChar
+;
+	MOV     A,#HOST_ETX             ; transmit a HOST_ETX
+	CALL    COM_TxChar              ;
+;
+	POP     B
+	RET
+;
+;******************************************************************************
+; Function:     HOST_ErrPing
+; Input:        ?
+; Output:       ?
+; Preserved:    B
+; Destroyed:    A
+; Description:   Send a "bad packet" response back to the Disney HOST machine,
+;               usually in response to an error in receiving or processing
+;               a packet sent by the HOST.
+;
+; Calls:        COM_TxChar
+;
+; Uses:         B
+;
+; Called in:    HOST.ASM
+;
+; Written by : Robert Sneddon           18 June 1999
+;******************************************************************************
+HOST_ErrPing:
+	PUSHB                           ; Save stuff
+	MOV     B,#COM_COM1
+;
+	MOV     A,#HOST_NAK             ; transmit a HOST_NAK
+	CALL    COM_TxChar
+;
+	MOV     A,#HOST_ETX             ; transmit a HOST_ETX
+	CALL    COM_TxChar              ;
+;
+	POP     B
+	RET
+;******************************************************************************
+;
+	
+	
+	
+	ENDIF
+	
+	
+	
+	
+	
+	END             ; Of module CONV.ASM

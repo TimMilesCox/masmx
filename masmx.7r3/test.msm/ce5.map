@@ -1,0 +1,4 @@
+	$include	"map_ppc.def"
+$(1:040004400)
+	$include,$binary "../result.txo/ce5.txo"
+

@@ -1,0 +1,44 @@
+MASMX 7r2Z
+3/scandal.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1 __registers_by_name	$set	1
+  :                            2: 	$include	"../aside.dem/ppc_64.def"
+  :                            3 .buffer	$equ,"$directive"	"$res"
+  :                            4 
+  :                            5 	$set_option	"i"
+  :                            6 
+  :                            7 __absolute_text	$set	0x01ac00000000000
+  :                            8 __absolute_data	$set	0x034000000000000
+  :                            9 
+  :                            10 $(.data:-32768:*__absolute_data+32768,r29)
+  :                            11 __start_data*
+  :                            12 rimskiy	.buffer	32760
+03:0034000000007FF8:00000067  +13 index	$do	4,korsakov(index)	+	104-index
+03:0034000000007FFC:00000066  +13 
+03:0034000000008000:00000065  +13 
+03:0034000000008004:00000064  +13 
+  :                            14 
+  :                            15 $(.text::*__absolute_text)
+Note: scandal.msm Line 16: GIANT SPACE: $ returns intrasegment part of counter only
+Note: scandal.msm Line 16: for absolute current location use $A
+01:001AC00000000000:4800000D  +16 	bl	letsgo
+01:001AC00000000004:0034000000008000
+                              +17 	+	 __absolute_data+32768:d
+01:001AC0000000000C:7FA802A6  +18 letsgo	mflr	r29
+01:001AC00000000010:EBBD0000  +19 	ld	r29, 0(r29)
+01:001AC00000000014:807DFFFC  +20 	lwz	r3, korsakov(2)
+01:001AC00000000018:809D0000  +21 	lwz	r4, korsakov(3)
+  :                            22 
+01:001AC0000000001C:67A9FFF8  +23 	li	r9, korsakov(1)
+01:001AC00000000020:67AA0004  +24 	li	r10,korsakov(4)
+  :                            25 
+Note: scandal.msm Line 26: GIANT SPACE: $ returns intrasegment part of counter only
+Note: scandal.msm Line 26: for absolute current location use $A
+01:001AC00000000024:4BFFFFDD  +26 	bl	somewhere
+01:001AC00000000028:4E800020  +27 	blr
+*EOF*
+:$(01):00000000:0000002C :$(03):FFFF8000:00000008 
+scandal.msm: object code 348 bytes: 0 errors: 1 undefined labels

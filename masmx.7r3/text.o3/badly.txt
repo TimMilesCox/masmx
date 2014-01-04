@@ -1,0 +1,2 @@
+MASMX 7r2
+Error: badly.msm Line 0: badly.msm file missing

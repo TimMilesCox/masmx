@@ -1,0 +1,2 @@
+MASMX 7r2
+Error: masm7.msm Line 0: masm7.msm file missing

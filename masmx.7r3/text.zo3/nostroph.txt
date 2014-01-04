@@ -1,0 +1,9 @@
+MASMX 7r2Z
+3/nostroph.msm
+*EOF*
+  :                            1 $(5:05000)
+  :                            2 "label\with(weird/things>in<it"
+05:005000 005000              +3         +       "label\with(weird/things>in<it"
+*EOF*
+:$(05):005000:005001 
+nostroph.msm: object code 44 bytes: 0 errors: 0 undefined labels

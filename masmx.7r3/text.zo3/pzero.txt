@@ -1,0 +1,10 @@
+MASMX 7r2Z
+3/pzero.msm
+  :                            1 pzreo*  $proc
+  :                            2         +       pzreo(0,2:1)
+  :                            3 .        $do     .dcount(1)=20000/GRANULE-3,    $list   1
+  :                            4         $end
+00:000000 000064              +5         pzreo,100       99
+  :                            6         $end
+:$(00):000000:000001 
+pzero.msm: object code 44 bytes: 0 errors: 0 undefined labels

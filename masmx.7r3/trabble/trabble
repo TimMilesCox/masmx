@@ -1,0 +1,8 @@
+rm *.txo
+../masmx	tribble	$1
+../masmx	trabble	$1
+../masmx	trybble	$1
+cp	tribble.txo	../test.o3
+cp      trabble.txo     ../test.o3
+cp      trybble.txo     ../test.o3
+

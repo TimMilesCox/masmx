@@ -1,0 +1,58 @@
+MASMX 7r2Z
+3/scally2.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1 __giant	$set		 1
+  :                            2: 	$include	"../aside.dem/ppc_64.def"
+  :                            3: 	$include	../aside.dem/enter64a.def
+  :                            4 
+  :                            5 __base36A	$set	0x00444400000f0000
+  :                            6 $(.literal::*__base36A,30/__literal)
+Note: scally2.msm Line 7: GIANT SPACE: $ returns intrasegment part of counter only
+Note: scally2.msm Line 7: for absolute current location use $A
+  :                            7 __base36* $equ	.+__base36A
+  :                            8 
+  :                            9 $(.data::*0x00444400000e0000)
+  :                            10 gotcha*	$res	16
+03:00444400000E0010:00444400000E0018
+                              +11 secret_factor1	+	wonderloaf:d
+03:00444400000E0018:776F6E6465726C6F61660000
+                              +12 wonderloaf      "wonderloaf"
+  :                            13 #factor1*	+	wonderloaf
+  :                            14 
+  :                            15 $(.text::*0x00444400000a0000)
+  :                            16 zoohoo*
+01:00444400000A0000:F821FFE1  +17 	enter64	32
+01:00444400000A0004:7C0802A6  +17 
+01:00444400000A0008:FBE10018  +17 
+01:00444400000A000C:F8010028  +17 
+01:00444400000A0010:63E10000  +17 
+01:00444400000A0014:FBDF0010  +17 
+01:00444400000A0018:4800000D  +17 
+01:00444400000A001C:00444400000F0000
+                              +17 
+01:00444400000A0024:7FC802A6  +17 
+01:00444400000A0028:EBDE0000  +17 
+  :                            18 	$if	__giant
+01:00444400000A002C:E87E0000  +19 	ld	r3, __literal(wonderloaf:d)
+  :                            20 	$else
+  :                            21 	oris	r3, 0, wonderloaf@ha
+  :                            22 	ori	r3, r3, wonderloaf@l
+  :                            23 	$endif
+  :                            24 
+01:00444400000A0030:E81E0008  +25 	ld	r0, __literal(fireup:d)
+01:00444400000A0034:7C0803A6  +26 	mtlr	r0
+01:00444400000A0038:4E800021  +27 	blrl
+01:00444400000A003C:E83F0000  +28 	leave64
+01:00444400000A0040:E8010008  +28 
+01:00444400000A0044:7C0803A6  +28 
+01:00444400000A0048:EBC1FFF0  +28 
+01:00444400000A004C:EBE1FFF8  +28 
+01:00444400000A0050:4E800020  +28 
+*EOF*
+24:00444400000F0000+00444400000E0018
+24:00444400000F0008+[0000]40:0000000000000000
+:$(01):00000000:00000054 :$(03):00000000:00000024 :$(24):00000000:00000010 
+scally2.msm: object code 579 bytes: 0 errors: 1 undefined labels

@@ -1,0 +1,18 @@
+MASMX 7r2Z
+3/quo1.msm
+QDELIM='
+*EOF*
+  :                            1         $quote  027
+  :                            2 p*      $proc
+  :                            3 'name:p(1,1)'
+  :                            4         +       'name:p(1,1)'+0c0000
+  :                            5         +       name:no+0a0000
+  :                            6         $snap    2
+  :                            7         $end
+  :                            8 $(0:64)
+00:000040 00006E616D65466E6F  +9         p       no
+00:000043 0A0040              +9 
+NAME:NO=$00:000040
+*EOF*
+:$(00):000040:000044 
+quo1.msm: object code 63 bytes: 0 errors: 0 undefined labels

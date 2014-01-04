@@ -1,0 +1,8 @@
+        $include        "8051.def"
+target1 $res    126
+        sjmp    target1
+        sjmp    target1
+        sjmp    target2
+        sjmp    target2
+        $res    126
+target2

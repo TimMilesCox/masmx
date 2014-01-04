@@ -1,0 +1,49 @@
+MASMX 7r2Z
+3/reco.msm
+*EOF*
+  :                            1         $set_option "u"
+  :                            2 low*    $proc
+  :                            3         $note   low
+  :                            4 transient $equ	low(1, 1)
+  :                            5 label   $equ    transient
+  :                            6         $snap   2
+  :                            7         +       label
+  :                            8         $end
+  :                            9 
+  :                            10 mid*    $proc
+  :                            11         $note   mid
+  :                            12 transient $equ	mid(1, 1)
+  :                            13 label   $equ    transient
+  :                            14         $snap   2
+  :                            15         low     label*/4
+  :                            16         +       label
+  :                            17         $end
+  :                            18 
+  :                            19 top*    $proc
+  :                            20         $note   top
+  :                            21 label   $equ    top(1, 1)
+  :                            22         $snap   2
+  :                            23         mid     label*/4
+  :                            24         +label*/1
+  :                            25         $end
+  :                            26 
+  :                            27 label   $equ    99
+Note: reco.msm Line 28: top
+LABEL=000064
+Note: reco.msm Line 28: mid
+LABEL+1=000064
+TRANSIENT=000640
+LABEL=000640
+Note: reco.msm Line 28: low
+LABEL+1=000064
+TRANSIENT+2=000640
+LABEL+2=000640
+TRANSIENT=006400
+LABEL=006400
+00:000000 006400              +28         top     100
+00:000001 000640              +28 
+00:000002 0000C8              +28 
+00:000003 000063              +29         +       label
+*EOF*
+:$(00):000000:000004 
+reco.msm: object code 65 bytes: 0 errors: 0 undefined labels

@@ -1,0 +1,27 @@
+	$plist	5
+
+$(1:128)
+$(0:64)
+
+one*	$proc
+fun*	$func *
+	$return 44
+	$end
+two*	$proc
+	+	fun
+	$end
+	two
+	$end
+
+rum*	$func
+three*  $proc   $(1)
+        +       99
+        $end
+
+	three
+	$return	$(1)
+	$end
+
+	one
+	+	rum
+	$end

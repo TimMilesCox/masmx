@@ -1,0 +1,664 @@
+        $cont_char      0
+        $lterm          ';'
+        $quote          027
+        $sterm          '.'
+
+        $suffix 1
+
+        $text   / and /--/
+        $text   / or /++/
+        $text   / xor /**/
+        $text   \ shr \/*\
+        $text   \ shl \*/\
+        $text   \ mod \///\
+        $text   / eq /=/
+        $text   / gt />/
+        $text   / lt /</
+        $text   / <> /#/
+        $text   / = /=/
+        $text   / * /*/
+        $text   \ / \/\
+        $text   / + /+/
+        $text   / - /-/
+        $text   /# low/#low/
+        $text   /#low /#low/
+        $text   / not /!/
+        $text   /#not /#!/
+        $text   /#not/#!/
+        $text   / ERROR / $note /
+
+equ     $equ,$directive    $equ        
+
+if      equ,$directive     $if
+elseif  equ,$directive     $elseif
+else    equ,$directive     $else
+endif   equ,$directive     $endif
+include equ,$directive     $include
+macro   equ,$directive     $proc
+macend  equ,$directive     $end
+name    equ,$directive     $name
+memtrap equ,$directive     $nop
+preset  equ,$directive     $nop
+end     equ,$directive     $nop
+set     equ,$directive     $set
+
+        $word           8
+        $byte           8
+        $quantum        8
+        $awidth         16
+
+
+lmacro  macro
+list    $set    1        
+nolist  $set    0
+        $if     lmacro(1,1)
+        $plist
+        $else
+        $noplist
+        $endif
+        macend
+
+dw      macro
+        $do     dw(1)
+v       $set    dw(1, $d+1)        
+        +       v, v/*8:d
+        $endo
+        macend
+
+dd      macro
+        $do     dd(1)
+v       $set    dd(1, $d+1)        
+        +       v, v/*8, v/*16, v/*24:q
+        $endo
+        macend
+
+
+org     macro
+procedure_name $set 1        
+        if      ($t(org(1,1))=procedure_name)--(org(1,1)=VAR)
+        $pushlocator
+$(1)
+        $res    org(1,2)-$
+        $poplocator
+        else
+        $res    org(1,1)-$
+        endif
+        macend
+
+align   macro
+topage  $set    256
+procedure_name $set 1
+        if      ($t(align(1,1))=procedure_name)--(align(1,1)=var)
+        $pushlocator
+$(1)
+grain   $set    align(1,2)
+        $res    ($+grain-1)--(-grain)-$
+        $poplocator
+        $else
+grain   $set    align(1,1)
+        $res    ($+grain-1)--(-grain)-$
+        $endif
+        macend
+
+
+
+
+p       $proc
+db      $name        
+        $string,02c p(1)
+        $end
+
+
+var     $proc
+;        
+        $pushlocator
+$(1)
+        $linelabel $
+        $res    var(1,1)
+        $poplocator
+        $end
+
+acc     $equ    0e0
+b       $equ    0f0
+psw     $equ    0d0
+dph     $equ    083
+dpl     $equ    082
+;dpsel   $equ    092
+sp      $equ    081
+it1     $equ    08a
+ex1     $equ    0aa
+p3      $equ    0b0
+p1      $equ    090
+it0     $equ    088
+tmod    $equ    089
+tcon    $equ    088
+f0      $equ    0d5
+
+i$mova_r        $form   5,3
+i$mova_direct   $form   8,8
+i$mova_indirect $form   7,1
+i$movr_direct   $form   5,3,8
+i$movd_direct   $form   8,8,8
+i$movd_indirect $form   7,1,8
+
+i$long_jump     $form   8,16
+
+i$acall         $form   3,5,8
+
+i$add_r         $form   4,1,3
+i$add_direct    $form   4,4,8
+i$add_indirect  $form   4,3,1
+
+i$boole_d       $form   4,4,8,8
+
+i$cjne_a        $form   8,8,8
+i$cjne_r        $form   5,3,8,8
+i$cjne_indirect $form   7,1,8,8
+
+i$set           $form   4,4
+
+p       $proc
+
+acall   $name   011
+ajmp    $name   1
+
+        i$acall       p(1,1)/*8, $n, p(1,1)
+        $if     (p(1,1)/*11)#($/*11)
+          $flag Target Outwith 2K page
+        $endif
+        $end
+
+
+p       $proc
+
+add     $name   2
+addc    $name   3
+subb    $name   9
+xch     $name   12
+
+        $if     ($region(p(1,1))=REGISTERS$)--(p(1,1)=A)
+          $if   p(1,@2)
+            i$add_indirect      $n, 3, p(1,2)
+          $elseif ($region(p(1,2))=RREGISTERS$)
+            i$add_r             $n, 1, p(1,2)
+          $elseif p(1,#2)
+            $if $n=12
+              $flag You Cannot XCH A,#ImmediateValue
+            $else
+              i$add_direct        $n, 4, p(1,2)
+            $endif
+          $else
+            i$add_direct        $n, 5, p(1,2)
+          $endif
+        $else
+          $flag Left-Side Operand may only be A
+        $endif
+        
+        $end
+
+p       $proc
+
+anl     $name   5
+orl     $name   4
+xrl     $name   6
+
+        $if     ($region(p(1,1))=REGISTERS$)--(p(1,1)=A)
+          $if   p(1,@2)
+            $if p(1,2)<2
+            i$add_indirect      $n, 3, p(1,2)
+            $else
+            $flag @R0 or @R1
+            $endif
+          $elseif $region(p(1,2))=RREGISTERS$
+            i$add_r             $n, 1, p(1,2)
+          $elseif p(1,#2)
+            i$add_direct        $n, 4, p(1,2)
+          $else
+            i$add_direct        $n, 5, p(1,2)
+          $endif
+        $elseif     ($region(p(1,1))=REGISTERS$)--(p(1,1)=C)
+          $if   p(1,*2)
+            $if $n=5
+              i$mova_direct    082, p(1,2)
+            $elseif $n=4
+              i$mova_direct    072, p(1,2)
+            $else
+              $flag C Not Supported as Operand
+            $endif
+          $else
+            $if $n=5
+              i$mova_direct    0d0, p(1,2) 
+            $elseif $n=4
+              i$mova_direct    0a0, p(1,2)
+            $else
+              $flag C Not Supported as Operand
+            $endif
+          $endif
+        $elseif   ($region(p(1,2))=REGISTERS$)--(p(1,2)=a)
+          i$add_direct        $n, 2, p(1,1)
+        $elseif p(1,#2)
+          i$boole_d             $n, 3, p(1,1), p(1,2)  
+        $else
+          $flag Operands Not Right
+        $endif
+        $end
+
+
+        
+p       $proc
+
+cjne    $name
+
+        $if     ($region(p(1,1))=REGISTERS$)--(p(1,1)=A)
+          $if   p(1,#2)
+            i$cjne_a            0b4, p(1,2), rel3(p(1,3))
+          $else
+            i$cjne_a            0b5, p(1,2), rel3(p(1,3))
+          $endif
+        $elseif p(1,@1)
+          $if   p(1,#2)
+            i$cjne_indirect     05bh, p(1,1), p(1,2), rel3(p(1,3))
+          $else
+            $flag Second Operand Must Be Immediate
+          $endif
+        $elseif $region(p(1,1))=RREGISTERS$
+          $if  p(1,#2)
+            i$cjne_r            017, p(1,1), p(1,2), rel3(p(1,3))
+          $else
+            $flag Second Operand Must Be Immediate
+          $endif
+        $else
+          $flag First Operand Must be A/Rn/@Rn
+        $endif
+        $end
+
+p       $proc
+clr     $name   12
+cpl     $name   11
+        $if $region(p(1,1))=REGISTERS$
+          $if   p(1,1)=A
+            $if $n=12
+            i$set       14, 4
+            $endif
+            $if $n=11
+            i$set       15, 4
+            $endif
+          $elseif p(1,1)=C
+            i$set       $n, 3
+          $else         
+            $flag A or C or a Bit
+          $endif
+        $else
+          i$add_direct         $n, 2, p(1,1)     
+        $endif
+        $end
+
+p       $proc
+setB    $name   13
+        $if $region(p(1,1))=REGISTERS$
+          $if p(1,1)=C
+            i$set       $n, 3
+          $else         
+            $flag C or a Bit
+          $endif
+        $else
+          i$add_direct         $n, 2, p(1,1)      
+        $endif
+        $end
+
+p       $proc
+da      $name   11
+        $if ($region(p(1,1))=REGISTERS$)--(p(1,1)=A)
+          i$set $n, 4
+        $else
+          $flag DA A, Nothing Else
+        $endif
+        $end
+
+p       $proc
+inc     $name     0
+dec     $name     1
+        $if $region(p(1,1))=REGISTERS$
+          $if           p(1,1)=A
+            i$set       $n, 4
+          $elseif       p(1,1)=dptr
+            $if $n=0
+               i$set    10, 3
+            $else
+               $flag You can only INC dptr
+            $endif
+          $else
+            $flag You can't INC/DEC This Register
+          $endif
+        $elseif p(1,@1)
+          $if   p(1,1)<2
+            i$add_indirect      $n, 3, p(1,1)
+          $else
+            $flag @R0 or @R1
+          $endif
+
+        $elseif $region(p(1,1))=RREGISTERS$
+          i$add_r       $n, 1, p(1,1)
+        $else
+          i$add_direct  $n,  5, p(1,1)
+        $endif
+        $end
+
+p       $proc
+div     $name   8
+mul     $name   10
+        $if     ($region(p(1,1))=REGISTERS$)--(p(1,1)=AB)
+          i$set   $n, 4
+        $else
+          $flag   Mul/Div AB Only
+        $endif
+        $end
+
+p       $proc
+djnz    $name
+        $if     $region(p(1,1))=RREGISTERS$
+          i$movr_direct 01bh, p(1,1), rel2(p(1,2))
+        $else  
+          i$movd_direct 0d5, p(1,1), rel3(p(1,2))
+        $endif
+        $end
+
+p       $proc
+jb      $name   020
+jnb     $name   030
+jbc     $name   010
+        i$movd_direct   $n, p(1,1), rel3(p(1,2))
+        $end
+
+p       $proc
+jc      $name   040
+jnc     $name   050
+jz      $name   060
+jnz     $name   070
+sjmp    $name   080        
+        i$mova_direct $n, rel2(p(1,1))
+        $end
+
+p       $proc
+lcall   $name   012
+ljmp    $name   002
+        i$long_jump     $n, p(1,1)
+        $end
+
+p       $proc
+call    $name
+        
+        $ifequ  p(1,1)
+          $if   p(1,1)>$
+            lcall p(1,1)
+          $else
+            $if     ($+2)/*11=p(1,1)/*11
+              acall p(1,1)
+            $else
+              lcall p(1,1)
+            $endif
+          $endif
+        $else
+
+        lcall   p(1,1)
+
+        $endif
+        
+        $end
+
+p       $proc
+jmp     $name
+        $if     p(1,@1)--($region(p(1,1))=REGISTERS$)--(p(1,1)=A+DPTR)
+        +       073
+        $else
+          $ifequ  p(1,1)
+            $if     p(1,1)>$
+              ljmp    p(1,1)
+            $else
+              $if (p(1,1)<$+2+127)--(p(1,1)>$+2-129)
+                sjmp    p(1,1)
+              $elseif ($+2)/*11=p(1,1)/*11
+                ajmp    p(1,1)
+              $else
+                ljmp    p(1,1)
+              $endif
+            $endif
+        
+          $else
+
+            ljmp    p(1,1)
+            
+          $endif
+        
+        $endif
+        
+        $end
+
+p       $proc
+movc    $name
+        $if     ($region(p(1,1))=REGISTERS$)--(p(1,1)=A)
+          $if     $region(p(1,2))=REGISTERS$
+            $if   p(1,2)=A+DPTR
+              +   093s
+            $elseif p(1,2)=A+PC
+              +   083s
+            $else
+              $flag From Must Be @A+DPTR or @A+PC
+            $endif
+          $else
+            $flag From Must Be @A+DPTR or @A+PC
+          $endif
+        $else
+          $flag To Must Be A
+        $endif
+        $end
+
+p       $proc
+movx    $name
+        $if     p(1,@1)
+          $if   ($region(p(1,2))=REGISTERS$)--(p(1,2)=A)
+            $if ($region(p(1,1))=REGISTERS$)--(p(1,1)=DPTR)
+              +     0f0s
+            $elseif ($region(p(1,1))=RREGISTERS$)--(p(1,1)<2)
+              i$mova_indirect 079, p(1,1)
+            $else       
+              $flag MOVX @DPTR,A or MOVX @R0,A or MOVX @R1,A
+            $endif
+          $else
+            $flag  CPU Operand Must Be A
+          $endif
+        $elseif  p(1,@2)
+          $if   ($region(p(1,1))=REGISTERS$)--(p(1,1)=A)
+            $if ($region(p(1,2))=REGISTERS$)--(p(1,2)=DPTR)
+              +     0e0s
+            $elseif ($region(p(1,2))=RREGISTERS$)--(p(1,2)<2)
+              i$mova_indirect 071, p(1,2)
+            $else       
+              $flag MOVX A,@DPTR or MOVX A,@R0 or MOVX A,@R1
+            $endif
+          $else
+            $flag  CPU Operand Must Be A
+          $endif
+        $else
+          $flag MOVX A,@... or MOVX @...,A
+        $endif
+        $end
+
+p       $proc
+nop     $name   0        
+ret     $name   022
+reti    $name   032
+        +       $n
+        $end
+
+p       $proc
+push    $name   0c0        
+pop     $name   0d0
+        $if     p(1,#1)++p(1,@1)++($region(p(1,1))=REGISTERS$)
+          $flag PUSH/POP Direct Addressed IRAM Location or SFR Only
+        $else
+          $if $region(p(1,1))=RREGISTERS$
+            $note Caution: RRegister Bank May Change Between PUSH/POP
+          $endif
+          i$mova_direct   $n, p(1,1)
+        $endif
+        $end
+
+p       $proc
+rl      $name   023        
+rlc     $name   033
+rr      $name   003
+rrc     $name   013
+swap    $name   0c4        
+        $if     ($region(p(1,1))=REGISTERS$)--(p(1,1)=A)
+          +     $n:s 
+        $else
+          $flag You can only do this to A
+        $endif
+        $end
+
+xchd    $proc
+        $if     ($region(p(1,1))=REGISTERS$)--(p(1,1)=A)--(p(1,@2)--($region(p(1,2))=RREGISTERS$)--(p(1,2)<2)
+          i$mova_indirect 06bh, p(1,2)
+        $else
+          $flag XCHD A,@R0 or XCHD A,@R1. No Other Formats
+        $endif
+        $end
+
+p       $proc
+mov     $name
+        $if     ($region(p(1,1))=REGISTERS$)--(p(1,1)=A)
+          $if   p(1,@2)
+            i$mova_indirect     073, p(1,2)
+          $elseif $region(p(1,2))=RREGISTERS$                
+            i$mova_r            01dh, p(1,2)
+          $elseif p(1,#2)
+            i$mova_direct       074, p(1,2)
+          $else
+            i$mova_direct       0e5, p(1,2)
+          $endif
+        $elseif p(1,@1)                              ; @Rn<-
+          $if   ($region(p(1,2))=REGISTERS$)--(p(1,2)=A)
+            i$mova_indirect     07bh, p(1,1)
+          $elseif p(1,#2)
+            i$movd_indirect     03bh, p(1,1), p(1,2)
+          $else
+            i$movd_indirect     053h, p(1,1), p(1,2)
+          $endif
+        $elseif $region(p(1,1))=RREGISTERS$          ; Rn<-
+          $if   ($region(p(1,2))=REGISTERS$)--(p(1,2)=A)
+            i$mova_r            01f, p(1,1)
+          $elseif p(1,#2)
+            i$movr_direct       0f, p(1,1), p(1,2)
+          $else
+            i$movr_direct       015, p(1,1), p(1,2)
+          $endif
+        $elseif ($region(p(1,1))=REGISTERS$)--(p(1,1)=dptr)  ; xram address
+          $if   p(1,#2)
+            i$long_jump         090, p(1,2)
+          $else
+            $flag DPTR may only be loaded with an immediate operand
+          $endif
+        $elseif ($region(p(1,1))=REGISTERS$)--(p(1,1)=C)
+          i$mova_direct        0a2, p(1,2)
+        $elseif ($region(p(1,2))=REGISTERS$)--(p(1,2)=C)
+          i$mova_direct         092, p(1,1)
+        $else                                           ; direct<-
+          $if   ($region(p(1,2))=REGISTERS$)--(p(1,2)=A)
+            i$mova_direct       0f5, p(1,1)
+          $elseif p(1,@2)
+            i$movd_indirect     043, p(1,2), p(1,1)
+          $elseif $region(p(1,2))=RREGISTERS$
+            i$movr_direct       011, p(1,2), p(1,1)
+          $elseif p(1,#2)
+            i$movd_direct       075, p(1,1), p(1,2)
+          $else
+            i$movd_direct       085, p(1,2), p(1,1)
+          $endif
+        $endif
+        $end
+
+rel2    $func            
+        $if     (rel2(1,1)-($+2))<-128
+          $flag can only jump back -128 from $+2
+        $endif
+        $if     (rel2(1,1)-($+2))>127
+          $flag can only jump forwards 127 from $+2
+        $endif
+        $return (rel2(1,1)-($+2))
+        $end
+
+rel3    $func            
+        $if     (rel3(1,1)-($+3))<-128
+          $flag can only jump back -128 from $+3
+        $endif
+        $if     (rel3(1,1)-($+3))>127
+          $flag can only jump forwards 127 from $+3
+        $endif
+        $return (rel3(1,1)-($+3))
+        $end
+
+
+low     $func
+        $return low(1,1)
+        $end
+
+high    $func
+v       $set    high(1,1)        
+        $return v/*8
+        $end
+
+
+acc.0   equ     0e0h
+b.0     equ     0f0h
+psw.0   equ     0d0h
+acc.1   equ     0e1h
+b.1     equ     0f1h
+psw.1   equ     0d1h
+acc.2   equ     0e2h
+b.2     equ     0f2h
+psw.2   equ     0d2h
+acc.3   equ     0e3h
+b.3     equ     0f3h
+psw.3   equ     0d3h
+acc.4   equ     0e4h
+b.4     equ     0f4h
+psw.4   equ     0d4h
+acc.5   equ     0e5h
+b.5     equ     0f5h
+psw.5   equ     0d5h
+acc.6   equ     0e6h
+b.6     equ     0f6h
+psw.6   equ     0d6h
+acc.7   equ     0e7h
+b.7     equ     0f7h
+psw.7   equ     0d7h
+
+
+
+
+
+
+
+
+
+REGISTERS$ $EQU  71
+RREGISTERS$ $EQU 70
+
+$(REGISTERS$:0)
+dptr    $res    1
+pc      $res    1
+ab      $res    1
+c       $res    1
+a       $res    1
+$(RREGISTERS$:0)
+r0      $res    1
+r1      $res    1
+r2      $res    1
+r3      $res    1
+r4      $res    1
+r5      $res    1
+r6      $res    1
+r7      $res    1
+$(1:*0)
+$(0:*0)

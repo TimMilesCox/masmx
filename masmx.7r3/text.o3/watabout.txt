@@ -1,0 +1,11 @@
+MASMX 7r2
+3/watabout.msm
+*EOF*
+[SPOGGI]Error: watabout.msm Line 1: not a command
+  :                            1 watabout	spoggi
+  :                            2 blippy	$equ,222	3434
+[BLIPPY]Error: watabout.msm Line 3: not a command
+  :                            3 	blippy
+*EOF*
+
+watabout.msm: object code 0 bytes: 2 errors: 0 undefined labels

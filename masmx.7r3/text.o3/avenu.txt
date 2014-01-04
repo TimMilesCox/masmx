@@ -1,0 +1,2 @@
+MASMX 7r2
+Error: avenu.msm Line 0: avenu.msm file missing

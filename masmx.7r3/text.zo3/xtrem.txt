@@ -1,0 +1,12 @@
+MASMX 7r2Z
+3/xtrem.msm
+  :                            1: 	$include	"critical.def"
+  :                            2 x       $do     HOW_MANY*3,n(x)
+  :                            3 y       $do     HOW_MANY*2,o(y)
+  :                            4 z	$do	HOW_MANY,p(z)
+00:000000 002400              +5         +       n()
+00:000001 001800              +6         +       o()
+00:000002 000C00              +7         +       p()
+  :                            8         $end
+:$(00):000000:000003 
+xtrem.msm: object code 58 bytes: 0 errors: 0 undefined labels

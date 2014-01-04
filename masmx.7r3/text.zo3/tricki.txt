@@ -1,0 +1,24 @@
+MASMX 7r2Z
+3/tricki.msm
+*EOF*
+  :                            1 	$set_option	"l"
+                                	+       1; 	   
+                                	++2;
+00:000000 000007              +4 	++4
+00:000001 00003B              +5 	+	';'
+00:000002 000000              +6 	+	";"
+                                	+	";";
+00:000003 000000              +8 		";"
+                                	+	';';
+00:000004 3B273B              +10 		';'
+[;99]Error: tricki.msm Line 11: not a command
+  :                            11 	;99
+                                	+	oojama;
+00:000005 000000              +13 	'flip
+00:000006 00006F6F6A616D613B  +14 	+	'oojama;
+[']Error: tricki.msm Line 15: not a command
+  :                            15 	'
+00:000009 000063              +16 	+	99
+*EOF*
+:$(00):000000:00000A 
+tricki.msm: object code 169 bytes: 2 errors: 3 undefined labels

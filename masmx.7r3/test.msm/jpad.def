@@ -1,0 +1,9 @@
+p       $proc
+jpad$*  $name
+        
+$(0:0)
+loop    $do     p(),	j	p(loop)
+        
+        $do     (64-$),	fret	0
+
+        $end

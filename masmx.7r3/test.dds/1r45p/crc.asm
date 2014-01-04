@@ -1,0 +1,173 @@
+;******************************************************************************
+;
+; File     : CRC.ASM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains anything to do with crc's and checksums etc.
+;
+; System   : 80C537
+;
+; History  :
+;   Date     Who Ver  Comments
+;
+; NOTE, currently using simple checksums, no crcs
+;
+;******************************************************************************
+
+;***********
+; Prototypes
+;***********
+
+;void CRC_GenerateChecksum (DPTR *chunk)
+;void CRC_ComputeChecksum (DPTR *datablock, R6 lenhigh, R7 lenlow)
+;ACC CRC_ConfirmChecksum (DPTR *chunk)
+;ACC CRC_ConfirmChecksumLen (DPTR *chunk, R6 lenhigh, R7 lenlow)
+
+;******************************************************************************
+;
+; Function:	CRC_GenerateChecksum
+; Input:	DPTR = address of chunk
+; Output: None
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   A checksum is generated for the headed chunk and it is written into
+;   the header
+;
+;******************************************************************************
+
+CRC_GenerateChecksum: ; DPTR=chunk
+	PUSHDPH
+	PUSHDPL
+	INC	DPTR	; skip the old checksum in the chunk
+        INC	DPTR
+        PUSHDPH
+        PUSHDPL
+        INC	DPTR
+        MOVX	A,@DPTR
+        MOV	R7,A
+        INC	DPTR
+        MOVX	A,@DPTR
+        MOV	R6,A
+        POP	DPL
+        POP	DPH
+        ; dptr now at chunk type byte, r6/r7 = len of chunk
+        MOV	A,R7
+        CLR	C
+        SUBB	A,#2
+        MOV	R7,A
+        MOV	A,R6
+        SUBB	A,#0
+        MOV	R6,A
+        CALL	CRC_ComputeChecksum
+        POP	DPL
+        POP	DPH
+        CALL	MTH_StoreWord
+        RET
+
+;******************************************************************************
+;
+; Function:	CRC_ComputeChecksum
+; Input:	DPTR = address of data block
+;               R6/R7 = number of bytes
+; Output:	result in mth_operand1
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+CRC_ComputeChecksum:
+	CLR	A
+	CALL	MTH_LoadOp1Acc
+	MOV	A,R7
+	MOV	R5,A
+	JZ	CRC_CCloop
+	INC	R6
+CRC_CCloop:
+	MOVX	A,@DPTR
+	INC	DPTR
+	CALL	MTH_LoadOp2Acc
+	CALL	MTH_AddLongs
+	DJNZ	R5,CRC_CCloop
+	DJNZ	R6,CRC_CCloop
+        MOV     mth_op1hl,#0
+        MOV     mth_op1hh,#0
+	RET
+
+;******************************************************************************
+;
+; Function:	CRC_ConfirmChecksum
+; Input:	DPTR = address of headed data block
+; Output:	A=0 if fail, A=1 if ok
+; Preserved:	DPTR
+; Destroyed:	?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+CRC_ConfirmChecksum:
+	PUSHDPH		; read the byte count
+        PUSHDPL		;
+	INC	DPTR		;
+        INC	DPTR		;
+        INC	DPTR		;
+        MOVX	A,@DPTR		;
+        MOV	R7,A		;
+        INC	DPTR		;
+        MOVX	A,@DPTR		;
+        MOV	R6,A		;
+        POP	DPL		;
+        POP	DPH		;
+        ; fall thru to next routine
+
+;******************************************************************************
+;
+; Function:	CRC_ConfirmChecksumLen
+; Input:        DPTR = address of data block
+;               R6/R7 = len of block
+; Output:	A=0 if fail, A=1 if ok
+; Preserved:	DPTR
+; Destroyed:	?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+CRC_ConfirmChecksumLen:
+        PUSHDPH		; get start address
+        PUSHDPL             ; of data to checksum
+        INC	DPTR		; (everything except the checksum itself)
+        INC	DPTR		;
+
+        CLR     C               ;
+        MOV	A,R7		; decrement data count
+        SUBB	A,#2		; by 2 to exclude the
+        MOV	R7,A		; header's checksum field
+        MOV	A,R6		; in the checksumming
+        SUBB	A,#0		; algorithm
+        MOV	R6,A		;
+
+        CALL	CRC_ComputeChecksum
+
+        POP	DPL
+        POP	DPH
+        PUSHDPH
+        PUSHDPL
+        CALL	MTH_LoadOp2Word
+        POP	DPL
+        POP	DPH
+
+        CALL	MTH_CompareLongs
+	JZ	CRC_CCfail
+
+        MOV	A,#1
+CRC_CCfail:
+	RET
+
+;********************************* End Of CRC.ASM ******************************

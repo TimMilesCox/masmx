@@ -1,0 +1,10 @@
+FILL_BOUNDARY EQU 0
+
+boundary        MACRO
+        LMACRO  LIST
+        IF      FILL_BOUNDARY
+        db      FILL_BOUNDARY dup (($+255) AND (-256))-$
+        ELSE
+        ALIGN   ToPAGE
+        ENDIF
+        MACEND

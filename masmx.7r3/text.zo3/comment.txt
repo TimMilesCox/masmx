@@ -1,0 +1,9 @@
+MASMX 7r2Z
+3/comment.msm
+00:000000 400001C00000000000000000
+                              +1  + 1.5 .	I'm a comment
+00:000004 400001CCCCCCCCCCCCCCCCCD
+                              +2  + 1.6 .	I'm another
+  :                            3  $end
+:$(00):000000:000008 
+comment.msm: object code 87 bytes: 0 errors: 0 undefined labels

@@ -1,0 +1,5 @@
+	$include	"map1.def"
+$(3:*8)
+	$include,$binary "../result.txo/adsomor1.txo"
+	$include,$binary "../result.txo/adsomor2.txo"
+

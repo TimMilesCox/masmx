@@ -1,0 +1,14 @@
+	$floating_point	192
+
+number  $set	1.5
+        +       number
+number  $set	-1.5
+        +       number
+number  $set	1.75*+1000000
+        +       number
+number  $set	175*-1000000
+        +       number
+number  $set	17.5e1000001
+        +       number
+number  $set	175.0e-1000000
+        +       number

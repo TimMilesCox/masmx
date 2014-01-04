@@ -1,0 +1,9 @@
+twinset*	$proc
+*	$set	99
+	$end
+
+forty	twinset
+
+	$snap,1
+
+	+	forty

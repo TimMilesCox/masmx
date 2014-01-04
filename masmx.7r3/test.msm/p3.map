@@ -1,0 +1,4 @@
+	$include	"map1.def"
+	$include,$binary "../result.txo/packem.txo"	$(64,65,3)
+	$include,$binary "../result.txo/table34.txo"
+	$end

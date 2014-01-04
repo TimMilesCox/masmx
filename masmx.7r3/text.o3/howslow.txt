@@ -1,0 +1,5 @@
+MASMX 7r2
+3/howslow.msm
+Error: howslow.msm Line 5: $do count,image
+Note: howslow.msm Line 7: really
+*EOF*

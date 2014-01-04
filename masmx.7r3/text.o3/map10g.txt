@@ -1,0 +1,49 @@
+MASMX 7r2
+3/map10g.msm
+../result.txo/image7.txo:$(1) 328 bytes decimal from hexadecimal 00000000 to 00000148
+../result.txo/image7.txo:$(3) 24 bytes decimal from hexadecimal 00000000 to 00000018
+../result.txo/image7.txo:$(5) 12 bytes decimal from hexadecimal 00000000 to 0000000C
+../result.txo/image7.txo:$(6) 8 bytes decimal from hexadecimal 00000000 to 00000008
+../result.txo/image7.txo:$(36) 40 bytes decimal from hexadecimal 00000000 to 00000028
+../result.txo/gzactor.txo:$(1) 88 bytes decimal from hexadecimal 00000148 to 000001A0
+../result.txo/gzactor.txo:$(3) 4 bytes decimal from hexadecimal 00000018 to 0000001C
+../result.txo/gzactor.txo:$(36) 16 bytes decimal from hexadecimal 00000028 to 00000038
+*EOF*
+  :                            1 __giant	$set		1
+  :                            2: 	$include	"ppc64map.def"
+  :                            3 	$list		 2
+  :                            4 	$plist		8
+  :                            5 	$include,$void		../result.txo/image7
+  :                            6: 	$include,$binary	../result.txo/gzactor
+03:000B000000000018:00000063  +4 00000063
+01:000A000000000148:F821FFE1  +7 F821FFE1 7C0802A6 FBE10018 F8010028 63E10000 FBDF0010
+01:000A00000000014C:7C0802A6  +7 
+01:000A000000000150:FBE10018  +7 
+01:000A000000000154:F8010028  +7 
+01:000A000000000158:63E10000  +7 
+01:000A00000000015C:FBDF0010  +7 
+01:000A000000000160:4800000D  +8 4800000D (24)40:0000000000000000 7FC802A6 EBDE0000 E93E0000
+01:000A000000000164:000A800000000028
+                              +8 
+01:000A00000000016C:7FC802A6  +8 
+01:000A000000000170:EBDE0000  +8 
+01:000A000000000174:E93E0000  +8 
+01:000A000000000178:80090004  +9 [0000]10-:80090000 E95E0008 (03)10-:816A0000 [0001:FFFFFFC4/*02]18*/02+:(-01:FFFFFFC4/*02)18*/02+:4BFFFFC5
+01:000A00000000017C:E95E0008  +9 
+01:000A000000000180:816A0018  +9 
+01:000A000000000184:4BFFFE7D  +9 
+01:000A000000000188:E83F0000  +10 E83F0000 E8010008 7C0803A6 EBC1FFF0 EBE1FFF8 4E800020
+01:000A00000000018C:E8010008  +10 
+01:000A000000000190:7C0803A6  +10 
+01:000A000000000194:EBC1FFF0  +10 
+01:000A000000000198:EBE1FFF8  +10 
+01:000A00000000019C:4E800020  +10 
+24:000A800000000028:000C000000000000
+                              +13 [0000:00008000/*10]30*/10:0000000000000000
+24:000A800000000030:000B000000000000
+                              +14 (03:00008000/*10)30*/10:0000000000000000
+  :                            7 
+  :                            8 	$store			image10
+*EOF*
+:$(01):00000000:000001A0 :$(03):00000000:0000001C :$(05):00000000:0000000C :$(06):00000000:00000008 :$(24):00000000:00000038 
+map10g.msm: object code 732 bytes: 0 errors: 0 undefined labels

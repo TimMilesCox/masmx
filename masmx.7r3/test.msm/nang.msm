@@ -1,0 +1,12 @@
+p	$proc	$(44)
+ning*	$name	100
+nang*	$name	200
+nong*	$name	300
+	+	$n
+	$end
+
+	$res	512
+	ning
+	nang
+	nong
+	+	1000

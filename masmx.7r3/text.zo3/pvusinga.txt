@@ -1,0 +1,142 @@
+MASMX 7r2Z
+3/pvusinga.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+[.(55)][00000000000000000000000000000000000000000000e240]
+*EOF*
+  :                            1 __registers_by_name $set 1
+  :                            2 
+  :                            3:         $include        "../aside.dem/ppc_603.def"
+  :                            4 
+  :                            5 hi16*	$func
+  :                            6 	$return	hi16(1, 1)/*16
+  :                            7 	$end
+  :                            8 
+  :                            9 lo16*	$func
+  :                            10 	$return lo16(1, 1)**65535
+  :                            11 	$end
+  :                            12 
+  :                            13 record* $proc        
+  :                            14 *       $tree
+  :                            15 h       +       record(1,1)
+  :                            16 t       $res    record(1,1)*4
+  :                            17         $root
+  :                            18         $end
+  :                            19 
+  :                            20 tree*   $proc
+  :                            21 *       $tree
+  :                            22 times   $do     3,dibber(times) record    tree(1,1)
+  :                            23         $root
+  :                            24         $end
+  :                            25 
+  :                            26 SEGMENT $equ    55*1024+768
+  :                            27 GALACTASEGMENT $set 0x00FFCC007FFC0000
+  :                            28 
+  :                            29 $(55:SEGMENT:*GALACTASEGMENT,r12/GALACTAPOD)
+Note: pvusinga.msm Line 30: GIANT SPACE: $ returns intrasegment part of counter only
+Note: pvusinga.msm Line 30: for absolute current location use $A
+  :                            30 this_segment $equ .+GALACTASEGMENT
+[$TREE]Error: pvusinga.msm Line 31: not a command
+[$TREE]Error: pvusinga.msm Line 31: not a command
+37:00FFCC007FFCDF00:00000012  +31 times   $do     2,raddle1(times) tree    18
+[$ROOT]Error: pvusinga.msm Line 31: not a command
+[$TREE]Error: pvusinga.msm Line 31: not a command
+37:00FFCC007FFCDF4C:00000012  +31 
+[$ROOT]Error: pvusinga.msm Line 31: not a command
+[$TREE]Error: pvusinga.msm Line 31: not a command
+37:00FFCC007FFCDF98:00000012  +31 
+[$ROOT]Error: pvusinga.msm Line 31: not a command
+[$ROOT]Error: pvusinga.msm Line 31: not a command
+[$TREE]Error: pvusinga.msm Line 31: not a command
+[$TREE]Error: pvusinga.msm Line 31: not a command
+37:00FFCC007FFCDFE4:00000012  +31 
+[$ROOT]Error: pvusinga.msm Line 31: not a command
+[$TREE]Error: pvusinga.msm Line 31: not a command
+37:00FFCC007FFCE030:00000012  +31 
+[$ROOT]Error: pvusinga.msm Line 31: not a command
+[$TREE]Error: pvusinga.msm Line 31: not a command
+37:00FFCC007FFCE07C:00000012  +31 
+[$ROOT]Error: pvusinga.msm Line 31: not a command
+[$ROOT]Error: pvusinga.msm Line 31: not a command
+[$TREE]Error: pvusinga.msm Line 32: not a command
+[$TREE]Error: pvusinga.msm Line 32: not a command
+37:00FFCC007FFCE0C8:0000001E  +32 raddle2 tree    30
+[$ROOT]Error: pvusinga.msm Line 32: not a command
+[$TREE]Error: pvusinga.msm Line 32: not a command
+37:00FFCC007FFCE144:0000001E  +32 
+[$ROOT]Error: pvusinga.msm Line 32: not a command
+[$TREE]Error: pvusinga.msm Line 32: not a command
+37:00FFCC007FFCE1C0:0000001E  +32 
+[$ROOT]Error: pvusinga.msm Line 32: not a command
+[$ROOT]Error: pvusinga.msm Line 32: not a command
+37:00FFCC007FFCE23C:0000E2D0  +33         +       GALACTAPOD(1*/120)
+  :                            34 $(1:118*1024,r2/.nbss)
+  :                            35 static  .equ    .      
+  :                            36 buffer1 $res    40
+  :                            37 buffer2 $res    15
+  :                            38         .align  2
+  :                            39 $(0:120*1024)
+  :                            40 xibl
+00:0001E000 64027FFC          +41         oris    r2, 0, hi16(GALACTASEGMENT)
+00:0001E004 60420000          +42         ori     r2, r2,lo16(GALACTASEGMENT)
+  :                            43 yibl        
+00:0001E008 83020038          +44         lwz     r24, .nbss(this_segment)
+00:0001E00C 806CDF00          +45         lwz     r3, raddle1(1).dibber(2)
+00:0001E010 64040000          +46         li      r4, raddle2.dibber(3)
+00:0001E014 6585DFE4          +47         li      r5, raddle1(2)
+00:0001E018 80CCE0C8          +48         lwz     r6, raddle2
+  :                            49 
+00:0001E01C 832CE2D0          +50         lwz     r25, GALACTAPOD(1*/120)
+00:0001E020 834CE2E0          +51         lwz     r26, GALACTAPOD(3*/120)
+  :                            52 zibl
+[.(55)]Note: pvusinga.msm Line 53: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: pvusinga.msm Line 53: for absolute address use $A(WITH_A_LABEL_ARGUMENT)
+[00000000000000000000000000000000000000000000e240]
+  :                            53 	$trace	.(55)
+[.(55)]Note: pvusinga.msm Line 54: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: pvusinga.msm Line 54: for absolute address use $A(WITH_A_LABEL_ARGUMENT)
+[00000000000000000000000000000000000000000000e240]
+  :                            54 	$trace,1 .(55)
+  :                            55 oibl
+  :                            56 $(55, 11)
+  :                            57 voibl
+Note: pvusinga.msm Line 58: GIANT SPACE: $ returns intrasegment part of counter only
+Note: pvusinga.msm Line 58: for absolute current location use $A
+  :                            58 new_segment $equ .+GALACTASEGMENT
+[$TREE]Error: pvusinga.msm Line 59: not a command
+[$TREE]Error: pvusinga.msm Line 59: not a command
+37:00FFCC007FFCE240:00000006  +59 jessalabel tree 6
+[$ROOT]Error: pvusinga.msm Line 59: not a command
+[$TREE]Error: pvusinga.msm Line 59: not a command
+37:00FFCC007FFCE25C:00000006  +59 
+[$ROOT]Error: pvusinga.msm Line 59: not a command
+[$TREE]Error: pvusinga.msm Line 59: not a command
+37:00FFCC007FFCE278:00000006  +59 
+[$ROOT]Error: pvusinga.msm Line 59: not a command
+[$ROOT]Error: pvusinga.msm Line 59: not a command
+[$TREE]Error: pvusinga.msm Line 60: not a command
+[$TREE]Error: pvusinga.msm Line 60: not a command
+37:00FFCC007FFCE294:00000004  +60 jumbly  tree    4
+[$ROOT]Error: pvusinga.msm Line 60: not a command
+[$TREE]Error: pvusinga.msm Line 60: not a command
+37:00FFCC007FFCE2A8:00000004  +60 
+[$ROOT]Error: pvusinga.msm Line 60: not a command
+[$TREE]Error: pvusinga.msm Line 60: not a command
+37:00FFCC007FFCE2BC:00000004  +60 
+[$ROOT]Error: pvusinga.msm Line 60: not a command
+[$ROOT]Error: pvusinga.msm Line 60: not a command
+  :                            61 $(0:.(0))
+00:0001E024 61620000          +62 	mr	r11, r2
+00:0001E028 83020040          +63         lwz     r24, .nbss(new_segment)
+00:0001E02C 806BE294          +64         lwz     r3, jumbly
+00:0001E030 808BE298          +65         lwz     r4, jumbly+4
+00:0001E034 90600000          +66         stw     r3, jessalabel.dibber(3).h
+00:0001E038 90800000          +67         stw     r4, jessalabel.dibber(3).t
+*EOF*
+01:00000038+00FFCC007FFCDF00
+01:00000040+00FFCC007FFCE240
+37:00FFCC007FFCE2D0+01000000000000000000000000000000
+37:00FFCC007FFCE2E0+03000000000000000000000000000000
+:$(00):0001E000:0001E03C :$(01):0001D800:0001D848 :$(37):0000DF00:0000E2F0 
+pvusinga.msm: object code 759 bytes: 40 errors: 0 undefined labels

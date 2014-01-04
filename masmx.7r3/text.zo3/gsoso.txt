@@ -1,0 +1,145 @@
+MASMX 7r2Z
+3/gsoso.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1 __giant		$set	1
+  :                            2 __relocatable	$set	1
+  :                            3: 	$include	"../aside.dem/ppc_64.def"
+  :                            4 	$list		2
+  :                            5 __litseg $set		36
+  :                            6 $(__litseg:*8,r30/__literal)
+  :                            7 __base36
+  :                            8: 	$include	gsoso.s
+  :                            1 	.file	"soso.c"
+  :                            2 	.globl clanjamfrie
+  :                            3 	.section	.sdata,"aw",@progbits
+  :                            4 	.align 2
+  :                            5 	.type	clanjamfrie, @object
+  :                            6 	.size	clanjamfrie, 4
+  :                            7 clanjamfrie:
+06:00000000 00000037          +8 	.int	55
+  :                            9 	.section	".data"
+  :                            10 	.align 2
+  :                            11 	.type	yasimi, @object
+  :                            12 	.size	yasimi, 4
+  :                            13 yasimi:
+03:00000000 00000063          +14 	.int	99
+  :                            15 	.align 2
+  :                            16 	.type	cu, @object
+  :                            17 	.size	cu, 8
+  :                            18 cu:
+03:00000004 0000000000000008  +19 	.quad	startfromhere
+  :                            20 	.lcomm	clearly_so.1543,8,8
+  :                            21 	.type	clearly_so.1543, @object
+  :                            22 	.align 2
+  :                            23 	.type	separate_static_item.1542, @object
+  :                            24 	.size	separate_static_item.1542, 4
+  :                            25 separate_static_item.1542:
+03:0000000C A5A5A5A5          +26 	.int	-1515870811
+  :                            27 	.section	".text"
+  :                            28 	.align 2
+  :                            29 	.globl soso
+  :                            30 	.type	soso, @function
+  :                            31 
+  :                            32 x	$equf	16, 31	# dynamic integer in the stack frame
+  :                            33 
+  :                            34 soso:
+01:00000000 F821FFC1          +35 	stdu	1, -64(1)
+01:00000004 7C0802A6          +36 	mflr	0
+01:00000008 FBE10038          +37 	std   31, 56(1)	# save r31 just below the previous stack frame 
+01:0000000C F8010048          +38 	std   0, 72(1)	# save LR value inside the previous stack frame
+01:00000010 63E10000          +39 	mr    31, 1	# use a frame pointer in case the stack is pushed
+01:00000014 FBDF0030          +40 	std	30, 48(31)	# save the literals base register
+  :                            41 
+01:00000018 4800000D          +42 	bl	__haulup
+01:0000001C 0000000000000000  +43 	+	.absolute(__base36):d
+  :                            44 __haulup
+01:00000024 7FC802A6          +45 	mflr	30	# .literal segment 36 holds __literal table
+  :                            46 			# which is accessed base_displacement with r30
+  :                            47 	
+01:00000028 EBDE0000          +48 	ld	30, 0(30) # LR was pointing to the pointer
+  :                            49 
+01:0000002C E93E0000          +50 	ld	9, __literal(	__upper48	startfromhere@ha)
+01:00000030 E929000A          +51 	lwa	9, startfromhere@l(9)
+01:00000034 913F0010          +52 	stw	9, x
+  :                            53 
+01:00000038 38010009          +54 	addi	0, 9, 1
+  :                            55 
+01:0000003C E93E0000          +56 	ld	9, __literal(	__upper48	startfromhere@ha)
+01:00000040 90090008          +57 	stw	0, startfromhere@l(9)
+  :                            58 
+01:00000044 E93E0008          +59 	ld	9, __literal(	__upper48	factor@ha)
+01:00000048 E9290002          +60 	lwa	9, factor@l(9)
+01:0000004C E81F0012          +61 	lwa	0, x
+  :                            62 
+01:00000050 7C0049D6          +63 	mullw	0, 0, 9
+01:00000054 901F0010          +64 	stw	0, x
+  :                            65 
+01:00000058 E93E0010          +66 	ld	9, __literal(	__upper48	cu@ha)
+01:0000005C E8090004          +67 	ld	0, cu@l(9)
+01:00000060 60600000          +68 	mr	3, 0
+  :                            69 
+01:00000064 4BFFFF9D          +70 	bl	adjustment
+01:00000068 61230000          +71 	mr	9, 3
+01:0000006C 801F0010          +72 	lwz	0, x
+  :                            73 
+01:00000070 7C004A14          +74 	add	0, 0, 9
+01:00000074 901F0010          +75 	stw	0, x
+  :                            76 
+01:00000078 E93E0018          +77 	ld	9, __literal(	__upper48	yasimi@ha)
+01:0000007C E9290002          +78 	lwa	9, yasimi@l(9)
+  :                            79 
+01:00000080 E81F0012          +80 	lwa	0, x
+01:00000084 7C090050          +81 	subf	0, 9, 0
+  :                            82 
+  :                            83 #	stw	0, x
+  :                            84 #	lwz	0, x	# the compiler had these lines in
+  :                            85 
+01:00000088 60600000          +86 	mr	3, 0	# this ABI has r3 for results
+  :                            87 
+  :                            88 #	the geography of the stack frame is
+  :                            89 #	LOW ADDRESS REPRESENTED HERE    ______________________________
+  :                            90 #	STACK TOP R31 points to ------> |   saved SP (r1) 8 bytes    |
+  :                            91 #					|............................|
+  :                            92 #				+ 8	| next LR save area 8 bytes  |
+  :                            93 #					|............................|
+  :                            94 #				+ 16	| var x 4 bytes|/////////////|
+  :                            95 #					|..............|.............|
+  :                            96 
+  :                            97 
+  :                            98 
+  :                            99 #				+ 48	|     saved r30 8 bytes      |
+  :                            100 #					|............................|
+  :                            101 #				+ 56	|     saved r31 8 bytes      |
+  :                            102 #					|____________________________|
+  :                            103 #	PREVIOUS STACK FRAME ---------> | previous saved r1 8 bytes  |
+  :                            104 #					|............................|
+  :                            105 #				+ 72	|  actual saved LR 8 bytes   |
+  :                            106 
+  :                            107 
+  :                            108 
+01:0000008C E9610000          +109 	ld	11, 0(1)	# there is complete confidence r1 unchanged
+01:00000090 E80B0008          +110 	ld	0, 8(11)	# pick up LR
+01:00000094 7C0803A6          +111 	mtlr	0
+01:00000098 EBDF0030          +112 	ld	30, 48(31)
+01:0000009C EBEBFFF8          +113 	ld	31, -8(11)
+  :                            114 
+01:000000A0 602B0000          +115 	mr	1,11
+  :                            116 
+01:000000A4 4E800020          +117 	blr
+  :                            118 
+  :                            119 	.size	soso, .-soso
+  :                            120 	.lcomm	startfromhere,4,4
+  :                            121 	.type	startfromhere, @object
+  :                            122 	.ident	"GCC: (GNU) 4.2.1"
+  :                            9 #	$store		gsoso
+  :                            10 	.align		3	# align for 64-bit literal pointer constants
+*EOF*
+24:00000000+(05:00008008/*10)30*/10:0000000000000000
+24:00000008+[0000:00008000/*10]30*/10:0000000000000000
+24:00000010+(03:00008004/*10)30*/10:0000000000000000
+24:00000018+(03:00008000/*10)30*/10:0000000000000000
+:$(01):00000000:000000A8 :$(03):00000000:00000010 :$(05):00000000:0000000C :$(06):00000000:00000004 :$(24):00000000:00000020 
+gsoso.msm: object code 1138 bytes: 0 errors: 2 undefined labels

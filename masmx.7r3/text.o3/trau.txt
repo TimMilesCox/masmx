@@ -1,0 +1,17 @@
+MASMX 7r2
+3/trau.msm
+*EOF*
+  :                            1 $(0:96)
+  :                            2 tree    $tree
+00:000060 000001              +3 leaf    +1
+00:000061 000060              +4         +       leaf
+  :                            5 rustle  $equ    leaf
+  :                            6 whisper	$set	leaf
+00:000062 000060              +7         +       rustle
+  :                            8         $root
+00:000063 000060              +9         +       rustle
+00:000064 000060              +10         +       tree:leaf
+00:000065 000060              +11 	+	whisper
+*EOF*
+:$(00):000060:000066 
+trau.msm: object code 79 bytes: 0 errors: 0 undefined labels

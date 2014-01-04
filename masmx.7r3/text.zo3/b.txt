@@ -1,0 +1,80 @@
+MASMX 7r2Z
+3/b.msm
+*EOF*
+  :                            1 $(2:02000)
+  :                            2 $(5:05000)
+  :                            3 $(62:62*262144)
+  :                            4 $(63:63*262144)
+  :                            5 $(0:64)
+  :                            6 bd      $form   24, 12, 6, 6, 48
+  :                            7 struccie $form  8, 16
+  :                            8 
+  :                            9 p       $proc
+  :                            10 call*   $name   7
+  :                            11         struccie $n, p(1,1)
+  :                            12         $end
+  :                            13 
+  :                            14 go*     $proc
+  :                            15         struccie 4, go(1,1)
+  :                            16         $end
+  :                            17 
+  :                            18 bdi*    $proc   $(62)
+  :                            19         $byte   6
+  :                            20         bd      bdi(1, 1), 0, 3, 0, "bdi(1,1)"
+  :                            21         $byte   8
+  :                            22         $end
+  :                            23 
+  :                            24 vector* $proc   $(2)
+  :                            25 *       +       $(62):s
+  :                            26         bdi     vector(1,1)
+  :                            27         $end
+  :                            28 
+  :                            29 "$v"*   $func	*        
+  :                            30         $if     $t($v(1,1))=0
+  :                            31 "$v(1,1)"***   vector  $v(1,1)
+  :                            32         $endif
+  :                            33         $return $v(1,1)
+  :                            34         $end
+  :                            35 
+  :                            36 s*      $func	*
+  :                            37         $if     $t(s(1,1))=0
+  :                            38 "s(1,1)"* fixit        
+  :                            39         $endif
+  :                            40         $return s(1,1)
+  :                            41         $end
+  :                            42 
+  :                            43 fixit*  $proc   $(5)
+  :                            44 *       +       $(63):s
+  :                            45         bdiu    fixit(1,1)
+  :                            46         $end
+  :                            47 
+  :                            48 bdiu*   $proc   $(63)
+  :                            49         $byte   6
+  :                            50         bd      bdiu(1, 1), 0, 3, 0, "bdiu(1,1)"
+  :                            51         $byte   8
+  :                            52         $end
+  :                            53 
+  :                            54 squall* $proc
+  :                            55         call    $v(squall(1,1))
+  :                            56         $end
+  :                            57 
+  :                            58 .        +       99
+  :                            59 . ok        vector  yes
+  :                            60 .        +       100
+  :                            61 . yea        vector  always
+  :                            62 
+  :                            63 .        struccie 8, s(plat)
+  :                            64 .        go      s(plat)
+  :                            65 .        struccie 5, $v(snibbo)
+02:002000 F80000              +66         squall  gribbons
+3E:F80000 0020000000C09F2A628AFBB3
+                              +66 
+00:000040 072000              +66 
+00:000041 072000              +67         squall  gribbons
+02:002001 F80004              +68         call    $v(ribbons)
+3E:F80004 0020010000C0CA98A2BEECC0
+                              +68 
+00:000042 072001              +68 
+*EOF*
+:$(00):000040:000043 :$(02):002000:002002 :$(05):005000:005000 :$(3E):F80000:F80008 :$(3F):FC0000:FC0000 
+b.msm: object code 301 bytes: 0 errors: 0 undefined labels

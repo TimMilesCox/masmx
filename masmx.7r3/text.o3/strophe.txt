@@ -1,0 +1,12 @@
+MASMX 7r2
+3/strophe.msm
+QDELIM='
+*EOF*
+  :                            1         $QUOTE  027
+  :                            2 $(5:05000)
+  :                            3 'label\with(weird/things>in<it'
+05:005000 5C776974682877656972642F7468696E67733E696E3C6974
+                              +4         +       'label\with(weird/things>in<it'
+*EOF*
+:$(05):005000:005008 
+strophe.msm: object code 86 bytes: 0 errors: 0 undefined labels

@@ -1,0 +1,9 @@
+MASMX 7r2
+3/nuri.msm
+*EOF*
+  :                            1 $(4:0480)
+  :                            2 123OLeary
+04:000480 000481              +3         +       "123OLeary"+1       
+*EOF*
+:$(04):000480:000481 
+nuri.msm: object code 44 bytes: 0 errors: 0 undefined labels

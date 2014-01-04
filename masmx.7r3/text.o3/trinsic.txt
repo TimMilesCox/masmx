@@ -1,0 +1,32 @@
+MASMX 7r2
+3/trinsic.msm
+*EOF*
+  :                            1: 	$include	"trinsic.def"
+  :                            2 	$set_option	"a"
+  :                            3 $(0)
+                                	"stringalongstringalong":;
+                                	"swingalongswingalong":;
+00:000000 737472696E67616C6F6E67737472696E67616C6F6E677377
+                              +6 	"stringalongdo"
+00:000008 696E67616C6F6E677377696E67616C6F6E67737472696E67
+                              +6 
+00:000010 616C6F6E67646F2020  +6 
+  :                            7 
+                                	+	("stringalongstringalong":;
+                                	1:2:3:4:;
+                                        "swingalongswingalong":;
+00:000013 000027              +11         "stringalongdo")
+  :                            12 
+                                        "":     100:"caligraphic":10:10:"fragilistic":;
+                                		04:03:02:01:"consequential":;
+00:000014 6463616C69677261706869630A0A66726167696C69737469
+                              +15 		0aa:0bb:0cc:"completion"
+00:00001C 6304030201636F6E73657175656E7469616CAABBCC636F6D
+                              +15 
+00:000024 706C6574696F6E2020  +15 
+*EOF*
+00:000027+737472696E67616C6F6E67737472696E67616C6F6E670102
+03047377696E67616C6F6E677377696E67616C6F6E677374
+72696E67616C6F6E67646F20
+:$(00):000000:00003B 
+trinsic.msm: object code 413 bytes: 0 errors: 0 undefined labels

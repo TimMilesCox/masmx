@@ -1,0 +1,39 @@
+morzils* $proc
+grimpo*	$tree
+wzlip	$res	16
+	$root
+	$end
+
+these*	$proc
+first*	$branch
+one	+	1
+two	$res	40
+	morzils
+three	+	3
+	$root
+
+second*	$branch
+one	+	1
+two	$res	118
+	morzils
+three	+	3
+	$root
+
+third*	$branch
+one	+	1
+two	$res	14
+	morzils
+three	+	3
+	$root
+	$end
+
+those*	$proc
+allofit*	$tree
+firstings $res	120
+	these
+secondings $res 120
+	$root
+	$end
+
+	those
+different	+	99

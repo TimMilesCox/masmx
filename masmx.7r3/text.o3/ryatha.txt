@@ -1,0 +1,12 @@
+MASMX 7r2
+3/ryatha.msm
+*EOF*
+  :                            1 f*      $func
+  :                            2         $return $t(f(1,1))
+  :                            3         $end
+  :                            4 
+00:000000 000000              +5         +       f(hyacinth)
+00:000001 00007E              +6         +       f($equ)
+*EOF*
+:$(00):000000:000002 
+ryatha.msm: object code 51 bytes: 0 errors: 0 undefined labels

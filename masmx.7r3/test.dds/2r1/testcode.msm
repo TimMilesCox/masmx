@@ -1,0 +1,1776 @@
+;******************************************************************************
+;
+; File     : TESTCODE.ASM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains all the test routines for the test prom.
+;
+; System   : 80C51
+;
+; History  :
+;   Date     Who Ver  Comments
+;
+;******************************************************************************
+
+TST_SwitchOff:
+	CALL	SYS_UnitPowerOff
+	RET
+
+TST_LightUp:
+	CALL	LED_Led1On
+        CALL	LED_Led2On
+        CALL	LED_Led3On
+        CALL	LED_Led4On
+        CALL	TST_SolidLCD
+        CALL	KBD_WaitKey
+        CALL	LCD_Clear
+	CALL	LED_Led1Off
+        CALL	LED_Led2Off
+        CALL	LED_Led3Off
+        CALL	LED_Led4Off
+	RET
+
+;******************
+; Paper Cutter Test
+;******************
+
+TST_PaperCutter:
+	CALL	PRT_StartPrint
+	MOV	DPTR,#man_cutterctrl
+        MOV	A,#1
+        MOVX	@DPTR,A
+        CALL	CUT_FireCutter
+        CALL	PRT_EndPrint
+        CLR     A
+	RET
+
+;*****************
+; Cash Drawer Test
+;*****************
+
+TST_CashDrawer:
+	MOV	DPTR,#man_drawerenable
+        MOV	A,#255
+        MOVX	@DPTR,A
+	CALL	CDR_OpenCashDrawer
+        CLR	A
+        RET
+
+;*******************************************************************************
+;
+;                 C u s t o m e r   D i s p l a y   T e s t s
+;
+;*******************************************************************************
+
+tst_cdtestmenu:
+	DB 3
+	DB '==Cust Disp Test Menu='
+	DW 0
+	DB 'Character Test SER0   '
+	DW TST_CustomerDisplaySER0
+	DB 'Character Test SER1   '
+	DW TST_CustomerDisplaySER1
+
+msg_cd_test:	DB 21,'Customer Display Test'
+
+;******************************************************************************
+
+TST_CustDisp:
+	CALL	MNU_NewMenu
+TST_CDagain:
+	MOV	DPTR,#tst_cdtestmenu
+	CALL	MNU_LoadMenuCODE
+	CALL	MNU_SelectMenuOption
+        JNB     ACC.7,TST_CDagain
+	CLR	A
+	RET
+;**********************
+; Test Customer Display
+;**********************
+
+msg_cdline1:	DB 20,'The Customer Display'
+msg_cdline2:	DB 20,'Should Not Be Blank!'
+
+TST_CustomerDisplaySER0:
+        MOV	DPTR,#man_custdispctrl
+	MOV	A,#1
+        MOVX	@DPTR,A
+        JMP	TST_CDdisplay
+TST_CustomerDisplaySER1:
+        MOV	DPTR,#man_custdispctrl
+	MOV	A,#3
+        MOVX	@DPTR,A
+TST_CDdisplay:
+	CALL	LCD_Clear
+        MOV	DPTR,#msg_cd_test
+        CALL	LCD_DisplayStringCODE
+
+	CALL	DIS_Init
+        MOV     R0,#3
+        CALL    delay100ms
+
+        MOV	A,#32
+TST_CDloop:
+
+        PUSHACC
+        MOV	A,#0
+        CALL	DIS_GotoXY
+        POP	ACC
+        MOV	R7,#20
+TST_CDloop2:
+        PUSHACC
+        CALL	DIS_Tx
+        POP	ACC
+        DJNZ	R7,TST_CDloop2
+
+        PUSHACC
+        MOV	A,#64
+        CALL	DIS_GotoXY
+        POP	ACC
+        MOV	R7,#20
+TST_CDloop3:
+        PUSHACC
+        CALL	DIS_Tx
+        POP	ACC
+        DJNZ	R7,TST_CDloop3
+
+	INC	A
+        CJNE	A,#127,TST_CDcharok
+	MOV	A,#32
+TST_CDcharok:
+	PUSHACC
+        MOV	R0,#5
+        CALL	delay100ms
+        CALL	KBD_ReadKey
+        JNZ	TST_CDdone
+        POP	ACC
+        JMP	TST_CDloop
+TST_CDdone:
+	CALL	DIS_Clear
+	POP	ACC
+        RET
+
+;        MOV	DPTR,#msg_cdline1
+;        CALL	DIS_DisplayStringCODE
+;        MOV	A,#64
+;        CALL	DIS_GotoXY
+;        MOV	DPTR,#msg_cdline2
+;        CALL	DIS_DisplayStringCODE
+;        CLR     A
+;	RET
+
+;******************************************************************************
+;
+;                             E E P R O M   T e s t s
+;
+;******************************************************************************
+
+tst_eetestmenu:
+	DB 3
+	DB '===EEPROM Test Menu==='
+	DW 0
+	DB 'Test EE (On-board)    '
+	DW TST_EEMotherboard
+	DB 'Test EE (PricePlug)   '
+	DW TST_EEPricePlug
+
+;******************************************************************************
+
+msg_ee_testmother:	DB 23,'Testing On-board EEPROM'
+msg_ee_testpriceplug:	DB 24,'Testing PricePlug EEPROM'
+msg_ee_pass:		DB 13,'EEPROM Passed'
+msg_ee_fail:		DB 13,'EEPROM Failed'
+
+TST_EE:
+	CALL	MNU_NewMenu
+TST_EEagain:
+	MOV	DPTR,#tst_eetestmenu
+	CALL	MNU_LoadMenuCODE
+	CALL	MNU_SelectMenuOption
+        JNB     ACC.7,TST_EEagain
+	CLR	A
+	RET
+
+TST_EEMotherboard:
+	CALL	LCD_Clear
+	MOV	DPTR,#msg_ee_testmother
+	CALL	LCD_DisplayStringCODE
+	CLR	F0
+	SETB	F1
+	MOV	R1,#EE_SLAVE
+	MOV	DPTR,#255
+	JMP	TST_EEGeneric
+
+TST_EEpass:
+	MOV	A,#64
+	CALL	LCD_GotoXY
+	MOV	DPTR,#msg_ee_pass
+        CALL	SYS_PricePlugPowerOff
+	CALL	LCD_DisplayStringCODE
+	CALL	KBD_WaitKey
+	CLR	A
+	RET
+
+TST_EEfail:
+	MOV	A,#64
+	CALL	LCD_GotoXY
+	MOV	DPTR,#msg_ee_fail
+	CALL	LCD_DisplayStringCODE
+        CALL	SYS_PricePlugPowerOff
+	CALL	SND_Warning
+	CALL	KBD_WaitKey
+	CLR	A
+	RET
+
+TST_EEPricePlug:
+	CALL	SYS_PricePlugPowerOn
+	MOV	R1,#PPG_EESLAVE
+	CALL	LCD_Clear
+	MOV	DPTR,#msg_ee_testpriceplug
+	CALL	LCD_DisplayStringCODE
+	SETB	F0
+	CLR	F1
+	MOV	DPTR,#2047
+TST_EEGeneric:
+	MOV	B,#0AAh
+	CALL	I2C_Write
+	CALL	I2C_Read
+	JNZ	TST_EEfail
+	MOV	A,B
+	CJNE	A,#0AAh,TST_EEfail
+	MOV	B,#055h
+	CALL	I2C_Write
+	CALL	I2C_Read
+	JNZ	TST_EEfail
+	MOV	A,B
+	CJNE	A,#055h,TST_EEfail
+	JMP	TST_EEpass
+	RET
+
+;******************************************************************************
+;
+;                                L C D   T e s t s
+;
+;******************************************************************************
+
+TST_SolidLCD:
+        MOV	A,#0
+        CALL	LCD_GotoXY
+        MOV	DPTR,#lcd_test_str3
+        CALL	LCD_DisplayStringCODE
+        MOV	A,#64
+        CALL	LCD_GotoXY
+        MOV	DPTR,#lcd_test_str3
+        CALL	LCD_DisplayStringCODE
+	RET
+
+lcd_test_str:	DB 24,'123456789012345678901234'
+lcd_test_str2:	DB 24,'ABCDEFGHIJKLabcdefghijkl'
+lcd_test_str3:	DB 24,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+TST_LCD:
+	CALL	LCD_Clear
+        MOV	A,#0
+        CALL	LCD_GotoXY
+        MOV	DPTR,#lcd_test_str
+        CALL	LCD_DisplayStringCODE
+        MOV	A,#64
+        CALL	LCD_GotoXY
+        MOV	DPTR,#lcd_test_str2
+        CALL	LCD_DisplayStringCODE
+        MOV	R0,#15
+        CALL	delay100ms
+        CALL	TST_SolidLCD
+        MOV	R0,#15
+        CALL	delay100ms
+        MOV	A,CMH3
+	PUSHACC
+	MOV	A,#1
+	CALL	LCD_SetBacklightIntensity
+	MOV	R0,#20
+	CALL	delay100ms
+        POP	ACC
+        CALL	LCD_SetBacklightIntensity
+        CALL	LCD_Clear
+        CLR	A
+        RET
+
+;******************************************************************************
+;
+;                              S o u n d   T e s t s
+;
+;******************************************************************************
+
+tst_sndtestmenu:
+	DB 3
+	DB '====Sound Test Menu==='
+	DW 0
+	DB 'Test Sound            '
+	DW TST_WierdSound
+        DB 'Organ ???             '
+        DW TST_Organ
+
+TST_Sound:
+	CALL	MNU_NewMenu
+TST_Sagain:
+	MOV	DPTR,#tst_sndtestmenu
+	CALL	MNU_LoadMenuCODE
+	CALL	MNU_SelectMenuOption
+        JNB     ACC.7,TST_Sagain
+	CLR	A
+	RET
+
+;************************************************
+
+tst_octavetable: DB 124,110,98,93,83,73,65,62
+tst_msg_organ: DB 21,'Organ Mode - Play Me!'
+
+TST_Organ:
+	CALL	LCD_Clear
+        MOV	DPTR,#tst_msg_organ
+        CALL	LCD_DisplayStringCODE
+TST_Oloop:
+	CALL	KBD_ScanKeyboard
+        JZ	TST_Onosound
+        CJNE	A,#KBD_CANCEL,TST_Okey
+        CLR	A
+        RET
+TST_Okey:
+        CLR	C
+        SUBB	A,#11
+        MOV	DPTR,#tst_octavetable
+        MOVC	A,@A+DPTR
+        MOV	B,A
+        CALL	SND_SoundOn
+	JMP	TST_Oloop
+TST_Onosound:
+	CALL	SND_SoundOff
+        JMP	TST_Oloop
+
+;************************************************
+
+notes: DB 124,98,110,93,73,83,65,62
+lcd_test_sound: DB 10,'Sound Test'
+
+TST_Sound1:
+	MOV	R2,#255
+        MOV	A,#0
+        MOV	B,#255
+DT_FDloop:
+	CALL	SND_SoundOn
+        MOV     R0,#30
+        CALL    delay100us
+        XCH	A,B
+	CALL	SND_SoundOn
+        MOV     R0,#30
+        CALL    delay100us
+        XCH     A,B
+        INC     A
+        DEC     B
+        DJNZ	R2,DT_FDloop
+        CALL	SND_SoundOff
+	RET
+
+TST_WierdSound:
+	CALL	LCD_Clear
+        MOV	A,#0
+        CALL	LCD_GotoXY
+        MOV	DPTR,#lcd_test_sound
+        CALL	LCD_DisplayStringCODE
+
+	MOV	B,#50
+TST_Sloop1:
+        CALL	SND_SoundOn
+        MOV     R0,#20
+        CALL    delay100us
+        DEC     B
+        MOV     A,B
+        JNZ     TST_Sloop1
+
+	MOV	B,#50
+DT_FAloop:
+        CALL	SND_SoundOn
+        MOV     R0,#50
+        CALL    delay100us
+        DJNZ	B,DT_FAloop
+
+	MOV	R2,#255
+DT_FBloop:
+	CLR	C
+	MOV	A,#255
+        SUBB	A,R2
+        MOV	B,A
+        CALL	SND_SoundOn
+        MOV     R0,#10
+        CALL    delay100us
+        DJNZ	R2,DT_FBloop
+
+	MOV	R2,#255
+        MOV	A,#0
+        MOV	B,#255
+DT_FCloop:
+	CALL	SND_SoundOn
+        MOV     R0,#5
+        CALL    delay100us
+        XCH	A,B
+	CALL	SND_SoundOn
+        MOV     R0,#5
+        CALL    delay100us
+        XCH     A,B
+        INC     A
+        DEC     B
+        DJNZ	R2,DT_FCloop
+
+        CALL	TST_Sound1
+
+	MOV	R2,#128
+        MOV	A,#0
+        MOV	B,#255
+DT_FEloop:
+	CALL	SND_SoundOn
+        MOV     R0,#20
+        CALL    delay100us
+        XCH	A,B
+	CALL	SND_SoundOn
+        MOV     R0,#20
+        CALL    delay100us
+        XCH     A,B
+        INC     A
+        INC     A
+        DEC     B
+        DEC     B
+        DEC     B
+        DEC     B
+        DJNZ	R2,DT_FEloop
+
+	MOV	R2,#128
+        MOV	A,#0
+        MOV	B,#255
+DT_FGloop:
+	CALL	SND_SoundOn
+        MOV     R0,#50
+        CALL    delay100us
+        XCH	A,B
+	CALL	SND_SoundOn
+        MOV     R0,#50
+        CALL    delay100us
+        XCH     A,B
+        INC     A
+        DEC     B
+        DJNZ	R2,DT_FGloop
+
+	MOV	DPTR,#notes
+        MOV	R3,#8
+DT_FHloop:
+	CLR	A
+	MOVC	A,@A+DPTR
+        MOV	B,A
+        CALL	SND_SoundOn
+        MOV	R0,#1
+        CALL	delay100ms
+        INC	DPTR
+        DJNZ	R3,DT_FHloop
+        CALL	SND_SoundOff
+        CALL    SND_Warning
+	CLR	A
+	RET
+
+;******************************************************************************
+;
+;                          P r i n t e r   T e s t s
+;
+;******************************************************************************
+
+tst_prttestmenu:
+	DB 11
+	DB '===Printer Test Menu=='
+	DW 0
+	DB 'Test Paper Sensor     '
+	DW TST_PaperOut
+	DB 'Test Paper Feed       '
+	DW TST_PaperFeed
+	DB 'Test Printing         '
+	DW TST_Printing
+        DB 'Form Feed             '
+        DW TST_FormFeed
+        DB 'Continuous Form Feed  '
+        DW TST_ContinuousFormFeed
+        DB 'Test PrintHead Cut-out'
+        DW TST_PrintCutout
+        DB 'Set Print Intensity   '
+        DW PRT_SetPrintIntensity
+        DB 'Set Print Quality     '
+        DW PRT_SetPrintQuality
+	DB 'Set Perf Offset       '
+	DW PRT_SetPerfOffset
+	DB 'Set Perf Line Size    '
+	DW PRT_SetPerfLineSize
+
+;******************************************************************************
+
+TST_Printer:
+	CALL	MNU_NewMenu
+TST_Pagain:
+	MOV	DPTR,#tst_prttestmenu
+	CALL	MNU_LoadMenuCODE
+	CALL	MNU_SelectMenuOption
+        JNB     ACC.7,TST_Pagain
+	CLR	A
+	RET
+
+;******************************************************************************
+
+prt_test_str:	DB 255,32,0,0,0,0,32,'12345678901234567890123456789012'
+                DB 255,32,0,0,0,8,32,'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEF'
+                DB 255,32,0,0,0,16,32,'abcdefghijklmnopqrstuvwxyzabcdef'
+                DB 255,32,0,0,0,24,32,' "œ$%^&*()-=#_+~[]{};',39,':@./<>?\|`'
+                DB 0
+
+prt_test:	DB 12,'Printer Test'
+
+TST_Printing:
+	CALL	LCD_Clear
+        MOV	A,#0
+        CALL	LCD_GotoXY
+        MOV	DPTR,#prt_test
+        CALL	LCD_DisplayStringCODE
+
+	CALL	PRT_StartPrint
+        MOV     A,#32
+        CALL    PRT_SetBitmapLenSmall
+        CALL	PRT_ClearBitmap
+        MOV	DPTR,#prt_test_Str
+        CALL	PRT_FormatBitmapCODE
+        CALL	PRT_PrintBitmap
+        MOV	R7,#40
+        CALL	PRT_LineFeed
+        CALL	PRT_EndPrint
+        CLR	A
+        RET
+
+;******************************************************************************
+
+tst_po_missing: DB 13,'Paper Out    '
+tst_po_present: DB 13,'Paper Present'
+
+TST_PaperOut:
+	CALL	PRT_StartPrint
+	CALL	LCD_Clear
+        CALL    KBD_DisableKeyInts
+TST_POloop:
+	MOV	A,P7
+	JNB	prt_paper_sense,TST_POpresent
+        MOV	DPTR,#tst_po_missing
+	JMP	TST_POdisplay
+TST_POpresent:
+	MOV	DPTR,#tst_po_present
+TST_POdisplay:
+	MOV	A,#0
+	CALL	LCD_GotoXY
+	CALL	LCD_DisplayStringCODE
+        CALL	KBD_ScanKeyboard
+        JZ	TST_POloop
+        CJNE	A,#KBD_CANCEL,TST_POfeed
+        CALL    KBD_EnableKeyInts
+        CALL    testdelay
+        CALL	KBD_FlushKeyboard
+        CALL	PRT_EndPrint
+        CLR     A
+	RET
+TST_POfeed:
+	MOV	R7,#1
+	CALL	PRT_LineFeed
+	JMP	TST_POloop
+
+;******************************************************************************
+
+TST_PaperFeed:
+	CALL	PRT_StartPrint
+	CALL	LCD_Clear
+	CALL	KBD_DisableKeyInts
+TST_PFloop:
+;***
+	MOV	A,ADCON0
+	ANL	A,#0C0h		; keep two bits nothing to do with ADC
+	MOV	ADCON0,A
+	MOV	ADCON1,#04h		; ADC7 = battery
+	MOV	DAPR,#0
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+TST_PFwait:
+	JB	0DCh,TST_PFwait
+	MOV	A,ADDAT
+;        CALL    DBG_TxChar
+;***
+        CALL	KBD_ScanKeyboard
+        JZ	TST_PFloop
+        CJNE	A,#KBD_CANCEL,TST_PFfeed
+        CALL	KBD_EnableKeyInts
+        CALL    testdelay
+        CALL	KBD_FlushKeyboard
+        CALL	PRT_EndPrint
+        CLR     A
+	RET
+TST_PFfeed:
+	CLR	prt_paperout
+	MOV	R7,#1
+	CALL	PRT_LineFeed
+	JMP	TST_PFloop
+
+;******************************************************************************
+
+TST_FormFeed:
+	CLR	prt_paperout
+        CALL	LED_Led1Off
+	CALL	PRT_StartPrint
+	CALL	PRT_FormFeed
+        CALL	PRT_EndPrint
+        CLR     A
+        RET
+
+;******************************************************************************
+
+TST_ContinuousFormFeed:
+	CLR	prt_paperout
+        CALL	LED_Led1Off
+        CALL	PRT_StartPrint
+TST_CFFloop:
+	CALL	KBD_ReadKey
+        JNZ	TST_CFFdone
+        CALL	PRT_FormFeed
+        MOV     R0,#3
+        CALL    delay100ms
+        JNB	prt_paperout,TST_CFFloop
+TST_CFFdone:
+        CALL	PRT_EndPrint
+        CLR     A
+        RET
+
+;******************************************************************************
+
+tst_prtcutout: DB 255,21,0,0,0,0,21,'       ',3,'     ',3,'       '
+TST_PrintCutout:
+	CALL	PRT_StartPrint
+	CALL	PRT_ClearBitmap
+        MOV     A,#8
+        CALL    PRT_SetBitmapLenSmall
+        MOV	DPTR,#tst_prtcutout
+        CALL	PRT_FormatCODEField
+        MOV	DPTR,#prt_bitmap
+        CALL	PRT_TransferLine
+        CALL	PRT_Strobe
+
+	CLR	prt_head_oe_port	; prepare to turn OE on
+	MOV	CMH2,#0			; cause a compare match to make the
+	MOV	CML2,#0			; OE turn on
+	MOV	TH2,#0
+	MOV	TL2,#0
+	MOV	CMH2,#100		; set timeout for next compare
+	MOV	CML2,#0
+	SETB	prt_head_oe_port	; at compare, make line go high (OE off)
+
+        MOV	R7,#100
+        CALL	PRT_LineFeed
+        CALL	PRT_EndPrint
+        CLR     A
+	RET
+
+;******************************************************************************
+;
+;                   C o m m u n i c a t i o n s   T e s t s
+;
+;******************************************************************************
+
+com_test0: DB 18,'Serial Port 0 Test'
+com_test1: DB 18,'Serial Port 1 Test'
+com_test2: DB 18,'Serial Port 2 Test'
+com_test_str:	DB 'DT5/DT10 Test Prom - Communications Test',13,10
+
+tst_comtestmenu:
+	DB 4
+	DB '=== Comms Test Menu =='
+	DW 0
+	DB 'Test Serial Port 0    '
+	DW TST_COM0
+	DB 'Test Serial Port 1    '
+	DW TST_COM1
+	DB 'Test Serial Port 2    '
+	DW TST_COM2
+
+;******************************************************************************
+
+TST_Comms:
+	CALL	MNU_NewMenu
+TST_Cagain:
+	MOV	DPTR,#tst_comtestmenu
+	CALL	MNU_LoadMenuCODE
+	CALL	MNU_SelectMenuOption
+        JNB     ACC.7,TST_Cagain
+	CLR	A
+	RET
+
+TST_COM0:
+	CALL	LCD_Clear
+	MOV	DPTR,#com_test0
+	CALL	LCD_DisplayStringCODE
+	MOV	DPTR,#com_test_str
+        MOV	R7,#42
+TST_COM0loop:
+	CLR	A
+        MOVC	A,@A+DPTR
+        INC	DPTR
+        MOV	B,#COM_COM0
+        CALL	COM_TxChar
+        DJNZ	R7,TST_COM0loop
+        CALL	KBD_ReadKey
+        JZ	TST_COM0
+        CALL	LCD_Clear
+        CLR	A
+        RET
+
+TST_COM1:
+	CALL	LCD_Clear
+	MOV	DPTR,#com_test1
+	CALL	LCD_DisplayStringCODE
+	MOV	DPTR,#com_test_str
+        MOV	R7,#42
+TST_COM1loop:
+	CLR	A
+        MOVC	A,@A+DPTR
+        INC	DPTR
+        MOV	B,#COM_COM1
+        CALL	COM_TxChar
+        DJNZ	R7,TST_COM1loop
+        CALL	KBD_ReadKey
+        JZ	TST_COM1
+        CALL	LCD_Clear
+        CLR	A
+        RET
+
+TST_COM2:
+	CLR	com_selab
+;        CALL	SBS_WriteSB1
+	CALL	LCD_Clear
+	MOV	DPTR,#com_test2
+	CALL	LCD_DisplayStringCODE
+	MOV	DPTR,#com_test_str
+        MOV	R7,#42
+TST_COM2loop:
+	CLR	A
+        MOVC	A,@A+DPTR
+        INC	DPTR
+        MOV	B,#COM_COM1
+        CALL	COM_TxChar
+        DJNZ	R7,TST_COM2loop
+        CALL	KBD_ReadKey
+        JZ	TST_COM2
+        CALL	LCD_Clear
+	SETB	com_selab
+;        CALL	SBS_WriteSB1
+        CLR	A
+        RET
+
+;******************************************************************************
+;
+;                          K e y b o a r d   T e s t s
+;
+;******************************************************************************
+
+tst_key_msg: DB 13,'Keyboard Test'
+tst_key_table:
+	DB 6,'     0'
+	DB 6,'     1'
+	DB 6,'     2'
+	DB 6,'     3'
+	DB 6,'     4'
+	DB 6,'     5'
+	DB 6,'     6'
+	DB 6,'     7'
+	DB 6,'     8'
+	DB 6,'     9'
+	DB 6,'     A'
+	DB 6,'     B'
+	DB 6,'     C'
+	DB 6,'     D'
+	DB 6,'     E'
+	DB 6,'     F'
+	DB 6,'     G'
+	DB 6,'     H'
+	DB 6,'CANCEL'
+	DB 6,'    OK'
+
+TST_Keyboard:
+	CALL	LCD_Clear
+        MOV	DPTR,#tst_key_msg
+        CALL	LCD_DisplayStringCODE
+TST_Keyloop:
+	CALL	KBD_ReadKey
+        JZ	TST_Keyloop
+TST_Kgo:
+	PUSHACC
+	DEC	A
+	MOV	B,#7
+	MUL	AB
+	MOV	DPTR,#tst_key_table
+	CALL	AddABtoDPTR
+        MOV	A,#64
+        CALL	LCD_GotoXY
+        CALL	LCD_DisplayStringCODE
+        POP	ACC
+        CJNE	A,#KBD_OK,TST_Keyloop
+        CALL	SND_Warning
+        CLR	A
+	RET
+
+;******************************************************************************
+;
+;                      P o w e r   /   B a t t e r y   T e s t s
+;
+;******************************************************************************
+
+sys_batt_test: DB 24,'Power Supply: Volts Temp'
+msg_voltshigh: DB 13,'(Seems High!)'
+msg_seemsok:   DB 13,'             '
+
+TST_Battery:
+	CALL	LCD_Clear
+	MOV	A,#0
+	CALL	LCD_GotoXY
+	MOV	DPTR,#sys_batt_test
+	CALL	LCD_DisplayStringCODE
+TST_batloop:
+	CALL	SYS_ScanBatteryVolts
+	CALL	SYS_ScanBatteryTemp
+	MOV	DPSEL,#1
+	MOV	DPTR,#buffer
+	MOV	DPSEL,#0
+	MOV	DPTR,#sys_batteryvolts16
+	MOV	R5,#4
+	MOV	R6,#2
+	CALL	NUM_NewFormatFloat16
+	MOV	DPSEL,#1
+	MOV	DPTR,#buffer+5
+	MOV	DPSEL,#0
+	MOV	DPTR,#sys_batterytemp
+	MOV	R5,#3
+	CALL	NUM_NewFormatDecimal8
+	MOV	A,#78
+	CALL	LCD_GotoXY
+	MOV	DPTR,#buffer
+	MOV	R7,#5
+	CALL	LCD_DisplayStringXRAM
+	MOV	A,#85
+	CALL	LCD_GotoXY
+	MOV	DPTR,#buffer+5
+	MOV	R7,#3
+	CALL	LCD_DisplayStringXRAM
+
+        MOV	A,#64
+        CALL	LCD_GotoXY
+        MOV     DPTR,#sys_batteryvolts
+        MOVX    A,@DPTR
+        CJNE    A,#200,TST_Bnot200
+TST_Bok1:
+	MOV	DPTR,#msg_seemsok
+        CALL    LCD_DisplayStringCODE
+TST_Bok2:
+	CALL	KBD_ReadKey
+	JZ	TST_Batloop
+	CALL	LCD_Clear
+	CLR	A
+	RET
+
+TST_Bnot200:
+	JC	TST_Bok1			; battery volts > 32volts
+        MOV	DPTR,#msg_voltshigh		; display warning message
+        CALL	LCD_DisplayStringCODE		;
+        JMP	TST_Bok2			;
+
+msg_batbaktest: DB 22,'Battery Backup Test...'
+TST_TestBatteryBackup:
+	CALL	TST_CheckRAMSize
+        JZ	TST_TBBnoram
+        CALL    TST_TestBatteryBackup2
+TST_TBBnoram:
+	CLR	A
+	RET
+
+TST_TestBatteryBackup2:
+        PUSHACC
+        CALL	LCD_Clear
+        MOV	DPTR,#msg_batbaktest
+        CALL	LCD_DisplayStringCODE
+        POP	ACC
+        MOV	B,A
+        CALL    TST_CompareCycleRAM
+        JZ      TST_TBBfail
+        JMP	TST_RAMpass
+TST_TBBfail:
+	JMP	TST_RAMfail
+
+;******************************************************************************
+;
+;                                L E D   T e s t s
+;
+;******************************************************************************
+
+test_led_str: DB 8,'LED test'
+TST_LEDs:
+	CALL	LED_LED1Off
+	CALL	LED_LED2Off
+	CALL	LED_LED3Off
+	CALL	LED_LED4Off
+	CALL	LCD_Clear
+	MOV	DPTR,#test_led_str
+	CALL	LCD_DisplayStringCODE
+TST_LEDloop:
+	CALL	LED_LED2On
+	MOV	R0,#3
+	CALL	delay100ms
+	CALL	LED_LED2Off
+	CALL	LED_LED1On
+	MOV	R0,#3
+	CALL	delay100ms
+	CALL	LED_LED1Off
+	CALL	LED_LED3On
+	MOV	R0,#3
+	CALL	delay100ms
+	CALL	LED_LED3Off
+	CALL	LED_LED4On
+	MOV	R0,#3
+	CALL	delay100ms
+	CALL	LED_LED4Off
+	CALL	KBD_ReadKey
+	JZ	TST_LEDloop
+	CALL	LCD_Clear
+	CLR	A
+	RET
+
+test_setsermsg: DB 24,'Enter Unit Serial Number'
+TST_SetSerial:
+	CALL	LCD_Clear
+	MOV	DPTR,#test_setsermsg
+	CALL	LCD_DisplayStringCODE
+	MOV	B,#64
+        MOV     R7,#5
+	CALL	NUM_GetNumber
+	JZ	TST_ssabort
+	MOV	DPTR,#sys_dtserial
+	CALL	MTH_StoreLong
+
+        CALL    SYS_WriteUnitInfo		; store serial V2.50 onwards
+
+	CLR	F0				; for compatability, store
+	SETB	F1				; the serial number in the
+	MOV	R1,#EE_SLAVE			; pre V2.50 location too
+	MOV	DPTR,#EE_DTSERIAL		;
+	CALL	MEM_SetDest			;
+	MOV	DPTR,#sys_dtserial		;
+	CALL	MEM_SetSource			;
+	MOV	R7,#4				;
+	CALL	MEM_CopyXRAMtoEEsmall		;
+	JZ	TST_ssabort			;
+	CALL	SND_Warning			;
+TST_ssabort:
+	CLR	A
+	RET
+
+tst_inittestmenu:
+	DB 5
+	DB '====Initialise Menu==='
+	DW 0
+	DB 'Init AUDIT ROLL       '
+;	DW AUD_ManagerCleardown
+	DW 0
+	DB 'Init TICKET NUMBER    '
+	DW TKT_ManagerCleardown
+	DB 'Init WAYBILL NUMBER   '
+	DW SHF_ManagerCleardown
+	DB '** Master Cleardown **'
+	DW TST_VirginMachine
+
+;****
+
+TST_InitialiseMachine:
+	CALL	MNU_NewMenu
+TST_IMagain:
+	MOV	DPTR,#tst_inittestmenu
+	CALL	MNU_LoadMenuCODE
+	CALL	MNU_SelectMenuOption
+        JNB     ACC.7,TST_IMagain
+	CLR	A
+	RET
+
+msg_vm_init:	DB 20,'Initialising Machine'
+
+TST_VirginMachine:
+	CALL	LCD_Clear
+	MOV	DPTR,#msg_vm_init
+	CALL	LCD_DisplayStringCODE
+	MOV	R1,#EE_SLAVE
+	MOV	DPTR,#buffer
+	CLR	A
+	MOV	R7,#0
+TST_VMloop:
+	MOVX	@DPTR,A
+	INC	DPTR
+	DJNZ	R7,TST_VMloop
+	MOV	DPTR,#buffer
+	CALL	MEM_SetSource
+	MOV	DPTR,#EE_STATS_POWER
+	CALL	MEM_SetDest
+	MOV	R7,#(SYS_STATS_ITEMS*4)
+	CALL	MEM_CopyXRAMtoEEsmall
+	CLR	A
+	RET
+
+;********************************************
+
+
+;******************************************************************************
+;
+;                              R A M   T E S T S
+;
+;******************************************************************************
+
+msg_fixedramtest:	DB 22,'Fixed Pattern RAM Test'
+msg_testfill:		DB  5,'Fill '
+msg_testcompare:		DB  8,'Compare '
+msg_cycleramtest:	DB 23,'Cyclic Pattern RAM Test'
+msg_testfillcycle:	DB 10,'Fill Cycle'
+msg_testcomparecycle:	DB 13,'Compare Cycle'
+msg_ramfail:		DB 23,'Fail Page xx Addr xxxxx'
+msg_noramdetected:	DB 24,'No Offboard Ram Detected'
+msg_rampassed:		DB 15,'RAM Test Passed'
+
+tst_ramtestmenu:
+	DB 4
+	DB '=====RAM Test Menu===='
+	DW 0
+	DB 'Auto Ram Detect xxxxK '
+	DW TST_AutoRAMDetect
+	DB 'Fixed Pattern Test    '
+	DW TST_FixedPatternAutoRamTest
+	DB 'Cyclic Pattern Test   '
+	DW TST_CyclicPatternAutoRamTest
+
+
+TST_RAMTests:
+	CALL	MNU_NewMenu
+TST_RTagain:
+	MOV	DPTR,#tst_ramtestmenu
+	CALL	MNU_LoadMenuCODE
+
+	MOV	DPTR,#sys_ramsize
+	MOVX	A,@DPTR
+	CALL	MTH_LoadOp1Acc
+	MOV	A,#32
+	CALL	MTH_LoadOp2Acc
+	CALL	MTH_Multiply32by16
+	MOV	DPTR,#buffer
+	CALL	MTH_StoreLong
+	MOV	DPSEL,#0
+	MOV	DPTR,#buffer
+	MOV	DPSEL,#1
+	MOV	DPTR,#buffer+1024+41
+	MOV	R5,#4
+	CALL	NUM_NewFormatDecimal32
+
+	CALL	MNU_SelectMenuOption
+        JNB     ACC.7,TST_RTagain
+	CLR	A
+	RET
+
+TST_CheckRamSize:
+	CALL	SYS_DetectRAM
+	MOV	DPTR,#sys_ramsize
+	MOVX	A,@DPTR
+	JNZ	TST_CRSok
+	CALL	LCD_Clear
+	MOV	DPTR,#msg_noramdetected
+	CALL	LCD_DisplayStringCODE
+	CALL	SND_Warning
+	CALL	KBD_WaitKey
+	CLR	A
+TST_CRSok:
+	RET
+
+TST_AutoRAMDetect:
+	CALL	SYS_DetectRAM
+	CLR	A
+	RET
+
+TST_FixedPatternAutoRamTest:
+	CALL	TST_CheckRamSize
+	JZ	TST_FPRTAfail
+	CALL	TST_FixedPatternRamTest
+TST_FPRTAfail:
+	CLR	A
+	RET
+
+TST_CyclicPatternAutoRamTest:
+	CALL	TST_CheckRamSize
+	JZ	TST_CPRTAfail
+	CALL	TST_CyclicPatternRamTest
+TST_CPRTAfail:
+	CLR	A
+	RET
+
+TST_FixedPatternRamTest:	;A=pages to test
+	PUSHACC
+	CALL	LCD_Clear
+	MOV	DPTR,#msg_fixedramtest
+	CALL	LCD_DisplayStringCODE
+	POP	ACC
+	MOV	B,A
+	MOV	A,#000h
+	CALL	TST_FillRAM
+	CALL	TST_CompareRam
+	JZ	TST_FPRTfail
+	MOV	A,#0FFh
+	CALL	TST_FillRAM
+	CALL	TST_CompareRam
+	JZ	TST_FPRTfail
+	MOV	A,#055h
+	CALL	TST_FillRAM
+	CALL	TST_CompareRam
+	JZ	TST_FPRTFail
+	MOV	A,#0AAh
+	CALL	TST_FillRAM
+	CALL	TST_CompareRam
+	JZ	TST_FPRTFail
+	JMP	TST_RAMPass
+TST_FPRTfail:
+	JMP	TST_RAMFail
+
+TST_FillRAM:	;B=pages,A=pattern
+	PUSH	B
+	PUSH	ACC
+	CALL	LCD_Clear2
+	MOV	A,#64			; display "Fill" message
+	CALL	LCD_GotoXY		;
+	MOV	DPTR,#msg_testfill	;
+	CALL	LCD_DisplayStringCODE	;
+	POP	ACC
+	PUSH	ACC
+	SWAP	A
+	ANL	A,#00Fh
+	CALL	HexChar
+	CALL	LCD_WriteData
+	POP	ACC
+	PUSH	ACC
+	ANL	A,#00Fh
+	CALL	HexChar
+	CALL	LCD_WriteData
+	POP	ACC
+	POP	B
+	PUSH	B
+	MOV	R4,#0
+	MOV	R7,B
+TST_FillRAMpageloop:
+	ANL	SB1data,#0E0h		; set page addressing
+	PUSH	ACC			;
+	MOV	A,R4			;
+	ORL	SB1data,A		;
+	POP	ACC			;
+;	CALL	SBS_WriteSB1
+
+	MOV	DPTR,#08000h
+	MOV	B,#0
+	MOV	R5,#127
+	MOV	R6,#0
+TST_FillRAMbyteloop:
+	MOVX	@DPTR,A
+	INC	DPTR
+	DJNZ	R6,TST_FillRAMbyteloop
+	DJNZ	R5,TST_FillRAMbyteloop
+	INC	R4
+	DJNZ	R7,TST_FillRAMpageloop
+	POP	B
+	RET
+
+TST_CompareRAM:	;B=pages,A=pattern
+	PUSH	B
+	PUSH	ACC
+	CALL	LCD_Clear2
+	MOV	A,#64			; display "Compare" message
+	CALL	LCD_GotoXY		;
+	MOV	DPTR,#msg_testcompare	;
+	CALL	LCD_DisplayStringCODE	;
+	POP	ACC
+	PUSH	ACC
+	SWAP	A
+	ANL	A,#00Fh
+	CALL	HexChar
+	CALL	LCD_WriteData
+	POP	ACC
+	PUSH	ACC
+	ANL	A,#00Fh
+	CALL	HexChar
+	CALL	LCD_WriteData
+	POP	ACC
+	POP	B
+	PUSH	B
+	MOV	R4,#0
+	MOV	R7,B
+TST_CompareRAMpageloop:
+	ANL	SB1data,#0E0h		; set page addressing
+	PUSH	ACC			;
+	MOV	A,R4			;
+	ORL	SB1data,A		;
+	POP	ACC			;
+;	CALL	SBS_WriteSB1
+
+	MOV	DPTR,#08000h
+	MOV	B,#0
+	MOV	R5,#127
+	MOV	R6,#0
+TST_CompareRAMbyteloop:
+	MOV	B,A
+	MOVX	A,@DPTR
+	CJNE	A,B,TST_CRfail
+	INC	DPTR
+	DJNZ	R6,TST_CompareRAMbyteloop
+	DJNZ	R5,TST_CompareRAMbyteloop
+	INC	R4
+	DJNZ	R7,TST_CompareRAMpageloop
+	POP	B
+	MOV	A,#1			; success
+	RET
+TST_CRfail:
+	POP	B
+	CLR	A			; fail
+	RET
+
+TST_CyclicPatternRamTest: ;A=pages to test
+	PUSH	ACC
+	CALL	LCD_Clear
+	MOV	DPTR,#msg_cycleramtest
+	CALL	LCD_DisplayStringCODE
+	POP	ACC
+	MOV	B,A
+	CALL	TST_FillCycleRAM
+	CALL	TST_CompareCycleRAM
+	JZ	TST_CPRTfail
+	JMP	TST_RAMPass
+TST_CPRTfail:
+	JMP	TST_RAMFail
+
+TST_FillCycleRAM:	;B=pages
+	PUSH	B
+	CALL	LCD_Clear2
+	MOV	A,#64			; display "Fill" message
+	CALL	LCD_GotoXY		;
+	MOV	DPTR,#msg_testfillcycle	;
+	CALL	LCD_DisplayStringCODE	;
+	POP	B
+	PUSH	B
+	MOV	R4,#0
+	MOV	R7,B
+TST_FCRpageloop:
+	ANL	SB1data,#0E0h		; set page addressing
+	PUSH	ACC			;
+	MOV	A,R4			;
+	ORL	SB1data,A		;
+	POP	ACC			;
+;	CALL	SBS_WriteSB1
+
+	MOV	DPTR,#08000h
+	MOV	A,#1
+	MOV	B,#0
+	MOV	R5,#127
+	MOV	R6,#0
+TST_FCRbyteloop:
+	MOVX	@DPTR,A
+	INC	DPTR
+	INC	A
+	CJNE	A,#14,TST_FCRok
+	MOV	A,#1
+TST_FCRok:
+	DJNZ	R6,TST_FCRbyteloop
+	DJNZ	R5,TST_FCRbyteloop
+	INC	R4
+	DJNZ	R7,TST_FCRpageloop
+	POP	B
+	RET
+
+TST_CompareCycleRAM:	;B=pages
+	PUSH	B
+	CALL	LCD_Clear2
+	MOV	A,#64			; display "Compare" message
+	CALL	LCD_GotoXY		;
+	MOV	DPTR,#msg_testcomparecycle	;
+	CALL	LCD_DisplayStringCODE	;
+	POP	B
+	PUSH	B
+	MOV	R4,#0
+	MOV	R7,B
+TST_CRpageloop:
+	ANL	SB1data,#0E0h		; set page addressing
+	PUSH	ACC			;
+	MOV	A,R4			;
+	ORL	SB1data,A		;
+	POP	ACC			;
+;	CALL	SBS_WriteSB1
+
+	MOV	DPTR,#08000h
+	MOV	B,#1
+	MOV	R5,#127
+	MOV	R6,#0
+TST_CRbyteloop:
+	MOVX	A,@DPTR
+	CJNE	A,B,TST_CRCfail
+	INC	DPTR
+	MOV	A,B
+	INC	A
+	CJNE	A,#14,TST_CRnowrap
+	MOV	A,#1
+TST_CRnowrap:
+	MOV	B,A
+	DJNZ	R6,TST_CRbyteloop
+	DJNZ	R5,TST_CRbyteloop
+	INC	R4
+	DJNZ	R7,TST_CRpageloop
+	POP	B
+	MOV	A,#1			; success
+	RET
+TST_CRCfail:
+	POP	B
+	CLR	A			; fail
+	RET
+
+TST_RAMPass:
+	CALL	LCD_Clear2
+	MOV	A,#64
+	CALL	LCD_GotoXY
+	MOV	DPTR,#msg_rampassed
+	CALL	LCD_DisplayStringCODE
+	CALL	KBD_WaitKey
+	RET
+
+TST_RAMFail:
+	PUSH	DPH
+	PUSH	DPL
+	MOV	A,R4
+	PUSH	ACC
+	CALL	LCD_Clear2
+	MOV	A,#64
+	CALL	LCD_GotoXY
+	MOV	DPTR,#msg_ramfail
+	CALL	LCD_DisplayStringCODE
+	POP	ACC
+	MOV	B,A
+	MOV	DPSEL,#1
+	MOV	DPTR,#buffer
+	MOV	R5,#2
+	CALL	NUM_NewFormatDecimalB
+	MOV	A,#64+10
+	CALL	LCD_GotoXY
+	MOV	DPTR,#buffer
+	MOV	R7,#2
+	CALL	LCD_DisplayStringXRAM
+	MOV	A,#64+18
+	CALL	LCD_GotoXY
+	POP	DPL
+	POP	DPH
+	MOV	B,DPH
+	MOV	A,DPL
+	MOV	DPTR,#buffer
+	MOVX	@DPTR,A
+	MOV	A,B
+	INC	DPTR
+	MOVX	@DPTR,A
+	MOV	DPSEL,#0
+	MOV	DPTR,#buffer
+	MOV	DPSEL,#1
+	MOV	DPTR,#buffer+2
+	MOV	R5,#5
+	CALL	NUM_NewFormatDecimal16
+	MOV	DPTR,#buffer+2
+	MOV	R7,#5
+	CALL	LCD_DisplayStringXRAM
+
+	CALL	SND_Warning
+	CALL	KBD_WaitKey
+	RET
+
+
+;******************************************************************************
+
+msg_rtc_fail: DB 22,'Real Time Clock Failed'
+
+tst_rtctestmenu:
+	DB 4
+	DB '=====RTC Test Menu===='
+	DW 0
+	DB 'Test RTC              '
+	DW TST_TestRTC
+	DB 'Set Date              '
+	DW TST_SetDate
+	DB 'Set Time              '
+	DW TST_SetTime
+
+;****
+
+TST_RealTimeClock:
+	CALL	MNU_NewMenu
+TST_RTCagain:
+	MOV	DPTR,#tst_rtctestmenu
+	CALL	MNU_LoadMenuCODE
+	CALL	MNU_SelectMenuOption
+        JNB     ACC.7,TST_RTCagain
+	CLR	A
+	RET
+
+TST_SetDate:
+	CALL	TIM_ChangeDate
+	CLR	A
+	RET
+TST_SetTime:
+	CALL	TIM_ChangeTime
+	CLR	A
+	RET
+
+TST_TestRTC:
+	CALL	LCD_Clear
+TST_RTCloop:
+	MOV	DPSEL,#0
+	MOV	DPTR,#buffer
+
+	MOV	R1,#RTC_SLAVE		; prepare to use I2C RTC
+	MOV	DPSEL,#1			; read the hours
+	MOV	DPTR,#04h		;
+	CALL	I2C_Read8		;
+	JNZ	TST_RTCfail		;
+	MOV	A,B			;
+	ANL	A,#03Fh			;
+	MOV	DPSEL,#0
+	CALL	BCDtoASCII
+
+	MOV	A,#':'
+	MOVX	@DPTR,A
+	INC	DPTR
+
+	MOV	DPSEL,#1			; read the minutes
+	MOV	DPTR,#03 		;
+	CALL	I2C_Read8		;
+	JNZ	TST_RTCfail		;
+	MOV	A,B			;
+	ANL	A,#07Fh			;
+	MOV	DPSEL,#0
+	CALL	BCDtoASCII
+
+	MOV	A,#':'
+	MOVX	@DPTR,A
+	INC	DPTR
+
+	MOV	DPSEL,#1			; read the seconds
+	MOV	DPTR,#02 		;
+	CALL	I2C_Read8		;
+	JNZ	TST_RTCfail		;
+	MOV	A,B			;
+	ANL	A,#07Fh			;
+	MOV	DPSEL,#0
+	CALL	BCDtoASCII
+
+;	CALL	LCD_Clear
+	MOV	A,#10
+	CALL	LCD_GotoXY
+	MOV	DPTR,#buffer
+	MOV	R7,#8
+	CALL	LCD_DisplayStringXRAM
+
+	MOV	A,#0
+	CALL	LCD_GotoXY
+	CALL	TIM_GetDateTime
+	MOV	DPSEL,#1
+	MOV	DPTR,#buffer
+	CALL	TIM_FormatDate
+	MOV	DPTR,#buffer
+	MOV	R7,#8
+	CALL	LCD_DisplayStringXRAM
+
+	CALL	KBD_ReadKey
+	JZ	TST_RTCloop
+	CLR	A
+	RET
+
+TST_RTCfail:
+	CALL	SND_Warning
+	MOV	A,#64
+	CALL	LCD_GotoXY
+	MOV	DPTR,#msg_rtc_fail
+	CALL	LCD_DisplayStringCODE
+	CALL	KBD_WaitKey
+	CLR	A
+	RET
+
+;******************************************************************************
+;
+;                    D E B U G G I N G   U T I L I T I E S
+;
+;******************************************************************************
+
+tst_debugmenu:
+	DB 6
+	DB '===Debug/Utils Menu==='
+	DW 0
+        DB 'Wiggle Page Bits      '
+        DW TST_WigglePageBits
+        DB 'Wiggle I2C Lines      '
+        DW TST_WiggleI2CLines
+        DB 'Digital Scope Mode    '
+        DW TST_DigitalScopeMode
+        DB 'Stepper Tests         '
+        DW TST_StepperTests
+        DB 'Graphics Test         '
+        DW TST_Graphics
+
+;****
+
+TST_DebugUtils:
+	CALL	MNU_NewMenu
+TST_DUagain:
+	MOV	DPTR,#tst_debugmenu
+	CALL	MNU_LoadMenuCODE
+	CALL	MNU_SelectMenuOption
+        JNB     ACC.7,TST_DUagain
+	CLR	A
+	RET
+
+;****
+
+msg_wiggling: DB 21,'Wiggling Page Bits...'
+
+TST_WigglePageBits:
+	CALL	LCD_Clear
+        MOV	DPTR,#msg_wiggling
+        CALL	LCD_DisplayStringCODE
+        MOV	B,#0
+TST_WPBloop:
+;        CALL	SBS_WriteSB1
+        MOV	A,SB1data
+        INC	A
+        ANL	A,#31
+	MOV	SB1data,A
+	CALL	KBD_ReadKey
+        JZ	TST_WPBloop
+        CALL	LCD_Clear
+        CLR     A
+	RET
+
+
+msg_i2cwiggle: DB 21,'Wiggling I2C Lines...'
+
+TST_WiggleI2CLines:
+	CALL	LCD_Clear
+        CALL    SYS_PricePlugPowerOn
+        MOV	DPTR,#msg_i2cwiggle
+        CALL   	LCD_DisplayStringCODE
+        CLR	F0
+        SETB	F1
+	MOV	R1,#EE_SLAVE
+        MOV	R2,#0
+TST_WILloop:
+	CALL	I2C_Read
+        INC	R2
+	CALL	KBD_ReadKey
+        JZ	TST_WILloop
+        CALL    SYS_PricePlugPowerOff
+        CALL	LCD_Clear
+        CLR     A
+	RET
+
+msg_digscope: DB 18,'Digital Scope Mode'
+
+TST_DSMsample:
+	MOV	A,ADCON0
+	ANL	A,#0C0h		; keep two bits nothing to do with ADC
+	MOV	ADCON0,A
+	MOV	ADCON1,#04h
+	MOV	DAPR,#0
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+TST_DSMloop2:
+	JB	0DCh,TST_DSMloop2
+	MOV	A,ADDAT
+        PUSH    ACC
+;        CALL    DBG_TxChar
+        POP     ACC
+	RET
+
+TST_DigitalScopeMode:
+ CALL PRT_StartPrint
+	CALL	LCD_Clear
+	MOV	DPTR,#msg_digscope
+	CALL	LCD_DisplayStringCODE
+TST_DSMloop:
+	CALL	TST_DSMsample
+
+; MOV R7,#1
+; CALL PRT_LineFeed
+; CLR  prt_paperout
+; CALL KBD_ScanKeyboard
+; JNZ TST_DSMloop
+; CALL PRT_EndPrint
+; CALL KBD_FlushKeyboard
+TST_DSMwaitkey:
+ CALL KBD_ReadKey
+ JNZ TST_DSMgotkey
+ CALL TST_DSMsample
+ JMP TST_DSMwaitkey
+TST_DSMgotkey:
+ CJNE A,#KBD_OK,TST_DSMdone
+; CALL PRT_StartPrint
+        JMP     TST_DSMloop
+TST_DSMdone:
+	RET
+
+
+msg_steppertests: DB 19,'Stepper Motor Tests'
+TST_StepperTests:
+	CALL	LCD_Clear
+	MOV	DPTR,#msg_steppertests
+	CALL	LCD_DisplayStringCODE
+	CALL	PRT_StartPrint
+TST_STloop:
+	CALL	KBD_WaitKey
+	MOV     DPTR,#testkeytable
+	DEC     A
+	RL      A
+	JMP     @A+DPTR
+testkeytable:
+	AJMP    TST_Key0
+	AJMP    TST_Key1
+	AJMP    TST_Key2
+	AJMP    TST_Key3
+	AJMP    TST_Key4
+	AJMP    TST_Key5
+	AJMP    TST_Key6
+	AJMP    TST_Key7
+	AJMP    TST_Key8
+	AJMP    TST_Key9
+	AJMP    TST_KeyA
+	AJMP    TST_KeyB
+	AJMP    TST_KeyC
+	AJMP    TST_KeyD
+	AJMP    TST_KeyE
+	AJMP    TST_KeyF
+	AJMP    TST_KeyG
+	AJMP    TST_KeyH
+	AJMP    TST_KeyCancel
+	AJMP    TST_KeyOk
+TST_Key0:
+	MOV	R7,#255
+TST_K0loop:
+	CALL	PRT_GeneratePulse
+	CALL	PRT_CheckPaper
+        MOV	R0,prt_stepdelay
+	CALL	delay100us
+	DJNZ	R7,TST_K0loop
+	CALL	PRT_StopMotor
+	JMP	TST_STloop
+TST_Key1:
+TST_Key2:
+TST_Key3:
+TST_Key4:
+TST_Key5:
+TST_Key6:
+TST_Key7:
+TST_Key8:
+TST_Key9:
+TST_KeyA:
+	INC	prt_stepdelay
+        JMP	TST_STloop
+TST_KeyB:
+	DEC	prt_stepdelay
+        JMP	TST_STloop
+TST_KeyC:
+	INC	prt_stepdelay2
+        JMP	TST_STloop
+TST_KeyD:
+	DEC	prt_stepdelay2
+        JMP	TST_STloop
+TST_KeyE:
+	INC	prt_stepdelay3
+        JMP	TST_STloop
+TST_KeyF:
+	DEC	prt_stepdelay3
+        JMP	TST_STloop
+TST_KeyG:
+	MOV	DPTR,#prt_density
+        MOVX	A,@DPTR
+        INC	A
+        MOVX	@DPTR,A
+        JMP	TST_STloop
+TST_KeyH:
+	MOV	DPTR,#prt_density
+        MOVX	A,@DPTR
+        DEC	A
+        MOVX	@DPTR,A
+        JMP	TST_STloop
+TST_KeyCancel:
+	CALL	PRT_EndPrint
+	CLR	A
+	RET
+TST_KeyOk:
+        MOV     A,#32
+        CALL    PRT_SetBitmapLenSmall
+        CALL	PRT_ClearBitmap
+        MOV	DPTR,#prt_test_Str
+        CALL	PRT_FormatBitmapCODE
+        CALL	PRT_PrintBitmap
+        CALL	PRT_PrintBitmap
+        JMP	TST_STloop
+
+;*******************************
+
+TST_Graphics:
+	CALL	SND_Warning
+        CALL	KBD_WaitKey
+
+; pull down rows of 21 bytes into prt_bitmap, then print it
+
+        MOV     A,#0
+        MOV     B,#1
+        CALL    PRT_SetBitmapLen
+        CALL	PRT_ClearBitmap
+	MOV	DPTR,#prt_bitmap
+
+TST_Grxloop1:
+        MOV	R7,#21
+        PUSHDPH
+	PUSHDPL
+TST_Grxloop2:
+	MOV	B,#COM_COM0
+        MOV	R5,#10
+        CALL	COM_RxCharTimeout
+        JNC	TST_Gprt
+        MOVX	@DPTR,A
+        INC	DPTR
+        DJNZ	R7,TST_Grxloop2
+        POP	DPL
+        POP	DPH
+        MOV	A,#32
+        CALL	AddAtoDPTR
+        JMP	TST_Grxloop1
+
+TST_Gprt:
+	CALL	PRT_StartPrint
+        CALL	PRT_PrintBitmap
+        CALL	PRT_EndPrint
+        CALL	KBD_ReadKey
+        JZ	TST_Graphics
+        CLR	A
+        RET
+
+;**************************** End Of TESTCODE.ASM *****************************
+;

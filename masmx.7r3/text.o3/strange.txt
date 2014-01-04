@@ -1,0 +1,14 @@
+MASMX 7r2
+3/strange.msm
+*EOF*
+  :                            1 p*      $proc        
+  :                            2         +       f\p(1,1), p(1,1), 100-p(1)
+  :                            3         $end
+  :                            4 f*      $func
+  :                            5         $return f(1,1)*/1
+  :                            6         $end
+  :                            7 
+00:000000 C62163              +8         p       33(99)
+*EOF*
+:$(00):000000:000001 
+strange.msm: object code 44 bytes: 0 errors: 0 undefined labels

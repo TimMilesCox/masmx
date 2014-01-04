@@ -1,0 +1,13 @@
+MASMX 7r2Z
+3/maxwini.msm
+*EOF*
+00:000000 000000              +1 aaa + aaa
+00:000001 000001              +2 baa + baa
+00:000002 000002              +3 caa + caa
+  :                            8408         $list   1
+00:0020D6 0020D6              +8409 ilm + ilm
+00:0020D7 0020D7              +8410 jlm + jlm
+00:0020D8 0020D8              +8411 klm + klm
+*EOF*
+:$(00):000000:0020D9 
+maxwini.msm: object code 58900 bytes: 0 errors: 0 undefined labels

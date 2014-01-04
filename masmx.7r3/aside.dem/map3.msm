@@ -1,0 +1,18 @@
+	$include	"map_ppc.def"
+
+text	$equ	1
+data	$equ	3
+bss	$equ	5
+sdata	$equ	6
+
+$(1:000A0000)
+	$include,$binary	soso	$(text)
+	$include,$binary	factor	$(text)
+        $include,$binary        soso    $(data)
+        $include,$binary        factor  $(data)
+
+$(0:000C0000)
+	$include,$binary	soso	$(bss, sdata)
+	$include,$binary	factor	$(bss, sdata)
+
+	$store			image3

@@ -1,0 +1,23 @@
+MASMX 7r2
+3/liable.msm
+*EOF*
+  :                            1 f*      $func
+  :                            2         +       99
+  :                            3 one     +       100
+  :                            4 two     +       101
+  :                            5 three   +       102
+  :                            6         $snap   2
+  :                            7         $return 103
+  :                            8         $end
+00:000000 000063              +9         +       f()
+00:000001 000064              +9 
+00:000002 000065              +9 
+00:000003 000066              +9 
+ONE=$00:000001
+TWO=$00:000002
+THREE=$00:000003
+Error: liable.msm Line 9: Function Adding Code Inline
+00:000004 000067              +9 
+*EOF*
+:$(00):000000:000005 
+liable.msm: object code 72 bytes: 1 errors: 0 undefined labels

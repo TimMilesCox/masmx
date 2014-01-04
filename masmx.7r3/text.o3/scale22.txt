@@ -1,0 +1,21 @@
+MASMX 7r2
+3/scale22.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1: 	$include	"../aside.dem/ppc_603.def"
+  :                            2 $(.data:*4)
+  :                            3 gotcha*	$res	16
+03:00000010 776F6E6465726C6F61660000
+                              +4 wonderloaf      "wonderloaf"
+  :                            5 
+  :                            6 $(.text:*4)
+  :                            7 zoohoo*
+01:00000000 64070000          +8 	oris	r7, 0, wonderloaf@ha
+01:00000004 60E70010          +9 	ori	r7, r7, wonderloaf@l
+01:00000008 4BFFFFF9          +10 	bl	fireup
+01:0000000C 4E800020          +11 	blr
+*EOF*
+:$(01):00000000:00000010 :$(03):00000000:0000001C 
+scale22.msm: object code 317 bytes: 0 errors: 1 undefined labels

@@ -1,0 +1,10 @@
+MASMX 7r2Z
+3/void.msm
+*EOF*
+  :                            1 	$word		32
+  :                            2 	$quantum	8
+  :                            3 	$awidth		32:64
+  :                            4 index	$do	72,$(index-1:*1)
+*EOF*
+
+void.msm: object code 0 bytes: 0 errors: 0 undefined labels

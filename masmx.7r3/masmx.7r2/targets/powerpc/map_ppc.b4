@@ -1,0 +1,105 @@
+	$word	32
+	$byte	 8
+	$quantum 8
+	$awidth	32:64
+
+	$do	$t(__giant)=0,__giant	$set	0
+
+p	$proc
+"$map"*	$name
+
+p	$proc
+word*	$name
+parts	$set	p(1,1:)
+"$data"	$set,$binary	p(1,1:parts)
+
+	$do	__giant,v	$set	0
+
+part	$do	parts-1,	relocate	p(1, 1:part)
+	$load,$bits	$data
+	$end
+
+p	$proc
+relocate* $name
+
+
+label1	$pushrel	p(1,1)
+
+	$if	$t(label1)=$equf
+
+	$if	__giant
+sum	$pushrel,$long_absolute	p(1,1)
+v*	$set	v+sum
+	$else
+v	$set	label1\1
+	$endif
+
+bits    $set    label1\2
+scale   $set    label1\3
+offset  $set    label1\4
+descant $set    label1\5
+
+limit   $set    1*/bits
+mask    $set    limit-1
+unmask  $set    ^(mask*/scale)
+
+        $if     (bits=24)**(($data**2)=0)**(descant=-2)
+
+.	$if	$rel
+.	$if	$a=0
+.	$flag	relative jump from relocatable to absolute
+.	$endif
+.	$endif
+
+field	$set	v+offset
+
+.	$trace	v
+.	$trace	offset
+.	$trace	field
+
+	$if	__giant
+	$do	part=parts,	$info,$offset	field
+	$else
+        $info,$offset   field
+	$endif
+
+"$data"* $set   ($data**0FC000003)++(field**03FFFFFC)
+
+        $else
+
+field	$set	$net(v+(($data/*scale)**mask))
+
+	$if	descant<0
+field	$set	(v+offset)/*(-descant)
+	$if	__giant
+	$do	part=parts,	$info,$offset	v+offset
+	$else
+        $info,$offset   v+offset
+	$endif
+	$endif
+
+field	$set	$net(field**mask)
+"$data"* $set	(field*/scale)++($data**unmask)
+
+	$endif
+	$else
+
+	$note	label1 is not an $equf
+
+offset	$set	label1/*96
+bits	$set	(label1/*32)**0FFFFFFFF
+	$if	bits=24
+        $if	($data**2)=0
+update	$set	(offset-$b)**0FFFFFFFF
+	$trace	update
+	$info,$offset	update
+"$data"* $set	($data**0FC000003)++(update**03FFFFFC)
+	$endif
+	$endif
+
+	$endif
+	$end
+
+index	$do	p(),	word	p(index, 1)
+	$end
+

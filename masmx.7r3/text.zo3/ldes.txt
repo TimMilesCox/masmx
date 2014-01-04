@@ -1,0 +1,13 @@
+MASMX 7r2Z
+3/ldes.msm
+*EOF*
+  :                            1         $word   32
+  :                            2         $quantum 8
+  :                            3         $byte   8
+  :                            4 label_descriptor $form  8, 8, 16, 4, 60   
+  :                            5 
+00:00000000 0700FFF63404C4142454C310
+                              +6      label_descriptor 7,0,-10,3,"@LABEL1"
+*EOF*
+:$(00):00000000:0000000C 
+ldes.msm: object code 70 bytes: 0 errors: 0 undefined labels

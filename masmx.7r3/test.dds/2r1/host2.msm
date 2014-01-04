@@ -1,0 +1,517 @@
+;******************************************************************************
+;
+; File     : HOST2.ASM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains the support routines for handling the HOST-MASTER
+; communications link. The CASE statement code that processes the type of packet
+; received from the HOST is in HOST.ASM, and calls these routines.
+;
+; System   : 80C537
+;
+; History  :
+;   Date	Who	Ver	Comments
+;
+;******************************************************************************
+;
+;             H o s t   I n i t i a l i s a t i o n   R o u t i n e s
+;
+;******************************************************************************
+
+HOST_Init:
+	MOV	host_lastchar,#0
+	CLR	host_inpacket
+	MOV     host_curpktlen,#0
+	MOV     host_packets,#0
+	MOV     host_startbuf,#0
+	MOV     host_endbuf,#0
+	RET
+;
+; HOST-MASTER handshake chars
+HOST_DLE	EQU	16
+HOST_STX	EQU	02
+HOST_ACK	EQU	06
+HOST_NAK	EQU	21
+HOST_ETX	EQU	03
+;
+;
+; Two buffers, host_buffer and disney_buffer, are defined in RS485.ASM.
+;
+; The following bytes are declared in IRAM_MAP.INC
+; host_ddsbuffptr		EQU 30	; IRAM bytes, reused.
+; host_wdwbuffptr		EQU 31
+;
+host_pingflag	VAR	1
+;
+;******************************************************************************
+;
+;                    H o s t   R e c e i v e   R o u t i n e s
+;
+;******************************************************************************
+;
+
+        IF      LCD_BUG
+host_mib_chars  var     1
+host_mib_drops  var     1
+host_mib_packets var    1
+
+host_mib_expected var 1
+host_mib_received var 1
+host_mib_delimiter var 1
+
+        ENDIF
+
+HOST_Rx:
+	PUSHPSW		; Save system state
+	PUSHACC
+	MOV	A,S1CON			; test RI1 (bit 0) (S1CON not bit-addressable)
+	JB	ACC.0,HOST_Rcont
+;
+; Fall-through - Tx interrupt.
+	POP	ACC			; No Rx interrupt, finish now.
+	POP	PSW
+	RETI
+;
+HOST_Rcont:			; Receive interrupt confirmed.
+	PUSHB
+	PUSHDPH
+	PUSHDPL
+
+
+        IF      LCD_BUG
+        mov     dptr,#host_mib_chars
+        movx    a,@dptr
+        inc     a
+        movx    @dptr,a
+        ENDIF
+
+	MOV    A,R0
+	PUSHACC
+	MOV    A,R1
+	PUSHACC
+	MOV    A,R7
+	PUSHACC
+	PUSH	mth_op1ll
+	PUSH	mth_op1lh
+	PUSH	mth_op1hl
+	PUSH	mth_op1hh
+	PUSH	mth_op2ll
+	PUSH	mth_op2lh
+	PUSH	mth_op2hl
+	PUSH	mth_op2hh
+
+
+        IF      HOST_BUFFER_TRACE
+        mov     dptr,#host_trace_intracursor
+        movx    a,@dptr
+        inc     a
+        movx    @dptr,a
+        dec     a
+        mov     dpl,a
+        inc     dph
+        ENDIF     
+
+	MOV	A,S1BUF
+
+        IF      HOST_BUFFER_TRACE
+        movx    @dptr,a
+        ENDIF
+
+	MOV	host_ch,A		; Save the byte
+;
+	CJNE	A,#HOST_DLE,HOST_Rnotdle	; Is it a DLE? If not, skip.
+	MOV	host_lastchar,#HOST_DLE		; Record this DLE for next test.
+;
+HOST_Rtx2:
+	JMP	HOST_Rtx	; Longjump to exit.
+;
+HOST_Rnotdle:
+	CJNE	A,#HOST_STX,HOST_Rdlestxok	; It's not a DLE, is it an STX?
+	MOV	A,host_lastchar			; If it is, was the preceding char a DLE?			
+	CJNE	A,#HOST_DLE,HOST_Rbadheader	; Nope, deal with it as an error.
+; Fall-through - this is the STX that follows a DLE. The next byte will be part of an
+; incoming packet.
+;
+	CLR	A
+	MOV	host_endbuf,A		; "end of packet" pointer into buffer
+	SETB	host_inpacket		; "Packet coming in" marker.
+	MOV	A,#6
+	MOV	host_actpktlen,A	; expected final length of packet is 6 or greater.
+	JMP	HOST_Rtx
+;
+HOST_Rbadheader:
+; The <DLE><STX> header is corrupt, somehow. Ignore any received chars until another
+; <DLE> arrives, as the start of another packet.
+	CLR	A
+	MOV	host_lastchar,A		; clear <DLE> marker
+	CLR	host_inpacket		; clear "Packet coming in" marker.
+
+
+        IF      LCD_BUG
+        mov     dptr,#host_mib_drops
+        movx    a,@dptr
+        inc     a
+        movx    @dptr,a
+        ENDIF
+
+	JMP	HOST_Rtx
+;
+; This is the point where a character has been validated as part of a packet.
+HOST_Rdlestxok:
+	JNB	host_inpacket,HOST_Rtx	; No header previously received, error.
+	MOV	A,host_ch
+;
+	MOV	DPTR,#disney_buffer	; Point to packet buffer (note: has to be aligned
+	MOV	DPL,host_endbuf		; to a 256-byte page. This allows DPL to be set
+	MOV	A,host_ch		; to index through the buffer, and host_endbuf to
+	MOVX	@DPTR,A			; be used as the byte counter).
+	INC	host_endbuf		; Add one to endbuf.
+;
+; We need to determine the packet-to-be's length. This is defined in the first two ASCII
+; characters in the buffer.
+	MOV	A,host_endbuf
+	CJNE	A,#2,HOST_Rlennot2	; If there are not just 2 bytes in buffer, continue.
+; Fall-through - now two chars. Convert them to a binary value.
+	MOV	DPTR,#disney_buffer	; Point to 1st. byte in packet buffer
+
+        IF      HOST_LENGTH_ENCODING_DECIMAL
+
+        movx    a,@dptr
+        anl     a,#15
+        mov     b,#10
+        mul     ab
+        mov     b,a
+        inc     dptr
+        movx    a,@dptr
+        anl     a,#15
+        add     a,b
+                   
+        ELSE
+
+	CALL	HOST_ASCII_Bin
+
+        ENDIF
+	ADD	A,#2			; Disney length does not include the length bytes.
+	MOV	host_actpktlen,A	; Record true expected final length of packet.
+	JMP	HOST_Rtx		; and finish up.
+;
+HOST_Rlennot2:
+; Last thing to check is if this was the last byte in a packet.
+
+        IF      LCD_BUG
+        mov     a,host_actpktlen
+        mov     dptr,#host_mib_expected
+        movx    @dptr,a
+        mov     a,host_endbuf
+        mov     dptr,#host_mib_received
+        movx    @dptr,a
+        mov     a,#'?'
+        mov     dptr,#host_mib_delimiter
+        movx    @dptr,a
+        ENDIF
+
+	MOV	A,host_endbuf		; Compare current end-of-buffer with packet length.
+	CJNE	A,host_actpktlen,HOST_Rtx	; Not finished, skip conversion
+
+        IF      LCD_BUG
+        mov     a,#'.'
+        mov     dptr,#host_mib_delimiter
+        movx    @dptr,a
+        ENDIF
+;
+; Fall-through - packet complete, with host_actpktlen bytes.
+; First thing to do is to check the native (Disney) checksum, as for the
+; DDS processing it will be necessary to recreate a new checksum.
+	CALL	HOST_Disney_Chksum	; 0 = OK, 1 = error
+	JZ	HOST_Rchkok
+; Fall-though - bad checksum. Set an error flag, and return a <NAK> to HOST
+	CLR	host_inpacket		; This packet is corrupt, processing finished.
+
+        IF      LCD_BUG
+        mov     a,#'c'
+        mov     dptr,#host_mib_delimiter
+        movx    @dptr,a
+        mov     dptr,#host_mib_drops
+        movx    a,@dptr
+        inc     a
+        movx    @dptr,a
+        ENDIF
+
+	CLR	A
+	MOV	host_lastchar,A		; clear <DLE> marker
+	MOV	A,#2			; 2 = NAK ping
+	MOV	DPTR,#host_pingflag
+	MOVX	@DPTR,A
+	JMP	HOST_Rtx
+;
+HOST_Rchkok:
+	CALL	HOST_Disney_DDS_Convert
+	CLR	host_inpacket		; This packet's processing is finished.
+;
+	INC	host_packets		; One more complete packet
+
+        IF      LCD_BUG
+        mov     a,#'='
+        mov     dptr,#host_mib_delimiter
+        movx    @dptr,a
+        mov     dptr,#host_mib_packets
+        movx    a,@dptr
+        inc     a
+        movx    @dptr,a
+        ENDIF
+;
+HOST_Rtx:
+	POP	mth_op2hh
+	POP	mth_op2hl
+	POP	mth_op2lh
+	POP	mth_op2ll
+	POP	mth_op1hh
+	POP	mth_op1hl
+	POP	mth_op1lh
+	POP	mth_op1ll
+
+	POP	ACC		; Return from interrupt - restore system state
+	MOV	R7,A
+	POP	ACC
+	MOV	R1,A
+	POP	ACC
+	MOV	R0,A
+	POP	DPL
+	POP	DPH
+	POP	B
+	POP	ACC
+	POP	PSW
+	ANL	S1CON,#11111110b	; CLR RI1
+	RETI
+;
+;******************************************************************************
+;
+; Function:	HOST_ASCII_Bin
+; Input:	DPTR points to first of two ASCII characters
+; Output:	A = 8 bit binary value, DPTR points to second character
+; Preserved:	All except A, DPTR	
+; Destroyed:	None
+; Description:  Convert two ASCII bytes pointed to by DPTR into a single
+;		binary byte value. Reverse routine is [NUMBERS.ASM]BinToHex
+;		Big-endian - (XY)hex = (X*16 + Y)decimal
+; Calls:	HOST_ASCII_Nibble (defined locally)
+; Uses:		?
+;
+; Called in:	Local module
+;
+; Written by : Robert Sneddon		1 June 1999
+;******************************************************************************
+
+HOST_ASCII_Bin:
+	PUSHB
+	MOVX	A,@DPTR			; First byte (tens)
+	CALL	HOST_ASCII_Nibble	; Convert from ASCII to 4-bit value
+	SWAP	A			; Put in upper nibble
+	MOV	B,A
+	INC	DPTR
+	MOVX	A,@DPTR			; Second byte (units)
+	CALL	HOST_ASCII_Nibble	; Convert
+	ORL	A,B			; Put in lower nibble
+	POP	B
+	RET
+;
+; Convert ASCII byte in A into 4-bit nibble (top 4 bits set to zero).
+HOST_ASCII_Nibble:
+	CLR	C
+	SUBB	A,#'A'
+	JC	HOST_ASC_low	; Less than 10?
+; Fall-through - char is in the range A through F
+	ADD	A,#10		; After SUBB, 'A' = 0, 'F' = 5
+	JMP	HOST_ASC_badtest	
+;
+HOST_ASC_low:
+; At this point, '0'=> A=EFH, '9'=> A=F8H
+	ADD	A,#1		; Range now F0 to F9
+	ANL	A,#00001111B	; Char is in the range 0 through 9
+; Check for bad ASCII characters - if value is > 15, set it to zero.
+HOST_ASC_badtest:
+	CJNE	A,#15,HOST_ASC_btne
+	RET
+;
+HOST_ASC_btne:
+	JC	HOST_ASC_btok
+	MOV	A,#0
+HOST_ASC_btok:
+	RET
+;******************************************************************************
+;
+; Function:	HOST_ReceivePacket
+; Input:	DPTR => packet in host_buffer
+; Output:	buffer with packet in it and A=1, or no packet and A=0.
+; Preserved:	All
+; Destroyed:	
+; Description:	Transfers a packet from host_buffer into buffer.
+;		Note: the previous code assumed there might be multiple
+;		packets in host_buffer, sent from the HOST machine. The
+;		new version assumes only one packet at any time, although
+;		"no packet" is also an option.
+;
+; Calls:	HOST_RxChar
+;
+; Uses:		host_packets, R7, 2 stack bytes
+;
+; Called in:	Local module
+;
+; Written by : Robert Sneddon		1 June 1999
+;******************************************************************************
+;
+HOST_ReceivePacket:
+	MOV	A,host_packets	; Any packets present?
+	JZ	HOST_RPnopkts	; None, skip processing.
+; Comment - if no packets, return immediately. Rewrite this later -
+;	JNZ	HOST_RPpkts
+;	RET
+; There are a couple of JMPs and some lines at the end of this section to
+; remove, to tidy up the code.
+HOST_RPpkts:
+	DEC	host_packets	; One less after this.
+	PUSHDPH
+	PUSHDPL
+
+	MOV	R7,#3		; copy CRCl, CRCh and LEN first
+HOST_RPloop1:
+	CALL	HOST_RxChar
+	JNC	HOST_RPnopkts2	; C clear -> buffer empty, no chars
+	MOVX	@DPTR,A
+	INC	DPTR
+	DJNZ	R7,HOST_RPloop1
+;
+	POP	DPL
+	POP	DPH
+	INC	DPTR
+	INC	DPTR		; point at len byte in pkt again.
+	MOVX	A,@DPTR
+	CLR	C
+	SUBB	A,#3		; Number of data bytes
+	MOVX    @DPTR,A		; Put this back in pkt
+	INC	DPTR		; point at pkt type byte
+	MOV	R7,A		; counter set with no. of data bytes
+;
+HOST_RPloop2:
+	CALL	HOST_RxChar
+	JNC	HOST_RPnopkts	; error trap - this means malformed packet
+	MOVX	@DPTR,A
+	INC	DPTR
+	DJNZ	R7,HOST_RPloop2
+
+	MOV	A,#1		; 'OK' return
+	RET
+
+HOST_RPnopkts2:
+	POP	DPL
+	POP	DPH
+
+HOST_RPnopkts:
+	CLR	A		; 'error' return
+	RET
+;
+;******************************************************************************
+;
+; Function:	HOST_RxChar
+; Input:	host_startbuf -> char in host_buffer
+; Output:	A contains next char in host_buffer, carry set. If carry clear,
+;		no character.
+; Preserved:	DPTR
+; Destroyed:	A
+; Description:  This routine copies a byte from host_buffer to the next free
+;		place in buffer, the all-purpose scratch area. host_startbuf is
+;		incremented if a char is transferred.
+;
+; Calls:	none
+;
+; Uses:		host_buffer, host_endbuf, host_startbuf, DPTR, 2 stack bytes
+;
+; Called in:	Local module
+;
+; Written by : Robert Sneddon		1 June 1999
+;******************************************************************************
+;
+HOST_RxChar:
+	MOV	A,host_endbuf
+	CJNE	A,host_startbuf,HOST_RCbufok	; start = end => no characters.
+	CLR	C				; error return
+	RET
+;
+HOST_RCbufok:
+	PUSHDPH
+	PUSHDPL				; Save current DPTR
+	MOV	DPTR,#host_buffer	; Point into host_buffer (on xx00H boundary)
+	MOV	DPL,host_startbuf	; Index to next char in current packet
+	MOVX	A,@DPTR
+	INC	host_startbuf		; Point at next char
+	SETB	C			; OK return
+	POP	DPL
+	POP	DPH
+	RET
+
+;******************************************************************************
+;
+;                   H o s t   T r a n s m i t   R o u t i n e s
+;
+;******************************************************************************;
+; Function:	HOST_TransmitPacket
+; Input:	DPTR -> first byte of packet
+;		R7 = packet data length-3 (not including header)
+; Output:	A contains next char in host_buffer, carry set. If carry clear,
+;		no character.
+; Preserved:	DPTR, R7
+; Destroyed:	A
+; Description:  Send a packet back to the Disney HOST machine. A DDS-Disney
+;		conversion will be done before the bytes are sent, so no
+;		DDS checksum is required.
+;
+; Calls:	COM_TxChar
+;
+; Uses:		4 stack bytes, rs485_txcrcl, rs485_txcrch, rs485_txlen, R7
+;
+; Called in:	Local module
+;
+; Written by : Robert Sneddon		1 June 1999
+;******************************************************************************
+HOST_TransmitPacket:
+	PUSHDPH
+	PUSHDPL
+	MOV	A,R7
+	PUSHACC				; Save stuff
+;
+	MOV	A,R7
+	ADD	A,#3
+	MOV	DPTR,#host_buffer+2
+	MOVX	@DPTR,A
+;
+	CALL	HOST_DDS_Disney_Convert	; return disney_buffer
+;
+	MOV	B,#COM_COM1
+	MOV	A,#HOST_DLE		; transmit a HOST_DLE
+	CALL	COM_TxChar
+	MOV	A,#HOST_STX		; transmit a HOST_STX
+	CALL	COM_TxChar		;
+;
+	MOV	DPTR,#disney_buffer	; Length bytes
+	CALL	HOST_ASCII_Bin
+	ADD	A,#2			; Len excludes itself in count
+	MOV	R7,A			; No. of bytes
+
+	MOV	DPTR,#disney_buffer	; start of buffer
+;
+HOST_TPdloop:				; transmit the data
+	MOVX	A,@DPTR
+	INC	DPTR
+	CALL	COM_TxChar
+	DJNZ	R7,HOST_TPdloop
+;
+	POP	ACC
+	MOV	R7,A
+	POP	DPL
+	POP	DPH
+	RET
+;
+	END	;***** Of HOST2.ASM ******                                                                                                                                                                                                                                                                                                                                                                                                                                                                    -6 04                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         R[	 01- ž ž ž  §  02  ²  02  ¾ 02  ç 02  ò 02  ÷ 02                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 

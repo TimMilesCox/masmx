@@ -1,0 +1,62 @@
+MASMX 7r2
+3/tree.msm
+*EOF*
+  :                            1 tree*   $proc
+  :                            2 *       $tree
+  :                            3 branch1 branch  tree(1) tree(2)
+  :                            4 branch2 branch  tree(3) tree(4)
+  :                            5         $root
+  :                            6         $end
+  :                            7 
+  :                            8 branch* $proc
+  :                            9 *       $tree
+  :                            10 twig1   twig    branch(1)    
+  :                            11 twig2   twig    branch(2)
+  :                            12         $root
+  :                            13         $end
+  :                            14 
+  :                            15 twig*   $proc
+  :                            16 *       $tree
+  :                            17 leaf1   +       twig(1, 1)
+  :                            18 leaf2   +       twig(1, 2)
+  :                            19         $root
+  :                            20         $end
+  :                            21 
+  :                            22 oak     $tree
+  :                            23 branch1 $tree
+  :                            24 twig1   $tree
+00:000000 000001              +25 leaf1   +       1
+00:000001 000002              +26 leaf2   +       2
+  :                            27         $root
+  :                            28 twig2   $tree
+00:000002 000003              +29 leaf1   +       3
+00:000003 000004              +30 leaf2   +       4
+  :                            31         $root
+  :                            32         $root
+  :                            33 branch2 $tree
+  :                            34 twig1   $tree
+00:000004 000001              +35 leaf1   +       1
+00:000005 000002              +36 leaf2   +       2
+  :                            37         $root
+  :                            38 twig2   $tree
+00:000006 000003              +39 leaf1   +       3
+00:000007 000004              +40 leaf2   +       4
+  :                            41         $root
+  :                            42         $root
+00:000008 000002              +43         +branch1:twig2
+  :                            44         $root
+  :                            45 
+00:000009 000008              +46 tulip   tree    8,7 6,5 4,3 2,1
+00:00000A 000007              +46 
+00:00000B 000006              +46 
+00:00000C 000005              +46 
+00:00000D 000004              +46 
+00:00000E 000003              +46 
+00:00000F 000002              +46 
+00:000010 000001              +46 
+  :                            47 
+00:000011 000007              +48         +oak:branch2:twig2:leaf2
+00:000012 00000F              +49         +tulip:branch2:twig2:leaf1
+*EOF*
+:$(00):000000:000013 
+tree.msm: object code 170 bytes: 0 errors: 0 undefined labels

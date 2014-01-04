@@ -1,0 +1,17 @@
+MASMX 7r2
+3/leggy.msm
+*EOF*
+                                        +       262144;
+                                               ++65536;
+                                                      ;
+                                               ++16384;      
+                                                ++4096;
+                                                ++1024;
+                                                 ++256;
+                                                  ++64;
+                                                  ++16;
+                                                   ++4;
+00:000000 055555              +11                    ++1
+*EOF*
+:$(00):000000:000001 
+leggy.msm: object code 44 bytes: 0 errors: 0 undefined labels

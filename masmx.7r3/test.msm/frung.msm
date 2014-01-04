@@ -1,0 +1,16 @@
+p*	$proc	$(60)
+*
+	$if	0
+	+	p(1,1)q
+	$else
+	$do 12,		+	p(1,1)
+	$endif
+
+	$end
+$(60:60*4096)
+$(1:01000)
+yoo	+	10
+yoyo	p	99
+hoo	+	11
+hoho	p	100
+frung	+	12

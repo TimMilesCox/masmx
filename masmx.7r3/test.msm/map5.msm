@@ -1,0 +1,11 @@
+	$include	"map_ppc.def"
+	$set_option	"b"
+$(1:000A0000)
+$(3:000B0000)
+$(5:000B8000)
+$(6:000C0000)
+	$list	2
+	$include,$binary	../result.txo/map4
+	$include,$binary	../result.txo/zactor
+
+	$store			image5

@@ -1,0 +1,11 @@
+	$word	32
+
+pinsel*	$proc
+	$end
+
+hubert*	$proc
+	+	hubert(1, 1),,$hubert,100
+	$end
+
+"$hubert" $equ	hubert
+	hubert	99

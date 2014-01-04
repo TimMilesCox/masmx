@@ -1,0 +1,24 @@
+MASMX 7r2Z
+3/prango.msm
+*EOF*
+  :                            1 p*	$proc
+  :                            2 	q	p(1, 1)
+  :                            3 	$end
+  :                            4 
+  :                            5 q*	$proc
+  :                            6 	+	third(q(1, 1)), second(q(1, 1)), first(q(1, 1))
+  :                            7 	$end
+  :                            8 
+  :                            9 f	$func
+  :                            10 first*	$name	1
+  :                            11 second*	$name	2
+  :                            12 third*	$name	3
+  :                            13 	$return	f($n, 1)
+  :                            14 	$end
+  :                            15 
+00:000000 030201              +16 	p	(1, 2, 3)
+  :                            17 
+  :                            18 
+*EOF*
+:$(00):000000:000001 
+prango.msm: object code 44 bytes: 0 errors: 0 undefined labels

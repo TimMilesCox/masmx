@@ -1,0 +1,2 @@
+MASMX 7r2Z
+Error: trysome.msm Line 0: trysome.msm file missing

@@ -1,0 +1,80 @@
+	$word	32
+	$byte	 8
+	$quantum 8
+	$awidth	32:64
+
+p	$proc
+"$map"*	$name
+
+p	$proc
+word*	$name
+parts	$set	p(1,1:)
+"$data"	$set,$binary	p(1,1:parts)
+part	$do	parts-1,	relocate	p(1, 1:part)
+	$load,$bits	$data
+	$end
+
+p	$proc
+relocate* $name
+
+
+label1	$pushrel	p(1,1)
+
+	$if	$t(label1)=$equf
+v	$pushrel,$long_absolute p(1,1)
+base	$zbase			$r
+
+bits	$set	from2(label1)
+scale	$set	from3(label1)
+offset	$set	from4(label1)
+descant	$set	from5(label1)
+
+limit	$set	1*/bits
+mask	$set	limit-1
+unmask	$set	^(mask*/scale)
+
+        $if     (bits=24)**(($data**2)=0)**(descant=-2)
+	$if	$rel
+        $if	$a=0
+	$flag	relative jump from relocatable to absolute
+	$endif
+	$endif
+
+field   $set    v+offset-base
+        $info,$offset   field
+	$trace	v
+	$trace	offset
+	$trace	base
+.	$trace	field
+.	$trace	$b
+.	$trace	v+offset-$base($r)-$b
+"$data"* $set   ($data**0FC000003)++(field**03FFFFFC)
+
+        $else
+
+field	$set	v+(($data/*scale)**mask)
+
+	$do	descant<0,;
+field	$set	(v+offset)/*(-descant)
+
+
+field	$set	field**mask
+"$data"* $set	(field*/scale)++($data**unmask)
+
+	$endif
+	$endif
+	$end
+
+f	$func
+from2*	$name
+	$return	f(1, 2)
+from3*	$name
+	$return	f(1, 3)
+from4*	$name
+	$return	f(1, 4)
+from5*	$name
+	$return	f(1, 5)
+	$end
+index	$do	p(),	word	p(index, 1)
+	$end
+

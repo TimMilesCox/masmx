@@ -1,0 +1,14 @@
+	$cont_char	'\'
+	$include	"8051.def"
+	$cont_char	'\'
+
+p	$proc
+string*	$name
+
+index	$do	p(1),	''.p(1,index).\
+	''
+	$end
+
+	string	'How', 10, 'do', 10, 'you', 32, 'do?', 10
+	db	'How', 10, 'do', 10, 'you', 32, 'do?', 10
+

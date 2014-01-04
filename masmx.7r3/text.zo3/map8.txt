@@ -1,0 +1,24 @@
+MASMX 7r2Z
+3/map8.msm
+../result.txo/map7.txo:$(1) 328 bytes decimal from hexadecimal 00000000 to 00000148
+../result.txo/map7.txo:$(3) 24 bytes decimal from hexadecimal 00000000 to 00000018
+../result.txo/map7.txo:$(5) 12 bytes decimal from hexadecimal 00000000 to 0000000C
+../result.txo/map7.txo:$(6) 8 bytes decimal from hexadecimal 00000000 to 00000008
+../result.txo/map7.txo:$(36) 40 bytes decimal from hexadecimal 00000000 to 00000028
+../result.txo/gzactor.txo:$(1) 88 bytes decimal from hexadecimal 00000148 to 000001A0
+../result.txo/gzactor.txo:$(3) 4 bytes decimal from hexadecimal 00000018 to 0000001C
+../result.txo/gzactor.txo:$(36) 16 bytes decimal from hexadecimal 00000028 to 00000038
+*EOF*
+  :                            1 __giant	$set		1
+  :                            2: 	$include	"ppc64map.def"
+  :                            3 	$list		 1
+  :                            4 
+  :                            5 .	$set_option	"b"
+  :                            6 
+  :                            7: 	$include,$binary	../result.txo/map7
+  :                            8: 	$include,$binary	../result.txo/gzactor
+  :                            9 
+  :                            10 	$store			image8
+*EOF*
+:$(01):00000000:000001A0 :$(03):00000000:0000001C :$(05):00000000:0000000C :$(06):00000000:00000008 :$(24):00000000:00000038 
+map8.msm: object code 1756 bytes: 0 errors: 0 undefined labels

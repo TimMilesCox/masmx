@@ -1,0 +1,15 @@
+MASMX 7r2Z
+3/ll3.msm
+*EOF*
+  :                            1 $(0:*8:040/$00)
+  :                            2 f*      $func        
+  :                            3         $return -f(1,1)
+  :                            4         $end
+  :                            5 
+00:000040 064065              +6         +       trimgo, $00(f(16), trimgo)
+  :                            7         $res    35
+00:000064 000FFF              +8 trimgo  +       4095
+*EOF*
+00:000065+(00)0C:FF0064
+:$(00):000000:000066 
+ll3.msm: object code 118 bytes: 0 errors: 0 undefined labels

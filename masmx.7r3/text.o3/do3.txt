@@ -1,0 +1,292 @@
+MASMX 7r2
+3/do3.msm
+*EOF*
+  :                            1         $word   32
+  :                            2 "$instru" $form	4, 4, 4, 4, 16
+  :                            3 htu     $form   16, 8, 8
+  :                            4         $set_option "pl"
+  :                            5         $plist  3
+  :                            6 
+  :                            7 b1      $equ    4
+  :                            8 b2      $equ    5
+  :                            9 b3      $equ    6
+  :                            10 b4      $equ    7
+  :                            11 
+  :                            12 immediate $equ  1
+  :                            13 h1      $equ    2
+  :                            14 h2      $equ    3
+  :                            15 
+  :                            16 r0      $equ    0
+  :                            17 r1      $equ    1
+  :                            18 r2      $equ    2
+  :                            19 r3      $equ    3
+  :                            20 r4      $equ    4
+  :                            21 r5      $equ    5
+  :                            22 r6      $equ    6
+  :                            23 r7      $equ    7
+  :                            24 r8      $equ    8
+  :                            25 r9      $equ    9
+  :                            26 r10     $equ    10
+  :                            27 r11     $equ    11
+  :                            28 r12     $equ    12
+  :                            29 r13     $equ    13
+  :                            30 r14     $equ    14
+  :                            31 r15     $equ    15
+  :                            32 
+  :                            33 p       $proc
+  :                            34 load*   $name   1
+  :                            35 add*    $name   2
+  :                            36 store*  $name   3
+  :                            37         $instru	$n, p(0,2)++p(1,4), p(1, 1), p(1,3), p(1,2)
+  :                            38         $end
+  :                            39 
+  :                            40 p       $proc
+  :                            41 bytes_to_integer* $name
+  :                            42 column  $set    p(1,4)-b1        
+  :                            43 digit   $do     p(0,2),	majipro,p(0,2) p(1,1), p(1,2), p(1,3), p(1,4)
+  :                            44         $end
+  :                            45 
+  :                            46 p	$proc
+  :                            47 majipro* $name
+  :                            48 
+  :                            49 remaining $set  p(0,2)-digit+1
+  :                            50 column	$set	p(1,4)-b1+digit-1
+  :                            51         
+  :                            52         $if     remaining=5      
+  :                            53 selection $equf ten_thousands-030,p(1,1)+1
+  :                            54         $elseif remaining=4
+  :                            55 selection $equf thousands-030,p(1,1)+1
+  :                            56         $elseif remaining=3
+  :                            57 selection $equf hundreds_tens_units-030,p(1,1)+1, h1
+  :                            58         $elseif remaining=2
+  :                            59 selection $equf hundreds_tens_units-030,p(1,1)+1, b3
+  :                            60         $elseif remaining=1
+  :                            61 selection $equf hundreds_tens_units-030,p(1,1)+1, b4
+  :                            62         $else
+  :                            63         $flag   too many digits for this procedure
+  :                            64         $endif
+  :                            65 
+  :                            66         $snap   2
+  :                            67 
+  :                            68         load,column///4+b1 p(1,1)+1, p(1,2)+column/4, p(1, 3)
+  :                            69         $if     digit>1
+  :                            70         add     p(1,1), selection
+  :                            71         $else
+  :                            72         load    p(1,1), selection
+  :                            73         $endif
+  :                            74 column  $set    column+1
+  :                            75 .        $endo
+  :                            76         $end
+  :                            77 
+  :                            78 
+  :                            79 code    $equ    1
+  :                            80 static  $equ    2
+  :                            81 $(static:16384)
+  :                            82 ten_thousands
+02:00004000 00000000          +83 tt        $do     10, + 10000*tt-10000
+02:00004001 00002710          +83 
+02:00004002 00004E20          +83 
+02:00004003 00007530          +83 
+02:00004004 00009C40          +83 
+02:00004005 0000C350          +83 
+02:00004006 0000EA60          +83 
+02:00004007 00011170          +83 
+02:00004008 00013880          +83 
+02:00004009 00015F90          +83 
+  :                            84 thousands
+02:0000400A 00000000          +85 to        $do     10, + 1000*to-1000
+02:0000400B 000003E8          +85 
+02:0000400C 000007D0          +85 
+02:0000400D 00000BB8          +85 
+02:0000400E 00000FA0          +85 
+02:0000400F 00001388          +85 
+02:00004010 00001770          +85 
+02:00004011 00001B58          +85 
+02:00004012 00001F40          +85 
+02:00004013 00002328          +85 
+  :                            86 hundreds_tens_units
+02:00004014 00000000          +87 htunit    $do     10, htu 100*htunit-100, 10*htunit-10, htunit-1
+02:00004015 00640A01          +87 
+02:00004016 00C81402          +87 
+02:00004017 012C1E03          +87 
+02:00004018 01902804          +87 
+02:00004019 01F43205          +87 
+02:0000401A 02583C06          +87 
+02:0000401B 02BC4607          +87 
+02:0000401C 03205008          +87 
+02:0000401D 03845A09          +87 
+  :                            88 buffer  $res    1024
+  :                            89 $(code:256)
+  :                            90 
+::::PROC:::: BYTES_TO_INTEGER [        bytes_to_integer,5 r5,buffer+9,,b3]
+:macro text:column  $set    BYTES_TO_INTEGER(1,4)-b1        
+:macro text:digit   $do     BYTES_TO_INTEGER(0,2), majipro,BYTES_TO_INTEGER(0,2) BYTES_TO_INTEGER(1,1), BYTES_TO_INTEGER(1,2), BYTES_TO_INTEGER(1,3), BYTES_TO_INTEGER(1,4)
+::::PROC:::: MAJIPRO [ majipro,5 r5, buffer+9, , b3]
+:macro text:remaining $set  MAJIPRO(0,2)-digit+1
+:macro text:column $set MAJIPRO(1,4)-b1+digit-1
+:macro text:        
+:macro text:        $if     remaining=5      
+:macro text:selection $equf ten_thousands-030,MAJIPRO(1,1)+1
+:macro text:        $elseif remaining=4
+(skipped):::selection $equf thousands-030,MAJIPRO(1,1)+1
+(skipped):::        $elseif remaining=3
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, h1
+(skipped):::        $elseif remaining=2
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, b3
+(skipped):::        $elseif remaining=1
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, b4
+(skipped):::        $else
+(skipped):::        $flag   too many digits for this procedure
+(skipped):::        $endif
+:macro text:        $snap   2
+COLUMN+1=00000002
+DIGIT+1=00000001
+REMAINING=00000005
+COLUMN=00000002
+SELECTION=00003FD0,00000006
+:macro text:        load,column///4+b1 MAJIPRO(1,1)+1, MAJIPRO(1,2)+column/4, MAJIPRO(1, 3)
+01:00000100 16604027          +91         bytes_to_integer,5 r5,buffer+9,,b3
+:macro text:        $if     digit>1
+(skipped):::        add     MAJIPRO(1,1), selection
+(skipped):::        $else
+:macro text:        load    MAJIPRO(1,1), selection
+01:00000101 10563FD0          +91 
+:macro text:        $endif
+:macro text:column  $set    column+1
+:::end proc:        $end
+::::PROC:::: MAJIPRO [ majipro,5 r5, buffer+9, , b3]
+:macro text:remaining $set  MAJIPRO(0,2)-digit+1
+:macro text:column $set MAJIPRO(1,4)-b1+digit-1
+:macro text:        
+:macro text:        $if     remaining=5      
+(skipped):::selection $equf ten_thousands-030,MAJIPRO(1,1)+1
+(skipped):::        $elseif remaining=4
+:macro text:selection $equf thousands-030,MAJIPRO(1,1)+1
+:macro text:        $elseif remaining=3
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, h1
+(skipped):::        $elseif remaining=2
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, b3
+(skipped):::        $elseif remaining=1
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, b4
+(skipped):::        $else
+(skipped):::        $flag   too many digits for this procedure
+(skipped):::        $endif
+:macro text:        $snap   2
+COLUMN+1=00000002
+DIGIT+1=00000002
+REMAINING=00000004
+COLUMN=00000003
+SELECTION=00003FDA,00000006
+:macro text:        load,column///4+b1 MAJIPRO(1,1)+1, MAJIPRO(1,2)+column/4, MAJIPRO(1, 3)
+01:00000102 17604027          +91 
+:macro text:        $if     digit>1
+:macro text:        add     MAJIPRO(1,1), selection
+01:00000103 20563FDA          +91 
+:macro text:        $else
+(skipped):::        load    MAJIPRO(1,1), selection
+(skipped):::        $endif
+:macro text:column  $set    column+1
+:::end proc:        $end
+::::PROC:::: MAJIPRO [ majipro,5 r5, buffer+9, , b3]
+:macro text:remaining $set  MAJIPRO(0,2)-digit+1
+:macro text:column $set MAJIPRO(1,4)-b1+digit-1
+:macro text:        
+:macro text:        $if     remaining=5      
+(skipped):::selection $equf ten_thousands-030,MAJIPRO(1,1)+1
+(skipped):::        $elseif remaining=4
+(skipped):::selection $equf thousands-030,MAJIPRO(1,1)+1
+(skipped):::        $elseif remaining=3
+:macro text:selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, h1
+:macro text:        $elseif remaining=2
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, b3
+(skipped):::        $elseif remaining=1
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, b4
+(skipped):::        $else
+(skipped):::        $flag   too many digits for this procedure
+(skipped):::        $endif
+:macro text:        $snap   2
+COLUMN+1=00000002
+DIGIT+1=00000003
+REMAINING=00000003
+COLUMN=00000004
+SELECTION=00003FE4,00000006,00000002
+:macro text:        load,column///4+b1 MAJIPRO(1,1)+1, MAJIPRO(1,2)+column/4, MAJIPRO(1, 3)
+01:00000104 14604028          +91 
+:macro text:        $if     digit>1
+:macro text:        add     MAJIPRO(1,1), selection
+01:00000105 22563FE4          +91 
+:macro text:        $else
+(skipped):::        load    MAJIPRO(1,1), selection
+(skipped):::        $endif
+:macro text:column  $set    column+1
+:::end proc:        $end
+::::PROC:::: MAJIPRO [ majipro,5 r5, buffer+9, , b3]
+:macro text:remaining $set  MAJIPRO(0,2)-digit+1
+:macro text:column $set MAJIPRO(1,4)-b1+digit-1
+:macro text:        
+:macro text:        $if     remaining=5      
+(skipped):::selection $equf ten_thousands-030,MAJIPRO(1,1)+1
+(skipped):::        $elseif remaining=4
+(skipped):::selection $equf thousands-030,MAJIPRO(1,1)+1
+(skipped):::        $elseif remaining=3
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, h1
+(skipped):::        $elseif remaining=2
+:macro text:selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, b3
+:macro text:        $elseif remaining=1
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, b4
+(skipped):::        $else
+(skipped):::        $flag   too many digits for this procedure
+(skipped):::        $endif
+:macro text:        $snap   2
+COLUMN+1=00000002
+DIGIT+1=00000004
+REMAINING=00000002
+COLUMN=00000005
+SELECTION=00003FE4,00000006,00000006
+:macro text:        load,column///4+b1 MAJIPRO(1,1)+1, MAJIPRO(1,2)+column/4, MAJIPRO(1, 3)
+01:00000106 15604028          +91 
+:macro text:        $if     digit>1
+:macro text:        add     MAJIPRO(1,1), selection
+01:00000107 26563FE4          +91 
+:macro text:        $else
+(skipped):::        load    MAJIPRO(1,1), selection
+(skipped):::        $endif
+:macro text:column  $set    column+1
+:::end proc:        $end
+::::PROC:::: MAJIPRO [ majipro,5 r5, buffer+9, , b3]
+:macro text:remaining $set  MAJIPRO(0,2)-digit+1
+:macro text:column $set MAJIPRO(1,4)-b1+digit-1
+:macro text:        
+:macro text:        $if     remaining=5      
+(skipped):::selection $equf ten_thousands-030,MAJIPRO(1,1)+1
+(skipped):::        $elseif remaining=4
+(skipped):::selection $equf thousands-030,MAJIPRO(1,1)+1
+(skipped):::        $elseif remaining=3
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, h1
+(skipped):::        $elseif remaining=2
+(skipped):::selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, b3
+(skipped):::        $elseif remaining=1
+:macro text:selection $equf hundreds_tens_units-030,MAJIPRO(1,1)+1, b4
+:macro text:        $else
+(skipped):::        $flag   too many digits for this procedure
+(skipped):::        $endif
+:macro text:        $snap   2
+COLUMN+1=00000002
+DIGIT+1=00000005
+REMAINING=00000001
+COLUMN=00000006
+SELECTION=00003FE4,00000006,00000007
+:macro text:        load,column///4+b1 MAJIPRO(1,1)+1, MAJIPRO(1,2)+column/4, MAJIPRO(1, 3)
+01:00000108 16604028          +91 
+:macro text:        $if     digit>1
+:macro text:        add     MAJIPRO(1,1), selection
+01:00000109 27563FE4          +91 
+:macro text:        $else
+(skipped):::        load    MAJIPRO(1,1), selection
+(skipped):::        $endif
+:macro text:column  $set    column+1
+:::end proc:        $end
+:::end proc:        $end
+*EOF*
+:$(01):00000100:0000010A :$(02):00004000:0000441E 
+do3.msm: object code 450 bytes: 0 errors: 0 undefined labels

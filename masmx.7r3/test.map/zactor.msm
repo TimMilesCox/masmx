@@ -1,0 +1,20 @@
+__relocatable $set	1
+	$include	"ppc_603.def"
+
+	$if	0
+$(.data)
+myword	.long		99
+	$endif
+
+$(.text)
+zactor*
+        lis 9,factor@ha
+        lwz 0,factor@l(9)
+
+	$if	0
+	lis 10,myword@ha
+	lwz 11,myword@l(10)
+	$endif
+
+	bl	soso
+	blr

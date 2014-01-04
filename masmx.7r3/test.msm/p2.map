@@ -1,0 +1,7 @@
+	$include	"map1.def"
+	$include,$binary ../result.txo/packem.txo	$(64,65,3)
+	$trace	$r
+	$trace	$b(3)
+	$include,$binary "../result.txo/ap3.txo"
+	$include,$binary "../result.txo/ap4.txo"
+	$end

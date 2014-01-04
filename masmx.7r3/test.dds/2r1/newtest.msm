@@ -1,0 +1,336 @@
+;******************************************************************************
+;
+; File     : NEWTEST.ASM
+;
+; Author   : Robert Gentles
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains the main program for the test prom.
+;
+; System   : 80C537 New DT10 SQ10
+;
+; History  :
+;   Date   :29/3/99
+;******************************************************************************
+USE_PAIGNTON    	EQU 0 ; define for Paignton Zoo
+USE_METROLAND   	EQU 0 ; define for The New Metroland
+USE_POWERSCOURT 	EQU 0 ; define for Powerscourt House & Gardens (Screenguard)
+USE_BEDFORD     	EQU 0 ; define for Bedford Rugby Club
+USE_SEAT_DEMO		EQU 0 ; define for a demo version of Bedford's code
+USE_TMACHS		EQU 0 ; define for Ticketing and Manual Access
+USE_DDS_DT10 		EQU 0 ; define for standard non-networked DDS version
+USE_DDS_DT10_NETWORK	EQU 0 ; define for standard networked DDS version
+
+USE_DDS_DT5         	EQU 0 ; define for standard non-networked DDS version
+USE_DDS_DT5_NETWORK	EQU 0 ; define for standard networked DDS version (?)
+
+USE_DDS_DT10W         	EQU 0 ; define for standard non-networked DDS version
+USE_DDS_DT10W_NETWORK	EQU 0 ; define for standard networked DDS version
+
+USE_DDS_DT10W_NARROW   	EQU 0 ; define for standard non-networked DDS version
+USE_DDS_DT10W_NETWORK_NARROW EQU 0 ; define for standard networked DDS version
+
+USE_ALTON		EQU 1 ; define for Alton Towers Slave Machine
+USE_SERVANT		EQU 0 ; define if required to respond to serial commands
+	PRESET VARTYPE,ALIGN
+POINTER PRESET 2
+LONG    PRESET 4
+
+DT_VERSION MACRO
+	DB 'v1.03'              ; version no. (must be 5 chars)
+	MACEND
+
+	INCLUDE custopts.inc
+	INCLUDE stack.asm
+
+VT10	EQU	1
+VTTEST	EQU	1
+;******************************************************************************
+;********************PROGRAM START*********************************************
+
+	INCLUDE	vectors.asm
+
+	ORG VAR,0100h		; Base address of XRAM (external RAM)
+buffer:	VAR 4096	; misc work buffer, declare as largest area needed
+aud_first:      VAR 4 ; these four are declared here so that when a machine
+aud_last:       VAR 4 ; has its eprom revision changed, the audit memory is
+aud_uploadfrom: VAR 4 ; guaranteed to be readable, even if nothing else is.
+aud_uploadto:   VAR 4 ;
+
+
+;*****************************************************************************
+	INCLUDE sfr.inc
+	ALIGN ToPage
+font:
+	IF DT10W
+	 INCLUDE vfont.asm
+	ELSE
+	 INCLUDE hfont.asm
+	ENDIF
+	INCLUDE ddslogo.asm
+	INCLUDE iram_map.inc
+	IF VT10
+	INCLUDE ports.asm
+	ENDIF
+	INCLUDE delay.asm
+	INCLUDE ee_map.inc
+	INCLUDE i2c.asm
+	INCLUDE sbus.asm
+	INCLUDE crc.asm
+	INCLUDE number.asm
+	INCLUDE memory.asm
+	INCLUDE math.asm
+	INCLUDE prt.asm
+	INCLUDE printer.asm
+	INCLUDE erp.asm
+	INCLUDE card.asm
+	INCLUDE cdrawer.asm
+	INCLUDE custdisp.asm
+	INCLUDE lcd2x24.asm
+	INCLUDE system.asm
+	INCLUDE sound.asm
+	INCLUDE leds.asm
+	INCLUDE keyboard.asm
+	INCLUDE comms.asm
+	IF USE_RS485
+	 INCLUDE rs485.asm
+	ELSE
+NODE_ID_INSTALL EQU 255
+	ENDIF
+	INCLUDE pplug.asm
+	INCLUDE login.asm
+	INCLUDE manager.asm
+	INCLUDE operator.asm
+	INCLUDE rtc.asm
+	INCLUDE time.asm
+	INCLUDE spotchck.asm
+	INCLUDE ticket.asm
+	INCLUDE tktprint.asm
+	INCLUDE receipt.asm
+	INCLUDE shift.asm
+;	INCLUDE waybill.asm
+	INCLUDE diags.asm
+;	INCLUDE audit.asm
+;	INCLUDE audith.asm
+	INCLUDE upload.asm
+	INCLUDE menu.asm
+	INCLUDE barcode.asm
+	IF USE_RS485
+	 INCLUDE ddsnet.asm
+	ENDIF
+	INCLUDE void.asm
+	INCLUDE cutter.asm
+	IF USE_SLAVE
+	 INCLUDE pktcomms.asm
+	 INCLUDE slave.asm
+	ENDIF
+	IF USE_TKTCTRL
+	 IF USE_ALTONCOMMS
+	  INCLUDE altctrl.asm
+	 ELSE
+	  INCLUDE tktctrl.asm
+	 ENDIF
+	ENDIF
+	IF USE_TMACHS
+	 INCLUDE loudoun.asm
+	ENDIF
+	IF USE_ALTON_FAST
+	 INCLUDE altoncom.asm
+	ENDIF
+
+;;;     INCLUDE complink.asm
+	INCLUDE TestCode.asm
+;*******************************************************************************
+Ready:		DB	16,'Ready           '
+Printing:	DB	16,'Printing        '
+Print_Test: DB 255,10,0,0,0,0,10,'Test Print'
+;*******************************************************************************
+
+Test_MapKeycode:
+	INC	A
+	MOVC	A,@A+PC
+	RET
+
+Test_keytable:	; must follow the RET above
+
+	DB 0,'0','1','2','3','4','5','6','7','8','9'
+	DB   'A','B','C','D','E','F','G','H','I','J'
+	DB   'G','H','I','J'
+
+;*******************************************************************************
+;********************************* START OF MAIN *******************************
+;*******************************************************************************
+DT_coldboot:
+
+DT_WarmBoot:
+	MOV	SP,#stackpointer
+	MOV	IEN0,#0			; disable all interrupts
+	MOV	IEN1,#0
+	MOV	IEN2,#0
+	MOV	R0,#PortMirrorA
+	MOV	@R0,#0
+	MOV	R0,#PortMirrorB
+	MOV	@R0,#0
+	MOV	R0,#PortMirrorC
+	MOV	@R0,#0
+	MOV	R0,#PortMirrorD
+	MOV	@R0,#0
+	MOV	R0,#PortMirrorE
+	MOV	@R0,#0
+	CALL	testdelay		; Do not remove !
+	CALL	KBD_InitKeyboard
+	CALL	LCD_Init
+	CALL	LCD_LoadCharSet
+;	CALL	COM_InitSerial
+	CALL	COM_InitRS485
+	CALL	LCD_Clear
+	CALL	LCD_TurnBacklightOff
+	CALL	testdelay
+	CALL	LCD_TurnBacklightOn
+; assume some values for just now
+;  CALL PRT_GetPrintOffset
+;  CALL	PRT_GetPrintQuality
+	MOV	prt_stepdelay3,#10
+	MOV     DPTR,#prt_density
+	MOV	A,#10
+	MOVX    @DPTR,A
+	CLR	prt_paperout
+	SETB	prt_perfmode
+	MOV	prt_perfoffhigh,#01h
+	MOV	prt_perfofflow,#0 ; was #03dh
+	MOV	prt_perffailhigh,#07h ; was 03h
+	MOV	prt_perffaillow,#08h; was 084h
+	MOV	prt_perflinemin,#60 ; was #50
+	MOV	prt_perflinemax,#70 ; was #60
+	MOV	prt_perfskipminhigh,#0
+	MOV	prt_perfskipminlow,#225
+	MOV	prt_perfskipmaxhigh,#1
+	MOV	prt_perfskipmaxlow,#24
+	CLR	A
+	CALL	PRT_SetPrintDevice
+	MOV	R1,#PRT_PHASE_SEQ
+	MOV	R2,#PRT_INPUT0_SEQ
+	MOV	R3,#PRT_INPUT1_SEQ
+	CALL	PRT_Initialise
+	MOV	A,#64
+	CALL	LCD_GotoXY
+Repeat:
+	MOV	A,#0
+	CALL	LCD_GotoXY
+	MOV	DPTR,#Ready
+	CALL	LCD_DisplayStringCODE
+	CALL 	KBD_WaitKey
+;	CALL	KBD_ScanKeyboard
+;	CALL	KBD_ReadKey
+	CALL	Test_MapKeycode
+	CJNE	A,#0,Test1
+	JMP	Repeat
+Test1:
+	PUSHACC
+	MOV	A,#64
+	CALL	LCD_GotoXY
+	POP	ACC
+	CALL	LCD_WriteData
+	CJNE	A,#'J',Test2
+	CALL	Print
+	JMP	Repeat
+Test2OK:	DB	16,'Comms Test OK   '
+Test2NOK:	DB	16,'Comms Test Fail '
+Test2:
+	CJNE	A,#'I',Test3
+	CALL	CommsTest
+	JZ	Test2Fail
+	MOV	A,#0
+	CALL	LCD_GotoXY
+	MOV	DPTR,#Test2OK
+	CALL	LCD_DisplayStringCODE
+	CALL	TestDelay
+	Call	TestDelay
+	JMP	Repeat
+Test2Fail:
+	MOV	A,#0
+	CALL	LCD_GotoXY
+	MOV	DPTR,#Test2NOK
+	CALL	LCD_DisplayStringCODE
+	CALL	TestDelay
+	Call	TestDelay
+	JMP	Repeat
+
+Test3:
+	CJNE	A,#'H',Test4
+	CLR	C
+	MOV	A,#1
+Loop:
+	CALL	PortSetD
+	CALL	testdelay
+	CALL	PortClrD
+	CALL	testdelay
+	RLC	A
+	JNC	Loop
+	CLR	C
+	JMP	Repeat
+Test4:
+	CJNE	A,#'G',Test5
+	CALL	TST_SolidLCD
+	CALL	TestDelay
+	CALL	TestDelay
+	JMP	Repeat
+
+Test5:
+	CJNE	A,#'F',Test6
+	CALL	TST_RealTimeClock
+	JMP	Repeat
+
+Test6:
+	CJNE	A,#'E',Test7
+	CALL	TST_EE
+	JMP	Repeat
+
+Test7:
+	JMP	Repeat
+
+
+
+CommsTest:
+	CALL	COM_DefaultSerialMux	; Set to Com 2
+	MOV	S1CON,#090h		; serial port 1, mode B, rx enabled
+	MOV	S1REL,#0D9h		; serial port 1, baud 9615 approx.
+	CALL	COM_RS485TxOn		; Turn TX On.
+	MOV	A,#'*'
+	MOV	S1BUF,A			; write the data
+wait:
+	MOV	A,S1CON			; wait for transmit
+	ANL	A,#00000010b		; buffer empty
+	JZ	wait		;
+	CALL	COM_RS485TxOff		; Turn Tx Off
+	MOV	A,S1CON			;
+	ANL	A,#11111100b		;
+	MOV	S1CON,A			;
+
+	MOV	A,S1BUF
+	CJNE	A,#'*',ComFail
+	MOV	A,#1
+	RET
+
+ComFail:
+	MOV	A,#0
+	RET
+
+
+Print:
+	MOV	A,#0
+	CALL	LCD_GotoXY
+	MOV	DPTR,#Printing
+	CALL	LCD_DisplayStringCODE
+	CALL    DIA_TestPrint
+	CALL    PRT_StartPrint
+	MOV	DPTR,#Print_Test
+	CALL	PRT_DisplayMessageCODE		; DPTR = message
+	CALL	PRT_FormFeed
+	CALL	PRT_EndPrint
+	CALL	CUT_FireCutter
+	RET
+;*******************************************************************************
+;********************************** End Of Main ********************************
+;*********************************************************** 

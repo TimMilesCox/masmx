@@ -1,0 +1,13 @@
+ $set_option "a"
+ $word  32
+ $byte  8
+ $quantum 8
+ $awidth  32:64
+$(0:080000000/lit)
+yes + 99
+no - 99
+ + (yes:s)
+ + (no:s)
+ + lit(yes:s):s
+ + lit(no:s):s
+ $end

@@ -1,0 +1,8 @@
+        $include        "8051.def"
+
+        +        rel3(100)
+
+porco   name    12
+        +       porco
+        +       jnz
+;	porco

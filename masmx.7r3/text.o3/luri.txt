@@ -1,0 +1,10 @@
+MASMX 7r2
+3/luri.msm
+*EOF*
+  :                            1         $word   32
+00:00000000 000F4240          +2         +       1000000
+00:00000001 01000000          +3         +       01000000
+00:00000002 000000AA          +4         +       \10101010
+*EOF*
+:$(00):00000000:00000003 
+luri.msm: object code 72 bytes: 0 errors: 0 undefined labels

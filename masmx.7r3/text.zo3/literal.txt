@@ -1,0 +1,2 @@
+MASMX 7r2Z
+Error: literal.msm Line 0: literal.msm file missing

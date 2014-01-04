@@ -1,0 +1,18 @@
+	$include	"ppc_603.def"
+	$list		2
+	$plist		3
+_unique_one*	$blank
+_unique_two*	$blank
+_first*	$blank
+_second* $blank
+	$include	"ximinez.def"
+	$include	"cricket.def"
+
+	$plist		7
+	$notef	invoke	ximinez
+	ximinez
+	$notef	return from ximinez
+	$notef	invoke	cricket
+	cricket
+	$notef return from cricket
+

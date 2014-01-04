@@ -1,0 +1,10 @@
+MASMX 7r2
+3/thing.msm
+  :                            1         $res    6
+  :                            2 index   $do     7,thing(4,index)
+00:000006 000007              +3         +       thing(4)
+  :                            4 index	$do	15,athing(index)
+00:000007 00000F              +5 	+	athing()
+  :                            6         $end 
+:$(00):000000:000008 
+thing.msm: object code 51 bytes: 0 errors: 0 undefined labels

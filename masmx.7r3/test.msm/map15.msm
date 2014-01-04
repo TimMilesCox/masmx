@@ -1,0 +1,15 @@
+__giant	$set		1
+
+	$include	"ppc64map.def"
+
+	$list		2
+
+$(1::*000A000000064000)
+$(3::*000B000000064000)
+$(5::*000B800000064000)
+$(6::*000C000000064000)
+$(36::*000A000000063000)
+	$include,$binary	../result.txo/gsoso
+	$include,$binary	../result.txo/gfactor
+
+	$store			image15

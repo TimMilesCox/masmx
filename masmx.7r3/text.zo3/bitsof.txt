@@ -1,0 +1,14 @@
+MASMX 7r2Z
+3/bitsof.msm
+  :                            1 oojit*	$proc        
+  :                            2         $end
+  :                            3 
+  :                            4         $res    80
+  :                            5 begin
+00:000050 000063              +6         +       99
+  :                            7         oojit
+00:000051 000065              +8         +       101
+00:000052 000066              +9         +       102
+  :                            10         $end     begin
+:$(00):000000:000053 
+bitsof.msm: object code 70 bytes: 0 errors: 0 undefined labels

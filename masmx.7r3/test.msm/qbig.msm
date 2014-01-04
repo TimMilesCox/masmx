@@ -1,0 +1,25 @@
+        $include        "../aside.dem/ppc_64.def"
+
+ARRAY   $equ    0x00FFFC0000000000
+GRANULE $equ    2048*2048
+
+proces*	$proc
+$(48::*ARRAY+GRANULE*x-GRANULE)
+        $do     x=3,    $list 0
+        $do     x=4094, $list 1
+item(x)* +       x*2048*2048+ARRAY
+        $end
+
+x	$do	4096,	proces
+
+$(49::,r15)
+h       $res    8
+t       $res    2048*2048-8
+
+$(0:3*65536)
+start   bl      loaded      
+        +       item(1536)
+loaded  mflr	r15
+        ld	r15,,r15
+        ld      r3, h
+        ld      r4, t

@@ -1,0 +1,125 @@
+MASMX 7r2Z
+3/ppcsinga.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1 __registers_by_name	$set	1
+  :                            2 record* $proc        
+  :                            3 *       $tree
+  :                            4 h       +       record(1,1)
+  :                            5 times   $do     record(1,1),t(times)       $res  4
+  :                            6         $root
+  :                            7         $end
+  :                            8 
+  :                            9:         $include        "../aside.dem/ppc_603.def"
+  :                            10 tree*   $proc
+  :                            11 *       $tree
+  :                            12 times   $do     3,dibber(times) record    tree(1,1)
+  :                            13         $root
+  :                            14         $end
+  :                            15 
+  :                            16 inline*	$proc
+  :                            17         lwz	r8, raddle1(1).dibber(3).t(index)
+  :                            18         add	r0,0,r8
+  :                            19 	$end
+  :                            20 
+  :                            21 SEGMENT $set    55*4096+768
+  :                            22 
+  :                            23 $(49::SEGMENT,r12)
+  :                            24 this_segment    $equ    .
+[$TREE]Error: ppcsinga.msm Line 25: not a command
+[$TREE]Error: ppcsinga.msm Line 25: not a command
+31:00000000 00000012          +25 times   $do     2,raddle1(times) tree    18
+[$ROOT]Error: ppcsinga.msm Line 25: not a command
+[$TREE]Error: ppcsinga.msm Line 25: not a command
+31:0000004C 00000012          +25 
+[$ROOT]Error: ppcsinga.msm Line 25: not a command
+[$TREE]Error: ppcsinga.msm Line 25: not a command
+31:00000098 00000012          +25 
+[$ROOT]Error: ppcsinga.msm Line 25: not a command
+[$ROOT]Error: ppcsinga.msm Line 25: not a command
+[$TREE]Error: ppcsinga.msm Line 25: not a command
+[$TREE]Error: ppcsinga.msm Line 25: not a command
+31:000000E4 00000012          +25 
+[$ROOT]Error: ppcsinga.msm Line 25: not a command
+[$TREE]Error: ppcsinga.msm Line 25: not a command
+31:00000130 00000012          +25 
+[$ROOT]Error: ppcsinga.msm Line 25: not a command
+[$TREE]Error: ppcsinga.msm Line 25: not a command
+31:0000017C 00000012          +25 
+[$ROOT]Error: ppcsinga.msm Line 25: not a command
+[$ROOT]Error: ppcsinga.msm Line 25: not a command
+[$TREE]Error: ppcsinga.msm Line 26: not a command
+[$TREE]Error: ppcsinga.msm Line 26: not a command
+31:000001C8 0000001E          +26 raddle2 tree    30
+[$ROOT]Error: ppcsinga.msm Line 26: not a command
+[$TREE]Error: ppcsinga.msm Line 26: not a command
+31:00000244 0000001E          +26 
+[$ROOT]Error: ppcsinga.msm Line 26: not a command
+[$TREE]Error: ppcsinga.msm Line 26: not a command
+31:000002C0 0000001E          +26 
+[$ROOT]Error: ppcsinga.msm Line 26: not a command
+[$ROOT]Error: ppcsinga.msm Line 26: not a command
+  :                            27 
+  :                            28 $(0:980*1024)
+00:000F5000 640C0003          +29         oris    r12,,SEGMENT/*16
+00:000F5004 618C7300          +30         ori     r12,r12,SEGMENT
+00:000F5008 806C0000          +31         lwz     r3, raddle1(1).dibber(2)
+00:000F500C 808C00E4          +32         lwz     r4, raddle1(2).dibber(3).h
+00:000F5010 80AC00E4          +33         lwz     r5, raddle1(2).dibber(3).t(12)
+00:000F5014 80CC01C8          +34         lwz     r6, raddle2
+00:000F5018 616C0000          +35         mr      r11, r12
+  :                            36 
+  :                            37 	$if	0
+  :                            38 	lwz	r7, raddle2.dibber(1).t(9), r11
+  :                            39 	$else
+00:000F501C 80EB0000          +40         lwz     r7, raddle2.dibber(1).t(9)(r11)
+  :                            41 	$endif
+  :                            42 
+  :                            43 index   $do     raddle1(1).dibber(3).t(),	inline
+  :                            44 
+  :                            45 SEGMENT	$set	.(49)+SEGMENT
+  :                            46 $(50::SEGMENT,r11)
+  :                            47 new_segment $equ .
+[$TREE]Error: ppcsinga.msm Line 48: not a command
+[$TREE]Error: ppcsinga.msm Line 48: not a command
+32:00000000 00000006          +48 jessalabel tree 6
+[$ROOT]Error: ppcsinga.msm Line 48: not a command
+[$TREE]Error: ppcsinga.msm Line 48: not a command
+32:0000001C 00000006          +48 
+[$ROOT]Error: ppcsinga.msm Line 48: not a command
+[$TREE]Error: ppcsinga.msm Line 48: not a command
+32:00000038 00000006          +48 
+[$ROOT]Error: ppcsinga.msm Line 48: not a command
+[$ROOT]Error: ppcsinga.msm Line 48: not a command
+[$TREE]Error: ppcsinga.msm Line 49: not a command
+[$TREE]Error: ppcsinga.msm Line 49: not a command
+32:00000054 00000004          +49 jumbly  tree    4
+[$ROOT]Error: ppcsinga.msm Line 49: not a command
+[$TREE]Error: ppcsinga.msm Line 49: not a command
+32:00000068 00000004          +49 
+[$ROOT]Error: ppcsinga.msm Line 49: not a command
+[$TREE]Error: ppcsinga.msm Line 49: not a command
+32:0000007C 00000004          +49 
+[$ROOT]Error: ppcsinga.msm Line 49: not a command
+[$ROOT]Error: ppcsinga.msm Line 49: not a command
+  :                            50 
+  :                            51 $(.ZERO)
+00:000F5020 640B0003          +52         oris    r11,,SEGMENT/*16
+00:000F5024 616B763C          +53         ori     r11,r11,SEGMENT
+00:000F5028 806B0054          +54         lwz     r3, jumbly
+00:000F502C 808B0058          +55         lwz     r4, jumbly+4
+00:000F5030 90600000          +56         stw     r3, jessalabel.dibber(3).h
+00:000F5034 90800000          +57         stw     r4, jessalabel.dibber(3).t()
+00:000F5038 80A34000          +58         lwz     r5, 0x4000(r3)
+00:000F503C 64040000          +59         li      r4, raddle2.dibber(3)
+00:000F5040 658500E4          +60         li      r5, raddle1(2)
+  :                            61 down
+00:000F5044 4800000C          +62 	b	up
+00:000F5048 4BFFFFFC          +63 	b	down
+00:000F504C 48000004          +64 	b	up
+  :                            65 up
+*EOF*
+:$(00):000F5000:000F5050 :$(31):00000000:0000033C :$(32):00000000:00000090 
+ppcsinga.msm: object code 632 bytes: 40 errors: 0 undefined labels

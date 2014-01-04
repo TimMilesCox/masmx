@@ -1,0 +1,66 @@
+	$lit	4
+	$set_option	"a"
+
+load_bank $equ	1*/18
+
+label$	$form	48
+
+p	$proc	$(7)
+label*	$name
+	label$	"p(1,1)"
+	$end
+
+f	$func
+name*	$name
+templabel $set $(7)
+	label	f(1,1)
+	$return templabel
+	$end
+
+$(4:03000)
+$(7:7*262144)
+$(62:62*262144)
+$(0:1024:load_bank+0)
+first_thing + $
+	+	first_thing
+ + second_thing
+	+	(1.5)
+ + third_thing
+	+	fourth_thing
+here1	+	name(spiggy)
+	+	here1
+one
+$(62)	"stringy string string"
+$(0)oddly_placed_label	+	one
+
+$(0:1024:load_bank+4096)
+second_thing + $
+	+	second_thing
+ + first_thing
+	+	(2.5)
+ + third_thing
+	+	fourth_thing
+here2	+	name(spuggy)
+	+	here2
+two
+$(62)	"thingy thing thing"
+$(0)	+	two
+
+$(1:4096:load_bank+16384)
+third_thing
+	+	$
+	+	third_thing
+three	+	(3.5)
+index	$do	64,	+	index
+fourth_thing
+	$do 256,	+	100
+	+	(1.5)
+	+	(2.5)
+	+	(3.5)
+$(2:02000)
+	+((4096**-4096)/*6)++(two**63)
+	+((16384**-4096)/*6)++(three**63)
+
+$(0:2048)
+	"a bit more of section 0"
+ $end

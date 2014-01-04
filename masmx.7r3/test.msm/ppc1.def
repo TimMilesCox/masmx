@@ -1,0 +1,860 @@
+        $lterm  '#'
+        $cont_char 0
+        $sterm  '.'
+
+        $word   32
+        $quantum 8
+        $byte   8
+        $awidth 32:64
+
+i$1     $form   6, 24, 2
+i$2     $form   6, 5, 5, 14, 2
+i$3     $form   6, 26
+i$4     $form   6, 5, 5, 16
+i$5     $form   6, 3, 2, 5, 16
+i$6     $form   6, 5, 5, 5, 11
+i$7     $form   6, 3, 2, 5, 5, 11
+i$8     $form   6, 5, 5, 5, 5, 5, 1
+i$9     $form   6, 3, 2, 3, 2, 5, 11
+
+directive $equ   "$directive"
+function $equ    "$function"
+
+.equ     $equ,directive  "$equ"
+.if      $equ,directive  "$if"
+.elseif  $equ,directive  "$elseif"
+.else    $equ,directive  "$else"
+.endif   $equ,directive  "$endif"
+
+.macro   $equ,directive  "$proc"
+.name    $equ,directive  "$name"
+.end     $equ,directive  "$end"
+.form    $equ,directive  "$form"
+
+.       $equ,function   "$"        
+#.dcount  $equ,function   "$d"
+.locator $equ,function   "$r"
+.labeltype $equ,function "$t"
+.option  $equ,function   "$o"
+
+
+.f*     $func
+        $if     .labeltype(.f(1,1))=GPR
+        $return .f(1, 1)
+        $endif
+        $return 0
+        $end
+        
+ha16*   $func
+        $if     ha16(1,1)**32768
+        $return ha16(1,1)/*16+1
+        $endif
+        $return ha16(1,1)/*16
+        $end
+
+hi16*   $func
+        $return hi16(1,1)/*16
+        $end
+
+lo16*   $func
+        $return lo16(1,1)**65535
+        $end
+
+case_requiredi*   $proc        
+        $if     .option(k)=0
+        $exit   Must Use /K Option
+        $endif
+        $end
+
+.org*   $proc
+newstart $set   .org(1, 1) 
+$(0:newstart)
+        $end
+
+
+.cseg*  $proc
+        $if     .cseg(1)
+base    $set    .cseg(1,1)
+$(0:base/literal*)
+        $else
+$(0)
+        $endif
+        $end
+
+.dseg*  $proc
+        $if     .dseg(1)
+base    $set    .dseg(1,1)
+$(1:base)
+        $else
+$(1)
+        $endif
+        $end
+        
+.align* $proc
+granule $set    1*/.align(1,1)
+        $res    ((.+granule-1)**-granule)-.
+        $end
+
+.long*  $proc
+        +       .long(1,1)
+        $end
+.globl* $proc
+".globl(1,1).77"**
+        $end
+
+GPR     .equ    128
+
+r0      .equ,GPR    0
+r1      .equ,GPR    1
+r2      .equ,GPR    2
+r3      .equ,GPR    3
+r4      .equ,GPR    4
+r5      .equ,GPR    5
+r6      .equ,GPR    6
+r7      .equ,GPR    7
+r8      .equ,GPR    8
+r9      .equ,GPR    9
+r10     .equ,GPR    10
+r11     .equ,GPR    11
+r12     .equ,GPR    12
+r13     .equ,GPR    13
+r14     .equ,GPR    14
+r15     .equ,GPR    15
+r16     .equ,GPR    16
+r17     .equ,GPR    17
+r18     .equ,GPR    18
+r19     .equ,GPR    19
+r20     .equ,GPR    20
+r21     .equ,GPR    21
+r22     .equ,GPR    22
+r23     .equ,GPR    23
+r24     .equ,GPR    24
+r25     .equ,GPR    25
+r26     .equ,GPR    26
+r27     .equ,GPR    27
+r28     .equ,GPR    28
+r29     .equ,GPR    29
+r30     .equ,GPR    30
+r31     .equ,GPR    31
+
+                        
+        $text   \<<\*/\
+        $text   \>>\/*/
+        $text   /|/++/
+        $text   /&/**/
+        $text   /^/--/
+
+p       $proc
+ba*  $name   18++2*/6
+bla*  $name   18++3*/6
+        i$1     p(0, 1), p(1, 1)/*2, p(0, 1)/*6
+        $end
+
+p       $proc
+b*  $name   18
+bl*  $name   18++1*/6
+        i$1     p(0, 1), (p(1, 1)-.)/*2, p(0, 1)/*6
+        $end
+
+p       $proc
+bca*  $name   16++2*/6
+bcla*  $name   16++3*/6
+        i$2     p(0, 1), p(1, 1), p(1, 2), p(1, 3)/*2, p(0, 1)/*6
+        $end
+
+p       $proc
+bc*  $name   16
+bcl*  $name   16++1*/6
+        i$2     p(0, 1), p(1, 1), p(1, 2), (p(1, 3)-.)/*2, p(0, 1)/*6
+        $end
+
+
+cr0     $equ    0
+cr1     $equ    4
+cr2     $equ    8
+cr3     $equ    12
+cr4     $equ    16
+cr5     $equ    20
+cr6     $equ    24
+cr7     $equ    28
+
+p       $proc
+        
+blta*  $name   16++0*/12++12*/8++2*/6  
+bgta*  $name   16++1*/12++12*/8++2*/6        
+bzea*  $name   16++2*/12++12*/8++2*/6        
+boa*  $name   16++3*/12++12*/8++2*/6        
+        
+bgea*  $name   16++0*/12++4*/8++2*/6        
+blea*  $name   16++1*/12++4*/8++2*/6        
+bnzea*  $name   16++2*/12++4*/8++2*/6        
+bnoa*  $name   16++3*/12++4*/8++2*/6        
+        
+bdnza*  $name   16++16*/8++1*/6
+bltla*  $name   16++0*/12++12*/8++3*/6        
+bgtla*  $name   16++1*/12++12*/8++3*/6        
+bzela*  $name   16++2*/12++12*/8++3*/6        
+bola*  $name   16++3*/12++12*/8++3*/6        
+        
+bgela*  $name   16++0*/12++4*/8++3*/6        
+blela*  $name   16++1*/12++4*/8++3*/6        
+bnzela*  $name   16++2*/12++4*/8++3*/6        
+bnola*  $name   16++3*/12++4*/8++3*/6        
+        
+bdnzla*  $name   16++16*/8++3*/6
+        
+        i$2     p(0, 1), p(0, 1)/*8, p(1, 1)++p(0, 1)/*12, p(1, 2)/*2, p(0, 1)/*6
+        $else
+        i$2     p(0, 1), p(0, 1)/*8,          p(0, 1)/*12, p(1, 1)/*2, p(0, 1)/*6
+        $endif
+        $end
+
+p       $proc
+blt*  $name   16++0*/12++12*/8        
+bgt*  $name   16++1*/12++12*/8        
+beq*  $name   16++2*/12++12*/8        
+bso*  $name   16++3*/12++12*/8        
+        
+bge*  $name   16++0*/12++4*/8        
+ble*  $name   16++1*/12++4*/8        
+bne*  $name   16++2*/12++4*/8        
+bno*  $name   16++3*/12++4*/8        
+        
+bdnz*  $name   16++16*/8
+        
+bltl*  $name   16++0*/12++12*/8++1*/6        
+bgtl*  $name   16++1*/12++12*/8++1*/6        
+bzel*  $name   16++2*/12++12*/8++1*/6        
+bol*  $name   16++3*/12++12*/8++1*/6        
+        
+bgel*  $name   16++0*/12++4*/8++1*/6        
+blel*  $name   16++1*/12++4*/8++1*/6        
+bnzel*  $name   16++2*/12++4*/8++1*/6        
+bnol*  $name   16++3*/12++4*/8++1*/6        
+        
+bdnzl*  $name   16++16*/8++1*/6
+        
+        $if     p(1)=2
+        i$2     p(0, 1), p(0, 1)/*8, p(1, 1)++p(0, 1)/*12, (p(1, 2)-.)/*2, p(0, 1)/*6
+        $else
+        i$2     p(0, 1), p(0, 1)/*8,          p(0, 1)/*12, (p(1, 1)-.)/*2, p(0, 1)/*6
+        $endif
+        $end
+
+p       $proc
+blr*  $name   16*/1++0
+blrl*  $name   16*/1++1
+        i$6     19, 20, 0, 0, p(0, 1)
+        $end
+
+p       $proc
+bctr*  $name      528*/1++0
+bctrl*  $name      528*/1++1
+bclr*  $name      16*/1++0
+bclrl*  $name      16*/1++1
+        i$6     19, p(1, 1), p(1, 2), 0, p(0, 1)
+        $end
+
+p       $proc
+
+bltctr*  $name   0*/12++12*/8++528*/1        
+bgtctr*  $name   1*/12++12*/8++528*/1        
+beqctr*  $name   2*/12++12*/8++528*/1        
+bsoctr*  $name   3*/12++12*/8++528*/1        
+        
+bgectr*  $name   0*/12++4*/8++528*/1        
+blectr*  $name   1*/12++4*/8++528*/1        
+bnectr*  $name   2*/12++4*/8++528*/1        
+bnsoctr*  $name   3*/12++4*/8++528*/1        
+        
+bdnzctr*  $name   16*/8++528*/1
+        
+bltctrl*  $name   0*/12++12*/8++528*/1++1        
+bgtctrl*  $name   1*/12++12*/8++528*/1++1        
+beqctrl*  $name   2*/12++12*/8++528*/1++1        
+boctrl*  $name   3*/12++12*/8++528*/1++1        
+        
+bgectrl*  $name   0*/12++4*/8++528*/1++1        
+blectrl*  $name   1*/12++4*/8++528*/1++1        
+bnectrl*  $name   2*/12++4*/8++528*/1++1        
+bnoctrl*  $name   3*/12++4*/8++528*/1++1        
+        
+bdnzctrl*  $name  16*/8++528*/1++1
+        
+bltlr*  $name   0*/12++12*/8++16*/1        
+bgtlr*  $name   1*/12++12*/8++16*/1        
+beqlr*  $name   2*/12++12*/8++16*/1        
+bolr*  $name   3*/12++12*/8++16*/1        
+        
+bgelr*  $name   0*/12++4*/8++16*/1        
+blelr*  $name   1*/12++4*/8++16*/1        
+bnelr*  $name   2*/12++4*/8++16*/1        
+bnolr*  $name   3*/12++4*/8++16*/1        
+        
+bdnzlr*  $name   16*/8++16*/1
+        
+bltlrl*  $name   0*/12++12*/8++16*/1++1        
+bgtlrl*  $name   1*/12++12*/8++16*/1++1        
+beqlrl*  $name   2*/12++12*/8++16*/1++1        
+bolrl*  $name   3*/12++12*/8++16*/1++1        
+        
+bgelrl*  $name   0*/12++4*/8++16*/1++1        
+blelrl*  $name   1*/12++4*/8++16*/1++1        
+bnelrl*  $name   2*/12++4*/8++16*/1++1        
+bnolrl*  $name   3*/12++4*/8++16*/1++1        
+        
+bdnzctrl*  $name  16*/8++16*/1++1
+        
+        
+        $if     p(1)
+        i$2     19, p(0, 1)/*8, p(1, 1)++p(0, 1)/*12, 0, p(0, 1)
+        $else
+        i$2     19, p(0, 1)/*8,          p(0, 1)/*12, 0, p(0, 1)
+        $endif
+        $end
+
+
+sc*     $proc
+        i$3     17, 2
+        $end
+
+p       $proc
+
+lwz*  $name   32
+lwzu*  $name   33
+lbz*  $name   34
+lbzu*  $name   35
+stw*  $name   36
+stwu*  $name   37
+stb*  $name   38
+stbu*  $name   39
+lhz*  $name   40
+lhzu*  $name   41
+lha*  $name   42
+lhau*  $name   43
+sth*  $name   44
+sthu*  $name   45
+lmw*  $name   46
+stmw*  $name   47
+lfs*  $name   48
+lfsu*  $name   49
+lfd*  $name   50
+lfdu*  $name   51
+stfs*  $name   52
+stfsu*  $name   53
+stfd*  $name   54
+stfdu*  $name   55
+        
+        $if     .f\p(1, 2)
+        i$4     p(0, 1), p(1, 1), .f\p(1, 2), p(1, 2)
+        $else
+        i$4     p(0, 1), p(1, 1), p(1, 3), p(1, 2)
+        $endif
+
+        $end
+
+p       $proc 
+
+twi*  $name   3
+mulli*  $name   7
+subfic*  $name   8
+
+addic*  $name   12
+addic.*  $name   13
+addi*  $name   14
+addis*  $name   15
+
+        i$4     p(0, 1), p(1, 1), p(1, 2), p(1, 3)
+        $end
+
+p       $proc
+
+ori*  $name   24        
+oris*  $name   25
+xori*  $name   26
+xoris*  $name   27
+andi.*  $name   28
+andis.*  $name   29
+
+        i$4     p(0, 1), p(1, 2), p(1, 1), p(1, 3)
+        $end
+
+li*     $proc
+x       $set    li(1, 3)
+        oris    li(1, 1), x, li(1,2)   
+        $end
+
+mr*     $proc
+        ori     mr(1,2), mr(1,1), 0
+        $end
+
+nop*    $proc
+        ori     0,0,0
+        $end
+
+la*     $proc
+        addi    la(1,1), .f\(la(1,2))++la(1,3), la(1,2)
+        $end
+
+word$ $equ    0
+long$ $equ    1
+
+p       $proc
+cmpli*  $name   10
+cmpi*  $name   11
+        i$5     p(0, 1), p(1, 1), p(1, 2), p(1, 3) p(1, 4)
+        $end
+
+p       $proc
+
+cmpldi*  $name   10++long$*/6
+cmplwi*  $name   10++word$*/6
+cmpdi*  $name   11++long$*/6
+cmpwi*  $name   11++word$*/6
+        
+        $if     p(1)=3
+        i$5     p(0, 1), p(1, 1), p(0, 1)/*6, p(1, 2), p(1, 3)
+        $else
+        i$5     p(0, 1), 0, p(0, 1)/*6, p(1, 1), p(1, 2)
+        $endif
+        
+        $end
+
+
+p       $proc
+tw*  $name   31*/11++4*/1
+
+subfc*  $name   31*/11++8*/1++0++0*/10
+subfc.*  $name   31*/11++8*/1++1++0*/10
+subfco*  $name   31*/11++8*/1++0++1*/10
+subfco.*  $name   31*/11++8*/1++1++1*/10
+
+addc*  $name   31*/11++10*/1++0++0*/10
+addc.*  $name   31*/11++10*/1++1++0*/10
+addco*  $name   31*/11++10*/1++0++1*/10
+addco.*  $name   31*/11++10*/1++1++1*/10
+
+mulhwu*  $name   31*/11++11*/1++0++0*/10
+mulhwu.*  $name   31*/11++11*/1++1++0*/10
+
+fdiv*  $name   63*/11++18*/1
+fdiv.*  $name   63*/11++18*/1++1
+
+fdivs*  $name   59*/11++18*/1
+fdivs.*  $name   59*/11++18*/1++1
+
+mfcr*  $name   31*/11++19*/1
+lwarx*  $name   31*/11++20*/1
+
+fsub*  $name   63*/11++20*/1
+fsub.*  $name   63*/11++20*/1++1
+
+fsubs*  $name   59*/11++20*/1
+fsubs.*  $name   59*/11++20*/1++1
+
+fadd*  $name   63*/11++21*/1
+fadd.*  $name   63*/11++21*/1++1
+
+fadds*  $name   59*/11++21*/1
+fadds.*  $name   59*/11++21*/1++1
+
+fsel*  $name   63*/11++23*/1
+fsel.*  $name   63*/11++23*/1++1
+
+lwzx*  $name   31*/11++23*/1
+
+
+fmsub*  $name   63*/11++28*/1
+fmsub.*  $name   63*/11++28*/1++1
+
+fmsubs*  $name   59*/11++28*/1
+fmsubs.*  $name   59*/11++28*/1++1
+
+fmadd*  $name   63*/11++29*/1
+fmadd.*  $name   63*/11++29*/1++1
+
+fmadds*  $name   59*/11++29*/1
+fmadds.*  $name   59*/11++29*/1++1
+
+fnmsub*  $name   63*/11++30*/1
+fnmsub.*  $name   63*/11++30*/1++1
+
+fnmsubs*  $name   59*/11++30*/1
+fnmsubs.*  $name  59*/11++30*/1++1
+
+fnmadd*  $name   63*/11++31*/1
+fnmadd.*  $name   63*/11++31*/1++1
+
+fnmadds*  $name   59*/11++31*/1
+fnmadds.*  $name  59*/11++31*/1++1
+
+crnor*  $name   19*/11++33*/1
+
+subf*  $name   31*/11++40*/1++0++0*/10
+subf.*  $name   31*/11++40*/1++1++0*/10
+subfo*  $name   31*/11++40*/1++0++1*/10
+subfo.*  $name   31*/11++40*/1++1++1*/10
+
+lwzux*  $name   31*/11++55*/1
+
+mulhw*  $name   31*/11++75*/1++0++0*/10
+mulhw.*  $name   31*/11++75*/1++1++0*/10
+
+
+mfmsr*  $name   31*/11++83*/1
+lbzx*  $name   31*/11++87*/1
+lbzux*  $name   31*/11++119*/1
+crand*  $name   19*/11++129*/1
+
+subfe*  $name   31*/11++136*/1++0++0*/10
+subfe.*  $name   31*/11++136*/1++1++0*/10
+subfeo*  $name   31*/11++136*/1++0++1*/10
+subfeo.*  $name   31*/11++136*/1++1++1*/10
+
+adde*  $name   31*/11++138*/1++0++0*/10
+adde.*  $name   31*/11++138*/1++1++0*/10
+addeo*  $name   31*/11++138*/1++0++1*/10
+addeo.*  $name   31*/11++138*/1++1++1*/10
+
+mtmsr*  $name   31*/11++146*/1
+stwcx*  $name   31*/11++150*/1
+stwx*  $name   31*/11++151*/1
+stwux*  $name   31*/11++183*/1
+crxor*  $name   19*/11++193*/1
+
+addze*  $name   31*/11++202*/1++0++0*/10
+addze.*  $name   31*/11++202*/1++1++0*/10
+addzeo*  $name   31*/11++202*/1++0++1*/10
+addzeo.*  $name   31*/11++202*/1++1++1*/10
+
+mtsr*  $name   31*/11++210*/1
+stbx*  $name   31*/11++215*/1
+crnand*  $name   19*/11++225*/1
+
+addme*  $name   31*/11++234*/1++0++0*/10
+addme.*  $name   31*/11++234*/1++1++0*/10
+addmeo*  $name   31*/11++234*/1++0++1*/10
+addmeo.*  $name   31*/11++234*/1++1++1*/10
+
+mullw*  $name   31*/11++235*/1++0++0*/10
+mullw.*  $name   31*/11++235*/1++1++0*/10
+mullwo*  $name   31*/11++235*/1++0++1*/10
+mullwo.*  $name   31*/11++235*/1++1++1*/10
+
+mtsrin*  $name   31*/11++242*/1
+stbux*  $name   31*/11++247*/1
+crand*  $name   19*/11++257*/1
+fabs*  $name   31*/11++264*/1
+
+add*  $name   31*/11++266*/1++0++0*/10
+add.*  $name   31*/11++266*/1++1++0*/10
+addo*  $name   31*/11++266*/1++0++1*/10
+addo.*  $name   31*/11++266*/1++1++1*/10
+
+lhzx*  $name   31*/11++279*/1
+eqv*  $name   31*/11++284*/1
+eqv.*  $name   31*/11++284*/1++1
+creqv*  $name   19*/11++289*/1
+tlbie*  $name   31*/11++306*/1
+eciwx*  $name   31*/11++310*/1
+lhzux*  $name   31*/11++311*/1
+lhax*  $name   31*/11++343*/1
+lhaux*  $name   31*/11++375*/1
+sthx*  $name   31*/11++407*/1
+crorc*  $name   19*/11++417*/1
+ecowx*  $name   31*/11++438*/1
+sthux*  $name   31*/11++439*/1
+cror*  $name   19*/11++449*/1
+
+divwu*  $name   31*/11++459*/1++0++0*/10
+divwu.*  $name   31*/11++459*/1++1++0*/10
+divwuo*  $name   31*/11++459*/1++0++1*/10
+divwuo.*  $name   31*/11++459*/1++1++1*/10
+
+divw*  $name   31*/11++491*/1++0++0*/10
+divw.*  $name   31*/11++491*/1++1++0*/10
+divwo*  $name   31*/11++491*/1++0++1*/10
+divwo.*  $name   31*/11++491*/1++1++1*/10
+
+mcrxr*  $name   31*/11++512*/1
+lswx*  $name   31*/11++533*/1
+lwbrx*  $name   31*/11++534*/1
+lfsx*  $name   31*/11++535*/1
+srw*  $name   31*/11++536*/1
+tlbsync*  $name   31*/11++566*/1
+lfsux*  $name   31*/11++567*/1
+mfsr*  $name   31*/11++592*/1
+lswi*  $name   31*/11++594*/1
+sync*  $name   31*/11++595*/1
+lswi*  $name   31*/11++597*/1
+lfdx*  $name   31*/11++599*/1
+lfdux*  $name   31*/11++631*/1
+mfsrin*  $name   31*/11++659*/1
+stswx*  $name   31*/11++661*/1
+stwbrx*  $name   31*/11++662*/1
+stfsx*  $name   31*/11++663*/1
+stfsux*  $name   31*/11++695*/1
+sraw*  $name   31*/11++713*/1
+stswi*  $name   31*/11++725*/1
+stfdx*  $name   31*/11++727*/1
+stfdux*  $name   31*/11++759*/1
+lhbrx*  $name   31*/11++790*/1
+srawi*  $name   31*/11++824*/1
+eieio*  $name   31*/11++854*/1
+sthbrx*  $name   31*/11++918*/1
+extsh*  $name   31*/11++922*/1
+extsh.*  $name   31*/11++922*/1++1
+extsb*  $name   31*/11++954*/1
+extsb.*  $name   31*/11++954*/1++1
+tlbld*  $name   31*/11++978*/1
+stfiwx*  $name   31*/11++983*/1
+tlbli*  $name   31*/11++1010*/1
+
+        i$6     p(0,1)/*11, p(1, 1), p(1, 2), p(1, 3), p(0,1)
+        $end
+
+
+p       $proc
+
+subfme*  $name   31*/11++232*/1++0
+subfme.*  $name   31*/11++232*/1++1
+subfmeo*  $name   31*/11++232*/1++0++1*/10
+subfmeo.*  $name  31*/11++232*/1++1++1*/10
+
+subfze*  $name   31*/11++232*/1++0
+subfze.*  $name   31*/11++232*/1++1
+subfzeo*  $name   31*/11++232*/1++0++1*/10
+subfzeo.*  $name  31*/11++232*/1++1++1*/10
+
+neg*  $name   31*/11++104*/1++0
+neg.*  $name   31*/11++104*/1++1
+nego*  $name   31*/11++104*/1++0++1*/10
+nego.*  $name   31*/11++104*/1++1++1*/10
+
+mtsr*  $name   31*/11++210*/1
+        
+        i$6     $n/*11, p(1, 1), p(1, 2), 0, $n
+        $end
+
+p       $proc
+
+cntlzw*  $name   31*/11++26*/1++0
+cntlzw.*  $name   31*/11++26*/1++1
+
+        i$6     $n/*11, p(1, 2), p(1, 1), 0, $n
+        $end
+
+
+p       $proc
+srw*  $name   31*/11++536*/1
+srw.*  $name   31*/11++536*/1++1
+srawi*  $name   31*/11++824*/1
+srawi.*  $name   31*/11++824*/1++1
+sraw*  $name   31*/11++792*/1
+sraw.*  $name   31*/11++792*/1++1
+slw*  $name   31*/11++24*/1
+slw.*  $name   31*/11++24*/1++1
+orc*  $name   31*/11++412*/1
+orc.*  $name   31*/11++412*/1++1
+or*  $name   31*/11++444*/1
+or.*  $name   31*/11++444*/1++1
+nor*  $name   31*/11++124*/1
+nor.*  $name   31*/11++124*/1++1
+nand*  $name   31*/11++476*/1
+nand.*  $name   31*/11++476*/1++1
+and*  $name   31*/11++28*/1++0
+and.*  $name   31*/11++28*/1++1
+andc*  $name   31*/11++60*/1++0
+andc.*  $name   31*/11++60*/1++1
+xor*  $name   31*/11++316*/1
+xor.*  $name   31*/11++316*/1++1
+
+        i$6     $n/*11, p(1, 2), p(1, 1), p(1, 3), $n
+        $end
+
+
+p       $proc
+dcba*  $name   31*/11++758*/1
+dcbf*  $name   31*/11++86*/1
+dcbi*  $name   31*/11++470*/1
+dcbst*  $name   31*/11++54*/1
+dcbt*  $name   31*/11++278*/1
+dcbtst*  $name   31*/11++246*/1
+dcbz*  $name   31*/11++1014*/1
+
+icbi*  $name   31*/11++982*/1
+        
+        i$6     $n/*11, 0, p(1, 1), p(1, 2), $n
+        $end
+
+
+p       $proc
+fabs*  $name   63*/11++264*/1
+fabs.*  $name   63*/11++264*/1++1
+fctiw*  $name   63*/11++14*/1
+fctiw.*  $name   63*/11++14*/1++1
+fctiwz*  $name   63*/11++15*/1
+fctiwz.*  $name   63*/11++15*/1++1
+fmr*  $name   63*/11++72*/1
+fmr.*  $name   63*/11++72*/1++1
+fmul*  $name   63*/11++25*/1
+fmul.*  $name   63*/11++25*/1++1
+fmuls*  $name   59*/11++25*/1
+fmuls.*  $name   59*/11++25*/1++1
+fnabs*  $name   63*/11++136*/1
+fnabs.*  $name   63*/11++136*/1++1
+fneg*  $name   63*/11++40*/1
+fneg.*  $name   63*/11++40*/1++1
+fres*  $name   59*/11++24*/1
+fres.*  $name   59*/11++24*/1++1
+frsp*  $name   63*/11++12*/1
+frsp.*  $name   63*/11++12*/1++1
+frsqte*  $name   63*/11++26*/1
+frsqte.*  $name   63*/11++26*/1++1
+fsqrt*  $name   63*/11++22*/1
+fsqrt.*  $name   63*/11++22*/1++1
+fsqrts*  $name   59*/11++22*/1
+fsqrts.*  $name   59*/11++22*/1++1
+
+mtsrin*  $name   31*/11++242*/1
+        
+        i$6     p(0, 1)/*11, p(1, 1), 0, p(1, 2), p(0, 1)
+        $end
+
+p       $proc
+isync*  $name   19*/11++150*/1
+tlbia*  $name   31*/11++370*/1        
+sync*  $name   31*/11++598*/1
+rfi*  $name   19*/11++50*/1
+        i$6     p(0, 1)/*11, 0, 0, 0, p(0, 1)
+        $end
+
+p       $proc
+mfcr*  $name   31*/11++19*/1
+mffs*  $name   63*/11++583*/1
+mffs.*  $name   63*/11++583*/1++1
+mfmsr*  $name   31*/11++83*/1
+        i$6     p(0, 1)/*11, p(1, 1), 0, 0, p(0, 1)
+        $end
+
+p       $proc
+
+mfspr*  $name   31*/11++339*/1
+
+        i$6     p(0, 1)/*11, p(1, 1), p(1, 2), p(1, 2)/*5, p(0, 1)
+        $end
+
+
+p       $proc
+
+mtspr*  $name   31*/11++467*/1
+
+        i$6     p(0, 1)/*11, p(1, 2), p(1, 1), p(1, 1)/*5, p(0, 1)
+        $end
+
+
+
+mfxer*   $proc
+        mfspr   p(1, 1), XER
+        $end
+
+mflr*    $proc
+        mfspr   p(1, 1), LR
+        $end
+
+mfctr*   $proc
+        mfspr   p(1, 1), CTR
+        $end
+
+mtlr*    $proc
+        mtspr   lr, mtlr(1,1)
+        $end
+
+mtctr*   $proc
+        mtspr   ctr, mtctr(1,1)
+        $end
+
+p       $proc
+cmp*  $name   0   
+cmpl*  $name   32
+        i$7     31, p(1, 1), p(1, 2), p(1, 3), p(1, 4), p(0, 1)
+        $end
+
+p       $proc
+
+cmpd*  $name   long$*/11++0
+cmpw*  $name   word$*/11++0
+
+cmpld*  $name   long$*/11++32
+cmplw*  $name   word$*/11++32
+
+        $if     p(1)=3
+        i$7     31, p(1, 1), p(0, 1)/*11, p(1, 2), p(1, 3), p(0, 1)
+        $else
+        i$7     31,       0, p(0, 1)/*11, p(1, 1), p(1, 2), p(0, 1)
+        $endif
+        $end
+
+p       $proc
+fcompo*  $name   32*/1
+fcompu*  $name   0
+        i$7     63, p(1, 1), 0, p(1, 2), p(1, 3), p(0, 1)
+        $end
+
+p       $proc
+rlwnm*  $name   23
+rlwnm.*  $name   23++1*/6
+rlwinm*  $name   21
+rlwinm.*  $name   21++1*/6
+rlwimi*  $name   20
+rlwimi.*  $name   20++1*/6
+        i$8     p(0, 1), p(1, 2), p(1, 1), p(1, 3), p(1, 4), p(1, 5), p(0, 1)/*6
+        $end
+
+slwi*   $proc
+        rlwinm  slwi(1,1), slwi(1,2), slwi(1,3), 0, 32-slwi(1,3)  
+        $end
+
+srwi*   $proc
+        rlwinm  slwi(1,1), slwi(1,2), 32-slwi(1,3), slwi(1,3), 31  
+        $end
+
+p       $proc
+mcrf*  $name   19*/11++0
+mcrfs*  $name   63*/11++64*/1
+mcrxr*  $name   31*/11++512*/1
+        i$9    p(0, 1)/*11, p(1, 1), 0, p(1, 2), 0, 0, p(0, 1)
+        $end
+        
+        $set_option     "mc"
+
+XER     $equ    1
+LR      $equ    8    
+CTR     $equ    9
+DSISR   $equ    18
+DAR     $equ    19
+DEC     $equ    22
+SDR1    $equ    25
+SRR0    $equ    26
+SRR1    $equ    27
+TBL     $equ    268
+TBU     $equ    269
+SPRG0   $equ    272
+SPRG1   $equ    273
+SPRG2   $equ    274
+SPRG3   $equ    275
+ASR     $equ    280
+EAR     $equ    282
+TBLW    $equ    284
+TBUW    $equ    285
+PVR     $equ    287
+DABR    $equ    1013
+FPECR   $equ    1022
+PIR     $equ    1023
+
+f	$func
+"$subfield"*	$name
+v	$set	f(1,1)
+	$return f(0, v)
+	$end
+

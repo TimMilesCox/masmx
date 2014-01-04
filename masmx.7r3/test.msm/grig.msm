@@ -1,0 +1,7 @@
+grig*   $tree
+one     +1
+two     +2
+three   $equ    3
+few     $do     2,thus(few)     +       two, three        
+        +       few
+        $root

@@ -1,0 +1,165 @@
+;******************************************************************************
+;
+; File     : POLL.ASM
+;
+; Author   : Robert Sneddon
+;
+; Project  : Network printers master - QV10
+;
+; Contents :    This file contains the routines to handle the polling delay
+;               required after a slave has started printing a ticket.
+;
+; Routines :    POLL_Delay              ; Called in [SYSTEM.ASM]SYS_SystemTick
+;               POLL_Delay_Test         ; Called in [DT.ASM]DT_MainLoop
+;               POLL_Delay_Set          ; Called in [CONTROL.ASM]
+;
+; System   : 80C537
+;
+; History  :
+;   Date        Who     Ver     Comments
+; 21/05/99      RS              Code moved out of CONTROL.ASM into separate file
+; 25/05/99      RS              Bugs in node number code fixed.
+;
+;******************************************************************************
+
+poll_delaytable VAR     MAX_DTS ; Poll delay values for each DT slave (0 = no delay)
+
+
+;       ******************************************************************
+;       *       Tim     19viij99        **********************************
+;       ******************************************************************
+;       *       poll_gap change from 23 to 12                            *
+;       *       polling will always resume before printing finishes      *
+;       ******************************************************************
+
+	
+	IF      DMSFAST
+poll_gap        EQU     1
+	ELSE
+poll_gap        EQU     12      ; Polling delay if slave is busy (n * 60mS ticks)
+	ENDIF
+
+;poll_gap        EQU     23      ; Polling delay if slave is busy (n * 60mS ticks)
+
+
+;******************************************************************************
+;
+; Function:     POLL_Delay
+; Input:        None
+; Output:       poll_delaytable updated
+; Preserved:    R7
+; Destroyed:    DPTR, A
+; Description:   Increment the poll_delaytable values for the slaves by one
+;               (if not zero). If a byte is zero, the master should attempt
+;               to poll this slave. If non-zero, the slave is busy printing,
+;               and the master should not poll it. If the count is at its
+;               max value (poll_gap), set it to zero. This will permit the
+;               master to poll this slave next cycle.
+;               IMPORTANT: This is called in an interrupt routine, so it is
+;               important to preserve all registers. The calling routine
+;               (currently SYS_SystemTick) only saves PSW, A, B, DPTR and
+;               R0.
+;
+; Uses:         #poll_gap, poll_delaytable, ctrl_dtcount
+;
+; Called in:    [SYSTEM.ASM]SYS_SystemTick
+;
+; Written by : Robert Sneddon           13 May 1999
+;******************************************************************************
+
+POLL_Delay:
+	MOV     A,R7                    ; Save R7 explicitly
+	PUSHACC
+	PUSH    DPSEL
+	MOV     R7,ctrl_dtcount         ; no. of slave nodes currently in use.
+;
+	MOV     DPSEL,#4
+	MOV     DPTR,#poll_delaytable
+;
+POLL_Dloop:
+	MOVX    A,@DPTR
+	JZ      POLL_Dnoinc             ; If = zero, leave it alone.
+	CJNE    A,#poll_gap,POLL_Dincct ; count <> max, increment it
+; Fall-through - A = #poll_gap (maximum), now set A = 0.
+	CLR     A               ; zero this table entry
+;
+POLL_Dstorect:
+	MOVX    @DPTR,A         ; and put it back into the table
+;
+POLL_Dnoinc:
+	INC     DPTR            ; Check the next table entry (maybe)
+	DJNZ    R7,POLL_Dloop   ; If count expired, finish up.
+	POP     DPSEL
+	POP     ACC
+	MOV     R7,A
+	RET
+;
+POLL_Dincct:
+	INC     A               ; Non-zero and not at max, increment it
+	JMP     POLL_Dstorect   ; and store it back in poll_delaytable
+;
+;******************************************************************************
+;
+; Function:     POLL_Delay_Test
+; Input:        ?
+; Output:       A
+; Preserved:    ?
+; Destroyed:    DPTR
+; Description:  Test the poll_delaytable value for the current slave node.
+;               If the slave node is busy (non-zero), return A > 0 else A = 0
+;
+; Uses:         #poll_delaytable, DPSEL (#4)
+; Calls:        [CONTROL.ASM]CTRL_GetDT, [MATHS.ASM]AddAtoDPTR
+; Called in:    [DT.ASM]DT_MainLoop
+;
+; Written by : Robert Sneddon           13 May 1999
+;******************************************************************************
+;
+POLL_Delay_Test:
+	PUSH    DPSEL
+	CALL    CTRL_GetDT              ; Node number (should be 0 through 9)
+;
+	MOV     DPSEL,#4
+	MOV     DPTR,#poll_delaytable   ; point into delay table
+	CALL    AddAToDPTR              ; offset by node number
+	MOVX    A,@DPTR
+	POP     DPSEL
+	RET
+;
+;******************************************************************************
+;
+; Function:     POLL_Delay_Set
+; Input:        ?
+; Output:       A
+; Preserved:    ?
+; Destroyed:    DPTR
+; Description:  Set the poll_delaytable value for the current node to 1.
+;               This starts the delay count running.
+;
+; Uses:         poll_delaytable, DPSEL (#4)
+; Calls:        [CONTROL.ASM]CTRL_GetDT, [MATH.ASM]AddAToDPTR
+;
+; Called in:    [CONTROL.ASM]
+;
+; Written by :  Robert Sneddon          13 May 1999
+; Modified by:  RS 26/05/99     If the count is non-zero already, don't change.
+;******************************************************************************
+;
+POLL_Delay_Set:
+	PUSH    DPSEL
+	CALL    CTRL_GetDT      ; current node number (0 through 9)
+;
+	MOV     DPSEL,#4
+	MOV     DPTR,#poll_delaytable
+	CALL    AddAToDPTR      ; Point to corresponding delay value
+	MOVX    A,@DPTR
+	JNZ     POLL_DSnoset
+	MOV     A,#1            ; set to 1 to initialise delay
+	MOVX    @DPTR,A
+POLL_DSnoset:
+	POP     DPSEL
+	RET
+
+;******************************************************************************
+	END     ; *********** POLL.ASM **************
+

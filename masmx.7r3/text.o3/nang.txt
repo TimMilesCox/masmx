@@ -1,0 +1,21 @@
+MASMX 7r2
+3/nang.msm
+*EOF*
+  :                            1 p	$proc	$(44)
+  :                            2 ning*	$name	100
+  :                            3 nang*	$name	200
+  :                            4 nong*	$name	300
+  :                            5 	+	$n
+  :                            6 	$end
+  :                            7 
+  :                            8 	$res	512
+Note: nang.msm Line 9: code generated in unbased counter
+2C:000000 000064              +9 	ning
+Note: nang.msm Line 10: code generated in unbased counter
+2C:000001 0000C8              +10 	nang
+Note: nang.msm Line 11: code generated in unbased counter
+2C:000002 00012C              +11 	nong
+00:000200 0003E8              +12 	+	1000
+*EOF*
+:$(00):000000:000201 :$(2C):000000:000003 
+nang.msm: object code 124 bytes: 0 errors: 0 undefined labels

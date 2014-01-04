@@ -1,0 +1,13 @@
+$(0:64)
+label
+.label   $equ    99
+.label   $set    99
+.label   $equf   99,99,99
+again   $equ    1
+again   $equ    2
+again   $set    3
+more    $set    4
+more    $set    5
+more    $equf   6,6
+over    $equf   7,7
+over    $equf   8,8

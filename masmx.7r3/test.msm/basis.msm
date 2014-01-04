@@ -1,0 +1,18 @@
+	$list	0
+	$include	"../aside.dem/map_ppc.def"
+	$list 2
+.	$include,$void	../result.txo/langobar
+$(1:010000:0a0000)
+$(3:030000:0b0000)
+	$include,$binary "../result.txo/frame2.txo"
+$(1)
+wayland*
+	$include,$binary "../result.txo/scale23.txo"
+$(3)
+wayward*	$blank	$
+	$include,$binary "../result.txo/scale24.txo"
+	$store	"../test.o3/basis"
+	$include,$binary	"../result.txo/further.txo"
+
+	$end	yoohoo
+

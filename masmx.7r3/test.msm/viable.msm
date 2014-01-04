@@ -1,0 +1,10 @@
+f*       $func
+        +       99
+one     +       100
+two     +       101
+three   +       102
+        $snap   2
+        $return 103
+        $end
+        +       f()
+        $snap   2

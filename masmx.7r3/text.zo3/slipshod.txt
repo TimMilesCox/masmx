@@ -1,0 +1,16 @@
+MASMX 7r2Z
+3/slipshod.msm
+*EOF*
+  :                            1 	$set_option	"a"
+00:000000 400000000000000000000000000000000000000000000000
+                              +2 	+	undecided_value
+00:000008 000002              +3 	+	location_2
+  :                            4 undecided_value	$set	1*/190
+
+[000000000000000000000000000000000000000000000002]
+[000000000000000000000000000000000000000000000009]
+Error: slipshod.msm Line 5: LOCATION_2 displacement altered
+  :                            5 location_2
+*EOF*
+:$(00):000000:000009 
+slipshod.msm: object code 93 bytes: 1 errors: 0 undefined labels

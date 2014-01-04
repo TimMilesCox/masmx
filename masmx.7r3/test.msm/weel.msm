@@ -1,0 +1,9 @@
+	$list	0
+	$include	ppc_603.def
+	$include	ieee754.def
+	$list	2
+
+	$include	weel.s
+
+	ieee754_64	1.8e400
+	ieee754_128	1.8e400

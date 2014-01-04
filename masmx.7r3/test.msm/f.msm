@@ -1,0 +1,25 @@
+f       $func
+yes*    $name   1
+no*     $name   2
+        $return $n
+        $end
+f*      $func	*
+forward* $name   3
+backward* $name  4
+lastlabel $set  $       
+        $snap   2
+        $if     $n=$net(forward)
+        $note   forward
+        $return nextlabel
+        $else
+        $note   backward
+        $return lastlabel
+        $endif
+        $return $n*/1
+nextlabel $set $
+        $end
+        +       yes()
+        +       no()
+        +       forward()
+        +       backward()
+        +       forward

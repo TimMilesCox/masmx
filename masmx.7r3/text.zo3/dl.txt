@@ -1,0 +1,16 @@
+MASMX 7r2Z
+3/dl.msm
+*EOF*
+  :                            1         $word   8
+  :                            2         $awidth 32
+  :                            3         
+  :                            4 dl*	$proc
+  :                            5 x       $do     dl(1),	+	dl(1,x), dl(1,x)/*8, dl(1,x)/*16, dl(1,x)/*24:q
+  :                            6         $end
+  :                            7 
+00:00000000 010000AA          +8         dl      0AA000001, 0BB000002, 0CC000003 
+00:00000004 020000BB          +8 
+00:00000008 030000CC          +8 
+*EOF*
+:$(00):00000000:0000000C 
+dl.msm: object code 72 bytes: 0 errors: 0 undefined labels

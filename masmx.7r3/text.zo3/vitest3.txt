@@ -1,0 +1,9 @@
+MASMX 7r2Z
+3/vitest3.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+Error: vitest2.msm Line 8: _ONE may not be restated
+Error: vitest2.msm Line 21: _ONE.1538 may not be restated
+Error: vitest2.msm Line 54: _ONE.1546 may not be restated
+*EOF*

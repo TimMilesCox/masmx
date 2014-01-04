@@ -1,0 +1,42 @@
+MASMX 7r2Z
+3/stsimple.msm
+*EOF*
+  :                            1 $(4:04000:*000444000000)
+Note: stsimple.msm Line 2: GIANT SPACE: $ returns intrasegment part of counter only
+Note: stsimple.msm Line 2: for absolute current location use $A
+04:000444004000:004000        +2 	+	$
+Note: stsimple.msm Line 3: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stsimple.msm Line 3: reference a label directly in the target segment
+04:000444004001:004001        +3 	+	$(4)
+04:000444004002:000444004002  +4 	+	$a
+04:000444004004:000444004008  +5 	+	$a(hoolaloola):d
+Note: stsimple.msm Line 6: GIANT SPACE: $ returns intrasegment part of counter only
+Note: stsimple.msm Line 6: for absolute current location use $A
+04:000444004006:004006        +6 	+	$
+Note: stsimple.msm Line 7: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stsimple.msm Line 7: reference a label directly in the target segment
+04:000444004007:004007        +7 	+	$(4)
+  :                            8 hoolaloola
+  :                            9 $(5:05000,5)
+  :                            10 	$res	12
+05:00000C 005010              +11 	+	$a(wirri)
+05:00000D 00500D              +12 	+	$a
+05:00000E 00000E              +13 	+	$a($)
+05:00000F 00000F              +14 	+	$a($(5))
+  :                            15 wirri
+  :                            16 
+  :                            17 $(6:06000:6*262144-06000, 6)
+06:000000 006004              +18 	+	$a(werri)
+06:000001 006001              +19 	+	$a
+06:000002 000002              +20 	+	$a($)
+06:000003 000003              +21 	+	$a($(6))
+  :                            22 werri
+  :                            23 $(7:*8:0400,7)
+07:000400 000404              +24 	+	$a(wyrri)
+07:000401 000401              +25 	+	$a
+07:000402 000402              +26 	+	$a($)
+07:000403 000403              +27 	+	$a($(7))
+  :                            28 wyrri
+*EOF*
+:$(04):004000:004008 :$(05):005000:005010 :$(06):006000:006004 :$(07):000000:000404 
+stsimple.msm: object code 344 bytes: 0 errors: 0 undefined labels

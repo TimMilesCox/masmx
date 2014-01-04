@@ -1,0 +1,18 @@
+MASMX 7r2
+3/isobar.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+  :                            1: 	$include	"../aside.dem/ppc_603.def"
+  :                            2 $(0::*0x00CCE0000000A0000)
+00:0CCE0000000A0000:0000000000000000
+                              +3 	+	_four_cares:d
+00:0CCE0000000A0008:0000000000000000
+                              +4 	+	_three_cares:d
+00:0CCE0000000A0010:0000000000000000
+                              +5 	+	_two_cares:d
+00:0CCE0000000A0018:0000000000000000
+                              +6 	+	_one_care:d
+  :                            7 	$end	0x00CCE0000000A0000
+:$(00):00000000:00000020 
+isobar.msm: object code 272 bytes: 0 errors: 4 undefined labels

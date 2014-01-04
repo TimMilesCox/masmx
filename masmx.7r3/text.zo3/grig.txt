@@ -1,0 +1,16 @@
+MASMX 7r2Z
+3/grig.msm
+*EOF*
+[$TREE]Error: grig.msm Line 1: not a command
+  :                            1 grig*   $tree
+00:000000 000001              +2 one     +1
+00:000001 000002              +3 two     +2
+  :                            4 three   $equ    3
+00:000002 001003              +5 few     $do     2,thus(few)     +       two, three        
+00:000003 001003              +5 
+00:000004 000002              +6         +       few
+[$ROOT]Error: grig.msm Line 7: not a command
+  :                            7         $root
+*EOF*
+:$(00):000000:000005 
+grig.msm: object code 89 bytes: 2 errors: 0 undefined labels

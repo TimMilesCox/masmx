@@ -1,0 +1,28 @@
+MASMX 7r2
+3/frame2.msm
+../result.txo/risobar.txo:$(1) 44 bytes decimal [*4] from hexadecimal 00000000 to 0000002C
+../result.txo/scale22.txo:$(1) 16 bytes decimal [*4] from hexadecimal 0000002C to 0000003C
+../result.txo/scale22.txo:$(3) 28 bytes decimal [*4] from hexadecimal 00000000 to 0000001C
+*EOF*
+  :                            3 	$list		2
+  :                            4 $(0:*4)
+  :                            5: 	$include,$binary	../result.txo/risobar
+01:00000000 48000025          +4 48000025 [0000]40:0000000000000000 [0001]40:0000000000000000
+01:00000004 0000000000000000  +4 
+01:0000000C 0000000000000000  +4 
+01:00000014 0000000000000000  +5 [0002]40:0000000000000000 [0003]40:0000000000000000 7D0304A0
+01:0000001C 0000000000000000  +5 
+01:00000024 7D0304A0          +5 
+01:00000028 4E800020          +6 4E800020
+  :                            6: 	$include,$binary	../result.txo/scale22
+03:00000010 776F6E6465726C6F61660000
+                              +4 776F6E6465726C6F61660000
+01:0000002C 64070000          +7 (03:00008010/*10)10:64070000 (03)10-:60E70010 [0000:FFFFFFF8/*02]18*/02+:(-01:FFFFFFF8/*02)18*/02+:4BFFFFF9
+01:00000030 60E70010          +7 
+01:00000034 4BFFFFCD          +7 
+01:00000038 4E800020          +8 4E800020
+  :                            7 	$store			"../test.o3/scale_x2"
+  :                            8 	
+*EOF*
+:$(01):00000000:0000003C :$(03):00000000:0000001C 
+frame2.msm: object code 551 bytes: 0 errors: 4 undefined labels

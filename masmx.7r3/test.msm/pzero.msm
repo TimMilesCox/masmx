@@ -1,0 +1,6 @@
+pzreo*  $proc
+        +       pzreo(0,2:1)
+.        $do     .dcount(1)=20000/GRANULE-3,    $list   1
+        $end
+        pzreo,100       99
+        $end

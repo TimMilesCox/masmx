@@ -1,0 +1,11 @@
+	$include	"../aside.dem/ppc_603.def"
+$(.data:*4)
+gotcha*	$res	16
+wonderloaf      "wonderloaf"
+
+$(.text:*4)
+zoohoo*
+	oris	r7, 0, wonderloaf@ha
+	ori	r7, r7, wonderloaf@l
+	bl	fireup
+	blr

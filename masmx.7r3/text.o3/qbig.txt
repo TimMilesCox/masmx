@@ -1,0 +1,43 @@
+MASMX 7r2
+3/qbig.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1:         $include        "../aside.dem/ppc_64.def"
+  :                            2 
+  :                            3 ARRAY   $equ    0x00FFFC0000000000
+  :                            4 GRANULE $equ    2048*2048
+  :                            5 
+  :                            6 proces*	$proc
+  :                            7 $(48::*ARRAY+GRANULE*x-GRANULE)
+  :                            8         $do     x=3,    $list 0
+  :                            9         $do     x=4094, $list 1
+  :                            10 item(x)* +       x*2048*2048+ARRAY
+  :                            11         $end
+  :                            12 
+30:00FFFC0000000000:00FFFC0000400000
+                              +13 x	$do	4096,	proces
+30:00FFFC0000400000:00FFFC0000800000
+                              +13 
+30:00FFFC03FF400000:00FFFC03FF800000
+                              +13 
+30:00FFFC03FF800000:00FFFC03FFC00000
+                              +13 
+30:00FFFC03FFC00000:00FFFC0400000000
+                              +13 
+  :                            14 
+  :                            15 $(49::,r15)
+  :                            16 h       $res    8
+  :                            17 t       $res    2048*2048-8
+  :                            18 
+  :                            19 $(0:3*65536)
+00:00030000 4800000D          +20 start   bl      loaded      
+00:00030004 00FFFC017FC00000  +21         +       item(1536)
+00:0003000C 7DE802A6          +22 loaded  mflr	r15
+00:00030010 E9EF0000          +23         ld	r15,,r15
+00:00030014 E86F0000          +24         ld      r3, h
+00:00030018 E88F0008          +25         ld      r4, t
+*EOF*
+:$(00):00030000:0003001C :$(30):00000000:00000008 :$(31):00000000:00400000 
+qbig.msm: object code 213163 bytes: 0 errors: 0 undefined labels

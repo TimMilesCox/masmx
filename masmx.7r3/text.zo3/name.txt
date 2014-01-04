@@ -1,0 +1,18 @@
+MASMX 7r2Z
+3/name.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1 __registers_by_name	$set	1	
+  :                            2:         $include        "../aside.dem/ppc_603.def"
+  :                            3 
+  :                            4 from    .equ    $ee84
+  :                            5 to      .equ    0xc008
+  :                            6 
+00:00000000 80C0EE84          +7         lwz     r6, from
+00:00000004 98CEC008          +8         stb     r6, to(r14)
+00:00000008 4E800020          +9         blr
+*EOF*
+:$(00):00000000:0000000C 
+name.msm: object code 72 bytes: 0 errors: 0 undefined labels

@@ -1,0 +1,16 @@
+MASMX 7r2
+3/isobar1.msm
+[BL]Error: isobar1.msm Line 1: not a command
+  :                            1 fireup*	bl	liftoff
+00:000000 000000000000        +2 	+	_four_cares:d
+00:000002 000000000000        +3 	+	_three_cares:d
+00:000004 000000000000        +4 	+	_two_cares:d
+00:000006 000000000000        +5 	+	_one_care:d
+  :                            6 liftoff*
+[MFSR]Error: isobar1.msm Line 7: not a command
+  :                            7 	mfsr	lr, 3
+[BLR]Error: isobar1.msm Line 8: not a command
+  :                            8 	blr
+  :                            9 	$end	fireup
+:$(00):000000:000008 
+isobar1.msm: object code 254 bytes: 3 errors: 4 undefined labels

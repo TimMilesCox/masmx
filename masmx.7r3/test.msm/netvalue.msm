@@ -1,0 +1,28 @@
+netvalue* $func
+
+        $return $net(netvalue(1, 1))
+        $end
+
+$(1:*:0100)
+here
+vref    $equ    here
+        +       netvalue(vref)
+        +       vref
+tleaf   $set    here
+        +       tleaf
+roseleaf $equ   tleaf
+        +       roseleaf
+bayleaf $set    vref
+        +       bayleaf
+aspen   $equ    netvalue(bayleaf)
+        +       aspen, bayleaf
+        +       bayleaf, aspen
+        +       $net(vref)
+tngwil  $equ    $net(vref)
+        +       tngwil
+tngwol  $equ    vref
+        +       tngwol
+tangw   $set    $net(vref)
+        +       tangw
+tngwy   $set    vref
+        +       tngwy

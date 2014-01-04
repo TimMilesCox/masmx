@@ -1,0 +1,109 @@
+
+p       $proc
+
+beq     $name   2*/16++12
+bne     $name   2*/16++4
+
+blt     $name   0*/16++12
+bge     $name   0*/16++4
+bnl     $name   0*/16++4
+
+bgt     $name   1*/16++12
+ble     $name   1*/16++4
+bng     $name   1*/16++4
+
+bun     $name   3*/16++12
+bnu     $name   3*/16++4
+
+bso     $name   3*/16++12
+bns     $name   3*/16++4
+
+
+        $if     p(1)>1
+        bc      p(0,1)/*16, p(0,1)++p(1,1), p(1,2)
+        $else
+        bc      p(0,1)/*16, p(0,1), p(1,1)
+        $endif
+        $end
+
+p       $proc
+
+beql    $name   2*/16++12
+bnel    $name   2*/16++4
+
+bltl    $name   0*/16++12
+bgel    $name   0*/16++4
+bnll    $name   0*/16++4
+
+bgtl    $name   1*/16++12
+blel    $name   1*/16++4
+bngl    $name   1*/16++4
+
+bunl    $name   3*/16++12
+bnul    $name   3*/16++4
+
+bsol    $name   3*/16++12
+bnsl    $name   3*/16++4
+
+
+        $if     p(1)>1
+        bcl     p(0,1)/*16, p(0,1)++p(1,1), p(1,2)
+        $else
+        bcl     p(0,1)/*16, p(0,1), p(1,1)
+        $endif
+        $end
+
+p       $proc
+
+beqa    $name   2*/16++12
+bnea    $name   2*/16++4
+
+blta    $name   0*/16++12
+bgea    $name   0*/16++4
+bnla    $name   0*/16++4
+
+bgta    $name   1*/16++12
+blea    $name   1*/16++4
+bnga    $name   1*/16++4
+
+buna    $name   3*/16++12
+bnua    $name   3*/16++4
+
+bsoa    $name   3*/16++12
+bnsa    $name   3*/16++4
+
+
+        $if     p(1)>1
+        bca     p(0,1)/*16, p(0,1)++p(1,1), p(1,2)
+        $else
+        bca     p(0,1)/*16, p(0,1), p(1,1)
+        $endif
+        $end
+
+p       $proc
+
+beqla   $name   2*/16++12
+bnela   $name   2*/16++4
+
+bltla   $name   0*/16++12
+bgela   $name   0*/16++4
+bnlla   $name   0*/16++4
+
+bgtla   $name   1*/16++12
+blela   $name   1*/16++4
+bngla   $name   1*/16++4
+
+bunla   $name   3*/16++12
+bnula   $name   3*/16++4
+
+bsola   $name   3*/16++12
+bnsla   $name   3*/16++4
+
+
+        $if     p(1)>1
+        bcla    p(0,1)/*16, p(0,1)++p(1,1), p(1,2)
+        $else
+        bcla    p(0,1)/*16, p(0,1), p(1,1)
+        $endif
+        $end
+

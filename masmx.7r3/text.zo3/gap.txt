@@ -1,0 +1,17 @@
+MASMX 7r2Z
+3/gap.msm
+*EOF*
+  :                            1 VORZAHL $set	1
+  :                            2 ZAHL	$set	5
+  :                            3 label$_
+  :                            4 ?	$do	VORZAHL,label(?)
+  :                            5 
+00:000000 000004              +6 ?	$do	ZAHL,label$(ZAHL+1-?)	+	label$(?)
+00:000001 000003              +6 
+00:000002 000002              +6 
+00:000003 000001              +6 
+00:000004 000000              +6 
+  :                            7 
+*EOF*
+:$(00):000000:000005 
+gap.msm: object code 72 bytes: 0 errors: 0 undefined labels

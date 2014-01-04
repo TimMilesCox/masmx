@@ -1,0 +1,30 @@
+MASMX 7r2Z
+3/scale1.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+../result.txo/langobar.txo:$(0) 16 bytes decimal from hexadecimal 00000000 to 00000010
+../result.txo/langobar.txo:$(3) 4 bytes decimal from hexadecimal 00000000 to 00000004
+  :                            4: 	$include	"absomap.def"
+  :                            5 #$(0::*)
+  :                            6: 	$include,"$binary" "../result.txo/langobar.txo"
+  :                            7 $(1::*0x00444400000c0000)
+  :                            8 	$list		2
+  :                            9: 	$include	"tisobar.msm"
+01:00444400000C0000:48000025  +1 fireup*	bl	liftoff
+01:00444400000C0004:000003FC000A000C
+                              +2 	+	_four_cares:d
+01:00444400000C000C:000003FC000A0008
+                              +3 	+	_three_cares:d
+01:00444400000C0014:000003FC000A0004
+                              +4 	+	_two_cares:d
+01:00444400000C001C:000003FC000A0000
+                              +5 	+	_one_care:d
+  :                            6 liftoff*
+01:00444400000C0024:7D0304A0  +7 	mfsr	lr, 3
+01:00444400000C0028:4E800020  +8 	blr
+  :                            9 	$end	fireup
+  :                            10 	$store		"../test.o3/scale1"
+  :                            11 	$end		fireup
+:$(00):00000000:00000010 :$(01):00000000:0000002C :$(03):00000000:00000004 
+scale1.msm: object code 610 bytes: 0 errors: 0 undefined labels

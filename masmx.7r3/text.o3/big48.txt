@@ -1,0 +1,15 @@
+MASMX 7r2
+3/big48.msm
+*EOF*
+  :                            1         $word   48
+  :                            2         $quantum 48
+00:000000000000 496E697469616C20537472696E6773206F6620382D626974
+                              +3         "Initial Strings of 8-bit data"
+00:000000000004 206461746120  +3 
+  :                            4         $byte   6
+00:000000000005 B21D25C80CF4CA9BA7CC0BE6034A67A34B39030863AE5900
+                              +5         "Later Strings of Tightly Packed Data"
+00:000000000009 921D21000000  +5 
+*EOF*
+:$(00):000000000000:00000000000A 
+big48.msm: object code 185 bytes: 0 errors: 0 undefined labels

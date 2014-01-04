@@ -1,0 +1,50 @@
+MASMX 7r2
+3/relstack.msm
+  :                            1 $(3:*8)
+  :                            2 one	$res	1
+  :                            3 two	$res	1
+  :                            4 three	$res	1
+  :                            5 
+  :                            6 first	$equf	one, two, three
+  :                            7 second	$equf	bozo, two, three
+Error: relstack.msm Line 8: external value FIVE may not be used in this context
+Error: relstack.msm Line 8: external value AKIMBO may not be used in this context
+  :                            8 third	$equf	four, five, akimbo
+  :                            9 
+Error: relstack.msm Line 10: external value TWENTY may not be used in this context
+Error: relstack.msm Line 10: external value TWENTY1 may not be used in this context
+  :                            10 fourth	$equf	nineteen, twenty, twenty1
+Error: relstack.msm Line 11: external value FORTY may not be used in this context
+Error: relstack.msm Line 11: external value MORE may not be used in this context
+  :                            11 fifth	$equf	kwazulu, forty, more
+Error: relstack.msm Line 12: external value NINETY may not be used in this context
+Error: relstack.msm Line 12: external value FIFTY may not be used in this context
+Error: relstack.msm Line 12: external value INSANITY may not be used in this context
+Error: relstack.msm Line 12: external value OUTRAGE may not be used in this context
+Error: relstack.msm Line 12: external value DISCREDIBLE may not be used in this context
+  :                            12 sixth	$equf	ndabaninghi, ninety, fifty, insanity, outrage, discredible
+Error: relstack.msm Line 13: external value WEASELSOME may not be used in this context
+Error: relstack.msm Line 13: external value NOTQUITENICE may not be used in this context
+Error: relstack.msm Line 13: external value AGAIN may not be used in this context
+Error: relstack.msm Line 13: external value ABIT may not be used in this context
+Error: relstack.msm Line 13: external value WOBBLY may not be used in this context
+  :                            13 seventh	$equf	dratful, weaselsome, notquitenice, again, abit, wobbly
+Error: relstack.msm Line 14: external value AWAY may not be used in this context
+Error: relstack.msm Line 14: external value NAUGHTINESS may not be used in this context
+Error: relstack.msm Line 14: external value FRIVELSOME may not be used in this context
+Error: relstack.msm Line 14: external value OH may not be used in this context
+  :                            14 eighth	$equf	one, two, away, naughtiness, frivelsome, oh, no
+  :                            15 ninth	$equf	three, three, three, three, three, three
+Error: relstack.msm Line 16: too many relocatable targets in $equf
+  :                            16 tenth	$equf	ninth+ninth
+  :                            17 eleventh $equf
+  :                            18 
+03:000003 000000              +19 	+	first, second, third
+03:000004 000000              +20 	+	fourth, fifth, sixth
+03:000005 000002              +21 	+	seventh, eighth, ninth
+03:000006 020202              +22 	+	ninth, ninth, ninth
+03:000007 040004              +23 	+	tenth, eighth, tenth
+  :                            24 
+  :                            25 	$end
+:$(03):000000:000008 
+relstack.msm: object code 336 bytes: 21 errors: 6 undefined labels

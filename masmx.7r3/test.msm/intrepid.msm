@@ -1,0 +1,13 @@
+	$include	"8051_3r1.def"
+
+	jmp	one
+	org	11
+	jmp	two
+	org	22
+	jmp	three
+zodo	var	100
+one	db	1,2,3
+two	db	3,4,5
+three	db	4,5,6
+	dw	rel2(one)
+

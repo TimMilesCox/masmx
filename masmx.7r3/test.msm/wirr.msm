@@ -1,0 +1,18 @@
+p*	$proc
+one(1)
+one(2)
+	+	one(3)
+	+	looksy
+	+	one()
+	+	one(2)
+	$end
+
+$(3:03000)
+looksy	p
+.  one(3)
+
+one(3,1)
+	+	one(3)
+	+	nowhere
+	+	one(3,1)
+	+	looksy

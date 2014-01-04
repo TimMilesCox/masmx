@@ -1,0 +1,14 @@
+MASMX 7r2
+3/twiggy.msm
+  :                            1 $(3:03000)
+  :                            2 uhu $tree
+  :                            3 twig $res 1
+  :                            4 leaf $res 2
+  :                            5  $root
+  :                            6 
+  :                            7 $(4:04000)
+04:004000 003001              +8  + uhu:leaf
+04:004001 003000              +9  + uhu:twig
+  :                            10  $end
+:$(03):003000:003003 :$(04):004000:004002 
+twiggy.msm: object code 77 bytes: 0 errors: 0 undefined labels

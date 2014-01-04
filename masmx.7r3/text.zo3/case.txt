@@ -1,0 +1,5 @@
+MASMX 7r2Z
+3/case.msm
+Note: case.msm Line 2: flags -ksy are actioned at command line only
+Error: case.msm Line 3: WIBBLE may not be restated
+*EOF*

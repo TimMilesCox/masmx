@@ -1,0 +1,9 @@
+MASMX 7r2
+3/a1.msm
+*EOF*
+  :                            1 	$word	32
+  :                            2 	$quantum 8
+00:00000000 61312020          +3 	"a1"
+*EOF*
+:$(00):00000000:00000004 
+a1.msm: object code 54 bytes: 0 errors: 0 undefined labels

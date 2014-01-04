@@ -1,0 +1,17 @@
+MASMX 7r2
+3/hangobar.msm
+*EOF*
+  :                            1 athing	$set	0x000003fc000a0000
+  :                            2 $(0::*athing)
+[BLR]Error: hangobar.msm Line 3: not a command
+  :                            3 _one_care*	blr
+[BLR]Error: hangobar.msm Line 4: not a command
+  :                            4 _two_cares*	blr
+[BLR]Error: hangobar.msm Line 5: not a command
+  :                            5 _three_cares*	blr
+[BLR]Error: hangobar.msm Line 6: not a command
+  :                            6 _four_cares*	blr
+  :                            7 
+*EOF*
+:$(00):000000:000000 
+hangobar.msm: object code 162 bytes: 4 errors: 0 undefined labels

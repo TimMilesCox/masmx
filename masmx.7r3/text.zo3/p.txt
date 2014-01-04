@@ -1,0 +1,26 @@
+MASMX 7r2Z
+3/p.msm
+*EOF*
+  :                            1 :bongo  $equ,$function  $    
+  :                            2 p       $proc   $(6)
+  :                            3 minus6* $name
+  :                            4         -       6d
+  :                            5         $end
+  :                            6 
+  :                            7 q       $proc   :bongo(5)
+  :                            8 minus5* $name
+  :                            9         -       5d
+  :                            10         minus6
+  :                            11         $end
+  :                            12 
+Note: p.msm Line 13: code generated in unbased counter
+05:000000 FFFFFFFFFFFB        +13         minus5
+Note: p.msm Line 13: code generated in unbased counter
+06:000000 FFFFFFFFFFFA        +13 
+  :                            14 
+00:000000 FFFFF6              +15         -10
+  :                            16 "+ 99"
+  :                            17 "+ 100"""
+*EOF*
+:$(00):000000:000001 :$(05):000000:000002 :$(06):000000:000002 
+p.msm: object code 144 bytes: 0 errors: 0 undefined labels

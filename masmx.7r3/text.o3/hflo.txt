@@ -1,0 +1,24 @@
+MASMX 7r2
+3/hflo.msm
+*EOF*
+  :                            1         $word   32
+  :                            2         $quantum 8
+  :                            3         $awidth 32
+  :                            4         $floating_point 32
+00:00000000 41C00000          +5         +1.5
+00:00000004 401C000000000000  +6         +1.5d
+00:0000000C 400001C00000000000000000
+                              +7         +0.15t*+1
+00:00000018 400001C0000000000000000000000000
+                              +8         +15:q*-1
+00:00000028 400001C000000000000000000000000000000000
+                              +9         +1.5p
+00:0000003C BFFFFE3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                              +10         -1.5h
+Note: hflo.msm Line 11: field is size of floating number
+		words given tag may follow the fraction +1234.567[[:]{sdtqpho}][*+exponent]
+00:00000054 400001C00000000000000000000000000000000000000000
+                              +11         +1.5o
+*EOF*
+:$(00):00000000:0000006C 
+hflo.msm: object code 268 bytes: 0 errors: 0 undefined labels

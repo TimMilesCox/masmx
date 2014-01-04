@@ -1,0 +1,8 @@
+	$include	"../test.gcc/map_ppc.def"
+	$set_option	"b"
+	$list		 2
+$(3:32768)
+$(1:65536)
+	$include,$binary "yieldppc.txo"
+	$include,$binary "idle.txo"
+	$store		smaragd

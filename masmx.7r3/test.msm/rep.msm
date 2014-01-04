@@ -1,0 +1,14 @@
+f*      $func	*
+        n
+        $return 077
+        $end
+n*      $proc	*
+
+	$do	$t(name)=0,name**
+
+name2** $set    $
+        $end
+$(0:64)        
+        +       f
+        +       f
+        +       name, name2

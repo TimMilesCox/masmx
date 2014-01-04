@@ -1,0 +1,14 @@
+MASMX 7r2
+3/trivs.msm
+  :                            1 	$set_option	"Q"
+  :                            2 
+  :                            3 "&"*    $func
+  :                            4         $return $r
+  :                            5         $end
+  :                            6 
+  :                            7 $(4:04000)
+04:004000 000004              +8         +       "&"
+04:004001 000004              +9 	+	$r
+  :                            10         $end
+:$(04):004000:004002 
+trivs.msm: object code 51 bytes: 0 errors: 0 undefined labels

@@ -1,0 +1,27 @@
+MASMX 7r2
+3/modest.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1:         $include        "../aside.dem/ppc_64.def"
+  :                            2 
+  :                            3 SEGMENT $set    0x00FFFC0000000000
+  :                            4 $(48::*SEGMENT:,r15)
+30:00FFFC0000000000:0000000000400000
+                              +5 part1   +       2048*2048d
+30:00FFFC0000000008:0000000000000064
+                              +6 part2   +       100d
+  :                            7 part3   $res    2048*2048-16
+  :                            8 
+  :                            9 $(0:3*65536)
+00:00030000 4800000D          +10 start   bl      loaded      
+00:00030004 00FFFC0000000000  +11         +       SEGMENT
+00:0003000C 7DE802A6          +12 loaded  mfspr   r15, LR
+00:00030010 E9EF0000          +13         ld      r15,,r15
+00:00030014 E86F0000          +14         ld      r3, part1
+00:00030018 E88F0008          +15         ld      r4, part2
+00:0003001C E8AF0010          +16         ld      r5, part3
+*EOF*
+:$(00):00030000:00030020 :$(30):00000000:00400000 
+modest.msm: object code 217 bytes: 0 errors: 0 undefined labels

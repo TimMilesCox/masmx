@@ -1,0 +1,12 @@
+MASMX 7r2
+3/dollar1.msm
+*EOF*
+  :                            1         $word           16
+  :                            2 $(6:06000)
+  :                            3 "$handle"
+  :                            4         $res    10
+06:600A 000A                  +5         +       $-$handle
+  :                            6 
+*EOF*
+:$(06):6000:600B 
+dollar1.msm: object code 34 bytes: 0 errors: 0 undefined labels

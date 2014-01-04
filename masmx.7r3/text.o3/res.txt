@@ -1,0 +1,37 @@
+MASMX 7r2
+3/res.msm
+  :                            1 	$plist	5
+  :                            2 p*	$proc
+  :                            3 	$do	$net(p(1,1))>4095,	$flag	gargoyle
+  :                            4 	$if	$net(p(1,1))>4095
+  :                            5 	$flag	gurgole
+  :                            6 	$endif
+  :                            7 	$if	p(1,1)>4095
+  :                            8 	$flag	gangrule
+  :                            9 	$endif
+  :                            10 zaporogets $set p(1,1)
+  :                            11 	$if	zaporogets>4095
+  :                            12 	$flag	gringole
+  :                            13 	$endif
+  :                            14 	$do	p(1,1)>4095,	$flag	grumbole
+  :                            15 	+	$net(p(1,1))
+  :                            16 	$end
+  :                            17 
+  :                            18 $(0:4094/dp)
+  :                            19 	$set_option	"a"
+  :                            20 $(2:02000)
+02:002000 000FFE              +21 	p	(99)
+02:002001 000FFF              +22 	p	(100)
+Error: res.msm Line 23: gargoyle
+Error: res.msm Line 23: gurgole
+Error: res.msm Line 23: gangrule
+Error: res.msm Line 23: gringole
+Error: res.msm Line 23: grumbole
+02:002002 001000              +23 	p	(101)
+  :                            24 
+  :                            25 	$end
+00:000ffe+000063
+00:000fff+000064
+00:001000+000065
+:$(00):000FFE:001001 :$(02):002000:002003 
+res.msm: object code 117 bytes: 5 errors: 0 undefined labels

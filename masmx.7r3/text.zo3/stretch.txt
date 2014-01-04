@@ -1,0 +1,14 @@
+MASMX 7r2Z
+3/stretch.msm
+*EOF*
+00:000000 000000800000        +1 one	+	awkward
+
+[000000000000000000000000000000000000000000000001]
+[000000000000000000000000000000000000000000000002]
+Error: stretch.msm Line 2: TWO displacement altered
+  :                            2 two
+  :                            3 
+  :                            4 awkward	$equ	0800000
+*EOF*
+:$(00):000000:000002 
+stretch.msm: object code 50 bytes: 1 errors: 0 undefined labels

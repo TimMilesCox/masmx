@@ -1,0 +1,10 @@
+MASMX 7r2
+3/otherwis.msm
+                                        +1;     .       one
+                                        +1;     .       two
+                                        +1;     .       three
+00:000000 000004              +4         +1      .       four
+  :                            5 .	$store	somewhat
+  :                            6         $end
+:$(00):000000:000001 
+otherwis.msm: object code 44 bytes: 0 errors: 0 undefined labels

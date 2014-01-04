@@ -1,0 +1,21 @@
+MASMX 7r2Z
+3/fzero.msm
+00:000000 400001C00000000000000000
+                              +1  + 1.5
+00:000004 400001C00000000000000000
+                              +2  + 1.500
+00:000008 000000000000000000000000
+                              +3  + 0.0
+00:00000C 000000000000000000000000
+                              +4  + 0.000
+00:000010 BFFFFE3FFFFFFFFFFFFFFFFF
+                              +5  - 1.5
+00:000014 BFFFFE3FFFFFFFFFFFFFFFFF
+                              +6  - 1.500
+00:000018 FFFFFFFFFFFFFFFFFFFFFFFF
+                              +7  - 0.0
+00:00001C FFFFFFFFFFFFFFFFFFFFFFFF
+                              +8  - 0.000
+  :                            9  $end
+:$(00):000000:000020 
+fzero.msm: object code 237 bytes: 0 errors: 0 undefined labels

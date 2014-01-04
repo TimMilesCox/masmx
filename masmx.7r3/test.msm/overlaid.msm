@@ -1,0 +1,28 @@
+	$do	$o('d'),first  $tree
+	$do     $o('d'),	$note	containing tree
+yo $branch
+one $res 12
+two + 2
+three + 3
+ $root
+ho $branch
+one $res 22
+two + 2
+three + 3
+ $root
+	$do     $o('d'),	$root
+interlude + 1.5
+	$do     $o('d'),second	$tree
+        $do     $o('d'),	$note   containing tree
+yep $branch
+one     $res    12
+two     +       2
+three   +       3
+        $root
+zep $branch
+one     $res    22
+two     +       2
+three   +       3
+        $root
+	$do     $o('d'),	$root
+ $end

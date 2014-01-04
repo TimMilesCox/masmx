@@ -1,0 +1,13 @@
+MASMX 7r2
+3/random.msm
+*EOF*
+  :                            1 $(0:*:100)
+  :                            2 pazam        
+00:000064 00003B9ACA65        +3         +       pazam+1000*1000*1000+1
+00:000066 00003B9ACA65        +4         +       1000*1000*1000+1+pazam
+00:000068 001000000065        +5         +       4096*4096*4096+pazam+1
+00:00006A 001000000065        +6         +       +pazam+1+4096*4096*4096
+00:00006C 0000C8              +7         +       pazam+pazam
+*EOF*
+:$(00):000000:00006D 
+random.msm: object code 150 bytes: 0 errors: 0 undefined labels

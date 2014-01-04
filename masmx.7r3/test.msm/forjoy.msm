@@ -1,0 +1,11 @@
+        $include        "8051_3r1.def"
+
+        ljmp    for.joy
+        $res    1000
+
+for.joy lcall    for.more
+         reti
+
+for.more 
+        nop
+        ret

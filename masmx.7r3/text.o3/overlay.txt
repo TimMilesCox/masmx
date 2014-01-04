@@ -1,0 +1,50 @@
+MASMX 7r2
+3/overlay.msm
+*EOF*
+  :                            1 morzils* $proc
+  :                            2 grimpo*	$tree
+  :                            3 wzlip	$res	16
+  :                            4 	$root
+  :                            5 	$end
+  :                            6 
+  :                            7 these*	$proc
+  :                            8 first*	$branch
+  :                            9 one	+	1
+  :                            10 two	$res	40
+  :                            11 	morzils
+  :                            12 three	+	3
+  :                            13 	$root
+  :                            14 
+  :                            15 second*	$branch
+  :                            16 one	+	1
+  :                            17 two	$res	118
+  :                            18 	morzils
+  :                            19 three	+	3
+  :                            20 	$root
+  :                            21 
+  :                            22 third*	$branch
+  :                            23 one	+	1
+  :                            24 two	$res	14
+  :                            25 	morzils
+  :                            26 three	+	3
+  :                            27 	$root
+  :                            28 	$end
+  :                            29 
+  :                            30 those*	$proc
+  :                            31 allofit*	$tree
+  :                            32 firstings $res	120
+  :                            33 	these
+  :                            34 secondings $res 120
+  :                            35 	$root
+  :                            36 	$end
+  :                            37 
+00:000078 000001              +38 	those
+00:0000B1 000003              +38 
+00:000078 000001              +38 
+00:0000FF 000003              +38 
+00:000078 000001              +38 
+00:000097 000003              +38 
+00:000178 000063              +39 different	+	99
+*EOF*
+:$(00):000000:000179 
+overlay.msm: object code 152 bytes: 0 errors: 0 undefined labels

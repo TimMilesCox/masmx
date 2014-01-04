@@ -1,0 +1,89 @@
+MASMX 7r2Z
+3/mungle.msm
+  :                            1 $(3:*4)
+03:000000 000005              +2 dingle + 5
+  :                            3 $(4:*4)
+04:000000 000005              +4 jingle + 5
+  :                            5 
+  :                            6 $(1:0100)
+  :                            7 
+Error: mungle.msm Line 8: too many relocatable targets in equate
+  :                            8 bingle $set dingle+boogle
+Error: mungle.msm Line 9: too many relocatable targets in equate
+  :                            9 ningle $set 0+dingle+boogle
+Error: mungle.msm Line 10: too many relocatable targets in equate
+  :                            10 pingle $set dingle+jingle
+Error: mungle.msm Line 11: too many relocatable targets in equate
+  :                            11 tingle $set jingle+zoogle+0
+Error: mungle.msm Line 12: too many relocatable targets in equate
+  :                            12 wingle $set 0+zoogle+jingle
+Error: mungle.msm Line 13: too many relocatable targets in equate
+  :                            13 wongle $set zoogle+boogle
+01:000100 000000              +14  + bingle
+01:000101 000000              +15  + 0+bingle
+01:000102 000000              +16  + bingle+0
+01:000103 000000              +17  + ningle
+01:000104 000000              +18  + 0+ningle
+01:000105 000000              +19  + ningle+0
+01:000106 000000              +20  + pingle
+01:000107 000000              +21  + 0+pingle
+01:000108 000000              +22  + pingle+0
+01:000109 000000              +23  + tingle
+01:00010A 000000              +24  + 0+tingle
+01:00010B 000000              +25  + tingle+0
+01:00010C 000000              +26  + wingle
+01:00010D 000000              +27  + 0+wingle
+01:00010E 000000              +28  + wingle+0
+01:00010F 000000              +29  + wongle
+01:000110 000000              +30  + 0+wongle
+01:000111 000000              +31  + wongle+0
+01:000112 000000              +32 	+	dingle+boogle
+01:000113 000000              +33 	+	dingle+jingle
+01:000114 000000              +34 	+	boogle+zoogle
+  :                            35 
+  :                            36 $(1:0200)
+  :                            37 
+Error: mungle.msm Line 38: too many relocatable targets in equate
+  :                            38 bingle $set dingle-boogle
+Error: mungle.msm Line 39: too many relocatable targets in equate
+  :                            39 ningle $set 0-dingle-boogle
+Error: mungle.msm Line 40: too many relocatable targets in equate
+  :                            40 pingle $set dingle-jingle
+Error: mungle.msm Line 41: too many relocatable targets in equate
+  :                            41 tingle $set jingle-zoogle+0
+Error: mungle.msm Line 42: too many relocatable targets in equate
+  :                            42 wingle $set 0+zoogle-jingle
+Error: mungle.msm Line 43: too many relocatable targets in equate
+  :                            43 wongle $set zoogle-boogle
+01:000200 000000              +44  + bingle
+01:000201 000000              +45  + 0+bingle
+01:000202 000000              +46  + bingle+0
+01:000203 000000              +47  + ningle
+01:000204 000000              +48  + 0+ningle
+01:000205 000000              +49  + ningle+0
+01:000206 000000              +50  + pingle
+01:000207 000000              +51  + 0+pingle
+01:000208 000000              +52  + pingle+0
+01:000209 000000              +53  + tingle
+01:00020A 000000              +54  + 0+tingle
+01:00020B 000000              +55  + tingle+0
+01:00020C 000000              +56  + wingle
+01:00020D 000000              +57  + 0+wingle
+01:00020E 000000              +58  + wingle+0
+01:00020F 000000              +59  + wongle
+01:000210 000000              +60  + 0+wongle
+01:000211 000000              +61  + wongle+0
+01:000212 000000              +62 	+	dingle-boogle
+01:000213 000000              +63 	+	dingle-jingle
+01:000214 000000              +64 	+	boogle-zoogle
+01:000215 000000              +65 	+	jingle-jingle
+01:000216 000000              +66 	+	zoogle-zoogle
+  :                            67 rangle	$set	5+boogle-boogle
+  :                            68 bangle	$set	dingle-dingle-5
+  :                            69 
+01:000217 000004              +70 	+	rangle-1
+01:000218 FFFFFC              +71 	+	1+bangle
+  :                            72 
+  :                            73  $end
+:$(01):000100:000219 :$(03):000000:000001 :$(04):000000:000001 
+mungle.msm: object code 890 bytes: 12 errors: 2 undefined labels

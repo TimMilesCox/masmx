@@ -1,0 +1,12 @@
+MASMX 7r2
+3/tribit.msm
+*EOF*
+  :                            1 fruitfool(1)	$equ	05000
+  :                            2 funilabel	$equ	04000
+  :                            3 $(5:fruitfool(1)+100)
+05:005064 005064              +4 	+	$
+  :                            5 $(6:funilabel+100)
+06:004064 004064              +6 	+	$
+*EOF*
+:$(05):005064:005065 :$(06):004064:004065 
+tribit.msm: object code 88 bytes: 0 errors: 0 undefined labels

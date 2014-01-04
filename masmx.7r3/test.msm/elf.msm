@@ -1,0 +1,13 @@
+
+"$EV_CURRENT"	$equ	1
+"$PH_ENTRY"	$equ	48
+"$SH_ENTRY"	$equ	48
+
+"$platform_le"	$set	0
+	$do	$o('d'),;
+"$platform_le"	$set	1
+
+	$include	"elf_5.def"
+
+stripey	Elf64_Ehdr	1 2 3 4 5 6 7 8 9 10
+

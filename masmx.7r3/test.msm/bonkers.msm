@@ -1,0 +1,5 @@
+        $if   $t(bonkers)^=0
+        $note   bonkers
+        $else
+        $note   not bonkers?
+        $endif

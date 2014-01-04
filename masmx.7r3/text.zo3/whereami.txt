@@ -1,0 +1,8 @@
+MASMX 7r2Z
+3/whereami.msm
+*EOF*
+  :                            1 $(48:0)
+30:000000 000030              +2 ThisIsUs +      $R(thisisus)
+*EOF*
+:$(30):000000:000001 
+whereami.msm: object code 44 bytes: 0 errors: 0 undefined labels

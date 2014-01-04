@@ -1,0 +1,22 @@
+MASMX 7r2
+3/carryon.msm
+*EOF*
+Error: carryon.msm Line 1: external value  may not be used in this context
+  :                            1 $(.data)
+00:000000 776F6E6465726C6F61662020
+                              +2 wonderloaf      "wonderloaf"
+  :                            3 
+Error: carryon.msm Line 4: external value  may not be used in this context
+  :                            4 $(.text)
+  :                            5 zoohoo*
+[ORIS]Error: carryon.msm Line 6: not a command
+  :                            6 	oris	r7, 0, wonderloaf@ha
+[ORI]Error: carryon.msm Line 7: not a command
+  :                            7 	ori	r7, r7, wonderloaf@l
+[BL]Error: carryon.msm Line 8: not a command
+  :                            8 	bl	fireup
+[BLR]Error: carryon.msm Line 9: not a command
+  :                            9 	blr
+*EOF*
+:$(00):000000:000004 
+carryon.msm: object code 81 bytes: 6 errors: 0 undefined labels

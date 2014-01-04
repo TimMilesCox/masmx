@@ -1,0 +1,20 @@
+MASMX 7r2Z
+3/code.msm
+QDELIM='
+*EOF*
+  :                            1         $word   32
+  :                            2         $quantum  8
+  :                            3         $byte   8
+  :                            4         $awidth 32
+  :                            5         $quote  027
+00:00000000 41424320          +6         'ABC'
+  :                            7         $data_code  'A':0c1, 0c2, 0c3, 0c4, 0c5, 0c6, 0c7, 0c8, 0c9
+  :                            8         $data_code  32:64
+00:00000004 C1C2C3C4C5C64040  +9         'ABCDEF'
+  :                            10         $ascii
+00:0000000C 4142434445462020  +11         'ABCDEF'
+  :                            12         $data_code
+00:00000014 C1C2C340          +13         'ABC'
+*EOF*
+:$(00):00000000:00000018 
+code.msm: object code 97 bytes: 0 errors: 0 undefined labels

@@ -1,0 +1,20 @@
+__giant	$set	1	
+	$include	"../aside.dem/ppc_64.def"
+	$include	../aside.dem/enter64a.def
+	$include	ppc64abi.def
+	$list		2
+	$include,"$binary"	../result.txo/scally3
+$(.literal,30/__literal)
+$(.data)
+wonderloaf      "wonderloaf3"
+	$res	1024
+
+$(.text)
+yoohoo	enter64	32
+	ld	r7, __literal(wonderloaf)
+	ld	r9, __literal(	__upper48	factor1@ha)
+	lwa	9,  factor1@l(9)
+	ld	10, __literal(factor2)
+	bl	zoohoo
+	leave64
+

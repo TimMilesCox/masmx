@@ -1,0 +1,29 @@
+MASMX 7r2Z
+3/qpart.msm
+../result.txo/langobar.txo:$(0) 16 bytes decimal from hexadecimal 00000000 to 00000010
+../result.txo/langobar.txo:$(3) 4 bytes decimal from hexadecimal 00000000 to 00000004
+../result.txo/visobar.txo:$(0) 44 bytes decimal from hexadecimal 00000010 to 0000003C
+*EOF*
+  :                            1: 	$include	"ppc64map.def"
+  :                            2 	$list   2               
+  :                            3: 	$include,$binary ../result.txo/langobar
+00:000003FC000A0000:4E800020  +4 4E800020 4E800020 4E800020 4E800020
+00:000003FC000A0004:4E800020  +4 
+00:000003FC000A0008:4E800020  +4 
+00:000003FC000A000C:4E800020  +4 
+03:000003FC000E0000:00000063  +7 00000063
+  :                            4: 	$include,$binary ../result.txo/visobar
+00:000003FC000A0010:48000025  +4 48000025 [0000]40:0000000000000000 [0001]40:0000000000000000
+00:000003FC000A0014:000003FC000A000C
+                              +4 
+00:000003FC000A001C:000003FC000A0008
+                              +4 
+00:000003FC000A0024:000003FC000A0004
+                              +5 [0002]40:0000000000000000 [0003]40:0000000000000000 7D0304A0
+00:000003FC000A002C:000003FC000A0000
+                              +5 
+00:000003FC000A0034:7D0304A0  +5 
+00:000003FC000A0038:4E800020  +6 4E800020
+*EOF*
+:$(00):00000000:0000003C :$(03):00000000:00000004 
+qpart.msm: object code 524 bytes: 0 errors: 0 undefined labels

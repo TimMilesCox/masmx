@@ -1,0 +1,12 @@
+MASMX 7r2
+3/bonkers.msm
+*EOF*
+  :                            1         $if   $t(bonkers)^=0
+  :                            2         $note   bonkers
+  :                            3         $else
+Note: bonkers.msm Line 4: not bonkers?
+  :                            4         $note   not bonkers?
+  :                            5         $endif
+*EOF*
+
+bonkers.msm: object code 0 bytes: 0 errors: 0 undefined labels

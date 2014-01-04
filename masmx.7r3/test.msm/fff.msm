@@ -1,0 +1,28 @@
+f       $form   24, 24
+
+s*      $func	*
+        $if     $t(s(1,1))=0
+"s(1,1)"** p       s(1,1)
+        $endif
+        $return s(1,1)
+        $end
+
+p*      $proc   $(2)
+*       $set    $
+        +       $(62)s
+        q       p(1,1)
+        $end
+
+q*      $proc   $(62)
+        +       99
+.        "+       q(1,1),q(1,1),q(1,1),q(1,1)q"
+        $end
+
+c*      $proc
+        f       c(1,1), c(1,2)
+        $end
+$(2:02000)
+$(62:62*262144)
+$(0:64)
+        c       99, s(whence)
+        c       44, s(whence)

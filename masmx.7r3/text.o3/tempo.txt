@@ -1,0 +1,36 @@
+MASMX 7r2
+3/tempo.msm
+*EOF*
+  :                            1 centre*	$proc
+  :                            2 left*	$name	0f0
+  :                            3 right*	$name	00f
+  :                            4 
+  :                            5 p $proc
+  :                            6 one* $name 1
+  :                            7 two* $name 2
+  :                            8 base	$set	p(0,2)
+  :                            9 q $proc	$(base)
+  :                            10 three* $name 3
+  :                            11 four* $name 4
+  :                            12  + q(0, 1), q(1, 1)
+  :                            13  $end
+  :                            14 
+  :                            15  $do $n=1, three p(1,1)
+  :                            16  $do $n=2, four p(1,1)
+  :                            17 
+  :                            18  $end
+  :                            19 	$do	centre(0,1)=left,	one,8	centre(1,1)
+  :                            20 	$do	centre(0,1)=right,	two,10	centre(1,1)
+  :                            21  $end
+  :                            22 
+  :                            23  $plist	4
+  :                            24 
+  :                            25 $(8:08000)
+  :                            26 $(10:0A000)
+  :                            27 $(0:256)
+  :                            28 
+08:008000 003063              +29  left 99
+0A:00A000 004064              +30  right 100
+*EOF*
+:$(00):000100:000100 :$(08):008000:008001 :$(0A):00A000:00A001 
+tempo.msm: object code 114 bytes: 0 errors: 0 undefined labels

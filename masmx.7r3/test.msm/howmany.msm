@@ -1,0 +1,10 @@
+p*	$proc
+	+	p(0), p(1), p(2), p(3):d
+	$end
+
+john	$equf	5, 6
+
+$(5:*64,14)
+silver
+
+	p,15	long john silver

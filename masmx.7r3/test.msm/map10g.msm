@@ -1,0 +1,8 @@
+__giant	$set		1
+	$include	"ppc64map.def"
+	$list		 2
+	$plist		8
+	$include,$void		../result.txo/image7
+	$include,$binary	../result.txo/gzactor
+
+	$store			image10

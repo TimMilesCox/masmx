@@ -1,0 +1,13 @@
+MASMX 7r2
+3/import.msm
+*EOF*
+  :                            1 $(5:*30)
+05:000000 000063              +2 unsatisfied* + 99
+05:000001 000064              +3 really*      + 100
+  :                            4 
+  :                            5 
+  :                            6 
+  :                            7 
+*EOF*
+:$(05):000000:000002 
+import.msm: object code 106 bytes: 0 errors: 0 undefined labels

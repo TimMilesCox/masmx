@@ -1,0 +1,39 @@
+MASMX 7r2Z
+3/hinge.msm
+*EOF*
+  :                            1 	$word	32
+  :                            2 	$quantum 8
+  :                            3 	$awidth	32:64
+  :                            4 
+  :                            5 	$set_option	"i"	.	test of sign extended addressing
+  :                            6 
+  :                            7 yabass	$equ	000FFC00000000000
+  :                            8 
+  :                            9 $(5:0FFFFFFF8:*yabass)
+05:00FFBFFFFFFFFFF8:00000063  +10 one	+	99
+05:00FFBFFFFFFFFFFC:00000064  +11 two	+	100
+05:00FFC00000000000:00000065  +12 three	+	101
+05:00FFC00000000004:00000066  +13 four	+	102
+  :                            14 
+05:00FFC00000000008:00FFBFFFFFFFFFF8
+                              +15 yabiggie1	+	yabass-8
+05:00FFC00000000010:00FFBFFFFFFFFFFC
+                              +16 yabiggie2	+       yabass-4
+05:00FFC00000000018:00FFC00000000000
+                              +17 yabiggie3	+       yabass-0
+05:00FFC00000000020:00FFC00000000004
+                              +18 yabiggie4	+       yabass+4
+  :                            19 
+05:00FFC00000000028:00FFBFFFFFFFFFF8
+                              +20 	+	one
+05:00FFC00000000030:00FFBFFFFFFFFFFC
+                              +21 	+	two
+05:00FFC00000000038:00FFC00000000000
+                              +22 	+	three
+05:00FFC00000000040:00FFC00000000004
+                              +23 	+	four
+05:00FFC00000000048:00FFC00000000048
+                              +24 	+	$a
+*EOF*
+:$(05):FFFFFFF8:00000050 
+hinge.msm: object code 256 bytes: 0 errors: 0 undefined labels

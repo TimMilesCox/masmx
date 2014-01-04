@@ -1,0 +1,23 @@
+MASMX 7r2
+3/map2.msm
+../result.txo/soso.txo:$(1) 148 bytes decimal from hexadecimal 000A0000 to 000A0094
+../result.txo/soso.txo:$(3) 12 bytes decimal from hexadecimal 000B0000 to 000B000C
+../result.txo/soso.txo:$(5) 12 bytes decimal from hexadecimal 000B8000 to 000B800C
+../result.txo/soso.txo:$(6) 4 bytes decimal from hexadecimal 000C0000 to 000C0004
+../result.txo/factor.txo:$(1) 96 bytes decimal from hexadecimal 000A0094 to 000A00F4
+../result.txo/factor.txo:$(3) 4 bytes decimal from hexadecimal 000B000C to 000B0010
+../result.txo/factor.txo:$(6) 4 bytes decimal from hexadecimal 000C0004 to 000C0008
+*EOF*
+  :                            1: 	$include	"map_ppc.def"
+  :                            2 	$set_option	"b"
+  :                            3 $(1:000A0000)
+  :                            4 $(3:000B0000)
+  :                            5 $(5:000B8000)
+  :                            6 $(6:000C0000)
+  :                            7: 	$include,$binary	../result.txo/soso
+  :                            8: 	$include,$binary	../result.txo/factor
+  :                            9 
+  :                            10 	$store			image2
+*EOF*
+:$(01):000A0000:000A00F4 :$(03):000B0000:000B0010 :$(05):000B8000:000B800C :$(06):000C0000:000C0008 
+map2.msm: object code 962 bytes: 0 errors: 0 undefined labels

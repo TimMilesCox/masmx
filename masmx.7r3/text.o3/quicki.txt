@@ -1,0 +1,8 @@
+MASMX 7r2
+3/quicki.msm
+*EOF*
+  :                            1 $(0:0)
+00:000000 000006              +2         +       08006-08000
+*EOF*
+:$(00):000000:000001 
+quicki.msm: object code 44 bytes: 0 errors: 0 undefined labels

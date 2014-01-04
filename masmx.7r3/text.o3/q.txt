@@ -1,0 +1,13 @@
+MASMX 7r2
+3/q.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1 __registers_by_name	$set	1
+  :                            2:         $include "../aside.dem/ppc_603.def"
+  :                            3 ADDRESS $equ    4094
+00:00000000 80DF0FFE          +4         lwz     r6, ADDRESS(R31)
+*EOF*
+:$(00):00000000:00000004 
+q.msm: object code 54 bytes: 0 errors: 0 undefined labels

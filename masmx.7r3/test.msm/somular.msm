@@ -1,0 +1,8 @@
+$(0:64)
+	$set_option	"j"
+label(1)
+times   $do     8,label(1,times)       $res    1
+times $do 5,label(2,1,times) $res 1
+label(1,1,1)
+	+	label(99)
+	+	label()

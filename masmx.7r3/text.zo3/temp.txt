@@ -1,0 +1,2 @@
+MASMX 7r2Z
+Error: temp.msm Line 0: temp.msm file missing

@@ -1,0 +1,20 @@
+MASMX 7r2
+3/rep.msm
+*EOF*
+  :                            1 f*      $func	*
+  :                            2         n
+  :                            3         $return 077
+  :                            4         $end
+  :                            5 n*      $proc	*
+  :                            6 
+  :                            7 	$do	$t(name)=0,name**
+  :                            8 
+  :                            9 name2** $set    $
+  :                            10         $end
+  :                            11 $(0:64)        
+00:000040 000077              +12         +       f
+00:000041 000077              +13         +       f
+00:000042 040041              +14         +       name, name2
+*EOF*
+:$(00):000040:000043 
+rep.msm: object code 58 bytes: 0 errors: 0 undefined labels

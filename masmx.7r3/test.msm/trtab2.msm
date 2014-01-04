@@ -1,0 +1,5 @@
+$(0)
+        $list   0
+hundreds $do    10,;
+tens    $do     10,;
+units   $do     10,     + '0'+hundreds-1, '0'+tens-1, '0'+units-1

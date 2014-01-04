@@ -1,0 +1,457 @@
+#ifdef LITERALS
+
+static void write_breakpoint(int x, long v)
+{
+   breakpoint		*p = lpart[x],
+                        *q = (breakpoint *) lr;
+                        
+   if (remainder < sizeof(breakpoint)) q = (breakpoint *) buy_ltable();
+   
+   lr = (object *) ((long) lr + (long) sizeof(breakpoint));
+   remainder -= sizeof(breakpoint);
+   
+   q->type = BREAKPOINT;
+   q->length = sizeof(breakpoint);
+   q->oblong = x;
+   q->along = NULL;
+   q->base = v;
+   
+   if (!p)
+   {
+      lpart[x] = q;
+      return;
+   }
+   
+   while (p->along) p = (breakpoint *) p->along;
+   p->along = (void *) q;
+}
+
+static long read_breakpoint(int x)
+{
+   breakpoint		*p = lpart[x];
+   long			 v = (p) ? p->base : 0;
+   
+   if (p) lpart[x] = (breakpoint *) p->along;
+
+   return v;
+}
+
+
+
+/********************************************************************
+
+	this routine allows the literal engine to
+	decide whether to put a unary plus in the
+	command position before the extracted literal
+	expression for assembly as
+
+		(labels+numbers)	->	+	labels+numbers
+
+	this doesn't need to be done:
+
+	if there is already a unary sign there:
+
+		(^0AAAA5555)		->	^0AAAA5555
+
+		(-1.5)			->	-1.5
+
+		(+	1.5)		->	+	1.5
+
+	and does not need to be done:
+
+	if the token is in quotes:
+
+		("Gruesse Welt")	->	"Gruesse Welt"
+
+	and does not need to be done:
+
+	if the token is a name of a code producing macro ($PROC):
+
+		(descriptor_macro	address, size, FLAGS)
+		->	descriptor_macro	address, size, FLAGS
+
+		(jump_instruction_name		target)
+		->	jump_instruction_name		target
+
+	because all those are opcode-position tokens which produce
+	a constant.
+
+	Any label which isn't a $PROC and any number string gets
+	the unary + placed in front if it does not have a unary
+	sign +-^ already. This includes the names of masm7-supplied
+	functions and user-written macro functions
+
+		(EQUATED_VALUE_LABEL)	->	+	EQUATED_VALUE_LABEL
+
+		(33)			->	+	33
+
+		(BIG_ADDRESS)		->	+	BIG_ADDRESS
+
+		($)			->	+	$
+
+		(my_logarithm_macro(224))
+					->	+ my_logarithm_macro(224)
+
+
+	and this allows the literal to go into the assembly
+	as it were a sensible line of code
+
+	an accidental void literal () is also given the +
+	and consequently a diagnostic is output, the assembly
+	is marked in error, and a zero constant is assembled.
+
+	what's actually returned to the literal routine is
+
+	-1	the tokens in the expression are a number without
+		a unary symbol, prepend the +
+
+	0	there is a unary sign there or it's a quote string,
+		don't prepend another unary sign
+
+	class of label
+
+		if that label represents an inline macro,
+		($PROC) that is a command which produces a constant,
+		don't prepend anything
+
+		if that is any other sort of label, including functions,
+		its meaning is a number value, prepend the +
+
+*********************************************************************/
+
+static int isacommand(char *p)
+{
+   int			 symbol;
+   object		*l1;
+
+   while (symbol = *p)
+   {
+      if (symbol != 32) break;
+      p++;
+   }
+
+   if (symbol ==     0) return -1;
+   if (symbol ==   '+') return  0;
+   if (symbol ==   '-') return  0;
+   if (symbol ==   '^') return  0;
+   if (symbol == qchar) return  0;
+
+   l1 = findlabel(p, NULL);
+
+   if (l1)
+   {
+      if (l1->l.valued == NAME)
+      {
+         if (l1->l.passflag & 128) return PROC;
+      }
+
+      if (l1->l.valued == UNDEFINED) return LOCATION;
+      return l1->l.valued;
+   }
+
+   return -1;
+}
+
+static long literal(char *arg, char *gparam, int tlocator)
+{
+   int			 t = 3, bdepth = 1, x;
+   long			 v;
+   char			 newmodel[READSIZE] = "   ", *newmodelv;
+   int			 inquote = 0;
+   int			 rvalue, symbol;
+   int			 zflag = uselector['Z'-'A'];
+   
+   location_counter	*tloc = &locator[tlocator];
+
+   #ifdef OVERLAY_LITERALS
+   txo			*sr;
+   #endif
+
+   #ifdef DOS
+   txo image = { LITERAL,        0, 0, NULL, 0, 0, 0 } ;
+   #else
+   txo image = { LITERAL, tlocator, 0, NULL, 0, 0, 0 } ;
+   #endif
+   
+   paragraph		*p, *q;
+
+   #ifdef DOS
+   image.rel = tlocator;
+   #endif
+   
+   if ((actual->flags == 128)
+   &&  (actual->base  ==   0)
+   &&  (actual->runbank == 0)
+   &&  (actual->relocatable == 0))
+   {
+      note("void section literal request dropped");
+      return 0;
+   }
+
+   /***************************************************
+
+	currently in a dsect
+	don't generate anything or update
+	the literal location counter
+
+   ***************************************************/
+
+   if ((tloc->flags == 128)
+   &&  (tloc->base  ==   0)
+   &&  (tloc->runbank == 0)
+   && (!tloc->relocatable))
+   {
+      flagg("literal in void section");
+      return 0;
+   }
+   
+   if (tloc->breakpoint > 63)
+   {
+      flagg("only 64 breakpoint parts may contain literals");
+      return 0;
+   }
+
+   if (!pass) return 0;
+   
+   arg++;             
+   if (tlocator > LOCATORS-1)
+   {
+      flagf("Location Counter of Literal Out of Range");
+      return 0;
+   }
+
+   while (symbol = *arg++)
+   {
+      if (symbol == qchar)
+      {
+         if ((inquote & 2) == 0) inquote ^= 1;
+      }
+      else
+      {
+         if (symbol == 0x27)
+         {
+            if ((inquote & 1) == 0) inquote ^= 2;
+         }
+      }
+
+      if (!inquote)
+      {
+	 if (symbol == '(') bdepth++;
+	 if (symbol == ')') bdepth--;
+	 if (!bdepth) break;
+      }
+
+      newmodel[t++] = symbol;
+   }
+   
+   newmodel[t] = 0;
+
+   newmodelv = substitute(newmodel, gparam);
+
+   symbol = isacommand(newmodelv+3);
+
+   if ((symbol < 0)
+   || ((symbol) && (symbol != FORM) && (symbol != PROC)))
+   {
+       newmodelv[1] = '+';
+   }
+
+   if ((selector['q'-'a']) && (pass) && (plist > masm_level))
+   {
+      printf("::::(%2.2x)::::%s\n", tlocator, newmodelv);
+   }
+
+   uselector['Z'-'A'] = 1;
+
+   #ifdef STRUCTURE_DEPTH
+   treeflag = 1;
+   #endif
+
+   #ifdef RELOCATION
+   maprecursion++;
+   rvalue = assemble(newmodelv, gparam, NULL, &image);
+   maprecursion--;
+   #else
+   rvalue = assemble(newmodelv, gparam, NULL, &image);
+   #endif
+
+   uselector['Z'-'A'] = zflag;
+
+   #ifdef STRUCTURE_DEPTH
+   treeflag = 0;
+   #endif
+
+   xpression(STACK_TOP_CLEAR, STACK_TOP_CLEAR, gparam);
+
+   t = image.symbols;
+   image.d[t++] = 0;
+
+   v = tloc->litlocator;
+
+   if (tloc->loc > v)
+   {
+      flag("literal table overlaps 2nd pass code");
+   }
+   
+   #ifdef RELOCATION
+   if (tloc->relocatable)
+   {
+      #ifdef USING_NO_REL
+      if (!(tloc->flags & 128))
+      #endif
+      
+      mapx->m.l.y |= 1;
+   }
+   mapx->m.l.rel = tlocator;
+   #endif
+   
+   #ifdef OVERLAY_LITERALS
+   sr = ltag[tlocator];
+
+   if (sr)
+   {
+      for (;;)
+      {
+	  x =  strcmp(sr->d, image.d); 
+	  if (x == 0)
+	  {
+	     #if 0
+	     mapx->m.l.y = sr->y;
+	     mapx->m.l.rel = sr->rel;
+	     #endif
+
+             #if 0
+	     linex = lxb;
+             #endif
+             
+	     /*
+	     maprecursion--;
+	     */
+             
+             #ifdef LITWISE
+             printf("[hit return %x]\n", sr->loc);
+             #endif
+
+	     return sr->loc;
+	  }
+	  if (!sr->along)break;
+	  sr = sr->along;
+      }
+   }
+   #endif
+   
+
+   tloc->litlocator = v + image.bits/address_quantum;
+
+   #ifdef LITWISE
+   printf("[miss insert %x/%x]\n", v, tloc->litlocator);
+   #endif
+   
+   #if 0
+   outstanding = 1;
+   linex = 0;
+   #endif
+
+   while (t & PARAGRAPH-1) image.d[t++] = 0;
+   t += 16;
+   
+   image.oblong = t;
+   
+   /*
+   image.length = t;
+   if (t > 252) image.length = 255;
+   */
+
+   image.loc = v;
+   
+   image.rel = tlocator;
+   
+   #ifdef OVERLAY_LITERALS
+   p = (paragraph *) lr;
+   if (t > remainder) p = (paragraph *) buy_ltable();
+   remainder -= t;
+
+   if (sr) sr->along = p;
+   else
+   {
+      image.along = ltag[tlocator];
+      ltag[tlocator] = (txo *) p;
+   }
+
+   q = (paragraph *) &image;
+   t >>= 2;
+   while (t--) *p++ = *q++;
+   
+   lr = (object *) p;
+   #endif
+
+   #ifdef LROOT
+   if (tloc->loc >= tloc->lroot)    
+   {
+      tloc->loc = tloc->litlocator;
+   }
+   #endif
+
+   return v;
+}
+
+static void output_literals(int tlocator)
+{
+   txo			*s = ltag[tlocator];
+   location_counter	*q = &locator[tlocator];
+   long			 v;
+   
+   if (!s) return;
+
+   outcounter(tlocator, s->loc, "\n$");
+   while (s)
+   {
+      write(ohandle, s->d, s->symbols);
+      write(ohandle, "\n", 1);
+
+      if ((selector['l'-'a']) && (list >= depth))
+      {
+         v = s->loc;
+         printf("%2.2x:", tlocator);
+
+         if (q->flags & 1)
+         {
+            illustrate_xad(q, v);
+         }
+         else
+         {
+            if (selector['d'-'a'])
+            {
+               if (!q->relocatable)
+               {
+                  if (q->flags & 128) v += q->base;
+                  if (q->breakpoint)  v -= q->base;
+               }
+
+               if (selector['v'-'a'])
+               {
+                  printf("%0*lx:", apwx, q->runbank);
+               }
+               else
+               {
+                  v += q->runbank;
+               }
+            }
+            printf("%0*lx", apw, v);
+         }
+
+         printf("+%s\n", s->d);
+      }
+
+      s = s->along;
+   }
+   ltag[tlocator] = s;
+
+   if (q->litlocator > q->loc)
+   {
+      q->loc = q->litlocator;
+   }
+}
+
+#endif
+

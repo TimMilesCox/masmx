@@ -1,0 +1,20 @@
+MASMX 7r2
+3/commas.msm
+*EOF*
+  :                            1         $word   48
+00:000000000000 666677778888  +2         +       06666, 07777, 08888
+00:000000000001 0A0B0C0D0E0F  +3         +       10, 11, 12, 13, 14, 15
+00:000000000002 FFF00AFFF00B  +4         +       -1, +10, -1, +11
+00:000000000003 123456789ABC  +5         +       1,2,3,4,5,6,7,8,9,10,11,12
+  :                            6 left    $equ    0aaaaaaaaaaaaaaaaaaaaa
+  :                            7 centre  $equ    0bbbbbbbbbbbbbbbbbbbbb
+  :                            8 right   $equ    0ccccccccccccccccccccc
+  :                            9 
+00:000000000004 AAAACCCCBBBB  +10         +       left, right, centre
+00:000000000005 AAAAAAAACCCCCCCCBBBBBBBB
+                              +11         +       left, right, centre:d   
+00:000000000007 AAAAAAAAAAAAAAAACCCCCCCCCCCCCCCCBBBBBBBBBBBBBBBB
+                              +12         +       left, right, centre:q   
+*EOF*
+:$(00):000000000000:00000000000B 
+commas.msm: object code 200 bytes: 0 errors: 0 undefined labels

@@ -1,0 +1,38 @@
+MASMX 7r2
+3/array.msm
+*EOF*
+  :                            1 tree*   $proc
+  :                            2 *       $tree
+  :                            3 part1   $res    tree(1,1)
+  :                            4 part2   $res    tree(1,1)
+  :                            5         $root
+  :                            6         $end
+  :                            7 
+  :                            8 array   $equ    5*/92
+  :                            9 
+  :                            10 vlbank*	$proc
+  :                            11 
+  :                            12 pointer	$set	array+(times-1)*6*1024*1024
+  :                            13 
+  :                            14 $(50::*pointer)
+  :                            15 
+  :                            16 label1(times)* tree      48
+  :                            17 label2(times)* tree      48
+  :                            18 label3(times)*        
+  :                            19 label4(times)*
+  :                            20         $end
+  :                            21 
+  :                            22 times	$do	4,	vlbank
+  :                            23 
+  :                            24 $(0:256)        
+00:000100 500000000000000001200060
+                              +25         +       label2(4)
+00:000104 500000000000000001200090
+                              +26         +       label2(4):part2
+  :                            27 
+  :                            28 pointer	$set	1024*1024-1024
+  :                            29 
+  :                            30 $(50:1024:*pointer)
+*EOF*
+:$(00):000100:000108 :$(32):000400:000400 
+array.msm: object code 131 bytes: 0 errors: 0 undefined labels

@@ -1,0 +1,28 @@
+MASMX 7r2
+3/quibble.msm
+*EOF*
+  :                            1 	$if	8
+  :                            2 		$if	wobble
+  :                            3 			-	5
+  :                            4 		$elseif	blarney
+  :                            5 			$if	ono
+  :                            6 			$endif
+  :                            7 			-	6
+  :                            8 		$elseif	6
+Note: quibble.msm Line 9: six
+  :                            9 			$note	six
+00:000000 000006              +10 			+	6
+  :                            11 		$elseif	5
+  :                            12 			$note	five
+  :                            13 			+	5
+  :                            14 		$elseif	4
+  :                            15 			$note	four
+  :                            16 			+	4
+  :                            17 		$elseif	3
+  :                            18 			$note	three
+  :                            19 			+	3
+  :                            20 		$endif
+  :                            21 	$endif
+*EOF*
+:$(00):000000:000001 
+quibble.msm: object code 75 bytes: 0 errors: 2 undefined labels

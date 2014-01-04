@@ -1,0 +1,17 @@
+MASMX 7r2Z
+3/allyoobl.msm
+  :                            1 $(4:*8:1024,14)
+  :                            2 allyoobl
+  :                            3 allwibl*	$equ	$
+  :                            4 awobl		$equ	$
+  :                            5 ambubl*
+  :                            6 $(8:*8:2048,15)
+  :                            7 wollybooble*	$equ	$
+08:000800 000400              +8 	+	allyoobl
+08:000801 000800              +9 	+	wollybooble
+08:000802 000400              +10 	+	allwibl
+08:000803 000400              +11 	+	awobl
+08:000804 000400              +12 	+	ambubl
+  :                            13 	$end
+:$(04):000000:000400 :$(08):000000:000805 
+allyoobl.msm: object code 194 bytes: 0 errors: 0 undefined labels

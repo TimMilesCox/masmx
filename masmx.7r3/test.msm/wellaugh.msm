@@ -1,0 +1,29 @@
+p	$proc
+foldaway* $name
+*	$tree
+one	$branch
+	+	7
+	+	8
+	+	9
+	$root
+two	$branch
+	+	p(1, 1)
+	$root
+	$root
+	$end
+
+go	$tree
+switch	$res	1
+first	$branch
+one	+	72
+two	foldaway 99
+three	+	96
+	$root
+second	$branch
+one	+	48
+two	foldaway 100
+three	+	192
+	$root
+	$root
+
+

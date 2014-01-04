@@ -1,0 +1,19 @@
+MASMX 7r2Z
+3/names.msm
+*EOF*
+  :                            1 
+  :                            2 this*	$proc
+  :                            3         $do     times=3,   $list 0
+  :                            4         $do     times=7497, $list 1
+  :                            5 name(times)*        +       name(times)
+  :                            6         $end
+  :                            7 
+00:000000 000000              +8 times	$do	7500,	this
+00:000001 000001              +8 
+00:001D48 001D48              +8 
+00:001D49 001D49              +8 
+00:001D4A 001D4A              +8 
+00:001D4B 001D4B              +8 
+*EOF*
+:$(00):000000:001D4C 
+names.msm: object code 52537 bytes: 0 errors: 0 undefined labels

@@ -1,0 +1,13 @@
+ $word 36
+ + 1.5
+hoho
+ $floating_point 118
+ + 1.5
+ + 1.5s
+ + 1.5d
+ + 1.5t
+ + 1.5q
+ + 1.5p
+ + 1.5h
+ + 1.5o
+ $end

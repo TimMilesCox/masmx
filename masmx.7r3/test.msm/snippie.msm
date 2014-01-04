@@ -1,0 +1,13 @@
+	$plist	7
+p*	$proc
+nomina*	$name
+?	$do	p(1),	"":p(1, ?)
+howmany	$set	p(1)
+	$trace,1	howmany
+	$end
+
+	p	1,2,3
+	nomina	1
+
+	p	"a","b","c"
+	p	"a"

@@ -1,0 +1,164 @@
+MASMX 7r2
+3/stcomple.msm
+*EOF*
+  :                            1 $(0:*8)
+  :                            2 PRIME	$res	4
+  :                            3 after_prime
+  :                            4 $(1:*8)
+  :                            5 FIRST	$res	4
+  :                            6 after_first
+  :                            7 $(2:*8) 
+  :                            8 SECOND	$res	4
+  :                            9 after_second
+  :                            10 $(3:*8)
+  :                            11 THIRD	$res	4
+  :                            12 after_third
+  :                            13 $(4::*000444000000)
+  :                            14 FOURTH	$res	16777216
+Note: stcomple.msm Line 15: GIANT SPACE: $ returns intrasegment part of counter only
+Note: stcomple.msm Line 15: for absolute current location use $A
+04:000445000000:000001000000  +15 after_fourth	+	$:d
+04:000445000002:000445000002  +16 		+	$a
+  :                            17 $(5::*000555000000)
+  :                            18 FIFTH	$res	16777216
+Note: stcomple.msm Line 19: GIANT SPACE: $ returns intrasegment part of counter only
+Note: stcomple.msm Line 19: for absolute current location use $A
+05:000556000000:000001000000  +19 after_fifth	+	$:d
+05:000556000002:000556000002  +20 		+	$a
+  :                            21 $(6::*000666000000)
+  :                            22 SIXTH   $res    16777216
+Note: stcomple.msm Line 23: GIANT SPACE: $ returns intrasegment part of counter only
+Note: stcomple.msm Line 23: for absolute current location use $A
+06:000667000000:000001000000  +23 after_sixth	+	$:d
+06:000667000002:000667000002  +24 		+	$a
+  :                            25 
+  :                            26 $(0)
+  :                            27 
+  :                            28 
+00:000004 000000FFFFFFFFFFFFFFFFFF
+                              +29 	+	$net(0FFFFFFFFFFFFFFFFFF)
+00:000008 0000FFFFFFFF        +30 	+	$net(0ffffffffffffffffff**0ffffffff)
+00:00000A 0000BBBBBBBB        +31         +       $net((00000000aaaaaaaa00000000bbbbbbbb/*0)**0ffffffffffffffff)
+00:00000C 0000AAAAAAAA        +32 	+	$net((00000000aaaaaaaa00000000bbbbbbbb/*64)**0ffffffffffffffff)
+  :                            33 
+  :                            34 one     $set    0FFFFFFFFFFFFFFFFFF
+  :                            35 two	$set	0ffffffffffffffffff**0ffffffff
+  :                            36 three	$set	(00000000aaaaaaaa00000000bbbbbbbb/*0)**0ffffffffffffffff
+  :                            37 four	$set	(00000000aaaaaaaa00000000bbbbbbbb/*64)**0ffffffffffffffff
+  :                            38 
+00:00000E 000000FFFFFFFFFFFFFFFFFF
+                              +39 	+	$a(one)
+00:000012 0000FFFFFFFF        +40 	+	$a(two)
+00:000014 0000BBBBBBBB        +41 	+	$a(three)
+00:000016 0000AAAAAAAA        +42 	+	$a(four)
+  :                            43 
+00:000018 000000FFFFFFFFFFFFFFFFFF
+                              +44         +       $a(0FFFFFFFFFFFFFFFFFF)
+00:00001C 0000FFFFFFFF        +45         +       $a(0ffffffffffffffffff**0ffffffff)
+00:00001E 0000BBBBBBBB        +46         +       $a((00000000aaaaaaaa00000000bbbbbbbb/*0)**0ffffffffffffffff)
+00:000020 0000AAAAAAAA        +47         +       $a((00000000aaaaaaaa00000000bbbbbbbb/*64)**0ffffffffffffffff)
+  :                            48 
+  :                            49 
+00:000022 000000              +50 	+	$a(PRIME)
+00:000023 000000              +51 	+	$a(FIRST)
+00:000024 000000              +52 	+	$a(SECOND)
+00:000025 000000              +53 	+	$a(THIRD)
+00:000026 000026              +54 	+	$a
+00:000027 000027              +55 	+	$a($(0))
+00:000028 000028              +56 	+	$
+00:000029 000004              +57 	+	$a($(1))
+00:00002A 000004              +58 	+	$(1)
+00:00002B 000004              +59         +       $a($(2))
+00:00002C 000004              +60 	+	$(2)
+00:00002D 000004              +61         +       $a($(3))
+00:00002E 000004              +62 	+	$(3)
+  :                            63 
+00:00002F 000444000000        +64 	+	$a(FOURTH)
+Note: stcomple.msm Line 65: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stcomple.msm Line 65: reference a label directly in the target segment
+00:000031 000001000004        +65 	+	$a($(4))
+Note: stcomple.msm Line 66: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stcomple.msm Line 66: reference a label directly in the target segment
+00:000033 000001000004        +66 	+	$(4)
+00:000035 000555000000        +67         +       $a(FIFTH)
+Note: stcomple.msm Line 68: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stcomple.msm Line 68: reference a label directly in the target segment
+00:000037 000001000004        +68         +       $a($(5))
+Note: stcomple.msm Line 69: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stcomple.msm Line 69: reference a label directly in the target segment
+00:000039 000001000004        +69 	+	$(5)
+00:00003B 000666000000        +70         +       $a(SIXTH)
+Note: stcomple.msm Line 71: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stcomple.msm Line 71: reference a label directly in the target segment
+00:00003D 000001000004        +71         +       $a($(6))
+Note: stcomple.msm Line 72: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stcomple.msm Line 72: reference a label directly in the target segment
+00:00003F 000001000004        +72 	+	$(6)
+  :                            73 
+  :                            74 $(1)
+01:000004 000004              +75 	+	$a
+  :                            76 $(2)
+02:000004 000004              +77         +       $a
+  :                            78 $(3)
+03:000004 000004              +79         +       $a
+  :                            80 $(4)
+04:000445000004:000445000004  +81         +       $a
+  :                            82 $(5)
+05:000556000004:000556000004  +83         +       $a
+  :                            84 
+  :                            85 
+  :                            86 $(6)
+06:000667000004:000667000004  +87 	+	$a
+06:000667000006:666666666666  +88 	+	$a(0666666666666)
+  :                            89 $(7::*000777000000,7)
+07:000777000000:000777000000  +90 	+	$a
+  :                            91 zaporogets*
+07:000777000002:000777000002  +92 	+	$a(zaporogets)
+07:000777000004:777777777777  +93 	+	$a(0777777777777)
+07:000777000006:000FEDCBA987654321
+                              +94 	+	$a(0fedcba987654321)
+07:000777000009:000777000009  +95 	+	$a
+Note: stcomple.msm Line 96: GIANT SPACE: $ returns intrasegment part of counter only
+Note: stcomple.msm Line 96: for absolute current location use $A
+07:00077700000B:00000B        +96 	+	$
+Note: stcomple.msm Line 97: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stcomple.msm Line 97: for absolute address use $A(WITH_A_LABEL_ARGUMENT)
+07:00077700000C:00000C        +97 	+	$(7)
+Note: stcomple.msm Line 98: GIANT SPACE: $ returns intrasegment part of counter only
+Note: stcomple.msm Line 98: for absolute current location use $A
+07:00077700000D:00000D        +98 	+	$a($)
+Note: stcomple.msm Line 99: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stcomple.msm Line 99: for absolute address use $A(WITH_A_LABEL_ARGUMENT)
+07:00077700000E:00000E        +99 	+	$a($(7))
+Note: stcomple.msm Line 100: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stcomple.msm Line 100: for absolute address use $A(WITH_A_LABEL_ARGUMENT)
+07:00077700000F:000000        +100 	+	$(8)
+  :                            101 
+  :                            102 $(8:06000:*000888000000, 8)
+  :                            103 	$res	8
+  :                            104 sliwowjc
+08:000888006008:000888006008  +105 	+	$a(sliwowjc)
+08:00088800600A:000123456789ABCDEF
+                              +106 	+	$a(0123456789abcdef)
+08:00088800600D:00088800600D  +107 	+	$a
+Note: stcomple.msm Line 108: GIANT SPACE: $ returns intrasegment part of counter only
+Note: stcomple.msm Line 108: for absolute current location use $A
+08:00088800600F:00600F        +108 	+	$
+Note: stcomple.msm Line 109: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stcomple.msm Line 109: for absolute address use $A(WITH_A_LABEL_ARGUMENT)
+08:000888006010:006010        +109 	+	$(8)
+Note: stcomple.msm Line 110: GIANT SPACE: $(counter) returns intrasegment part of counter only
+Note: stcomple.msm Line 110: for absolute address use $A(WITH_A_LABEL_ARGUMENT)
+08:000888006011:000010        +110 	+	$(7)
+  :                            111 $(0)
+00:000041 000004              +112 	+	$a(after_prime)
+00:000042 000004              +113         +       $a(after_first)
+00:000043 000004              +114         +       $a(after_second)
+00:000044 000004              +115         +       $a(after_third)
+00:000045 000445000000        +116         +       $a(after_fourth)
+00:000047 000556000000        +117         +       $a(after_fifth)
+00:000049 000667000000        +118         +       $a(after_sixth)
+  :                            119 
+*EOF*
+:$(00):000000:00004B :$(01):000000:000005 :$(02):000000:000005 :$(03):000000:000005 :$(04):000000:1000006 :$(05):000000:1000006 :$(06):000000:1000008 :$(07):000000:000010 :$(08):006000:006012 
+stcomple.msm: object code 1502 bytes: 0 errors: 0 undefined labels

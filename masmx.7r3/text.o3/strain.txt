@@ -1,0 +1,35 @@
+MASMX 7r2
+3/strain.msm
+*EOF*
+  :                            1         $word   32
+  :                            2         $quantum 8
+  :                            3 
+  :                            4 "$two"* $func    
+  :                            5         $return	$two(1,1)/*8
+  :                            6 	$return	$two(1,1)
+  :                            7         $end
+  :                            8 
+  :                            9 "$three"* $proc    
+  :                            10         $i	"":$three(1,1)/*16:$three(1,1)/*8:$three(1,1):
+  :                            11         $end
+  :                            12 
+  :                            13 "$four"* $proc    
+  :                            14         $i	"":$four(1,1)/*24:$four(1,1)/*16:$four(1,1)/*8:$four(1,1):
+  :                            15         $end
+  :                            16 
+  :                            17 
+  :                            18 "$bytes"* $proc  
+  :                            19 times    $do     $bytes(1), $i	"":$bytes(1,times):
+  :                            20         $end
+  :                            21 
+  :                            22 .        $space
+                                	"abc": 1: 2: 3:;
+                                        022:022:;
+                                        033:033:033:;
+                                        044:044:044:044:;
+00:00000000 61626301020322223333334444444420
+                              +27         ""
+  :                            28 .	$free
+*EOF*
+:$(00):00000000:00000010 
+strain.msm: object code 78 bytes: 0 errors: 0 undefined labels

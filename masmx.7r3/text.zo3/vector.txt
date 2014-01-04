@@ -1,0 +1,28 @@
+MASMX 7r2Z
+3/vector.msm
+*EOF*
+  :                            1 p       $proc   $(2)
+  :                            2 vector* $NAME
+  :                            3 "P(1,1):e"***
+  :                            4         + "p(1,1):e"
+  :                            5         $end
+  :                            6 
+  :                            7 f       $func	*
+  :                            8 "$v"*   $name
+  :                            9         $if     $t("f(1,1):e")=0
+  :                            10 "f(1,1)"**  $equ  $(2)   
+  :                            11         vector  f(1,1)
+  :                            12         $endif
+  :                            13         $return f(1,1)
+  :                            14         $end
+  :                            15         
+  :                            16 $(2:02000)        
+  :                            17 $(1:64)
+02:002000 002000              +18         +       -1, $v(yes):d
+01:000040 FFFFFF002000        +18 
+02:002001 002001              +19         +       -2, $v(always):d
+01:000042 FFFFFE002001        +19 
+01:000044 FFFFFD002000        +20 	+	-3, $v(yes):d
+*EOF*
+:$(01):000040:000046 :$(02):002000:002002 
+vector.msm: object code 223 bytes: 0 errors: 0 undefined labels

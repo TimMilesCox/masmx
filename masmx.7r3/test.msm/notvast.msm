@@ -1,0 +1,4 @@
+times   $do     7,label(5,times)   +       times
+        +       label(5,6)
+        +       label(5,3)
+        +       label(5)

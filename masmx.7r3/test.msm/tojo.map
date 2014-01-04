@@ -1,0 +1,4 @@
+	$include	"map1.def"
+$(3:*4)
+	$include,$binary "../test.o3/mojo.txo"
+	$include,$binary "../test.o3/zoto.txo"

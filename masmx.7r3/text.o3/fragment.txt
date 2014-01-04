@@ -1,0 +1,2 @@
+MASMX 7r2
+Error: fragment.msm Line 0: fragment.msm file missing

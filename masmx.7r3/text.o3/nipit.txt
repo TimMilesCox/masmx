@@ -1,0 +1,7 @@
+MASMX 7r2
+3/nipit.msm
+*EOF*
+00:000000 F55555              +1  + -0555555*/-3
+*EOF*
+:$(00):000000:000001 
+nipit.msm: object code 44 bytes: 0 errors: 0 undefined labels

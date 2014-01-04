@@ -1,0 +1,2 @@
+MASMX 7r2
+Error: capsule.msm Line 0: capsule.msm file missing

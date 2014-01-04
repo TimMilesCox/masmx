@@ -1,0 +1,2 @@
+MASMX 7r2Z
+Error: smaragd.msm Line 0: smaragd.msm file missing

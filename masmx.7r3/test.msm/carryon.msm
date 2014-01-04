@@ -1,0 +1,9 @@
+$(.data)
+wonderloaf      "wonderloaf"
+
+$(.text)
+zoohoo*
+	oris	r7, 0, wonderloaf@ha
+	ori	r7, r7, wonderloaf@l
+	bl	fireup
+	blr

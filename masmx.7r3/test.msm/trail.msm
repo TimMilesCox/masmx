@@ -1,0 +1,27 @@
+f       $form   8, 16
+r*      $proc   
+        f       r(1,2), r(1, 1)
+        f       r(1,#1), r(1, 1)
+        f       r(1,*1), r(1, 1)
+        $end
+p*      $proc
+        +       p(1,1), p(1, *1)
+        +       p(1,1), p(1, 2)
+        +       p(1,1), p(1, #1)
+        q       p(1,*1), p(1,1) p(1,2) 
+        $end
+
+q*      $proc
+        +       q(1,*1), q(1, 2) q(1, *3)
+        +       q(1,#1), q(1, 2) q(1, *3)
+        $end
+
+        p       *here
+        p       #here
+
+        r       #here
+        r       here
+        q       here
+        q       here
+
+here   +       here

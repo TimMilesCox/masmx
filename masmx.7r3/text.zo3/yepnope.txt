@@ -1,0 +1,8 @@
+MASMX 7r2Z
+3/yepnope.msm
+*EOF*
+00:000000 000000              +1         +       yep
+00:000001 000000              +2         +       nope
+*EOF*
+:$(00):000000:000002 
+yepnope.msm: object code 94 bytes: 0 errors: 2 undefined labels

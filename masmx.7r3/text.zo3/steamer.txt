@@ -1,0 +1,17 @@
+MASMX 7r2Z
+3/steamer.msm
+Error: steamer.msm Line 1: external value X may not be used in this context
+  :                            1 $(0::*4096, x)
+  :                            2 yes*
+Error: steamer.msm Line 3: external value Y may not be used in this context
+  :                            3 $(0::*8192, y)
+  :                            4 no*
+Error: steamer.msm Line 5: transfer target in multiple breakpoint segment
+use a separate location counter with one breakpoint or none
+  :                            5  $end yes
+error exporting YES in multi-breakpoint giant segment
+base+displacement tuple cannot be safely linked
+error exporting NO in multi-breakpoint giant segment
+base+displacement tuple cannot be safely linked
+:$(00):000000:000000 
+steamer.msm: object code 106 bytes: 5 errors: 0 undefined labels

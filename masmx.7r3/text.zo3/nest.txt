@@ -1,0 +1,39 @@
+MASMX 7r2Z
+3/nest.msm
+*EOF*
+  :                            1 o*      $proc
+  :                            2 noname    $equ    98
+  :                            3         p
+  :                            4 	$note	shallow
+  :                            5 	$snap	2
+  :                            6         +name
+  :                            7         $end
+  :                            8 p*      $proc
+  :                            9 name    $equ    99
+  :                            10         q
+  :                            11 	$note	medium
+  :                            12 	$snap	2
+  :                            13         $end
+  :                            14 q*      $proc
+  :                            15 name**  $equ    100
+  :                            16 	$note	deep
+  :                            17         $snap   2
+  :                            18         +       name
+  :                            19         $end
+Note: nest.msm Line 20: deep
+NONAME+1=000062
+NAME+2=000063
+NAME+1=000064
+00:000000 000064              +20         o
+Note: nest.msm Line 20: medium
+NONAME+1=000062
+NAME=000063
+NAME+1=000064
+Note: nest.msm Line 20: shallow
+NONAME=000062
+NAME=000064
+00:000001 000064              +20 
+  :                            21 
+*EOF*
+:$(00):000000:000002 
+nest.msm: object code 51 bytes: 0 errors: 0 undefined labels

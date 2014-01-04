@@ -1,0 +1,7 @@
+MASMX 7r2Z
+3/awkward.msm
+*EOF*
+  :                            1 awkward*	$equ	aardvaark+10
+*EOF*
+
+awkward.msm: object code 18 bytes: 0 errors: 1 undefined labels

@@ -1,0 +1,11 @@
+        $word   32
+        $quantum 8
+        $awidth 32
+        $floating_point 32
+        +1.5
+        +1.5d
+        +0.15t*+1
+        +15:q*-1
+        +1.5p
+        -1.5h
+        +1.5o

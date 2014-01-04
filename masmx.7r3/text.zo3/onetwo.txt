@@ -1,0 +1,18 @@
+MASMX 7r2Z
+3/onetwo.msm
+*EOF*
+  :                            1 $(15:2048:*0FFFF00000400,15)
+  :                            2 one
+  :                            3 two*
+0F:FFFF00000C00:000800        +4 	+	one
+0F:FFFF00000C01:000800        +5 	+	two
+0F:FFFF00000C02:00000F        +6 	+	one\2
+0F:FFFF00000C03:00000F        +7 	+	two\2
+  :                            8 $(16:2048,16)
+10:000000 000000              +9 three	+	three
+10:000001 000001              +10 four*	+	four
+10:000002 000010              +11 	+	three\2
+10:000003 000010              +12 	+	four\2
+*EOF*
+:$(0F):000800:000804 :$(10):000800:000804 
+onetwo.msm: object code 187 bytes: 0 errors: 0 undefined labels

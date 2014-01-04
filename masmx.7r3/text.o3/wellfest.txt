@@ -1,0 +1,42 @@
+MASMX 7r2
+3/wellfest.msm
+*EOF*
+  :                            1 p	$proc
+  :                            2 insider* $name
+  :                            3 yo	+	p(1,1)
+  :                            4 	$end
+  :                            5 
+  :                            6 outsider* $proc
+  :                            7 *	$tree
+  :                            8 	+	outsider(1, 1)
+  :                            9 	$root
+  :                            10 	$end
+  :                            11 
+  :                            12 well	$tree
+  :                            13 switch	$res	1
+  :                            14 blech	$branch
+  :                            15 	$res	7
+  :                            16 blas
+  :                            17 	$root
+  :                            18 come	$branch
+  :                            19 first	$branch
+00:000001 000001              +20 	insider	1
+  :                            21 	$root
+  :                            22 second	$branch
+00:000001 000002              +23 	insider 2
+  :                            24 	$root
+00:000002 000003              +25 third	outsider 3
+  :                            26 nearly
+  :                            27 	$root
+  :                            28 last
+  :                            29 	$root
+  :                            30 
+00:000008 000001              +31 	+	well:blech
+00:000009 000001              +32 	+	well:come:first
+00:00000A 000001              +33 	+	well:come:second
+00:00000B 000003              +34 	+	well:come:nearly
+00:00000C 000008              +35 	+	well:last
+  :                            36 
+*EOF*
+:$(00):000000:00000D 
+wellfest.msm: object code 126 bytes: 0 errors: 0 undefined labels

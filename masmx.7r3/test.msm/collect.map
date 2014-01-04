@@ -1,0 +1,4 @@
+	$include	"map5.def"
+$(1:040004400)
+	$include,$binary "centre2.txo"
+

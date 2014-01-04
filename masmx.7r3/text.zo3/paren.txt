@@ -1,0 +1,28 @@
+MASMX 7r2Z
+3/paren.msm
+*EOF*
+  :                            1         $word   32
+  :                            2 instruction $form 8,24 
+  :                            3 
+  :                            4 p       $proc
+  :                            5 load*   $name   1
+  :                            6 add*    $name   2
+  :                            7 store*  $name   3
+  :                            8 return* $name   4
+  :                            9         instruction     $n, p(1, 1)
+  :                            10         $end
+  :                            11 
+  :                            12         $set_option     "a"
+  :                            13 data    $equ    1
+  :                            14 code    $equ    0
+  :                            15 $(data:00400000)
+  :                            16 buffer  $res    120
+  :                            17 $(code:0100)
+00:00000100 01400000          +18         load    buffer
+00:00000101 02000104          +19         add     (07FFFFFFF)
+00:00000102 03400001          +20         store   buffer+1
+00:00000103 04000000          +21         return
+*EOF*
+00:00000104+7FFFFFFF
+:$(00):00000100:00000105 :$(01):00400000:00400078 
+paren.msm: object code 136 bytes: 0 errors: 0 undefined labels

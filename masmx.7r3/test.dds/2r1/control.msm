@@ -1,0 +1,1545 @@
+;***************************************************************
+CTRL_InitDTInfo:
+	CALL    CTRL_CalcCurrentPeriod
+
+	CLR     A
+	CALL    MTH_LoadOp1Acc
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_StoreWord
+
+	IF      THEATRE=0
+	MOV     DPTR,#ctrl_periodcount
+	CALL    MTH_StoreWord
+	ENDIF
+
+	MOV     DPTR,#ctrl_minimumahead
+	CALL    MTH_StoreByte
+
+
+CTRL_InitDTtable:
+
+	CALL    CTRL_GetDTCount
+	MOV     R6,ctrl_dtcount
+
+	MOV     DPSEL,#4
+	MOV     DPTR,#poll_delaytable
+	MOV     DPSEL,#2
+	MOV     DPTR,#pollinfotable
+	MOV     DPSEL,#0
+	MOV     DPTR,#nodetable
+	MOV     DPSEL,#1
+	MOV     DPTR,#nodes
+
+CTRL_IDTIloop:
+	MOV     A,R6            ; set bNode
+	MOVC    A,@A+DPTR       ;
+	MOV     DPSEL,#0        ;
+	MOVX    @DPTR,A         ;
+	INC     DPTR
+
+	MOV     A,#0            ; sales, failing, timeout and last_message
+	CALL    MTH_LoadOp1Acc  ; all initially zero
+	CALL    MTH_StoreLong   ;
+	CALL    MTH_StoreByte   ;
+	CALL    MTH_StoreByte   ;
+	CALL    MTH_StoreByte   ;
+
+	MOV     DPSEL,#4        ; poll_delaytable entries
+	CALL    MTH_StoreByte   ; all initially zero
+
+	MOV     DPSEL,#2        ; state, msgID and failhysterisis
+	CALL    MTH_StoreByte   ; all initially zero
+	CALL    MTH_StoreByte   ;
+	CALL    MTH_StoreByte   ;
+
+	MOV     DPSEL,#1
+	DJNZ    R6,CTRL_IDTIloop
+
+	MOV     A,ctrl_dtcount  ; set the value of bLastDT
+	DEC     A               ;
+	MOV     DPTR,#bLastDT   ;
+	MOVX    @DPTR,A         ;
+
+	MOV     DPTR,#bDT       ; set current DT to zero
+	MOV     A,#0            ;
+	MOVX    @DPTR,A         ;
+
+	CALL    RS485_EnableReceive
+	RET
+
+
+CTRL_ResetBuffer:
+	MOV     DPSEL,#3                ; DPTR3 points to the (comms) buffer
+	MOV     DPTR,#buffer            ;
+	MOV     A,R0
+	CALL    AddAtoDPTR
+	RET
+
+CTRL_ResetNodeTable:
+	CALL    CTRL_GetDT              ;
+	MOV     B,A                     ; DPTR1 points to the node table
+	MOV     DPSEL,#1                ;
+	MOV     DPTR,#nodetable         ;
+	MOV     A,#NODE_TABLE_SIZE      ;
+	MUL     AB                      ;
+	CALL    AddABtoDPTR             ;
+	MOV     A,R0
+	CALL    AddAtoDPTR
+	RET
+
+CTRL_ResetPollinfoTable:
+	CALL    CTRL_GetDT              ;
+	MOV     B,A                     ; DPTR2 points to the pollinfo table
+	MOV     DPSEL,#2                ;
+	MOV     DPTR,#pollinfotable     ;
+	MOV     A,#POLLINFO_TABLE_SIZE  ;
+	MUL     AB                      ;
+	CALL    AddABtoDPTR             ;
+	MOV     A,R0
+	CALL    AddAtoDPTR
+	RET
+
+CTRL_GetDTNode:
+	MOV     R0,#NODE_OFFSET
+	CALL    CTRL_ResetNodeTable
+	MOVX    A,@DPTR
+	RET
+
+CTRL_GetDT:
+	MOV     DPSEL,#0                ; A = bDT
+	MOV     DPTR,#bDT               ;
+	MOVX    A,@DPTR                 ;
+	RET
+
+CTRL_DelayTX:
+;       T,9ix99
+;        CALL    HOST_ProcessHostCommand
+
+	MOV     R0,ctrl_txdelay
+
+;       T,9ix99
+	cjne    r0,#0,CTRL_DoDelayT
+	ret
+CTRL_DoDelayT:
+
+	CALL    delay100us
+	RET
+
+CTRL_DelayRX:
+;       T,9ix99
+;        CALL    HOST_ProcessHostCommand
+
+	MOV     R0,ctrl_rxdelay
+
+;       T,9ix99
+	cjne    r0,#0,CTRL_DoDelayR
+	ret
+CTRL_DoDelayR:
+
+	CALL    delay100us
+	RET
+;******************************************************************
+
+CTRL_PollDT:
+	CALL    COM_InitRS485
+
+	MOV     DPTR,#bLastDT
+	MOVX    A,@DPTR
+	CJNE    A,#255,CTRL_PDTcarryoncamping   ; (bLastDT = 0FFH) => no slaves
+CTRL_PDTdelay:
+	RET
+
+CTRL_PDTcarryoncamping:
+; First check if this slave is busy or not
+
+
+	CALL    POLL_Delay_Test
+	JZ      CTRL_PDTslave1          ; Poll this slave
+;
+	JMP     CTRL_PDTcarryon10       ; If delay active, move on to next slave
+;
+CTRL_PDTslave1:
+;       T,9ix99
+;       CALL    HOST_ProcessHostCommand
+
+	MOV     R0,#STATE_OFFSET
+	CALL    CTRL_ResetPollinfoTable
+	MOVX    A,@DPTR
+;
+;       MOV     DPTR,#statejumptable
+;       RL      A
+;       RL      A
+;       JMP     @A+DPTR
+;
+;statejumptable:
+;       LJMP    CTRL_PDT_WTSGRQ
+;       NOP
+;       LJMP    CTRL_PDT_WTSTPI
+;       NOP
+;       LJMP    CTRL_PDT_WTSTSD
+;       NOP
+
+; SSM 17/06/99 - The following replaces the jump table above which
+; was prone to jumping into the middle of code if the value of
+; the machine state is not one of the expected codes (0,1,2).
+; This new version defaults back to state 0 if any problem exists.
+
+	CJNE    A,#DTS_WTSTSD,x1
+	JMP     CTRL_PDT_WTSTSD
+x1:     CJNE    A,#DTS_WTSTPI,x2
+	JMP     CTRL_PDT_WTSTPI
+x2:
+	CLR     A                       ; default back to wtsgrq
+	MOVX    @DPTR,A
+
+CTRL_PDT_WTSGRQ:
+	IF      DUAL_POLL_POLICY=0
+
+	MOV     R0,#0                  ; _T,10ix99. Transplanted
+	CALL    CTRL_ResetBuffer       ; _T,10ix99
+
+	ELSE
+
+;       ******************************************************************
+;       ******************************************************************
+;       *       Tim     10ix99  ******************************************
+;       ******************************************************************
+;       *       During Attraction Closed Time or Zero Tickets per Period,*
+;       *       Poll using the value IDLE instead of ENQ.                *
+;       *       This discourages slaves from even sending a TSR, where   *
+;       *       previously they sometimes dropped the TSF and printed an *
+;       *       emergency ticket.                                        *
+;       *       An equivalent change will be made to the slaves as a     *
+;       *       condition of their slavery. This should be better than   *
+;       *       informing slaves just once of Close-or-Zero, since it    *
+;       *       contains a constant reminder, and the change back to open*
+;       *       (revert to polling with ENQ) equally contains an iterated*
+;       *       statement.                                               *
+;       ******************************************************************
+;       *       NB This lot doesn't improve anything and consequently is *
+;       *       never used. The effective solution to the spurious       *
+;       *       emergency tickets is to make master/slave comms reliable.*
+;       *       Tim, 1x99. I'm just leaving the conditional code here in *
+;       *       case there is some other reason for a variety of poll    *
+;       *       formats in the future, since this code actually worked   *
+;       ******************************************************************
+
+
+	push    b                       ; T,10ix99.  At this depth no check.
+	mov     dptr,#act_tppzero       ; T,10ix99.  Either of these
+	movx    a,@dptr                 ;            locations is reputed
+	mov     b,a                     ;            to contain nonzero
+	mov     dptr,#act_closed        ;            for nae tickets.
+	movx    a,@dptr                 ;
+	orl     a,b                     ;            If so, this works.
+	mov     b,a                     ;            Save it.
+
+	MOV     R0,#0                   ; These two lines transplanted
+	CALL    CTRL_ResetBuffer        ; Routine Does not touch B
+
+	mov     a,b                     ; T,10ix99   Recover DON'T or DON'T
+	pop     b                       ;
+	jz      CTRL_EnqPoll            ;            If OR-sum = Zero
+	MOV     A,#MSG_IDL              ;            If it aint
+	jmp     CTRL_SomePoll           ;            
+CTRL_EnqPoll:                           ; T,10ix99           
+
+	ENDIF
+
+	MOV     A,#MSG_GRQ              ; Original Line
+CTRL_SomePoll:                          ; T,10ix99
+	MOVX    @DPTR,A                 ; Original Line
+
+	CALL    CTRL_DelayTX
+
+	MOV     R7,#1
+	CALL    CTRL_GetDTNode
+	MOV     R6,A
+
+	MOV     DPSEL,#3
+
+	CALL    RS485_TransmitPacket
+
+	CALL    CTRL_DelayRX
+
+	MOV     R0,#0
+	CALL    CTRL_ResetBuffer
+	CALL    NET_ReceivePacketEx
+	JNZ     CTRL_PDTcarryon1        ; Packet OK.
+
+;       ************************************************************
+;       *       Tim     19viij99        **********Start*************
+;       ************************************************************
+;       *       Advance the Token Rapidly                          *
+;       ************************************************************
+
+;;        jmp     CTRL_PDTcarryon10       ; look at the next PDT
+;        jmp     CTRL_PDTend              ; Don't use either of these
+					  ; changes. T,10ix99
+;       ************************************************************
+;       *       Tim     19viij99        **********End***************
+;       ************************************************************
+
+;
+; Fall-through - packet receive error.
+CTRL_PDTrxerror2:
+CTRL_PDTrxerror2_1:
+	MOV     R0,#2
+	CALL    CTRL_ResetBuffer
+	MOVX    A,@DPTR
+	INC     A
+	INC     A
+	MOV     R0,A
+DEBUG_1:
+	INC     DPTR
+	MOVX    A,@DPTR
+	DJNZ    R0,DEBUG_1
+
+	MOV     R0,#FAIL_HYSTERISIS_OFFSET
+	CALL    CTRL_ResetPollInfoTable
+	MOVX    A,@DPTR
+	CJNE    A,#FAIL_HYSTERISIS,CTRL_PDTcarryon9
+
+	MOV     R0,#FAILING_OFFSET
+	CALL    CTRL_ResetNodeTable     ; set fail flag
+	MOV     A,#1
+	MOVX    @DPTR,A
+	JMP     CTRL_PDTend
+
+CTRL_PDTcarryon9:
+	INC     A
+	MOVX    @DPTR,A
+	JMP     CTRL_PDTend
+
+CTRL_PDTcarryon1:
+	MOV     R0,#4                   ; check the received packet is from
+	CALL    CTRL_ResetBuffer        ; the correct node
+	MOVX    A,@DPTR                 ;
+	PUSHACC
+	CALL    CTRL_GetDTNode          ;
+	POP     B
+	CJNE    A,B,CTRL_PDTrxerror2_1    ; Wrong node - error
+
+	MOV     R0,#FAILING_OFFSET
+	CALL    CTRL_ResetNodeTable
+	CLR     A
+	MOVX    @DPTR,A
+
+	MOV     R0,#FAIL_HYSTERISIS_OFFSET
+	CALL    CTRL_ResetPollinfoTable
+	CLR     A
+	MOVX    @DPTR,A
+
+	MOV     R0,#5
+	CALL    CTRL_ResetBuffer
+	MOVX    A,@DPTR
+
+	CJNE    A,#MSG_IDL,CTRL_PDTnotidle
+	JMP     CTRL_PDTend             ; If slave idle, finish up.
+;
+; Fall-through - slave has sent a service request.
+CTRL_PDTnotidle:
+
+;       *******************************************************************
+;       *       Tim     20ix99  *******************Start*******************
+;       *******************************************************************
+;       *       do you have D/E-Tickets or Paper-Low to report?           *
+;       *******************************************************************
+
+;        CJNE    A,#MSG_TSC,CTRL_PDTpaperLow?
+	CJNE    A,#MSG_TSC,CTRL_PDTanormStatus?
+	mov     r0,#7            ; Read the ticket type
+	call    CTRL_ResetBuffer ;
+	movx    a,@dptr          ;
+	cjne    a,#5,CTRL_WrongTSC ; If it's not an E-Ticket counter
+	inc     dptr             ; pick up the little endian count
+
+	movx    a,@dptr
+	mov     b,a
+	inc     dptr
+	movx    a,@dptr
+	qads    ctrl_etktcount
+
+CTRL_WrongTSC:
+	jmp     CTRL_PDTend
+
+CTRL_PDTanormStatus?:
+;CTRL_PDTpaperLow?:
+	jnb     acc.7,CTRL_PDTnotAnormStatus
+;        CJNE    A,#MSG_PLOW,CTRL_PDTpaperOut?
+	MOV     R0,#FAILING_OFFSET      ;
+	push    acc
+	CALL    CTRL_ResetNodeTable     ; set fail flag
+	pop     acc
+;        MOV     A,#3                    ;
+	MOVX    @DPTR,A                 ;
+	jmp     CTRL_PDTend
+;CTRL_PDTpaperOut?:
+
+;       *******************************************************************
+;       *       Tim     20ix99  *******************End*********************
+;       *******************************************************************
+
+
+
+;        CJNE    A,#MSG_PO,CTRL_PDTnotpaperout   ; is it "Paper out"?
+;        MOV     R0,#FAILING_OFFSET      ;
+;        CALL    CTRL_ResetNodeTable     ; set fail flag
+;        MOV     A,#2                    ;
+;        MOVX    @DPTR,A                 ;
+;        JMP     CTRL_PDTend
+;
+;CTRL_PDTnotpaperout:
+CTRL_PDTnotAnormStatus:
+	CJNE    A,#MSG_SUM,CTRL_PDTnotsum
+	MOV     R0,#0
+	CALL    CTRL_ResetBuffer
+	MOV     A,#MSG_SUM
+	MOVX    @DPTR,A
+
+	CALL    CTRL_DelayTX
+
+	MOV     R7,#1
+	CALL    CTRL_GetDTNode
+	MOV     R6,A
+
+	MOV     DPSEL,#3
+	CALL    RS485_TransmitPacket
+	JMP     CTRL_PDTend
+;
+CTRL_PDTnotsum:
+	CJNE    A,#MSG_TSR,CTRL_PDTnottsr
+	JMP     CTRL_PDTcarryon2
+CTRL_PDTnottsr:
+	JMP     CTRL_PDTend
+;
+CTRL_PDTcarryon2:
+CTRL_PDTfindseat:
+;
+; If Tickets Per Period (TPP) = 0, don't issue any tickets
+	MOV     DPTR,#act_tppzero
+	MOVX    A,@DPTR                 ; Check flag
+	JNZ     CTRL_PDTsendTSF         ; If TRUE, send a TSF instead.
+;
+CTRL_PDTtppnonzero:
+; Now check if Attraction Closing Time (ACT) has tripped.
+	MOV     DPTR,#act_closed
+	MOVX    A,@DPTR                 ; Check flag
+	JZ      CTRL_PDTfindseat2       ; If FALSE, attraction not closed.
+CTRL_PDTsendTSF:
+	JMP     CTRL_PDTtsrsnotokay     ; If closed, send a TSF instead.
+;
+CTRL_PDTfindseat2:
+	
+	IF      DMS       ; Are we tracking BarCodes for Excess Use?
+
+	
+	mov     r0,#2           ; get the TSR Length
+	call    CTRL_ResetBuffer
+	movx    a,@dptr
+	add     a,#-8+5         ; Is the message overlength?
+	jz      CTRL_BarCodeClear ; No-so it's not carrying a barcode
+	jnc     CTRL_BarCodeClear
+	mov     prt_field_len,a ; set up the Database hash key
+	mov     r0,#8
+	call    CTRL_ResetBuffer
+	mov     r0,#prt_field_str
+	mov     b,prt_field_len
+CTRL_DMSA_L:
+	movx    a,@dptr
+	inc     dptr
+	mov     @r0,a
+	inc     r0
+	djnz    b,CTRL_DMSA_L
+
+	call    DMS_Store       ; which is also retrieve
+
+	mov     a,dms_status
+	jnz     CTRL_BarCodeClear ; It can't be stored, just carry on
+
+	call    ARITH_MinutesNow
+	mov     dms_rda2,a
+	mov     dms_rda3,b      ; read the current time
+	
+	IF      DMS_SYMBOLIC_FORMAT=ASCII21
+	mov     a,#22
+	ELSE
+	IF      DMS_SYMBOLIC_FORMAT=ASCII17
+	mov     a,#18
+	ELSE
+	mov     a,#10
+	ENDIF
+	ENDIF
+
+	mov     b,#2
+	call    DMS_RField      ; extract bytes 10_11 = Last Recorded Time
+	mov     a,dms_rda0
+	orl     a,dms_rda1      ; sum the two bytes in the field
+	jnz     CTRL_NotANewBarCode
+
+CTRL_MinimumSatisficed:        
+	
+	IF      RIDE_TIME_GATED
+	
+	mov     dptr,#ctrl_periodahead
+	movx    a,@dptr
+	add     a,dms_rda3
+	mov     dms_rda3,a
+	inc     dptr
+	movx    a,@dptr
+	addc    a,dms_rda2
+	mov     dms_rda2,a
+	
+	ENDIF
+	
+	mov     r0,#dms_rda2    ; write the current time to the data record
+	
+	IF      DMS_SYMBOLIC_FORMAT=ASCII21
+	mov     a,#22
+	ELSE
+	IF      DMS_SYMBOLIC_FORMAT=ASCII17
+	mov     a,#18
+	ELSE
+	mov     a,#10
+	ENDIF
+	ENDIF
+	
+	mov     b,#2
+	call    DMS_WFieldX
+	
+	jmp     CTRL_BarCodeClear
+
+CTRL_NotANewBarCode:        
+	mov     dptr,#ctrl_minterval ; Minimum Interval Single Octet in XRAM
+	movx    a,@dptr
+	add     a,dms_rda1      ; LS byte Last Recorded Time
+	cpl     a               ; Invert the sum
+	mov     dms_rda1,a      ; Keep it a moment
+	clr     a               ; i.e. MS Byte for 8-bit Minimum
+	addc    a,dms_rda0      ; MS byte Last Recorded Time
+	cpl     a               ; Invert the sum
+	mov     dms_rda0,a      ; Keep it
+	mov     a,dms_rda3      ; LS byte Actual Ordinal Minute
+	setB    C               ; Make the Addition 2s Complement
+	addc    a,dms_rda1      ; Subtract LS byte of LastTime + Minimum
+	mov     a,dms_rda2      ; MS byte Actual Ordinal Minute
+	addc    a,dms_rda0      ; Subtract MS byte of LastTime + Minimum
+	jc      CTRL_MinimumSatisficed ; 0+:proceed, first recording the time
+	jmp     CTRL_PDTtsrsnotokay    ; <0:don't
+
+
+CTRL_BarCodeClear:                ; Not Affected so far
+
+	ENDIF
+	
+	CALL    CTRL_TicketTime         ; set up ticket time data here
+	MOV     A,R2
+	CJNE    A,#TSRS_OK,CTRL_PDTtsrsnotokay  ; At the moment, CTRL_TT always returns
+	JMP     CTRL_PDTtsrsokay                ; TSRS_OK in R2...
+
+CTRL_PDTtsrsnotokay:
+	MOV     R0,#0
+	CALL    CTRL_ResetBuffer
+	MOV     A,#MSG_TSF              ; Transaction Sale Failed, no ticket.
+	MOVX    @DPTR,A
+
+	CALL    CTRL_DelayTX
+
+	MOV     R7,#1
+	CALL    CTRL_GetDTNode
+	MOV     R6,A
+
+	MOV     DPSEL,#3
+	CALL    RS485_TransmitPacket    ; Send the TSF packet to the SLAVE.
+	JMP     CTRL_PDTend
+;
+CTRL_PDTtsrsokay:
+	
+	MOV     R0,#STATE_OFFSET        ; change the state for next time
+	CALL    CTRL_ResetPollinfoTable ;
+	MOV     A,#DTS_WTSTPI           ; to Ticket Print Inquiry
+	MOVX    @DPTR,A                 ;
+	INC     DPTR                    ;
+
+CTRL_PDTsendtsi:
+	MOV     R0,#0                   ; set the message  byte
+	CALL    CTRL_ResetBuffer        ;
+	MOV     A,#MSG_TSI              ; Ticket Sale Information
+	MOVX    @DPTR,A                 ;
+	INC     DPTR                    ;
+
+	MOV     DPSEL,#2                ; set the item ID
+	MOVX    A,@DPTR                 ;
+	MOV     DPSEL,#3                ;
+	MOVX    @DPTR,A                 ;
+	INC     DPTR
+
+	MOV     DPSEL,#0                ;
+	MOV     DPTR,#datebuffer        ;
+	MOVX    A,@DPTR                 ; send the current date
+	MOV     DPSEL,#3                ;
+	MOVX    @DPTR,A                 ;
+	INC     DPTR                    ;
+	MOV     DPSEL,#0                ;
+	MOV     DPTR,#datebuffer+1      ;
+	MOVX    A,@DPTR                 ;
+	MOV     DPSEL,#3                ;
+	MOVX    @DPTR,A                 ;
+	INC     DPTR                    ;
+
+	MOV     DPSEL,#0                ;
+	MOV     DPTR,#timebuffer        ;
+	MOVX    A,@DPTR                 ; send the current time
+	MOV     DPSEL,#3                ;
+	MOVX    @DPTR,A                 ;
+	INC     DPTR                    ;
+	MOV     DPSEL,#0                ;
+	MOV     DPTR,#timebuffer+1      ;
+	MOVX    A,@DPTR                 ;
+	MOV     DPSEL,#3                ;
+	MOVX    @DPTR,A                 ;
+	INC     DPTR                    ;
+;
+	MOV     DPSEL,#0        ;
+	MOV     DPTR,#bHour     ; send the additional hours
+	MOVX    A,@DPTR         ;
+	MOV     DPSEL,#3        ;
+	MOVX    @DPTR,A         ;
+	INC     DPTR            ;
+
+	MOV     DPSEL,#0        ;
+	MOV     DPTR,#bMinute   ; send the additional minutes
+	MOVX    A,@DPTR         ;
+	MOV     DPSEL,#3        ;
+	MOVX    @DPTR,A         ;
+
+;;;;;;
+; SSM additions for the hour/minute offset for the "queue until" time
+	INC     DPTR
+	MOV     DPSEL,#0
+	CALL    MTH_LoadOp1Acc          ; bMinute
+	MOV     DPTR,#ctrl_queuetimelength
+	MOVX    A,@DPTR
+	CALL    MTH_LoadOp2Acc
+	CALL    MTH_AddWords            ; op1.w = bMinute+bLength
+	MOV     A,#60
+	CALL    MTH_LoadOp2Acc
+	CALL    MTH_Divide32by16        ; op1 = (bMinute+bLength)/60
+					; op2 = (bMinute+bLength)%60
+	MOV     A,mth_op2ll
+	MOV     DPSEL,#3
+	MOVX    @DPTR,A                 ; send "queue until" minutes offset
+	INC     DPTR
+	MOV     DPSEL,#0
+	MOV     DPTR,#bHour
+	MOVX    A,@DPTR
+	CALL    MTH_LoadOp2Acc
+	CALL    MTH_AddWords            ; op1.b = (bHour+(bMinute+bLength)/60)
+	MOV     A,mth_op1ll
+	CJNE    A,#24,CTRL_PDTnot24
+CTRL_PDThourwrap:
+	CLR     C
+	SUBB    A,#24
+	JMP     CTRL_PDThourok
+CTRL_PDTnot24:
+	JNC     CTRL_PDThourwrap
+CTRL_PDThourok:
+	MOV     DPSEL,#3
+	MOVX    @DPTR,A                 ; send "queue until" hours offset
+;
+CTRL_PDTsendpkt:
+	CALL    CTRL_DelayTX
+;;;;;;
+	MOV     R7,#10 ; was 8
+	CALL    CTRL_GetDTNode
+	MOV     R6,A
+	MOV     R0,#0
+	CALL    CTRL_ResetBuffer
+	CALL    RS485_TransmitPacket    ; Ticket Sale Info packet
+	CALL    POLL_Delay_Set          ; Allow slave to print ticket
+
+	JMP     CTRL_PDTend
+;
+;----------------------------------------------------------------
+CTRL_PDT_WTSTPI:
+	MOV     R0,#0
+	CALL    CTRL_ResetBuffer
+	MOV     A,#MSG_TPI              ; Prepare a TPI packet
+	MOVX    @DPTR,A
+
+	CALL    CTRL_DelayTX
+
+	MOV     R7,#1
+	CALL    CTRL_GetDTNode
+	MOV     R6,A
+	MOV     DPSEL,#3
+	CALL    RS485_TransmitPacket    ; And send it to the slave
+;
+	CALL    CTRL_DelayRX
+	MOV     R0,#0
+	CALL    CTRL_ResetBuffer
+
+; PUSHACC
+; MOV B,#150
+; CALL SND_SoundOn
+; POP ACC
+	CALL    NET_ReceivePacketEx     ; Wait for a return packet
+; PUSHACC
+; CALL SND_SoundOff
+; POP ACC
+	JNZ     CTRL_PDTcarryon3
+;
+; Fall-through - no packet received after a wait (200mS, usually).
+	MOV     R0,#TSC_TIMEOUTS_OFFSET ; Check the number of
+	CALL    CTRL_ResetNodeTable     ; timeouts for this slave.
+
+
+	MOVX    A,@DPTR
+
+;        CJNE    A,#11,CTRL_PDTcarryon8  ; If it has reached 11,
+	CJNE    A,#120,CTRL_PDTcarryon8  ; If it has reached 55,
+
+	MOV     R0,#FAILING_OFFSET      ;
+	CALL    CTRL_ResetNodeTable     ; set fail flag
+;        MOV     A,#1                    ; and reset the count.
+	mov     a,#0C0h
+	MOVX    @DPTR,A                 ;
+
+	clr     a                       ; T,3xj99
+	inc     dptr                    ; reinitialise the retry count
+	movx    @dptr,a
+
+	
+	IF      FAIL_SALE_RESUME
+	MOV     R0,#STATE_OFFSET
+	CALL    CTRL_ResetPollinfoTable
+	MOV     A,#DTS_WTSGRQ           ; Reset to GRQ
+	MOVX    @DPTR,A
+	ENDIF
+	
+	JMP     CTRL_PDTend             ; and give up
+
+	
+CTRL_PDTcarryon8:
+	INC     A
+					 
+	MOVX    @DPTR,A                 ; Increment the running TO count
+	JMP     CTRL_PDTend
+
+CTRL_PDTcarryon3:
+; Packet received from Slave
+	MOV     R0,#FAILING_OFFSET      ;
+	CALL    CTRL_ResetNodeTable     ; reset the fail flag and
+	CLR     A                       ; TSC timeout count
+	MOVX    @DPTR,A                 ;
+	INC     DPTR                    ;
+	MOVX    @DPTR,A                 ;
+
+; OK, what kind of packet?
+
+	MOV     R0,#5
+	CALL    CTRL_ResetBuffer
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     A,#MSG_TSC
+	CJNE    A,B,CTRL_PDTnottsc      ; Is it Ticket Sale Confirmation?
+	JMP     CTRL_PDTcarryon4
+
+CTRL_PDTnottsc:
+	JMP     CTRL_PDTend             ; If not TSC, give up and try again.
+
+CTRL_PDTcarryon4:
+; Pkt received from slave in response to TPI, the packet is a TSC
+	MOV     R0,#7
+	CALL    CTRL_ResetBuffer
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     A,#TSC_FAIL             ; Status byte from slave
+	CJNE    A,B,CTRL_PDTcarryon5    ; 0 = bad, > 0  = ticket type.
+CTRL_PDTtscerror:
+; failed to print ticket - return master to the GRQ state
+	MOV     R0,#STATE_OFFSET
+	CALL    CTRL_ResetPollinfoTable
+	MOV     A,#DTS_WTSGRQ           ; General ReQuest next poll.
+	MOVX    @DPTR,A
+	JMP     CTRL_PDTend
+;
+CTRL_PDTcarryon5:
+; Not failed. Good packet. Look at item no. in packet
+	MOV     R0,#6
+	CALL    CTRL_ResetBuffer
+	MOVX    A,@DPTR
+	MOV     B,A             ; B = packet ticket ID (item no.)
+	PUSHB
+;
+	MOV     R0,#MSGID_OFFSET
+	CALL    CTRL_ResetPollinfoTable
+	MOVX    A,@DPTR         ; A = stored ticket ID
+;
+	POP     B
+	CJNE    A,B,CTRL_PDTlastprinted
+	JMP     CTRL_PDTcarryon6        ; ticket numbers match.
+
+CTRL_PDTlastprinted:
+; Problem - the two numbers do not match
+	DEC     A                       ; Try the previous number
+	CJNE    A,B,CTRL_PDTtscerror    ; If it isn't this one, tough.
+	JMP     CTRL_PDTsendtsi         ; If it is, send the pkt again.
+;
+CTRL_PDTcarryon6:               ; received a tsc_okay for the correct message
+	INC     A               ; increment the message ID for next time
+	MOVX    @DPTR,A         ;
+	SETB    alt_ticketsold
+; RS - new code to save the ticket type (old STATUS byte).
+	MOV     R0,#7           ; Status byte is no. 7 in buffer
+	CALL    CTRL_ResetBuffer
+	MOVX    A,@DPTR
+	MOV     DPTR,#ctrl_tkttype
+	MOVX    @DPTR,A         ; Save the ticket type for counting later.
+	CALL    CTRL_CheckPeriodMax     ; Tickets per period stuff.
+;
+; fall through and send the TSD
+;----------------------------------------------------------------
+CTRL_PDT_WTSTSD:                ; send a tsd if we got to here
+	MOV     R0,#0
+	CALL    CTRL_ResetBuffer
+	MOV     A,#MSG_TSD      ; Ticket Sale Done packet
+	MOVX    @DPTR,A
+
+	CALL    CTRL_DelayTX
+
+	MOV     R7,#1
+	CALL    CTRL_GetDTNode
+	MOV     R6,A
+	MOV     DPSEL,#3
+	CALL    RS485_TransmitPacket
+
+	CALL    CTRL_DelayRX
+
+	MOV     R0,#0
+	CALL    CTRL_ResetBuffer
+
+; PUSHACC
+; MOV B,#200
+; CALL SND_SoundOn
+; POP ACC
+	CALL    NET_ReceivePacketEx
+; PUSHACC
+; CALL SND_SoundOff
+; POP ACC
+	JNZ     CTRL_PDTcarryon7
+;
+CTRL_PDTcarryon6.5:
+	MOV     R0,#STATE_OFFSET
+	CALL    CTRL_ResetPollinfoTable
+	MOV     A,#DTS_WTSTSD   ; Next poll is to be TSD
+	MOVX    @DPTR,A
+
+CTRL_PDTcarryon6.8:
+	JMP     CTRL_PDTend
+
+CTRL_PDTcarryon7:
+	MOV     R0,#5
+	CALL    CTRL_ResetBuffer
+	MOVX    A,@DPTR
+	MOV     B,A
+	MOV     A,#MSG_TSD
+	CJNE    A,B,CTRL_PDTnottsd
+	MOV     R0,#STATE_OFFSET
+	CALL    CTRL_ResetPollinfoTable
+	MOV     A,#DTS_WTSGRQ           ; Reset back to GRQ
+	MOVX    @DPTR,A
+
+	JNB     alt_ticketsold,CTRL_PDTnoticket
+	CLR     alt_ticketsold
+	CALL    CTRL_GetDT
+	CALL    DT_Ticket
+;
+CTRL_PDTnoticket:
+	JMP     CTRL_PDTend
+;
+CTRL_PDTnottsd:
+	MOV     A,#MSG_TSR
+	CJNE    A,B,CTRL_PDTnottsr2
+
+; message was a Transaction Sale Request (TSR)
+	MOV     R0,#STATE_OFFSET
+	CALL    CTRL_ResetPollinfoTable
+	MOV     A,#DTS_WTSGRQ
+	MOVX    @DPTR,A
+	JMP     CTRL_PDTfindseat
+
+CTRL_PDTnottsr2:
+	MOV     R0,#STATE_OFFSET
+	CALL    CTRL_ResetPollinfoTable
+	MOV     A,#DTS_WTSTSD
+	MOVX    @DPTR,A
+	JMP     CTRL_PDTend
+
+	
+msg_ok0:        DB 2,'O-'
+msg_ok1:        DB 2,'O+'
+msg_fail0:      DB 2,'F-'
+msg_fail1:      DB 2,'F+'
+msg_paperout0:  DB 2,'P-'
+msg_paperout1:  DB 2,'P+'
+msg_paperlow0:  DB 2,'L-'
+msg_paperlow1:  DB 2,'L+'
+msg_cutter0:    DB 2,'C-'
+msg_cutter1:    DB 2,'C+'
+msg_heat0:      DB 2,'H+'
+msg_heat1:      DB 2,'H-'
+msg_vheat0:     DB 2,'V+'
+msg_vheat1:     DB 2,'V-'
+msg_faily:      DB 2,'?-'
+msg_failz:      DB 2,'?+'
+
+
+CTRL_PDTend:
+	CALL    CTRL_GetDT
+	RL      A
+;       MOV     B,#4
+;       MUL     AB
+	ADD     A,#64
+	CALL    LCD_GotoXY
+
+QCALXSTAT EQU   1        
+	IF      QCALXSTAT                   ; T,11x99
+
+	mov     r0,#FAILING_OFFSET
+	call    CTRL_ResetNodeTable
+	movx    a,@dptr
+
+	mov     b,a
+	jz      CTRL_statOKOK
+	mov     b,#msg_fail0-msg_ok0
+	jb      acc.0,CTRL_statOKOK
+	mov     b,#msg_paperout0-msg_ok0
+	jb      acc.1,CTRL_statOKOK
+	mov     b,#msg_paperlow0-msg_ok0
+	jb      acc.2,CTRL_statOKOK
+	mov     b,#msg_cutter0-msg_ok0
+	jb      acc.3,CTRL_statOKOK
+	mov     b,#msg_heat0-msg_ok0
+	jb      acc.4,CTRL_statOKOK
+	mov     b,#msg_vheat0-msg_ok0
+	jb      acc.5,CTRL_statOKOK
+	mov     b,#msg_faily-msg_ok0
+CTRL_StatOKOK:
+
+	push    b
+	mov     r0,#LAST_MESSAGE_OFFSET
+	call    CTRL_ResetNodeTable         ; The legal values are 3 or 0
+	pop     b
+	movx    a,@dptr                     ; and it won't be anything else
+	anl     a,#3                        ; after these instructions
+	jnb     psw.0,CTRL_EvenParity
+	clr     a
+CTRL_EvenParity:                            ; 
+	xrl     a,#3                        ; Now flip-flop it
+	movx    @dptr,a                     ; And put it away
+	add     a,b                         ; This will not carry
+	push    acc                         ; Save to calculate sound
+	add     a,#msg_ok0 AND 255          ; This might
+	mov     dpl,a                       ;
+	mov     a,#msg_ok0 SHR 8
+	addc    a,#0
+	mov     dph,a
+	call    LCD_DisplayStringCode
+	pop     acc                         ; zero, 6, and odd numbers = OFF
+	jz      CTRL_Quiet                  ; zero = OFF
+	jb      acc.0,CTRL_Quiet            ; odd# = OFF
+	xrl     a,#msg_fail0-msg_ok0        ;    6 = OFF
+	jz      CTRL_Quiet
+
+
+	IF      NO_HOT_NOISE
+	xrl     a,#msg_fail0-msg_ok0
+	xrl     a,#msg_heat0-msg_ok0
+	jz      CTRL_Quiet
+	xrl     a,#msg_heat0-msg_ok0
+	xrl     a,#msg_vheat0-msg_ok0
+	jz      CTRL_Quiet
+	ENDIF
+
+
+	IF      SPEAKER
+	call    SND_Soundon
+	ENDIF
+
+	jmp     CTRL_Noise
+CTRL_Quiet:
+
+	IF      SPEAKER
+	call    SND_SoundOff
+	ENDIF
+
+CTRL_Noise:
+
+	ELSE
+
+
+	MOV     R0,#FAILING_OFFSET
+	CALL    CTRL_ResetNodeTable
+	MOVX    A,@DPTR
+	JNZ     CTRL_PDTnodefailing
+
+	MOV     R0,#LAST_MESSAGE_OFFSET
+	CALL    CTRL_ResetNodeTable
+	MOVX    A,@DPTR
+	JNZ     CTRL_PDTlastokay1
+
+	MOV     A,#1
+	MOVX    @DPTR,A
+	MOV     DPTR,#msg_ok1
+	CALL    LCD_DisplayStringCODE
+
+	IF      SPEAKER
+	CALL    SND_SoundOff
+	ENDIF
+
+; JMP drawstate
+	JMP     CTRL_PDTcarryon10
+
+CTRL_PDTlastokay1:
+	CLR     A
+	MOVX    @DPTR,A
+	MOV     DPTR,#msg_ok0
+	CALL    LCD_DisplayStringCODE
+
+	IF      SPEAKER
+	CALL    SND_SoundOff
+	ENDIF
+
+; JMP drawstate
+	JMP     CTRL_PDTcarryon10
+
+CTRL_PDTnodefailing:
+	 jnb    acc.0,CTRL_PDTstationery?  ; T,11x99
+;        cjne    a,#1,CTRL_PDTstationery?  ; T,20ix99
+;        DEC     A
+;        JNZ     CTRL_PDTpaperout
+
+CTRL_PDTgeneralFail:
+	MOV     R0,#LAST_MESSAGE_OFFSET
+	CALL    CTRL_ResetNodeTable
+	MOVX    A,@DPTR
+	JNZ     CTRL_PDTlastfail1
+
+	MOV     A,#1
+	MOVX    @DPTR,A
+	MOV     DPTR,#msg_fail1
+	CALL    LCD_DisplayStringCODE
+
+	IF      SPEAKER
+	CALL    SND_SoundOff
+	ENDIF
+
+	JMP     CTRL_PDTcarryon10
+
+CTRL_PDTlastfail1:
+	CLR     A
+	MOVX    @DPTR,A
+	MOV     DPTR,#msg_fail0
+	CALL    LCD_DisplayStringCODE
+
+	IF      SPEAKER
+	CALL    SND_SoundOff
+	ENDIF
+
+	JMP     CTRL_PDTcarryon10
+
+CTRL_PDTstationery?:
+CTRL_PDTpaperout:
+	jnb     acc.1,CTRL_PDTpaperLow?
+	MOV     R0,#LAST_MESSAGE_OFFSET
+	CALL    CTRL_ResetNodeTable
+	MOVX    A,@DPTR
+	JNZ     CTRL_PDTlastpaperout1
+
+	MOV     A,#1
+	MOVX    @DPTR,A
+	MOV     DPTR,#msg_paperout1
+	CALL    LCD_DisplayStringCODE
+
+	IF      SPEAKER
+	CALL    SND_SoundOff
+	ENDIF
+
+	JMP     CTRL_PDTcarryon10
+
+CTRL_PDTlastpaperout1:
+	CLR     A
+	MOVX    @DPTR,A
+	MOV     DPTR,#msg_paperout0
+	CALL    LCD_DisplayStringCODE
+	MOV     B,#25
+
+	IF      SPEAKER
+	CALL    SND_SoundOn
+	ENDIF
+
+	JMP     CTRL_PDTcarryon10
+
+CTRL_PDTpaperLow?:
+	jnb     acc.2,CTRL_PDTcutter?
+;        cjne    a,#3,CTRL_PDTpaperout
+	MOV     R0,#LAST_MESSAGE_OFFSET
+	CALL    CTRL_ResetNodeTable
+	MOVX    A,@DPTR
+	JNZ     CTRL_PDTlastpaperlow1
+
+	MOV     A,#1
+	MOVX    @DPTR,A
+	MOV     DPTR,#msg_paperlow1
+	CALL    LCD_DisplayStringCODE
+
+	IF      SPEAKER
+	CALL    SND_SoundOff
+	ENDIF
+
+	JMP     CTRL_PDTcarryon10
+
+CTRL_PDTlastpaperlow1:
+	CLR     A
+	MOVX    @DPTR,A
+	MOV     DPTR,#msg_paperlow0
+	CALL    LCD_DisplayStringCODE
+	MOV     B,#25
+		
+
+	IF      SPEAKER
+	CALL    SND_SoundOn
+	ENDIF
+
+	JMP     CTRL_PDTcarryon10
+
+CTRL_PDTcutter?:
+	jnb     acc.3,CTRL_PDTgeneralFail
+	MOV     R0,#LAST_MESSAGE_OFFSET
+	CALL    CTRL_ResetNodeTable
+	MOVX    A,@DPTR
+	JNZ     CTRL_PDTcutter1
+
+	MOV     A,#1
+	MOVX    @DPTR,A
+	MOV     DPTR,#msg_cutter1
+	CALL    LCD_DisplayStringCODE
+
+	IF      SPEAKER
+	CALL    SND_SoundOff
+	ENDIF
+
+	JMP     CTRL_PDTcarryon10
+
+CTRL_PDTcutter1:
+	CLR     A
+	MOVX    @DPTR,A
+	MOV     DPTR,#msg_cutter0
+	CALL    LCD_DisplayStringCODE
+	MOV     B,#25
+
+	IF      SPEAKER
+	CALL    SND_SoundOn
+	ENDIF
+
+	JMP     CTRL_PDTcarryon10
+
+	ENDIF
+
+
+CTRL_PDTcarryon10:
+	MOV     DPTR,#bLastDT
+	MOVX    A,@DPTR
+	MOV     B,A
+	CALL    CTRL_GetDT
+	CJNE    A,B,CTRL_PDTincdt
+	CLR     A
+	MOVX    @DPTR,A
+	RET
+CTRL_PDTincdt:
+	INC     A
+	MOVX    @DPTR,A
+	RET
+
+
+;;; this is the time setting code
+
+CTRL_CalcCurrentPeriod:
+	MOV     DPTR,#timebuffer        ;
+	MOVX    A,@DPTR                 ; get the current hours
+	ANL     A,#07h                  ;
+	RL      A                       ;
+	RL      A                       ;
+	MOV     B,A                     ;
+	INC     DPTR                    ;
+	MOVX    A,@DPTR                 ;
+	RL      A                       ;
+	RL      A                       ;
+	ANL     A,#03h                  ;
+	ORL     A,B                     ;
+	MOV     B,#60
+	MUL     AB
+
+	MOV     R0,#mth_operand1
+	CALL    MTH_ClearOperand
+	MOV     mth_op1ll,A
+	MOV     mth_op1lh,B
+
+	MOV     DPTR,#timebuffer+1
+	MOVX    A,@DPTR
+	ANL     A,#03Fh
+
+	CALL    MTH_LoadOp2Acc
+	CALL    MTH_AddWords
+
+CTRL_CalcVQuickCurrentPeriod:
+	MOV     DPTR,#ctrl_periodlength
+	CALL    MTH_LoadOp2Word
+	CALL    MTH_Divide32by16
+
+	MOV     DPTR,#ctrl_period
+	CALL    MTH_StoreWord
+	RET
+
+CTRL_UpdateTime:
+	     
+
+	MOV     DPTR,#ctrl_period
+	MOVX    A,@DPTR
+	PUSHACC
+	INC     DPTR
+	MOVX    A,@DPTR
+	PUSHACC
+
+	CALL    CTRL_CalcCurrentPeriod ; 
+
+	POP     mth_op2lh
+	POP     mth_op2ll
+
+	CALL    MTH_CompareWords
+	JNZ     CTRL_UTcarryon1              ; NZ = = !
+
+	CALL    MTH_SubWords
+
+	IF      MINUTES_AHEAD
+	mov     dptr,#ctrl_periodlength      ; compare minutes
+	call    MTH_LoadOp2Word              ;            with
+	call    MTH_Multiply32by16           ;         minutes
+	ENDIF
+
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_LoadOp2Word
+	CALL    MTH_TestGTWord
+
+	IF      MINUTES_AHEAD
+	jc      CTRL_UTslappitdown
+	ELSE
+	JC      CTRL_UTslowtraffic     ;
+	ENDIF
+
+CTRL_UTmoderatetraffic:
+	CALL    MTH_SwapOp1Op2
+	CALL    MTH_SubWords
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_StoreWord          ; 
+	JMP     CTRL_UTcarryon2
+
+CTRL_UTslowtraffic:
+	MOV     R0,#mth_operand1
+	CALL    MTH_ClearOperand      ; 
+	MOV     DPTR,#ctrl_periodcount
+	CALL    MTH_StoreWord
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_StoreWord           ;
+
+CTRL_UTslappitdown:
+CTRL_UTcarryon2:
+	CALL    CTRL_WritePA            ; Save new value to E2ROM
+	CALL    CTRL_CorrectAdvance    ; 
+CTRL_UTcarryon1:
+	RET
+
+;******************************************************************************
+; ensures that ctrl_periodahead is never less than ctrl_minimumahead
+
+CTRL_CorrectAdvance: ;SSM 18/3/99
+
+
+	MOV     DPTR,#ctrl_minimumahead
+	CALL    MTH_LoadOp1Byte
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_LoadOp2Word
+	CALL    MTH_TestGTWord
+	JNC     CTRL_CAok               ; minimum <= ahead
+
+
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_StoreWord
+	
+	mov     dptr,#ctrl_periodcount  ; T,31v2000
+	clr     a
+	movx    @dptr,a
+	inc     dptr
+	movx    @dptr,a
+
+	CALL    CTRL_WritePA            ; Save new value to E2ROM
+CTRL_CAok:
+	RET
+
+;******************************************************************************
+
+CTRL_TicketTime:
+	CLR     ctrl_checktickettime
+
+
+	MOV     DPTR,#ctrl_period
+	MOVX    A,@DPTR
+	PUSHACC
+	INC     DPTR
+	MOVX    A,@DPTR
+	PUSHACC
+
+	CALL    CTRL_CalcCurrentPeriod
+
+	POP     mth_op2lh
+	POP     mth_op2ll
+
+	CALL    MTH_CompareWords
+	JNZ     CTRL_TTcarryon1
+
+	CALL    MTH_SubWords
+
+	IF      MINUTES_AHEAD
+	mov     dptr,#ctrl_periodlength      ; compare minutes
+	call    MTH_LoadOp2Word              ;            with
+	call    MTH_Multiply32by16           ;         minutes
+	ENDIF
+
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_LoadOp2Word
+	CALL    MTH_TestGTWord
+
+
+	IF      MINUTES_AHEAD
+	JC      CTRL_TTslappitdown
+	ELSE
+	JC      CTRL_TTslowtraffic
+	ENDIF
+
+CTRL_TTmoderatetraffic:
+	CALL    MTH_SwapOp1Op2
+	CALL    MTH_SubWords
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_StoreWord
+	CALL    CTRL_WritePA            ; Save new value to E2ROM
+	JMP     CTRL_TTcarryon2
+
+CTRL_TTslowtraffic:
+	MOV     R0,#mth_operand1
+	CALL    MTH_ClearOperand
+	MOV     DPTR,#ctrl_periodcount
+	CALL    MTH_StoreWord
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_StoreWord
+	CALL    CTRL_WritePA            ; Save new value to E2ROM
+
+CTRL_TTslappitdown:
+CTRL_TTcarryon2:
+	CALL    CTRL_CorrectAdvance
+CTRL_TTcarryon1:
+
+	IF      MINUTES_AHEAD
+
+	mov     dptr,#ctrl_periodahead
+	call    mth_loadop1word
+
+	ELSE
+
+	MOV     DPTR,#ctrl_periodlength
+	CALL    MTH_LoadOp1Word
+
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_LoadOp2Word
+
+	CALL    MTH_Multiply32by16
+	ENDIF
+
+	MOV     R0,#mth_operand2
+	CALL    MTH_ClearOperand
+	MOV     mth_op2ll,#60
+	CALL    MTH_Divide32by16
+
+	MOV     DPTR,#bHour
+	CALL    MTH_StoreByte
+	MOV     A,mth_op2ll
+	PUSHACC
+
+	MOV     DPTR,#timebuffer        ; Top byte
+	MOVX    A,@DPTR                 ; get the current hours
+	ANL     A,#07h                  ; (bottom 3 bits)
+	RL      A                       ;
+	RL      A                       ; x 4
+	MOV     B,A                     ;
+	INC     DPTR                    ;
+	MOVX    A,@DPTR                 ; Bottom byte
+	RL      A                       ;
+	RL      A                       ; top 2 bits now bottom 2 bits
+	ANL     A,#03h                  ; Assemble all 5 bits
+	ORL     A,B                     ;
+	MOV     B,#60                   ; x 60
+	MUL     AB
+; Minutes since midnight in A and B - A low byte, B high byte
+	MOV     R0,#mth_operand1
+	CALL    MTH_ClearOperand
+	MOV     mth_op1ll,A
+	MOV     mth_op1lh,B
+
+	MOV     R0,#mth_operand2
+	CALL    MTH_ClearOperand
+	MOV     DPTR,#timebuffer+1
+	MOVX    A,@DPTR
+	ANL     A,#03Fh
+	MOV     mth_op2ll,A
+	CALL    MTH_AddWords    ; time in minutes now in mth_operand1
+
+	MOV     DPTR,#ctrl_periodlength
+	CALL    MTH_LoadOp2Word
+	CALL    MTH_Divide32by16
+	MOV     R0,#mth_operand1
+	CALL    MTH_ClearOperand
+	POP     mth_op1ll
+
+	CALL    MTH_CompareWords
+	JNZ     CTRL_TTcarryon
+	CALL    MTH_TestGTWord
+	JC      CTRL_TTcarryon
+
+	MOV     DPTR,#bHour
+	MOVX    A,@DPTR
+	JZ      CTRL_TTunderflow
+	DEC     A
+	JMP     CTRL_TTcarryon3
+;
+CTRL_TTunderflow:
+	MOV     A,#23
+CTRL_TTcarryon3:
+	MOVX    @DPTR,A
+
+	MOV     A,mth_op1ll
+	ADD     A,#60           ; @@@ suspicious @@@
+	MOV     mth_op1ll,A
+
+CTRL_TTcarryon:
+	CALL    MTH_SubWords
+	MOV     A,mth_op1ll
+	MOV     DPTR,#bMinute
+	MOVX    @DPTR,A
+;
+CTRL_TTend:
+	MOV     R2,#TSRS_OK
+	SETB    tim_timerupdate
+	RET
+;******************************************************************************
+;
+; Function:     CTRL_CheckPeriodMax
+; Input:        ctrl_tkttype = ticket (1 through 4)
+; Output:       ?
+; Preserved:    ?
+; Destroyed:    ?
+; Description:  Increments the appropriate counter for the ticket type
+;               issued, and increments the "tickets per period" counter.
+;               If this rolls over, the counter is zeroed and the period
+;               incremented. Don't count B tickets (invalid) for this purpose.
+;
+; Calls:        Various [MATH.ASM] routines
+; Uses:         ctrl_tkttable, ctrl_tkttype, ctrl_periodcount, ctrl_periodahead
+;
+; Called in:    Local module
+;
+; Written by : Robert Sneddon           24 June 1999
+;******************************************************************************
+;
+CTRL_CheckPeriodMax:
+
+;       ***************************************************************
+;       *       Tim     20ix99  ***************************************
+;       ***************************************************************
+;       *       Emergency ticket TSC (type E or 5) arrives as a poll  *
+;       *       response instead of MSG_IDL. It contains a counter up *
+;       *       to 65535.                                             *
+;       ***************************************************************
+
+								       
+	MOV     DPTR,#ctrl_tkttype
+	MOVX    A,@DPTR                 ; 1 to 5
+	DEC     A                       ; 0 to 4
+	RL      A                       ; 0, 2, 4, 6 or 8
+	MOV     DPTR,#ctrl_atktcount    ; Table of counters.
+	CALL    AddAtoDPTR
+	CALL    MTH_IncWord             ; Increment the counter for this ticket.
+; Now skip the period count if the ticket is invalid (type B, status = 2)
+	MOV     DPTR,#ctrl_tkttype
+	MOVX    A,@DPTR                 ; 1, 2, 3 or 4
+	CJNE    A,#2,CTRL_CPmax1        ; Type B is status = 2
+; Fall-through - invalid ticket. Don't count it as in the period allocation
+	JMP     CTRL_CPmax_end
+;
+CTRL_CPmax1:
+	cjne    a,#5,CTRL_CPmax2        ; or emergency ticket either
+	jmp     CTRL_CPmax_end          ; Impossible really. See general poll
+CTRL_CPmax2:                            ; T5x99
+	MOV     DPTR,#ctrl_periodcount  ; "Tickets per period" counter
+	CALL    MTH_IncWord
+;
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_LoadOp2Word
+	CALL    MTH_TestGTWord          ; No. of tickets issued this period
+	JNC     CTRL_CPmax_end          ; greater than tickets per period?
+;
+; Fall-through - reached the max. no. of tickets per period. Reset the tpp
+; counter, and step on to the next period.
+
+	IF      MINUTES_AHEAD
+	mov     dptr,#ctrl_periodlength ; T,7x99
+	movx    a,@dptr                 ;
+	mov     b,a                     ;
+	inc     dptr                    ;
+	movx    a,@dptr                 ;
+	qads    ctrl_periodahead        ;
+CTRL_CPshowShow:        
+	ENDIF
+
+	MOV     DPTR,#ctrl_periodahead
+
+	IF      MINUTES_AHEAD=0
+	CALL    MTH_IncWord             ; Next period.
+	ENDIF
+
+	CALL    CTRL_WritePA            ; Save new value to E2ROM
+;
+	MOV     R0,#mth_operand1
+	CALL    MTH_ClearOperand
+	MOV     DPTR,#ctrl_periodcount  ; Zero TPP counter
+	CALL    MTH_StoreWord
+
+;
+; If the period has shifted, evaluate the closing time flag.
+
+	setB    tim_timerupdate
+
+	CALL    ACT_ClosingTime
+CTRL_CPmax_end:
+	RET
+
+	END     ; ************ CONTROL.ASM *****************
+
+
+
+
+
+
+
+
+
+

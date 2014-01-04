@@ -1,0 +1,63 @@
+MASMX 7r2Z
+3/basis.msm
+../result.txo/frame2.txo:$(1) 60 bytes decimal from hexadecimal 00010000 to 0001003C
+../result.txo/frame2.txo:$(3) 28 bytes decimal from hexadecimal 00030000 to 0003001C
+../result.txo/scale23.txo:$(1) 16 bytes decimal from hexadecimal 0001003C to 0001004C
+../result.txo/scale23.txo:$(3) 272 bytes decimal from hexadecimal 0003001C to 0003012C
+../result.txo/scale24.txo:$(1) 32 bytes decimal from hexadecimal 0001004C to 0001006C
+../result.txo/scale24.txo:$(3) 12 bytes decimal from hexadecimal 0003012C to 00030138
+../result.txo/further.txo:$(1) 16 bytes decimal from hexadecimal 0001006C to 0001007C
+../result.txo/further.txo:$(3) 12 bytes decimal from hexadecimal 00030138 to 00030144
+  :                            3 	$list 2
+  :                            4 .	$include,$void	../result.txo/langobar
+  :                            5 $(1:010000:0a0000)
+  :                            6 $(3:030000:0b0000)
+  :                            7: 	$include,$binary "../result.txo/frame2.txo"
+01:00010000 48000025          +3 48000025 [0000]40:0000000000000000 [0001]40:0000000000000000
+01:00010004 0000000000000000  +3 
+01:0001000C 0000000000000000  +3 
+01:00010014 0000000000000000  +4 [0002]40:0000000000000000 [0003]40:0000000000000000 7D0304A0
+01:0001001C 0000000000000000  +4 
+01:00010024 7D0304A0          +4 
+01:00010028 4E800020          +5 4E800020
+03:00030010 776F6E6465726C6F61660000
+                              +9 776F6E6465726C6F61660000
+01:0001002C 64070003          +11 (03:00008010/*10)10:64070000 (03)10-:60E70010 (-01:FFFFFFCC/*02)18*/02+:(01:FFFFFFCC/*02)18*/02+:4BFFFFCD
+01:00010030 60E70010          +11 
+01:00010034 4BFFFFCD          +11 
+01:00010038 4E800020          +12 4E800020
+  :                            8 $(1)
+  :                            9 wayland*
+  :                            10: 	$include,$binary "../result.txo/scale23.txo"
+03:0003001C 776F6E6465726C6F61663200
+                              +4 776F6E6465726C6F61663200 00000064
+03:00030028 00000064          +4 
+01:0001003C 64070003          +7 (03:00008000/*10)10:64070000 (03)10-:60E70000 [0000:FFFFFFF8/*02]18*/02+:(-01:FFFFFFF8/*02)18*/02+:4BFFFFF9
+01:00010040 60E7001C          +7 
+01:00010044 4BFFFFE9          +7 
+01:00010048 4E800020          +8 4E800020
+  :                            11 $(3)
+  :                            12 wayward*	$blank	$
+  :                            13: 	$include,$binary "../result.txo/scale24.txo"
+03:0003012C 776F6E6465726C6F61663300
+                              +4 776F6E6465726C6F61663300
+01:0001004C 64070003          +7 (03:00008000/*10)10:64070000 (03)10-:60E70000 [0000:00008000/*10]10:3D200000
+01:00010050 60E7012C          +7 
+01:00010054 3D200000          +7 
+01:00010058 81290000          +8 [0000]10-:81290000 [0001:00008000/*10]10:3D400000 [0001]10-:814A0000
+01:0001005C 3D400003          +8 
+01:00010060 814A0028          +8 
+01:00010064 4BFFFFC9          +9 [0002:FFFFFFE8/*02]18*/02+:(-01:FFFFFFE8/*02)18*/02+:4BFFFFE9
+01:00010068 4E800020          +10 4E800020
+  :                            14 	$store	"../test.o3/basis"
+  :                            15: 	$include,$binary	"../result.txo/further.txo"
+03:00030138 776F6E6465726C6F61663600
+                              +4 776F6E6465726C6F61663600
+01:0001006C 64070003          +7 (03:00008000/*10)10:64070000 (03)10-:60E70000 [0000:FFFFFFF8/*02]18*/02+:(-01:FFFFFFF8/*02)18*/02+:4BFFFFF9
+01:00010070 60E70138          +7 
+01:00010074 4BFFFFB9          +7 
+01:00010078 4E800020          +8 4E800020
+  :                            16 
+  :                            17 	$end	yoohoo
+:$(01):00010000:0001007C :$(03):00030000:00030144 
+basis.msm: object code 941 bytes: 0 errors: 5 undefined labels

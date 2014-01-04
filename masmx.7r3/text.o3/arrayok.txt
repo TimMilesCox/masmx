@@ -1,0 +1,32 @@
+MASMX 7r2
+3/arrayok.msm
+*EOF*
+  :                            1 tree*   $proc
+  :                            2 *       $tree
+  :                            3 part1   $res    tree(1,1)
+  :                            4 part2   $res    tree(1,1)
+  :                            5         $root
+  :                            6         $end
+  :                            7 
+  :                            8 array   $equ    5*/92
+  :                            9 
+  :                            10 struktura* $proc
+  :                            11 entry	$set	array+(times-1)*6*1024*1024
+  :                            12 $(50::*entry)
+  :                            13 
+  :                            14 label1(times)* tree      48
+  :                            15 label2(times)* tree      48
+  :                            16 label3(times)*        
+  :                            17 label4(times)*
+  :                            18         $end
+  :                            19 
+  :                            20 times	$do	4,	struktura
+  :                            21 
+  :                            22 $(0:256)        
+00:000100 500000000000000001200060
+                              +23         +       label2(4)
+00:000104 500000000000000001200090
+                              +24         +       label2(4):part2
+*EOF*
+:$(00):000100:000108 :$(32):000000:0000C0 
+arrayok.msm: object code 131 bytes: 0 errors: 0 undefined labels

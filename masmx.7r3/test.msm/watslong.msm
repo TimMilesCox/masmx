@@ -1,0 +1,30 @@
+	$word	48
+	$awidth	24, 48
+i$	$form	8, 40
+
+p	$proc
+add*	$name	1
+load*	$name	2
+store*	$name	3
+jump*	$name	4
+
+	i$	p(0,0), p(1,1)
+	$end
+
+	$set_option	"a"
+
+$(0:0a000:*00a000000000/lit)
+$(2:02000:*002000000000)
+everywhere	+	(somewhere), (quickly)d
+there		+	(quickly)
+somewhere	$res	1
+$(0)
+	load	lit(-2)
+	add	(4)
+	store	somewhere
+	jump	(quickly:s)
+$(0:0a000:*00e000000000/lot)
+quickly
+	load	somewhere
+	add	(99)
+	jump	slightly

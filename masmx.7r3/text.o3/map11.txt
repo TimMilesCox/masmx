@@ -1,0 +1,16 @@
+MASMX 7r2
+3/map11.msm
+../result.txo/map1.txo:$(0) 0 bytes decimal from hexadecimal 000A0000 to 000A0000
+../result.txo/map1.txo:$(1) 272 bytes decimal from hexadecimal 000A0000 to 000A0110
+../result.txo/map1.txo:$(3) 128 bytes decimal from hexadecimal 000A0094 to 000A0114
+../result.txo/map1.txo:$(5) 12 bytes decimal from hexadecimal 000A00A0 to 000A00AC
+../result.txo/map1.txo:$(6) 108 bytes decimal from hexadecimal 000A00AC to 000A0118
+../result.txo/zactor.txo:$(1) 24 bytes decimal from hexadecimal 000A0118 to 000A0130
+../result.txo/zactor.txo:$(3) 4 bytes decimal from hexadecimal 000A0130 to 000A0134
+*EOF*
+  :                            1: 	$include		"map_ppc.def"
+  :                            2: 	$include,$binary	../result.txo/map1
+  :                            3: 	$include,$binary	../result.txo/zactor
+*EOF*
+:$(00):000A0000:000A0000 :$(01):000A0000:000A0130 :$(03):000A0094:000A0134 :$(05):000A00A0:000A00AC :$(06):000A00AC:000A0118 
+map11.msm: object code 1104 bytes: 0 errors: 0 undefined labels

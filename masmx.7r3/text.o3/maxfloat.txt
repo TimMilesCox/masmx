@@ -1,0 +1,43 @@
+MASMX 7r2
+3/maxfloat.msm
+Note: maxfloat.msm Line 1: characteristic outflow
+00:000000 800000800000000000000000
+                              +1 	+	1.0325317699179439621994*+1262611
+Note: maxfloat.msm Line 2: characteristic outflow
+00:000004 800000800000000000000000
+                              +2 	+	1.0325317699179439621995*+1262611
+Note: maxfloat.msm Line 3:  Floating Exponent Overflow 
+00:000008 800000800000000000000000
+                              +3 	+	1.0325317699179439621996*+1262611
+  :                            4 
+00:00000C 000000800000000000000001
+                              +5 	+	0.2421233004964754534361*-1262611
+Note: maxfloat.msm Line 6:  Floating Exponent Overflow 
+00:000010 FFFFFFFFFFFFFFFFFFFFFFFF
+                              +6         +       0.242123300496475453436*-1262611
+Note: maxfloat.msm Line 7:  Floating Exponent Overflow 
+00:000014 FFFFFFFFFFFFFFFFFFFFFFFD
+                              +7         +       0.2421233004964754534359*-1262611
+  :                            8 
+  :                            9 
+00:000018 000000800000000000000001
+                              +10 	+	2421233004964754534361*-1262633
+  :                            11 
+00:00001C 000000800000000000000001
+                              +12 	+(2421233004964754534361*-1262633)
+00:000020 7FFFFFF7EF2BA4ED825ECCCE
+                              +13 	+(1*+1262611)
+  :                            14 
+00:000024 7FFFFFF7EF2BA4ED825ECCCE
+                              +15 	+	1*+1262611
+00:000028 000002842A0043F074D91D7C
+                              +16 	+	1*-1262611
+  :                            17 
+00:00002C 8000000810D45B127DA13331
+                              +18 	-	1*+1262611
+00:000030 FFFFFD7BD5FFBC0F8B26E283
+                              +19 	-	1*-1262611
+  :                            20 
+  :                            21 	$end
+:$(00):000000:000034 
+maxfloat.msm: object code 362 bytes: 0 errors: 0 undefined labels

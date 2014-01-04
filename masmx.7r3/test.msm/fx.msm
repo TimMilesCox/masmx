@@ -1,0 +1,34 @@
+        $word           32
+        $include       "ieee754.def"
+        $floating_point 32
+        $characteristic 9
+        $characteristic,64 12
+
+
+        +1.75
+        +1.75d
+
+	$floating_point 192
+        ieee754_64      1.9375
+        ieee754_32      1.75
+        ieee754_64      1.75
+
+	$floating_point	32
+        +15*-1
+
+	$floating_point	192
+        ieee754_32      15.0e-1
+        ieee754_32      1.5
+        ieee754_32      1.75
+        ieee754_32      1.875
+        ieee754_32      1.9375
+
+        ieee754_64      1.5
+        ieee754_64      1.75
+        ieee754_64      1.875
+        ieee754_64      1.9375
+
+	$floating_point	32
+        +175.0de-1
+        +17.5d
+        +175:d*-1

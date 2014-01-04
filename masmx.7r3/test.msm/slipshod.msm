@@ -1,0 +1,5 @@
+	$set_option	"a"
+	+	undecided_value
+	+	location_2
+undecided_value	$set	1*/190
+location_2

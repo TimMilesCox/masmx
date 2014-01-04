@@ -1,0 +1,36 @@
+$(1:01000)
+jellicle(cat)
+terrible(cat)
+awful(mog)
+verrible()
+merrible(nose)
+jerrible(those)
+werrible(toes)
+$(3:*8)
+	+	100
+cat	+	99
+mog
+plaintive(cat)
+
+nose	$equ	4
+
+$(0:64)
+	+	cat
+	+	hat
+	+	nose
+	+	those
+	+	toes
+	+	jellicle(cat)
+	+	jellicle(hat)
+	+	verrible()
+	+	terrible(cat)
+	+	merrible(nose)
+	+	merrible(9)
+	+	jerrible(those)
+	+	werrible(toes)
+	+	plaintive(cat)
+	+	fearsome(woes)
+	+	werpentious(cat)
+	+	awful(mog)
+	+	awful(cat)
+	+	awful()

@@ -1,0 +1,14 @@
+MASMX 7r2Z
+3/outside.msm
+  :                            1 	$list	2
+  :                            2: 	$include	"inside.msm"
+00:000000 000001              +1 	+	1
+00:000001 000002              +2 	+	2
+00:000002 000003              +3 	+	3
+  :                            4 	$end
+00:000003 000004              +3 	+	4
+00:000004 000005              +4 	+	5
+00:000005 000006              +5 	+	6
+  :                            6 	$end
+:$(00):000000:000006 
+outside.msm: object code 79 bytes: 0 errors: 0 undefined labels

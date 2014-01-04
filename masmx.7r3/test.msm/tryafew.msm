@@ -1,0 +1,19 @@
+p*      $proc	$(0)
+name    +       1
+ya*       q
+        $end
+q*      $proc	$(0)
+name    $equf   3,3,3
+        +       name
+*       r
+        $end
+r*      $proc	$(0)
+name***   $equ    $ 
+*       +       3
+        $snap   2
+        $end
+$(64:*8:256)
+$(0:*8:64)
+here    p
+new     $set    name
+next    $equ    new

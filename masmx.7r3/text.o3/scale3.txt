@@ -1,0 +1,34 @@
+MASMX 7r2
+3/scale3.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            4 	$list		2
+  :                            5:         $include        "hangobar.msm"
+  :                            1 athing	$set	0x000003fc000a0000
+  :                            2 $(0::*athing)
+00:000003FC000A0000:4E800020  +3 _one_care*	blr
+00:000003FC000A0004:4E800020  +4 _two_cares*	blr
+00:000003FC000A0008:4E800020  +5 _three_cares*	blr
+00:000003FC000A000C:4E800020  +6 _four_cares*	blr
+  :                            7 
+  :                            6 $(60::*0x00444400000c0000)
+  :                            7: 	$include	"tisobar.msm"
+3C:00444400000C0000:48000025  +1 fireup*	bl	liftoff
+3C:00444400000C0004:000003FC000A000C
+                              +2 	+	_four_cares:d
+3C:00444400000C000C:000003FC000A0008
+                              +3 	+	_three_cares:d
+3C:00444400000C0014:000003FC000A0004
+                              +4 	+	_two_cares:d
+3C:00444400000C001C:000003FC000A0000
+                              +5 	+	_one_care:d
+  :                            6 liftoff*
+3C:00444400000C0024:7D0304A0  +7 	mfsr	lr, 3
+3C:00444400000C0028:4E800020  +8 	blr
+  :                            9 	$end	fireup
+  :                            8 	$store		"../test.o3/scale3.txo"
+*EOF*
+:$(00):00000000:00000010 :$(3C):00000000:0000002C 
+scale3.msm: object code 481 bytes: 0 errors: 0 undefined labels

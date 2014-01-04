@@ -1,0 +1,220 @@
+;*******************************************************************************
+; Stack $procs - Detects Stack Overflow & Reboots Machine
+;*******************************************************************************
+
+MANYMACS        $EQU     0
+
+;end     $proc   ; NO-OP the End Card
+;	$end
+
+
+		IF      MANYMACS
+
+; Only carry out the check when doing the final push. The rest is waste.
+; here are some lightweight $procs for r0..r7. T, 10ij2000
+;
+; e.g.                          push    acc    ; no check
+;                               push    b      ; no check
+;                               push    dph    ; no check
+;                               push    dpl    ; no check
+;                               qpushr0        ; no check
+;                               pushr1         ; check
+				
+
+qpushr0 $proc
+	mov     a,r0
+	push    acc
+	$end
+
+qpushr1 $proc  
+	mov     a,r1
+	push    acc
+	$end
+
+qpushr2 $proc  
+	mov     a,r2
+	push    acc
+	$end
+
+qpushr3 $proc  
+	mov     a,r3
+	push    acc
+	$end
+
+qpushr4 $proc  
+	mov     a,r4
+	push    acc
+	$end
+
+qpushr5 $proc  
+	mov     a,r5
+	push    acc
+	$end
+
+qpushr6 $proc  
+	mov     a,r6
+	push    acc
+	$end
+
+qpushr7 $proc  
+	mov     a,r7
+	push    acc
+	$end
+
+
+popr7   $proc
+	pop     acc
+	mov     r7,a
+	$end
+
+popr6   $proc
+	pop     acc
+	mov     r6,a
+	$end
+
+popr5   $proc
+	pop     acc
+	mov     r5,a
+	$end
+
+popr4   $proc
+	pop     acc
+	mov     r4,a
+	$end
+
+popr3   $proc
+	pop     acc
+	mov     r3,a
+	$end
+
+popr2   $proc
+	pop     acc
+	mov     r2,a
+	$end
+
+popr1   $proc
+	pop     acc
+	mov     r1,a
+	$end
+
+popr0   $proc
+	pop     acc
+	mov     r0,a
+	$end
+
+
+
+PUSHR0*  $proc	*
+	mov     a,r0
+	PUSH    acc
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+PUSHR1*  $proc	*
+	mov     a,r1
+	PUSH    acc
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+PUSHR2*  $proc	*
+	mov     a,r2
+	PUSH    acc
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+PUSHR3*  $proc	*
+	mov     a,r3
+	push    acc
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+PUSHR4*  $proc	*
+	mov     a,r4
+	PUSH    acc
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+PUSHR5*  $proc
+	mov     a,5
+	push    acc
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+PUSHR6*  $proc
+	mov     a,r6
+	PUSH    acc
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+PUSHR7*  $proc
+	mov     a,r7
+	push    acc
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+
+		ENDIF
+
+
+PUSHACC* $proc	*
+	PUSH    ACC
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+PUSHB* $proc	*
+	PUSH    B
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+PUSHDPH* $proc	*
+	PUSH    DPH
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+PUSHDPL* $proc	*
+	PUSH    DPL
+	MOV     stackcheck,SP
+	JB      stackcheck7,DT_StackOk
+	JMP     DT_ColdBoot
+DT_StackOk:
+	$end
+
+
+PUSHPSW* $proc	*
+	PUSH PSW
+	$end
+
+	END

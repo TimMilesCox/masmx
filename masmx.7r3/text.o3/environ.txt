@@ -1,0 +1,2 @@
+MASMX 7r2
+Error: environ.msm Line 0: environ.msm file missing

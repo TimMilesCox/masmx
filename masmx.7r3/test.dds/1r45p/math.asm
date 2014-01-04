@@ -1,0 +1,763 @@
+;******************************************************************************
+;
+; File     : MATH.ASM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains mathematic/arithmetic handling functions.
+;
+; System   : 80C537
+;
+; History  :
+;   Date     Who Ver  Comments
+;
+;******************************************************************************
+
+;***********
+; Prototypes
+;***********
+
+;void MTH_ClearOperand (R0 operand)
+;void MTH_SwapOp1Op2 (void)
+;void MTH_LoadOp1Acc (ACC value)
+;void MTH_LoadOp2Acc (ACC value)
+;void MTH_LoadOp1Byte (DPTR *byteval)
+;void MTH_LoadOp2Byte (DPTR *byteval)
+;void MTH_LoadOp1Word (DPTR *wordval)
+;void MTH_LoadOp2Word (DPTR *wordval)
+;void MTH_LoadOp1Long (DPTR *longval)
+;void MTH_LoadOp2Long (DPTR *longval)
+;void MTH_LoadOpAcc (R0 operand, ACC value)
+;void MTH_LoadOpByte (R0 operand, DPTR *byteval)
+;void MTH_LoadOpWord (R0 operand, DPTR *wordval)
+;void MTH_LoadOpLong (R0 operand, DPTR *longval)
+;void MTH_LoadConstWord (R0 operand, DPTR *wordconst)
+;void MTH_LoadConstLong (R0 operand, DPTR *longconst)
+;void MTH_LoadConst (R0 operand, R7 opsize, DPTR *const)
+;void MTH_StoreByte (DPTR *byteaddr)
+;void MTH_StoreWord (DPTR *wordaddr)
+;void MTH_StoreLong (DPTR *longaddr)
+;void MTH_Store (R7 opsize, DPTR *opaddr)
+;void MTH_AddWords (void)
+;void MTH_AddLongs (void)
+;void MTH_Add (R7 opsize)
+;void MTH_SubWords (void)
+;void MTH_SubLongs (void)
+;void MTH_Sub (R7 opsize)
+;void MTH_Multiply32by16 (void)
+;void MTH_Divide32by16 (void)
+;void MTH_IncLong (DPTR *longaddr)
+;void MTH_DecLong (DPTR *longaddr)
+;ACC MTH_CompareBytes (void)
+;ACC MTH_CompareWords (void)
+;ACC MTH_CompareLongs (void)
+;C MTH_TestGTWord (void)
+;C MTH_TestGTLong (void)
+
+;******************************************************************************
+;
+; Function:	MTH_ClearOperand
+; Input:	R0 = operand to clear
+; Output:	None
+; Preserved:	All
+; Destroyed:	None
+; Description:
+;   Clears the specified operand (all 4 bytes)
+;
+;******************************************************************************
+
+MTH_ClearOperand:
+	MOV	@R0,#0
+	INC	R0
+	MOV	@R0,#0
+	INC	R0
+	MOV	@R0,#0
+	INC	R0
+	MOV	@R0,#0
+	DEC	R0
+	DEC	R0
+	DEC	R0
+	RET
+
+
+MTH_SwapOp1Op2:
+	MOV	R0,#mth_operand1
+	MOV	R1,#mth_operand2
+	MOV	A,@R0
+	MOV	B,A
+	MOV	A,@R1
+	MOV	@R0,A
+	MOV	A,B
+	MOV	@R1,A
+	INC	R0
+	INC	R1
+	MOV	A,@R0
+	MOV	B,A
+	MOV	A,@R1
+	MOV	@R0,A
+	MOV	A,B
+	MOV	@R1,A
+	INC	R0
+	INC	R1
+	MOV	A,@R0
+	MOV	B,A
+	MOV	A,@R1
+	MOV	@R0,A
+	MOV	A,B
+	MOV	@R1,A
+	INC	R0
+	INC	R1
+	MOV	A,@R0
+	MOV	B,A
+	MOV	A,@R1
+	MOV	@R0,A
+	MOV	A,B
+	MOV	@R1,A
+	RET
+
+
+;******************************************************************************
+;
+; Function:	MTH_LoadOp1Acc & MTH_LoadOp2Acc
+; Input:	A = 8 bit number to load into specified operand
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	R0
+; Description:
+;   Loads the accumulator into the specified operand.
+;
+;******************************************************************************
+
+MTH_LoadOp1Acc:
+	MOV	R0,#mth_operand1
+	JMP	MTH_LoadOpAcc
+MTH_LoadOp2Acc:
+	MOV	R0,#mth_operand2
+	JMP	MTH_LoadOpAcc
+
+;******************************************************************************
+;
+; Function:	MTH_LoadOp1Byte & MTH_LoadOp2Byte
+; Input:	DPTR = address of BYTE to load into specified operand
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A, R0
+; Description:
+;   Loads the specified operand with the byte stored at DPTR in XRAM.
+;
+;******************************************************************************
+
+MTH_LoadOp1Byte:
+	MOV	R0,#mth_operand1
+	JMP	MTH_LoadOpByte
+MTH_LoadOp2Byte:
+	MOV	R0,#mth_operand2
+	JMP	MTH_LoadOpByte
+
+;******************************************************************************
+;
+; Function:	MTH_LoadOp1Word & MTH_LoadOp2Word
+; Input:	DPTR = address of WORD to load into specified operand
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A, DPTR, R0
+; Description:
+;   Loads the specified operand with the WORD stored at DPTR in XRAM.
+;
+;******************************************************************************
+
+MTH_LoadOp1Word:
+	MOV	R0,#mth_operand1
+	JMP	MTH_LoadOpWord
+MTH_LoadOp2Word:
+	MOV	R0,#mth_operand2
+	JMP	MTH_LoadOpWord
+
+;******************************************************************************
+;
+; Function:	MTH_LoadOp1Long & MTH_LoadOp2Long
+; Input:	DPTR = address of LONG to load into specified operand
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A, DPTR, R0
+; Description:
+;   Loads the specified operand with the LONG stored at DPTR in XRAM.
+;
+;******************************************************************************
+
+MTH_LoadOp1Long:
+	MOV	R0,#mth_operand1
+	JMP	MTH_LoadOpLong
+MTH_LoadOp2Long:
+	MOV	R0,#mth_operand2
+	JMP	MTH_LoadOpLong
+
+;******************************************************************************
+;
+; Function:	MTH_LoadOpAcc
+; Input:	A = 8 bit number to load into specified operand
+;               R0 = operand to load to
+; Output:	None
+; Preserved:	All
+; Destroyed:	None
+; Description:
+;   Loads the accumulator into the specified operand.
+;
+;******************************************************************************
+
+MTH_LoadOpAcc:
+	CALL	MTH_ClearOperand
+	MOV	@R0,A
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_LoadOpByte
+; Input:	DPTR = address of BYTE to load into specified operand
+;               R0 = operand to load to
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A, R0
+; Description:
+;   Loads the specified operand with the byte stored at DPTR in XRAM.
+;
+;******************************************************************************
+
+MTH_LoadOpByte:
+	CALL	MTH_ClearOperand
+	MOVX	A,@DPTR
+	MOV	@R0,A
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_LoadOpWord
+; Input:	DPTR = address of WORD to load into specified operand
+;               R0 = operand to load to
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A, DPTR, R0
+; Description:
+;   Loads the specified operand with the WORD stored at DPTR in XRAM.
+;
+;******************************************************************************
+
+MTH_LoadOpWord:
+	CALL	MTH_ClearOperand
+	MOVX	A,@DPTR
+	MOV	@R0,A
+	INC	DPTR
+	INC	R0
+	MOVX	A,@DPTR
+	MOV	@R0,A
+	INC	DPTR
+	INC	R0
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_LoadOp1Long & MTH_LoadOp2Long
+; Input:	DPTR = address of LONG to load into specified operand
+;               R0 = operand to load to
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A, DPTR, R0
+; Description:
+;   Loads the specified operand with the LONG stored at DPTR in XRAM.
+;
+;******************************************************************************
+
+MTH_LoadOpLong:
+	MOVX	A,@DPTR
+	MOV	@R0,A
+	INC	DPTR
+	INC	R0
+	MOVX	A,@DPTR
+	MOV	@R0,A
+	INC	DPTR
+	INC	R0
+	MOVX	A,@DPTR
+	MOV	@R0,A
+	INC	DPTR
+	INC	R0
+	MOVX	A,@DPTR
+	MOV	@R0,A
+	INC	DPTR
+	INC	R0
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_LoadConstWord & MTH_LoadConstLong
+; Input:	DPTR = address in CODE of word or long constant
+;               R0 = operand
+; Output:	None
+; Preserved:	?
+; Destroyed:	R7,A
+; Description:
+;   etc
+;
+;******************************************************************************
+
+MTH_LoadConstWord:
+	MOV	R7,#2
+	JMP	MTH_LoadConst
+MTH_LoadConstLong:
+	MOV	R7,#4
+MTH_LoadConst:
+	CLR	A
+	MOVC	A,@A+DPTR
+	MOV	@R0,A
+	INC	DPTR
+	INC	R0
+	DJNZ	R7,MTH_LoadConst
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_StoreByte
+; Input:	DPTR = address in XRAM to store operand
+; Output:	DPTR = address after last byte stored to
+; Preserved:	the rest
+; Destroyed:	A, R0, R7
+; Description:
+;   Stores the result of the previous MTH function (operand1) to the address
+;   specified in XRAM. Size of operand1 is BYTE.
+;
+;******************************************************************************
+
+MTH_StoreByte:
+	MOV	R7,#1
+	JMP	MTH_Store
+
+;******************************************************************************
+;
+; Function:	MTH_StoreWord
+; Input:	DPTR = address in XRAM to store operand
+; Output:	DPTR = address after last byte stored to
+; Preserved:	the rest
+; Destroyed:	A, R0, R7
+; Description:
+;   Stores the result of the previous MTH function (operand1) to the address
+;   specified in XRAM. Size of operand1 is WORD.
+;
+;******************************************************************************
+
+MTH_StoreWord:
+	MOV	R7,#2
+	JMP	MTH_Store
+
+;******************************************************************************
+;
+; Function:	MTH_StoreLong
+; Input:	DPTR = address in XRAM to store operand
+; Output:	DPTR = address after last byte stored to
+; Preserved:	the rest
+; Destroyed:	A, R0, R7
+; Description:
+;   Stores the result of the previous MTH function (operand1) to the address
+;   specified in XRAM. Size of operand1 is LONG.
+;
+;******************************************************************************
+
+MTH_StoreLong:
+	MOV	R7,#4
+	JMP	MTH_Store
+
+;******************************************************************************
+;
+; Function:	MTH_Store
+; Input:	DPTR = address in XRAM to store operand
+;               R7 = size of operand
+; Output:	DPTR = address after last byte stored to
+;               R7 = 0
+; Preserved:	the rest
+; Destroyed:	A, R0
+; Description:
+;   Stores the result of the previous MTH function (operand1) to the address
+;   specified in XRAM. Size of operand1 (bytes) specified in R7 (1 to 4)
+;
+;******************************************************************************
+
+MTH_Store:
+	MOV	R0,#mth_operand1
+MTH_Sloop:
+	MOV	A,@R0
+	MOVX	@DPTR,A
+	INC	DPTR
+	INC	R0
+	DJNZ	R7,MTH_Sloop
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_AddWords
+; Input:	None
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A,B,R0/1/7
+; Description:
+;   Adds the WORD in op2 to the WORD in op1, result in op1 (WORD)
+;
+;******************************************************************************
+
+MTH_AddWords:
+	MOV	R7,#2
+	JMP	MTH_Add
+
+;******************************************************************************
+;
+; Function:	MTH_AddLongs
+; Input:	None
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A,B,R0/1/7
+; Description:
+;   Adds the LONG in op2 to the LONG in op1, result in op1 (LONG)
+;
+;******************************************************************************
+
+MTH_AddLongs:
+	MOV	R7,#4
+	JMP	MTH_Add
+
+;******************************************************************************
+;
+; Function:	MTH_Add
+; Input:	R7 = size of operands
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A,B,R0,R1,R7
+; Description:
+;   Adds the number stored in mth_operand2 to the number stored in mth_operand1
+;   leaving the result in mth_operand1. The size of the operands in bytes is
+;   specified in R7 (1 to 4)
+;
+;******************************************************************************
+
+MTH_Add:
+	MOV	R0,#mth_operand1
+	MOV	R1,#mth_operand2
+	CLR	C
+MTH_AddLoop:
+	MOV	A,@R1
+	MOV	B,A
+	MOV	A,@R0
+	ADDC	A,B
+	MOV	@R0,A
+	INC	R0
+	INC	R1
+	DJNZ	R7,MTH_AddLoop
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_SubWords
+; Input:	None
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A,B,R0/1/7
+; Description:
+;   Subtracts the WORD in op2 from the WORD in op1, result in op1 (WORD)
+;
+;******************************************************************************
+
+MTH_SubWords:
+	MOV	R7,#2
+	JMP	MTH_Sub
+
+;******************************************************************************
+;
+; Function:	MTH_SubLongs
+; Input:	None
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A,B,R0/1/7
+; Description:
+;   Subtracts the LONG in op2 from the LONG in op1, result in op1 (LONG)
+;
+;******************************************************************************
+
+MTH_SubLongs:
+	MOV	R7,#4
+	JMP	MTH_Sub
+
+;******************************************************************************
+;
+; Function:	MTH_Sub
+; Input:	R7 = size of operands
+; Output:	None
+; Preserved:	the rest
+; Destroyed:	A,B,R0/1/7
+; Description:
+;   Subtracts the number stored in mth_operand2 from the number stored in
+;   mth_operand1 leaving the result in mth_operand1. The size of the operands
+;   in bytes is specified in R7 (1 to 4)
+;
+;******************************************************************************
+
+MTH_Sub:
+	CALL	MTH_TransmitOp1
+	CALL	MTH_TransmitOp2
+
+	MOV	R0,#mth_operand1
+	MOV	R1,#mth_operand2
+	CLR	C
+MTH_SubLoop:
+	MOV	A,@R1
+	MOV	B,A
+	MOV	A,@R0
+	SUBB	A,B
+	MOV	@R0,A
+	INC	R0
+	INC	R1
+	DJNZ	R7,MTH_SubLoop
+
+	CALL	MTH_TransmitOp1
+
+	RET
+
+MTH_TransmitOp1:
+	MOV	R0,#mth_op1hh
+	JMP	MTH_Transmit
+MTH_TransmitOp2:
+	MOV	R0,#mth_op2hh
+MTH_Transmit:
+	MOV	B,#0
+	MOV	A,@R0
+	CALL	COM_TxChar
+	DEC	R0
+	MOV	A,@R0
+	CALL	COM_TxChar
+	DEC	R0
+	MOV	A,@R0
+	CALL	COM_TxChar
+	DEC	R0
+	MOV	A,@R0
+	CALL	COM_TxChar
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_Multiply32by16
+; Input:	None
+; Output:	None
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   Multiplies the long value in operand1 with the word value in operand2
+;   and leaves the long result in operand1. Overflow is not handled properly.
+;
+;******************************************************************************
+
+MTH_Multiply32by16:
+	MOV	MD0,mth_op1ll
+	MOV	MD4,mth_op2ll
+	MOV	MD1,mth_op1lh
+	MOV	MD5,mth_op2lh		; multiply starts
+	MOV	mth_op2hl,mth_op1hl
+	MOV	mth_op2hh,mth_op1hh
+	MOV	mth_op1ll,MD0
+	MOV	mth_op1lh,MD1
+	MOV	mth_op1hl,MD2
+	MOV	mth_op1hh,MD3
+	MOV	MD0,mth_op2hl
+	MOV	MD4,mth_op2ll
+	MOV	MD1,mth_op2hh
+	MOV	MD5,mth_op2lh		; multiply starts
+	MOV	mth_op2ll,#0
+	MOV	mth_op2lh,#0
+	MOV	mth_op2hl,MD0
+	MOV	mth_op2hh,MD1
+	MOV	A,MD2
+	MOV	A,MD3
+	CALL	MTH_AddLongs
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_Divide32by16
+; Input:	?
+; Output:	?
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   Divides the long in operand1 by the word in operand2 and gives the long
+;   quotient in operand1 and the word remainder in operand2. Does not handle
+;   division by zero properly.
+;
+;******************************************************************************
+
+MTH_Divide32by16:
+	MOV	MD0,mth_op1ll
+	MOV	MD1,mth_op1lh
+	MOV	MD2,mth_op1hl
+	MOV	MD3,mth_op1hh
+	MOV	MD4,mth_op2ll
+	MOV	MD5,mth_op2lh
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	MOV	mth_op1ll,MD0
+	MOV	mth_op1lh,MD1
+	MOV	mth_op1hl,MD2
+	MOV	mth_op1hh,MD3
+	MOV	mth_op2ll,MD4
+	MOV	mth_op2lh,MD5
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_IncLong
+; Input:	DPTR = address of long value
+; Output:	?
+; Preserved:	DPTR
+; Destroyed:	?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+MTH_IncLong:
+	PUSHDPH
+	PUSHDPL
+	CALL	MTH_LoadOp1Long
+	MOV	A,#1
+	CALL	MTH_LoadOp2Acc
+	CALL	MTH_AddLongs
+	POP	DPL
+	POP	DPH
+        PUSHDPH
+        PUSHDPL
+	CALL	MTH_StoreLong
+        POP     DPL
+        POP     DPH
+	RET
+;******************************************************************************
+;
+; Function:	MTH_DecLong
+; Input:	DPTR = address of long value
+; Output:	?
+; Preserved:	DPTR
+; Destroyed:	?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+MTH_DecLong:
+	PUSHDPH
+	PUSHDPL
+	CALL	MTH_LoadOp1Long
+	MOV	A,#1
+	CALL	MTH_LoadOp2Acc
+	CALL	MTH_SubLongs
+	POP	DPL
+	POP	DPH
+	CALL	MTH_StoreLong
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_CompareLongs
+; Input:	None
+; Output:	ACC=1 is op1.long and op2.long are equal
+;               ACC=0 if not
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+MTH_CompareLongs:
+	MOV	R7,#4
+	JMP	MTH_Compare
+MTH_CompareWords:
+	MOV	R7,#2
+	JMP	MTH_Compare
+MTH_CompareBytes:
+	MOV	R7,#1
+MTH_Compare:
+	MOV	R0,#mth_operand1
+	MOV	R1,#mth_operand2
+MTH_Cloop:
+	MOV	A,@R0
+	INC	R0
+	MOV	B,@R1
+	INC	R1
+	CJNE	A,B,MTH_Cfail
+	DJNZ	R7,MTH_Cloop
+	MOV	A,#1
+	RET
+MTH_Cfail:
+	CLR	A
+	RET
+
+;******************************************************************************
+;
+; Function:	MTH_TestGTWord & MTH_TestGTLong
+; Input:	None
+; Output:	C=1 if op1 > op2
+;               C=0 if op1 <= op2
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+MTH_TestGTWord:
+	MOV	R7,#2
+	JMP	MTH_TestGT
+MTH_TestGTLong:
+	MOV	R7,#4
+MTH_TestGT:
+	MOV	A,#mth_operand1
+        ADD	A,R7
+        MOV	R0,A
+	MOV	A,#mth_operand2
+        ADD	A,R7
+        MOV	R1,A
+	CLR	C
+MTH_TGTloop:
+	DEC	R0
+        DEC	R1
+	MOV	A,@R1
+	MOV	B,A
+	MOV	A,@R0
+        CJNE    A,B,MTH_TGTne
+	DJNZ	R7,MTH_TGTloop
+MTH_TGTfalse:
+	CLR	C
+	RET
+MTH_TGTne:
+	JC	MTH_TGTfalse
+	SETB	C
+	RET
+;******************************************************************************
+
+
+MTH_IncWord:
+	PUSHDPH
+	PUSHDPL
+	CALL	MTH_LoadOp1Word
+	MOV	A,#1
+	CALL	MTH_LoadOp2Acc
+	CALL	MTH_AddWords
+	POP	DPL
+	POP	DPH
+	PUSHDPH
+	PUSHDPL
+	CALL	MTH_StoreWord
+	POP     DPL
+	POP     DPH
+	RET
+
+
+;******************************** End Of MATH.ASM *****************************

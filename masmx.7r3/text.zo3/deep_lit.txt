@@ -1,0 +1,32 @@
+MASMX 7r2Z
+3/deep_lit.msm
+*EOF*
+  :                            1 	$word	32
+  :                            2 
+  :                            3 	$plist	7
+  :                            4 
+  :                            5 $(2:020000/$vectors)
+  :                            6 $(62:62*16777216/$descriptors)
+  :                            7 
+  :                            8 vector*	$proc	$(2)
+  :                            9 address +	$descriptors(descriptor vector(1,1))
+  :                            10 	$end
+  :                            11 
+  :                            12 layout	$form	32, 32
+  :                            13 
+  :                            14 descriptor* $proc $(62)
+  :                            15 	layout	descriptor(1,1), "descriptor(1,1)"
+  :                            16 	$end
+  :                            17 
+3E:3E000000 00020000          +18 	+	$vectors(vector printf)
+Error: deep_lit.msm Line 19: 2nd pass code overlaps literal table
+3E:3E000001 00020001          +19 	+	$vectors(vector readf)
+3E:3E000002 3E000007          +20 	+	$descriptors(descriptor lookf)
+*EOF*
+02:00020000+3E000003
+02:00020001+3E000005
+3e:3e000003+[0000]20*/20:000000007072696E
+3e:3e000005+[0001]20*/20:0000000072656164
+3e:3e000007+[0002]20*/20:000000006C6F6F6B
+:$(02):00020000:00020002 :$(3E):3E000000:3E000009 
+deep_lit.msm: object code 296 bytes: 1 errors: 3 undefined labels

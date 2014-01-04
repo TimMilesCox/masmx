@@ -1,0 +1,22 @@
+MASMX 7r2
+3/simplify.msm
+*EOF*
+  :                            1         $res    4
+  :                            2 one(9)  $res    4
+  :                            3 .       +       one
+00:000008 000002              +4         +       one()
+00:000009 000004              +5 	+	one(8)
+00:00000A 00000E              +6         +       one(1)
+00:00000B 000000              +7         +       one(2)
+00:00000C 000000              +8         +       one(3)
+00:00000D 000002              +9         +       one()
+  :                            10 one(1)
+  :                            11 	$do	$o('k'),one(2)
+  :                            12 one(8,1)
+  :                            13 one(8,2)
+  :                            14 one(8,3)
+  :                            15 one(8,4)
+00:00000E 000000              +16         +       two(7)
+*EOF*
+:$(00):000000:00000F 
+simplify.msm: object code 86 bytes: 0 errors: 0 undefined labels

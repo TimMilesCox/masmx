@@ -1,0 +1,6 @@
+	$include "critical.def"
+
+	$set_option	"d"
+
+x	$do	HOW_MANY,n(x)
+	$do	$o('d'),	+	n()

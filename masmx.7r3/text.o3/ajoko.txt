@@ -1,0 +1,2 @@
+MASMX 7r2
+Error: ajoko.msm Line 0: ajoko.msm file missing

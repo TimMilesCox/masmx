@@ -1,0 +1,11 @@
+MASMX 7r2
+3/yasimi.msm
+*EOF*
+  :                            1 	$word		32
+  :                            2 	$quantum	8
+  :                            3 
+  :                            4 $(4:1024)
+04:00000400 00000404          +5 yasimi*	+	yadont
+*EOF*
+:$(04):00000400:00000408 
+yasimi.msm: object code 84 bytes: 0 errors: 0 undefined labels

@@ -1,0 +1,10 @@
+MASMX 7r2
+3/eq.msm
+Note: eq.msm Line 2: YES equate restated
+unchanged from[000000000000000000000000000000000000000000000001]
+*EOF*
+  :                            1 yes     $equ    1
+  :                            2 yes     $equ    2
+*EOF*
+
+eq.msm: object code 0 bytes: 0 errors: 0 undefined labels

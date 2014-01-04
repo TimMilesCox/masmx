@@ -1,0 +1,41 @@
+	$path		../../freeware/RTA1/rta/t77.4
+	$include	dq.def
+	$include	i_f.def
+	$path
+
+	$set_option	"za"
+
+p	$proc
+prang*	$name
+	+	("p(1, 1)":0)
+	+	$bits
+	$end
+
+$(1:*1/$1)
+?	$do	3,device(?)	i_f	,1000,this	;
+					,600		;
+					,1000,that
+
+this	$equ	99
+that	$equ	101
+
+$(66::,2)
+net1	i_f
+
+	+	$1("FINE NEW START")
+
+$(0:256)
+	prang	a
+	prang
+	prang	bcdef
+	prang	wergus
+
+	prang	considerabloonsexactliye
+	"considerabloonsexactliye"
+	+	$bits
+
+	"":1:2:3:4:5:6:7:8:9:10:11:12:13:14:15:16:17:18:19:20:21:22:23:24:25
+	+	$bits
+
+	$do	$zenith(1)>0b0,	$trace	$zenith(1)
+	$do	$zenith>0130,	$trace	$zenith

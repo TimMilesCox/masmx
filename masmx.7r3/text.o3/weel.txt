@@ -1,0 +1,30 @@
+MASMX 7r2
+3/weel.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            4 	$list	2
+  :                            5 
+  :                            6: 	$include	weel.s
+  :                            1 .globl _weel
+  :                            2 	.data
+  :                            3 	.align 3
+  :                            4 _weel:
+03:00000000 00000000          +5 	.long	0
+03:00000004 7FF00000          +6 	.long	2146435072
+  :                            7 .globl _weel_weel
+  :                            8 	.align 4
+  :                            9 _weel_weel:
+03:00000010 00000000          +10 	.long	0
+03:00000014 80000000          +11 	.long	2147483648
+03:00000018 00007FFF          +12 	.long	32767
+03:0000001C 00000000          +13 	.long	0
+  :                            14 	.subsections_via_symbols
+  :                            7 
+03:00000020 530893B3F9CA1B99  +8 	ieee754_64	1.8e400
+03:00000028 4530893B3F9CA1B98E9D33873CAF6153
+                              +9 	ieee754_128	1.8e400
+*EOF*
+:$(03):00000000:00000038 
+weel.msm: object code 207 bytes: 0 errors: 0 undefined labels

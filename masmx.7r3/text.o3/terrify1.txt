@@ -1,0 +1,298 @@
+MASMX 7r2
+3/terrify1.msm
+  :                            1 r       $equ    0
+  :                            2 k       $equ    1
+  :                            3 x       $equ    2
+  :                            4 y       $equ    3
+  :                            5 a       $equ    4
+  :                            6 b       $equ    5
+  :                            7 p $equ 12
+  :                            8 q $equ 13
+  :                            9 sp      $equ    14
+  :                            10 dp      $equ    15
+  :                            11 
+  :                            12 w0      $equ    0
+  :                            13 t1      $equ    1
+  :                            14 t2      $equ    2
+  :                            15 t3      $equ    3
+  :                            16 i       $equ    4
+  :                            17 xi      $equ    5
+  :                            18 
+  :                            19 h1      $equ    t1
+  :                            20 h2      $equ    t2
+  :                            21 
+  :                            22 i$      $form   5, 3, 1, 15
+  :                            23 i$x     $form   5, 3, 1, 3, 12
+  :                            24 i$a $form 5, 3, 16
+  :                            25 
+  :                            26 p       $proc
+  :                            27 sr*     $name   0
+  :                            28 sk*     $name   1
+  :                            29 sx*     $name   2
+  :                            30 sy*     $name   3
+  :                            31 sa*     $name   4
+  :                            32 sb*     $name   5
+  :                            33 z*      $name   6
+  :                            34 t*      $name   7
+  :                            35 lr*     $name   8
+  :                            36 lk*     $name   9
+  :                            37 lx*     $name   10
+  :                            38 ly*     $name   11
+  :                            39 la*     $name   12
+  :                            40 lb*     $name   13
+  :                            41 inc*    $name   14
+  :                            42 dec*    $name   15
+  :                            43 or*     $name   16
+  :                            44 orB*    $name   17
+  :                            45 and*    $name   18
+  :                            46 andB*   $name   19
+  :                            47 xor*    $name   20
+  :                            48 ta*     $name   21
+  :                            49 ax*     $name   22
+  :                            50 ay*     $name   23
+  :                            51 aa*     $name   24
+  :                            52 ab*     $name   25
+  :                            53 ana*    $name   26
+  :                            54 anb*    $name   27
+  :                            55 m*      $name   28
+  :                            56 mf*     $name   29
+  :                            57 d*      $name   30
+  :                            58 push*   $name   31
+  :                            59 
+  :                            60 "$address$" $set p(1,1)
+  :                            61  $if (p(0,2)=xi)++(p(1,3)=xi)
+  :                            62   $if p(1,2)
+  :                            63    $flag indexing not allowed with sign extended immediate
+  :                            64   $endif
+  :                            65   $if p(1,*1)
+  :                            66    $flag indirection not allowed with sign extended immediate
+  :                            67   $endif
+  :                            68   $do $net($address$)<-32768, $flag sign extended immediate too low
+  :                            69   $do $set($address$)>32767, $flag sign extended immediate too high
+  :                            70   i$a $n, xi, $address$
+  :                            71         $elseif p(1, 2)
+  :                            72         i$x     $n, p(0, 2)++p(1, 3), 1, p(1, 2), $address$
+  :                            73  $do $net($address$)>4095, $flag displacement out of range
+  :                            74         $do     $net($address$)>4095,   $trace $address$
+  :                            75         $else
+  :                            76         $do     $net($address$**0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF)>32767, $flag Address Out of Range
+  :                            77         $do     $net($address$**0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF)>32767,  $trace $net($address$)
+  :                            78         i$      $n, p(0, 2)++p(1, 3), p(1, *1), $address$
+  :                            79         $endif
+  :                            80         $end
+  :                            81 
+  :                            82 p       $proc
+  :                            83 ina*    $name   0
+  :                            84 inb*    $name   1
+  :                            85 outa*   $name   2
+  :                            86 outb*   $name   3
+  :                            87 plva*   $name   4
+  :                            88 
+  :                            89 sabr*   $name   6
+  :                            90 sbbr*   $name   7
+  :                            91 fsabr*  $name   14
+  :                            92 fsbbr*  $name   15
+  :                            93 
+  :                            94         $if     p(1, 2)
+  :                            95         i$x     $n, i, 1, p(1, 2), p(1, 1)
+  :                            96         $else
+  :                            97         i$      $n, i, p(1, *1), p(1, 1)
+  :                            98         $endif
+  :                            99         $end
+  :                            100 
+  :                            101 
+  :                            102 see$1   $equ    1*/14
+  :                            103 see$2   $equ    1*/13
+  :                            104 see$3   $equ    1*/12
+  :                            105 see$4   $equ    1*/11
+  :                            106 see$5   $equ    1*/10
+  :                            107 see$6   $equ    1*/9
+  :                            108 see$7   $equ    1*/8
+  :                            109 half$w  $equ    1*/7
+  :                            110 
+  :                            111 
+  :                            112 carry$  $equ    1*/4
+  :                            113 sign$   $equ    1*/3
+  :                            114 zero$   $equ    1*/2
+  :                            115 parity$ $equ    1*/1
+  :                            116 odd$    $equ    1
+  :                            117 
+  :                            118 p       $proc
+  :                            119 on*     $name   0
+  :                            120 off*    $name   1
+  :                            121 ask* $name 2
+  :                            122 
+  :                            123 ii*     $name   4
+  :                            124 ir*     $name   5
+  :                            125 lret*   $name   6
+  :                            126 fret*   $name   7
+  :                            127 
+  :                            128         $if p(1, 2)++p(1, *1)
+  :                            129         $flag no indexing or indirection with this instruction
+  :                            130         $flag only sign extended immediate 16-bit operand possible
+  :                            131         $endif
+  :                            132         i$a     $n, xi, p(1, 1)
+  :                            133         $end
+  :                            134 
+  :                            135 i$2a    $form   5, 3, 1, 7, 8 
+  :                            136 
+  :                            137 p       $proc
+  :                            138 l*      $name   14
+  :                            139 _ax*    $name   15
+  :                            140 
+  :                            141         $if     (p(0, 2)=xi)++(p(1, 3)=xi)
+  :                            142         i$2a    $n, xi, 1, p(1, 1), p(1, 2)
+  :                            143         $else
+  :                            144         i$2a    $n, xi, 0, p(1, 1), p(1, 2)
+  :                            145         $endif
+  :                            146         $end
+  :                            147 
+  :                            148 p       $proc
+  :                            149 sar*    $name   0
+  :                            150 sbr*    $name   1
+  :                            151 dsr*    $name   2
+  :                            152 lcal*   $name   3
+  :                            153 sal*    $name   4
+  :                            154 sbl*    $name   5
+  :                            155 dsl*    $name   6
+  :                            156 
+  :                            157 rar*    $name   8
+  :                            158 rbr*    $name   9
+  :                            159 drr*    $name   10
+  :                            160 
+  :                            161 ral*    $name   12
+  :                            162 rbl*    $name   13
+  :                            163 drl*    $name   14
+  :                            164 j*      $name   15
+  :                            165 saa*    $name   16
+  :                            166 sba*    $name   17
+  :                            167 dsa*    $name   18
+  :                            168 
+  :                            169 jdr*    $name   20
+  :                            170 jdk*    $name   21
+  :                            171 jnc*    $name   22
+  :                            172 jc*     $name   23
+  :                            173 jp*     $name   24
+  :                            174 jm*     $name   25
+  :                            175 jnz*    $name   26
+  :                            176 jz*     $name   27
+  :                            177 jpe*    $name   28
+  :                            178 jpo*    $name   29
+  :                            179 je*     $name   30
+  :                            180 jo*     $name   31
+  :                            181 
+  :                            182         $if     p(1, 2)
+  :                            183         i$x     $n, 6, 1, $index(p(1, 2)), $address12(p(1, 1))
+  :                            184         $else
+  :                            185         i$      $n, 6, p(1, *1), $address15(p(1, 1))
+  :                            186         $endif
+  :                            187         $end
+  :                            188 
+  :                            189 
+  :                            190 p       $proc
+  :                            191 ts*     $name   0
+  :                            192 n*      $name   1
+  :                            193 sim* $name 2
+  :                            194 labt*   $name   3
+  :                            195 push8* $name   4
+  :                            196 pop8* $name   5
+  :                            197 go*     $name   6
+  :                            198 call*   $name   7
+  :                            199 qs*     $name   8
+  :                            200 ql*     $name   9
+  :                            201 flp*    $name   10
+  :                            202 dpx*    $name   11
+  :                            203 fa*     $name   12
+  :                            204 fan*    $name   13
+  :                            205 fm*     $name   14
+  :                            206 fd*     $name   15
+  :                            207 
+  :                            208 
+  :                            209 pop* $name 16
+  :                            210 mlb* $name 17
+  :                            211 
+  :                            212 . xa*	$name	18
+  :                            213 ex* $name 19
+  :                            214 
+  :                            215 dlsc*   $name   20
+  :                            216 mta*    $name   21
+  :                            217 sc*     $name   22
+  :                            218 lc*     $name   23
+  :                            219 ds*     $name   24
+  :                            220 dl*     $name   25
+  :                            221 da*     $name   26
+  :                            222 dan*    $name   27
+  :                            223 lsc*    $name   28
+  :                            224 dtab*   $name   29
+  :                            225 src*    $name   30
+  :                            226 slc*    $name   31
+  :                            227 
+  :                            228 operand $set p(1, 1)
+  :                            229 
+  :                            230         $if     p(1, 2)
+  :                            231         i$x     $n, 7, 1, p(1, 2), operand
+  :                            232         $else
+  :                            233         $do p(1, *1)**($net(operand**0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF)>8191), $flag  indirection only on words 0 to 8191
+  :                            234         i$      $n, 7, p(1, *1), operand
+  :                            235         $endif
+  :                            236         $end
+  :                            237 
+  :                            238 f $func
+  :                            239 "$address15"* $name
+  :                            240 offset $set f(1, 1)
+  :                            241  $do $t(f(1,1))=$equf,offset $set offset**((1*/31)-1)
+  :                            242  $if f(1, *1)
+  :                            243         $do $net(offset**0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF)>8191, $flag  indirection only on words 0 to 8191
+  :                            244         $else
+  :                            245         $do $net(offset)>32767, $flag  direct addressing only 0 to 32767
+  :                            246         $endif
+  :                            247         $return offset
+  :                            248  $end
+  :                            249         
+  :                            250 f $func
+  :                            251 "$address12"* $name
+  :                            252 offset $set f(1, 1)
+  :                            253         $do $net(offset)>4095, $flag  base-displacement addressing only index + 0 to 4095
+  :                            254         $return offset
+  :                            255  $end
+  :                            256 
+  :                            257 f $func
+  :                            258 "$index"* $name
+  :                            259  $do f(1,*1),  $note  *flag on index value has no effect
+  :                            260  $do (f(1,1)>15)++(f(1,1)<2)++((f(1,1)>5)**(f(1,1)<14)), $flag only registers x,y,a,b,dp,sp (2,3,4,5,14,15) may be used for indexing
+  :                            261  $return f(1, 1) 
+  :                            262  $end
+  :                            263 
+  :                            264         $set_option "a"
+  :                            265 
+  :                            266 f $func
+  :                            267 "$bank_address"* $name
+  :                            268 
+  :                            269  $if f(1,1)<262144
+  :                            270 base $set f(1,1)/*12
+  :                            271 offset $set f(1,1)**4095
+  :                            272  $else
+  :                            273  $return f(1,1)
+  :                            274  $endif
+  :                            275 
+  :                            276  $return base*/18++offset
+  :                            277  $end
+  :                            278  
+  :                            279  $if 0
+  :                            280 f $func
+  :                            281 "$subfield"* $name
+  :                            282 v $set f(1, 1)
+  :                            283  $return f(0, v)**((1*/31)-1)
+  :                            284  $end
+  :                            285  $endif
+  :                            286 $(3:48, dp)
+03:000000 400001F00000000000000000
+                              +287 mint_julep + 1.875
+  :                            288 $(0:64)
+00:000040 4FF000              +289  ql mint_julep
+00:000041 670043              +290  fa (1.5)
+00:000042 000030              +291  + $a(mint_julep)
+  :                            292  $end
+00:000043+400001C00000000000000000
+:$(00):000040:000047 :$(03):000030:000034 
+terrify1.msm: object code 157 bytes: 0 errors: 0 undefined labels

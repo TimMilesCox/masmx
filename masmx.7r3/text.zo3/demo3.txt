@@ -1,0 +1,56 @@
+MASMX 7r2Z
+3/demo3.msm
+*EOF*
+  :                            1 
+  :                            2 	$word		32
+  :                            3  	$quantum	8
+  :                            4 	$byte		8
+  :                            5 	$awidth		32:64
+  :                            6 
+  :                            7 	$set_option	"v"
+  :                            8 
+  :                            9 ARRAY	$equ		5*/24
+  :                            10 ELEMENT_SIZE $equ 	4096
+  :                            11 HOW_MANY $equ		3072
+  :                            12 
+  :                            13 element* $proc
+  :                            14 *	+	subscript
+  :                            15 	$if	subscript=HOW_MANY
+  :                            16 	+	ARRAY
+  :                            17 	+	part(1)
+  :                            18 	$else
+  :                            19 	+	ARRAY+ELEMENT_SIZE*subscript
+  :                            20 	+	part(subscript+1)
+  :                            21 	$endif
+  :                            22 	$res	ELEMENT_SIZE-1024-12
+  :                            23 	$end
+  :                            24  
+  :                            25 newpart* $proc
+  :                            26 $(45:1024:ARRAY+ELEMENT_SIZE*subscript-ELEMENT_SIZE)
+  :                            27 	$do	subscript=4,		$list 0
+  :                            28 part(subscript)* element
+  :                            29 	$do	subscript=HOW_MANY-3,	$list 1
+  :                            30 	$end
+  :                            31 
+  :                            32 	$lit	45
+2D:00000400 00000001          +33 subscript $do	HOW_MANY,	newpart
+2D:00000404 05001000          +33 
+2D:00000408 00000400          +33 
+2D:00000400 00000002          +33 
+2D:00000404 05002000          +33 
+2D:00000408 00000400          +33 
+2D:00000400 00000003          +33 
+2D:00000404 05003000          +33 
+2D:00000408 00000400          +33 
+2D:00000400 00000BFE          +33 
+2D:00000404 05BFE000          +33 
+2D:00000408 00000400          +33 
+2D:00000400 00000BFF          +33 
+2D:00000404 05BFF000          +33 
+2D:00000408 00000400          +33 
+2D:00000400 00000C00          +33 
+2D:00000404 05000000          +33 
+2D:00000408 00000400          +33 
+*EOF*
+:$(2D):00000400:00001000 
+demo3.msm: object code 150560 bytes: 0 errors: 0 undefined labels

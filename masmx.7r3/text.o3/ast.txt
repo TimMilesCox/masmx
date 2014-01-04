@@ -1,0 +1,21 @@
+MASMX 7r2
+3/ast.msm
+*EOF*
+  :                            1 	$word	32
+  :                            2 
+  :                            3 $(4:040000)
+  :                            4 
+  :                            5 ast1	$branch
+  :                            6 axil	$res	1
+  :                            7 twig	$res	1
+  :                            8 x	$do	12,leaf(x)	$res	1
+04:0004000E 11111111          +9 	+	011111111
+  :                            10 	$root
+  :                            11 
+  :                            12 ast2	$branch
+  :                            13 x	$do	6,blossom(x)	$res	1
+04:00040006 22222222          +14 	+	022222222	
+  :                            15 	$root
+*EOF*
+:$(04):00040000:0004000F 
+ast.msm: object code 76 bytes: 0 errors: 0 undefined labels

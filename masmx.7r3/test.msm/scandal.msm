@@ -1,0 +1,27 @@
+__registers_by_name	$set	1
+	$include	"../aside.dem/ppc_64.def"
+.buffer	$equ,"$directive"	"$res"
+
+	$set_option	"i"
+
+__absolute_text	$set	0x01ac00000000000
+__absolute_data	$set	0x034000000000000
+
+$(.data:-32768:*__absolute_data+32768,r29)
+__start_data*
+rimskiy	.buffer	32760
+index	$do	4,korsakov(index)	+	104-index
+
+$(.text::*__absolute_text)
+	bl	letsgo
+	+	 __absolute_data+32768:d
+letsgo	mflr	r29
+	ld	r29, 0(r29)
+	lwz	r3, korsakov(2)
+	lwz	r4, korsakov(3)
+
+	li	r9, korsakov(1)
+	li	r10,korsakov(4)
+
+	bl	somewhere
+	blr

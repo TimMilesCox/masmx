@@ -1,0 +1,21 @@
+MASMX 7r2
+3/newby.msm
+*EOF*
+  :                            1 f       $func
+  :                            2 rel2*   $name   2
+  :                            3 rel3*   $name   3
+  :                            4 	$trace	f(0,1)
+  :                            5         $return f(1,1)-$-$n
+  :                            6         $end
+  :                            7 
+  :                            8 target1 $res    99
+  :                            9 .        +       f()
+[REL2][000000000000000000000000000000000000000000000002]
+00:000063 FFFF9B              +10         +       rel2(target1)
+[REL3][000000000000000000000000000000000000000000000003]
+00:000064 000061              +11         +       rel3(target2)
+  :                            12         $res    99
+  :                            13 target2
+*EOF*
+:$(00):000000:0000C8 
+newby.msm: object code 51 bytes: 0 errors: 0 undefined labels

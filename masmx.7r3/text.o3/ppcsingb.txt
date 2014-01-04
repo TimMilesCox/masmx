@@ -1,0 +1,120 @@
+MASMX 7r2
+3/ppcsingb.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1 record* $proc        
+  :                            2 *       $tree
+  :                            3 h       +       record(1,1)
+  :                            4 times   $do     record(1,1),t(times)       $res  4
+  :                            5         $root
+  :                            6         $end
+  :                            7 
+  :                            8 __registers_by_name	$set	1
+  :                            9 __fewer_functions	$set	1
+  :                            10:         $include        "../aside.dem/ppc_603.def"
+  :                            11 tree*   $proc
+  :                            12 *       $tree
+  :                            13 times   $do     3,dibber(times) record    tree(1,1)
+  :                            14         $root
+  :                            15         $end
+  :                            16 
+  :                            17 inline*	$proc
+  :                            18         lwz	r8, raddle1(1).dibber(3).t(index)
+  :                            19         add	r0,0,r8
+  :                            20 	$end
+  :                            21 
+  :                            22 SEGMENT $set    55*4096+768
+  :                            23 
+  :                            24 $(49::SEGMENT,r12)
+  :                            25 this_segment    $equ    .
+31:00000000 00000012          +26 times   $do     2,raddle1(times) tree    18
+31:0000004C 00000012          +26 
+31:00000098 00000012          +26 
+31:000000E4 00000012          +26 
+31:00000130 00000012          +26 
+31:0000017C 00000012          +26 
+31:000001C8 0000001E          +27 raddle2 tree    30
+31:00000244 0000001E          +27 
+31:000002C0 0000001E          +27 
+  :                            28 
+  :                            29 $(0:980*1024)
+00:000F5000 640C0003          +30         oris    r12,,SEGMENT/*16
+00:000F5004 618C7300          +31         ori     r12,r12,SEGMENT
+00:000F5008 806C004C          +32         lwz     r3, raddle1(1).dibber(2)
+00:000F500C 808C017C          +33         lwz     r4, raddle1(2).dibber(3).h
+00:000F5010 80AC01AC          +34         lwz     r5, raddle1(2).dibber(3).t(12)
+00:000F5014 80CC01C8          +35         lwz     r6, raddle2
+00:000F5018 616C0000          +36         mr      r11, r12
+  :                            37 
+  :                            38 	$if	0
+  :                            39 	lwz	r7, raddle2.dibber(1).t(9),r11
+  :                            40 	$else
+00:000F501C 80EB01EC          +41         lwz     r7, raddle2.dibber(1).t(9)(r11)
+  :                            42 	$endif
+  :                            43 
+00:000F5020 810C009C          +44 index   $do     raddle1(1).dibber(3).t(),	inline
+00:000F5024 7C004214          +44 
+00:000F5028 810C00A0          +44 
+00:000F502C 7C004214          +44 
+00:000F5030 810C00A4          +44 
+00:000F5034 7C004214          +44 
+00:000F5038 810C00A8          +44 
+00:000F503C 7C004214          +44 
+00:000F5040 810C00AC          +44 
+00:000F5044 7C004214          +44 
+00:000F5048 810C00B0          +44 
+00:000F504C 7C004214          +44 
+00:000F5050 810C00B4          +44 
+00:000F5054 7C004214          +44 
+00:000F5058 810C00B8          +44 
+00:000F505C 7C004214          +44 
+00:000F5060 810C00BC          +44 
+00:000F5064 7C004214          +44 
+00:000F5068 810C00C0          +44 
+00:000F506C 7C004214          +44 
+00:000F5070 810C00C4          +44 
+00:000F5074 7C004214          +44 
+00:000F5078 810C00C8          +44 
+00:000F507C 7C004214          +44 
+00:000F5080 810C00CC          +44 
+00:000F5084 7C004214          +44 
+00:000F5088 810C00D0          +44 
+00:000F508C 7C004214          +44 
+00:000F5090 810C00D4          +44 
+00:000F5094 7C004214          +44 
+00:000F5098 810C00D8          +44 
+00:000F509C 7C004214          +44 
+00:000F50A0 810C00DC          +44 
+00:000F50A4 7C004214          +44 
+00:000F50A8 810C00E0          +44 
+00:000F50AC 7C004214          +44 
+  :                            45 
+  :                            46 SEGMENT	$set	.(49)+SEGMENT
+  :                            47 $(50::SEGMENT,r11)
+  :                            48 new_segment $equ .
+32:00000000 00000006          +49 jessalabel tree 6
+32:0000001C 00000006          +49 
+32:00000038 00000006          +49 
+32:00000054 00000004          +50 jumbly  tree    4
+32:00000068 00000004          +50 
+32:0000007C 00000004          +50 
+  :                            51 $(0)
+00:000F50B0 640B0003          +52         oris    r11,,SEGMENT/*16
+00:000F50B4 616B763C          +53         ori     r11,r11,SEGMENT
+00:000F50B8 806B0054          +54         lwz     r3, jumbly
+00:000F50BC 808B0058          +55         lwz     r4, jumbly+4
+00:000F50C0 906B0038          +56         stw     r3, jessalabel.dibber(3).h
+00:000F50C4 90800006          +57         stw     r4, jessalabel.dibber(3).t()
+00:000F50C8 80A34000          +58         lwz     r5, 0x4000(r3)
+00:000F50CC 658402C0          +59         li      r4, raddle2.dibber(3)
+00:000F50D0 658500E4          +60         li      r5, raddle1(2)
+  :                            61 down
+00:000F50D4 4800000C          +62 	b	up
+00:000F50D8 4BFFFFFC          +63 	b	down
+00:000F50DC 48000004          +64 	b	up
+  :                            65 up
+*EOF*
+:$(00):000F5000:000F50E0 :$(31):00000000:0000033C :$(32):00000000:00000090 
+ppcsingb.msm: object code 956 bytes: 0 errors: 0 undefined labels

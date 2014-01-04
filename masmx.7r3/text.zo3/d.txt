@@ -1,0 +1,9 @@
+MASMX 7r2Z
+3/d.msm
+*EOF*
+  :                            1 $(0:0)
+d.msm=0<000003
+  :                            2         $snap   1
+*EOF*
+
+d.msm: object code 0 bytes: 0 errors: 0 undefined labels

@@ -1,0 +1,36 @@
+MASMX 7r2Z
+3/outline.msm
+*EOF*
+  :                            1 p*       $proc
+  :                            2         +       0aaaaaaaaaaaa:d
+  :                            3         $end
+  :                            4 
+  :                            5 q*      $proc   $(20)
+  :                            6         +       0bbbbbbbbbbbb:d
+  :                            7         $note   because it's not in the inline location counter
+  :                            8         $end
+  :                            9 
+  :                            10 f       $func
+  :                            11 legal*   $name   1 
+  :                            12 illegal* $name   2
+  :                            13         $if     $n=2
+  :                            14         p
+  :                            15         $else
+  :                            16         $note   the function-generated constant below is legal 
+  :                            17         q
+  :                            18         $endif
+  :                            19         $return -8
+  :                            20         $end
+  :                            21 
+00:000000 AAAAAAAAAAAA        +22         +       $, illegal():d
+Error: outline.msm Line 22: Function Adding Code Inline
+00:000002 000000FFFFF8        +22 
+  :                            23         $plist	7
+Note: outline.msm Line 24: the function-generated constant below is legal 
+Note: outline.msm Line 24: code generated in unbased counter
+14:000000 BBBBBBBBBBBB        +24         +       legal(), $:d
+Note: outline.msm Line 24: because it's not in the inline location counter
+00:000004 FFFFF8000004        +24 
+*EOF*
+:$(00):000000:000006 :$(14):000000:000002 
+outline.msm: object code 137 bytes: 1 errors: 0 undefined labels

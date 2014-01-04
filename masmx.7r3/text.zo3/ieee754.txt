@@ -1,0 +1,57 @@
+MASMX 7r2Z
+3/ieee754.msm
+*EOF*
+  :                            1         $word   32
+  :                            2 
+  :                            3 	$floating_point	192
+  :                            4 	$characteristic	24
+  :                            5 
+  :                            6 fieee754_64 $form 1, 11, 52
+  :                            7 
+  :                            8 p       $proc
+  :                            9 ieee754_64* $name 0
+  :                            10 
+  :                            11 tag     $set	p(1,1)
+  :                            12 .	$snap	2
+  :                            13 sign    $set    tag/*191
+  :                            14         
+  :                            15         $if     sign
+  :                            16 tag     $set    ^tag        
+  :                            17         $endif
+  :                            18 
+  :                            19 characteristic $set (((tag/*180)**1024)++((tag/*168)**1023))-2
+  :                            20 mantissa $set   ((tag**(1*/168)-1)+(7*/112))/*115
+  :                            21 
+  :                            22 	. adjust rounding outflow
+  :                            23 	. indicated by a 54th mantissa bit
+  :                            24 
+  :                            25 	$if	mantissa**(1*/53)
+  :                            26 mantissa $set	mantissa/*1
+  :                            27 characteristic $set characteristic+1
+  :                            28 	$endif
+  :                            29 
+  :                            30         . bb 166..115 rounded -> bb 51..0. Normalising Bit 167 Truncated
+  :                            31         
+  :                            32         fieee754_64 sign, characteristic, mantissa 
+  :                            33         $end
+  :                            34 
+  :                            35 
+  :                            36 $(0:0)
+00:00000000 3FF8000000000000  +37         ieee754_64 1.5
+00:00000002 3FF0000000000000  +38         ieee754_64 1.0
+00:00000004 4136E36000000000  +39         ieee754_64 1.5e6
+00:00000006 412E848000000000  +40         ieee754_64 1.0e6
+00:00000008 3EB92A737110E454  +41         ieee754_64 1.5e-6
+00:0000000A 3EB0C6F7A0B5ED8E  +42         ieee754_64 1.0e-6
+00:0000000C D4BB6E83B85F253C  +43         ieee754_64 -1.5e100
+00:0000000E 54BB6E83B85F253C  +44         ieee754_64 +1.5e100
+00:00000010 54B249AD2594C37D  +45         ieee754_64 1.0e100
+00:00000012 2B34FF632B6A83E4  +46         ieee754_64 1.5e-100
+00:00000014 2B2BFF2EE48E0530  +47         ieee754_64 1.0e-100
+00:00000016 7E41EB2D66005835  +48         ieee754_64 1.5e300
+00:00000018 7E37E43C8800759C  +49         ieee754_64 1.0e300
+00:0000001A 01B01297D23AB683  +50         ieee754_64 1.5e-300
+00:0000001C 01A56E1FC2F8F359  +51         ieee754_64 1.0e-300
+*EOF*
+:$(00):00000000:0000001E 
+ieee754.msm: object code 300 bytes: 0 errors: 0 undefined labels

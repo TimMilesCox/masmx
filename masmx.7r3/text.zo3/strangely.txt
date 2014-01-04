@@ -1,0 +1,36 @@
+MASMX 7r2Z
+3/strangely.msm
+*EOF*
+  :                            1 $(3:*8)
+03:000000 000063              +2 hoogoo	+	99
+  :                            3 
+  :                            4 $(7:*8,44)
+07:000000 400001C00000000000000000
+                              +5 zingaro	+	1.5
+  :                            6 
+  :                            7 $(0:256)
+  :                            8 
+00:000100 000000              +9 	+	hoogoo
+00:000101 000000              +10 	+	zingaro
+00:000102 000000              +11 	+	$a(zingaro)
+  :                            12 
+  :                            13 oso	$equf	hoogoo, 10
+  :                            14 soso	$equ	hoogoo
+  :                            15 
+  :                            16 yoho	$equf	zingaro, 11
+  :                            17 yoso	$equ	zingaro
+  :                            18 
+  :                            19 just_u	$equf	$a(zingaro), 12
+  :                            20 justso	$equ	$a(zingaro)
+  :                            21 
+00:000103 000000              +22 	+	oso
+00:000104 000000              +23 	+	soso
+00:000105 000000              +24 	+	yoho
+00:000106 000000              +25 	+	yoso
+00:000107 000000              +26 	+	just_u
+00:000108 000000              +27 	+	justso
+  :                            28 
+  :                            29 
+*EOF*
+:$(00):000100:000109 :$(03):000000:000001 :$(07):000000:000004 
+strangely.msm: object code 272 bytes: 0 errors: 0 undefined labels
