@@ -1,2 +1,0 @@
-MASMX 7r2
-Error: j2.msm Line 0: j2.msm file missing

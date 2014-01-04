@@ -1,7 +1,0 @@
-MASMX 7r2Z
-3/inc1.msm
-*EOF*
-  :                            1:         $include        "inc2.msm"
-*EOF*
-:$(00):000000:000001 
-inc1.msm: object code 44 bytes: 0 errors: 0 undefined labels

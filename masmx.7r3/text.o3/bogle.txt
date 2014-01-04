@@ -1,8 +1,0 @@
-MASMX 7r2
-3/bogle.msm
-*EOF*
-[BOGLE]Error: bogle.msm Line 1: not a command
-  :                            1         bogle
-*EOF*
-
-bogle.msm: object code 0 bytes: 1 errors: 0 undefined labels

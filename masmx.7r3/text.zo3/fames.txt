@@ -1,6 +1,0 @@
-MASMX 7r2Z
-3/fames.msm
-*EOF*
-*EOF*
-:$(00):000000:001D4C 
-fames.msm: object code 52537 bytes: 0 errors: 0 undefined labels

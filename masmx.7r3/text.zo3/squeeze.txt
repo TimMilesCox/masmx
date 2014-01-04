@@ -1,9 +1,0 @@
-MASMX 7r2Z
-3/squeeze.msm
-*EOF*
-00:000000 636363636363        +1 	+	'cccccc'
-  :                            2 	$byte	6
-00:000002 0008E38E38E3        +3 	+	'cccccc'
-*EOF*
-:$(00):000000:000004 
-squeeze.msm: object code 63 bytes: 0 errors: 0 undefined labels

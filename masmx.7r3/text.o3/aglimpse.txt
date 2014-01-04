@@ -1,2 +1,0 @@
-MASMX 7r2
-Error: aglimpse.msm Line 0: aglimpse.msm file missing

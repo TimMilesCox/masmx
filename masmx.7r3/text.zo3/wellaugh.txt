@@ -1,6 +1,0 @@
-MASMX 7r2Z
-3/wellaugh.msm
-Error: wellaugh.msm Line 23: ONE may not be restated
-Error: wellaugh.msm Line 24: TWO may not be restated
-Error: wellaugh.msm Line 25: THREE may not be restated
-*EOF*

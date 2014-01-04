@@ -1,7 +1,0 @@
-MASMX 7r2
-3/n.msm
-Note: n.msm Line 7: AGAIN equate restated
-unchanged from[000000000000000000000000000000000000000000000001]
-Error: n.msm Line 11: MORE may not be restated
-Error: n.msm Line 13: OVER may not be restated
-*EOF*

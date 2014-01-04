@@ -1,8 +1,0 @@
-MASMX 7r2
-3/grum.msm
-  :                            1 $(0:64)
-00:000040 000000              +2 grum(1) + grum
-00:000041 000040              +3  + grum(1)
-  :                            4  $end
-:$(00):000040:000042 
-grum.msm: object code 73 bytes: 0 errors: 1 undefined labels

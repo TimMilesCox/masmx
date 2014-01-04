@@ -1,7 +1,0 @@
-MASMX 7r2
-3/afile.msm
-*EOF*
-  :                            1 $(0:0)
-*EOF*
-
-afile.msm: object code 0 bytes: 0 errors: 0 undefined labels

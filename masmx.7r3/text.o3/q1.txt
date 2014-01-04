@@ -1,2 +1,0 @@
-MASMX 7r2
-Error: q1.msm Line 0: q1.msm file missing

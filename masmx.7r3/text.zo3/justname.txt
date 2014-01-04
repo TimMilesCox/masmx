@@ -1,7 +1,0 @@
-MASMX 7r2Z
-3/justname.msm
-  :                            1: 	$include	"critical.def"
-  :                            2 x $do HOW_MANY,n(HOW_MANY-x+1) $res n(x)+1-n(x)
-  :                            3  $end
-:$(00):000000:000C00 
-justname.msm: object code 26 bytes: 0 errors: 0 undefined labels

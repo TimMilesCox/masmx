@@ -1,4 +1,0 @@
-MASMX 7r2
-3/vitest.msm
-Error: vitest.msm Line 54: _ONE may not be restated
-*EOF*

@@ -1,6 +1,0 @@
-MASMX 7r2Z
-3/strial6.msm
-*EOF*
-*EOF*
-:$(00):000000:03D090 
-strial6.msm: object code 1750037 bytes: 0 errors: 0 undefined labels

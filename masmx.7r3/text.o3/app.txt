@@ -1,2 +1,0 @@
-MASMX 7r2
-Error: app.msm Line 0: app.msm file missing

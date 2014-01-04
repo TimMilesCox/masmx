@@ -1,8 +1,0 @@
-MASMX 7r2Z
-3/immediat.msm
-*EOF*
-  :                            1         $word   32
-00:00000000 0000006168657245  +2         +       'ahere'-32
-*EOF*
-:$(00):00000000:00000002 
-immediat.msm: object code 62 bytes: 0 errors: 0 undefined labels

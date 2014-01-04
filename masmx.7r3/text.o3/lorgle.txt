@@ -1,8 +1,0 @@
-MASMX 7r2
-3/lorgle.msm
-*EOF*
-  :                            1 lorgle(2)
-00:000000 000001              +2 	+	lorgle()
-*EOF*
-:$(00):000000:000001 
-lorgle.msm: object code 44 bytes: 0 errors: 0 undefined labels

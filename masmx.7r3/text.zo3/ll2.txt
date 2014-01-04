@@ -1,2 +1,0 @@
-MASMX 7r2Z
-Error: ll2.msm Line 0: ll2.msm file missing

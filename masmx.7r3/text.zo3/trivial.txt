@@ -1,8 +1,0 @@
-MASMX 7r2Z
-3/trivial.msm
-*EOF*
-00:000000 00000C              +1         +       12
-00:000001 FFFFF3              +2         +^12
-*EOF*
-:$(00):000000:000002 
-trivial.msm: object code 51 bytes: 0 errors: 0 undefined labels

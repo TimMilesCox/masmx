@@ -1,7 +1,0 @@
-MASMX 7r2
-3/strial5.msm
-*EOF*
-  :                            1: 	$include	"critical.def"
-*EOF*
-:$(00):000000:000C00 
-strial5.msm: object code 21541 bytes: 0 errors: 0 undefined labels

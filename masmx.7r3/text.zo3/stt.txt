@@ -1,2 +1,0 @@
-MASMX 7r2Z
-Error: stt.msm Line 0: stt.msm file missing

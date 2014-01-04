@@ -1,3 +1,0 @@
-MASMX 7r2
-3/strial4.msm
-[64] too many long labels

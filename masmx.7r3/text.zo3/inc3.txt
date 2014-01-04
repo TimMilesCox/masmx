@@ -1,7 +1,0 @@
-MASMX 7r2Z
-3/inc3.msm
-*EOF*
-00:000000 000001              +1 alabel  +       1
-*EOF*
-:$(00):000000:000001 
-inc3.msm: object code 44 bytes: 0 errors: 0 undefined labels

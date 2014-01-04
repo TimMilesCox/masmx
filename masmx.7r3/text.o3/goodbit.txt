@@ -1,2 +1,0 @@
-MASMX 7r2
-Error: goodbit.msm Line 0: goodbit.msm file missing

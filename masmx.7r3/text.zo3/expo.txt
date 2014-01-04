@@ -1,9 +1,0 @@
-MASMX 7r2Z
-3/expo.msm
-  :                            1 $(4:64)
-04:000040 000000              +2 kangaroo*	+	wombat
-  :                            3 tucker*		$equ	kangaroo+8
-  :                            4 didgeridoo*	$equf	tucker,15
-  :                            5 		$end
-:$(04):000040:000041 
-expo.msm: object code 131 bytes: 0 errors: 1 undefined labels

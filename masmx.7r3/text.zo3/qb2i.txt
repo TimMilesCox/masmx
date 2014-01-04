@@ -1,2 +1,0 @@
-MASMX 7r2Z
-Error: qb2i.msm Line 0: qb2i.msm file missing

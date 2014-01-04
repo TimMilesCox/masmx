@@ -1,9 +1,0 @@
-MASMX 7r2Z
-3/zipit.msm
-*EOF*
-00:000000 000002              +1 	+	1*/2//3
-00:000001 000001              +2 	+	1*/2/3
-00:000002 000004              +3 	+	1*/2///3
-*EOF*
-:$(00):000000:000003 
-zipit.msm: object code 58 bytes: 0 errors: 0 undefined labels

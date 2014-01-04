@@ -1,8 +1,0 @@
-MASMX 7r2Z
-3/dx.msm
-*EOF*
-dx.msm=0<000003
-  :                            1         $snap   0
-*EOF*
-
-dx.msm: object code 0 bytes: 0 errors: 0 undefined labels

@@ -1,8 +1,0 @@
-MASMX 7r2Z
-3/cancan.msm
-*EOF*
-Note: cancan.msm Line 1: who says I can't?
-  :                            1 	$note	who says I can't?
-*EOF*
-
-cancan.msm: object code 0 bytes: 0 errors: 0 undefined labels

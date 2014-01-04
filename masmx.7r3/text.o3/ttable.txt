@@ -1,6 +1,0 @@
-MASMX 7r2
-3/ttable.msm
-*EOF*
-*EOF*
-:$(00):000000:0003E8 
-ttable.msm: object code 7037 bytes: 0 errors: 0 undefined labels

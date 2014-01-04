@@ -1,8 +1,0 @@
-MASMX 7r2
-3/gram.msm
-  :                            1 $(0:64)
-00:000040 000041              +2 grum(1) + grum
-00:000041 000041              +3 grum	+ grum(1)
-  :                            4 	$end
-:$(00):000040:000042 
-gram.msm: object code 51 bytes: 0 errors: 0 undefined labels

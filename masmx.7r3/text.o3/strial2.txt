@@ -1,9 +1,0 @@
-MASMX 7r2
-3/strial2.msm
-*EOF*
-00:000000 000002              +1 x $do 3,n(4-x) + n(x)
-00:000001 000001              +1 
-00:000002 000000              +1 
-*EOF*
-:$(00):000000:000003 
-strial2.msm: object code 58 bytes: 0 errors: 0 undefined labels

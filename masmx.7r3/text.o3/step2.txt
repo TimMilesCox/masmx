@@ -1,3 +1,0 @@
-MASMX 7r2
-3/step2.msm
-Error: map3.def Line 0: map3.def file missing

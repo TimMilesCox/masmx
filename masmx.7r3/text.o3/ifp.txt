@@ -1,2 +1,0 @@
-MASMX 7r2
-Error: ifp.msm Line 0: ifp.msm file missing

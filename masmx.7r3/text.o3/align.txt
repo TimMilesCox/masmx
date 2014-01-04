@@ -1,2 +1,0 @@
-MASMX 7r2
-Error: align.msm Line 0: align.msm file missing

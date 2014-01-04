@@ -1,8 +1,0 @@
-MASMX 7r2Z
-3/rino.msm
-*EOF*
-00:000000 400001C00000000000000000
-                              +1         +       1.5
-*EOF*
-:$(00):000000:000004 
-rino.msm: object code 62 bytes: 0 errors: 0 undefined labels

@@ -1,4 +1,0 @@
-MASMX 7r2Z
-3/strial3.msm
-:$(00):000000:004E20 
-strial3.msm: object code 140037 bytes: 0 errors: 0 undefined labels

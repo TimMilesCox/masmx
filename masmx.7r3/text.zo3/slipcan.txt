@@ -1,9 +1,0 @@
-MASMX 7r2Z
-3/slipcan.msm
-*EOF*
-  :                            1 	$text	/black/shimmering/
-Note: slipcan.msm Line 2: who says I can't?
-  :                            2 	$note	who says I can't?
-*EOF*
-
-slipcan.msm: object code 0 bytes: 0 errors: 0 undefined labels

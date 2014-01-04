@@ -1,4 +1,0 @@
-MASMX 7r2
-3/brickie.msm
-Error: brickie.msm Line 4: FRED may not be restated
-*EOF*

@@ -1,2 +1,0 @@
-MASMX 7r2
-Error: wozita.msm Line 0: wozita.msm file missing
