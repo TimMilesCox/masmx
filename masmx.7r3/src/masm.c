@@ -192,9 +192,9 @@ extern unsigned _stklen = 32*1024;
 #define VERSION	"7"
 
 #ifdef	SUPERSET
-#define REVISION "2"
+#define REVISION "3"
 #else
-#define REVISION "2Z"
+#define REVISION "3Z"
 #endif
 
 #define	DISPLAY_Q
@@ -282,4 +282,5 @@ extern unsigned _stklen = 32*1024;
 #include "binary.c"
 #include "ilabels.c"
 #include "fpxpress.c"
+#include "espresso.c"
 #include "core.c"

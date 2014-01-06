@@ -9568,6 +9568,17 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                break;
                #endif
 
+               #ifdef ESPRESSO
+            case ESPRESSO:
+               if (!argument) break;
+               argument = substitute(argument, param);
+
+               limit = argument;
+               while (*limit++);
+               i_xpress(argument, limit);
+               break;
+               #endif
+
             default:
 	       flagf("unknown directive ");
 

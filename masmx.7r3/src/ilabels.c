@@ -168,7 +168,11 @@ static void internal_labels()
    #endif
 
    #ifdef FP_XPRESS
-    { "$fp_xqt", FP_XPRESS, DIRECTIVE } ,
+    { "$xqt_fp", FP_XPRESS, DIRECTIVE } ,
+   #endif
+
+   #ifdef ESPRESSO
+    { "$xqt_i", ESPRESSO, DIRECTIVE } ,
    #endif
 
    #ifdef ZENITH

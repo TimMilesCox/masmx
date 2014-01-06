@@ -1,3 +1,5 @@
+#define EXCLUDE_OPERATORS 1
+
 #ifdef	FP_XPRESS
 
 static char *l2r_find(int symbol, char *s, char *e)
@@ -13,21 +15,23 @@ static int complex(char *s, char *e)
    if (*s == '(') return complex(s + 1, e);
 
    if (l2r_find('(', s, e)) return 1;
-   if (contains(s, e, "+\0-\0/\0*\0")) return 1;
+
+   if (next_operator(s, e, "*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
+
    return 0;
 }
 
 static int complex_beyond_add(char *s, char *e)
 {
    if (l2r_find('(', s, e)) return 1;
-   if (contains(s, e, "-\0/\0*\0")) return 1;
+   if (next_operator(s, e, "+\0*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
    return 0;
 }
 
 static int complex_beyond_multiply(char *s, char *e)
 {
    if (l2r_find('(', s, e)) return 1;
-   if (contains(s, e, "+\0-\0/\0")) return 1;
+   if (next_operator(s, e, "*\0*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
    return 0;
 }
 
@@ -43,6 +47,7 @@ static int number(char *s, char *e)
    if (l->l.valued == LOCATION) return 0;
    if (l->l.valued ==     LTAG) return 0;
    if (l->l.valued ==     EQUF) return 0;
+   if (l->l.r.l.xref < 0)       return 0;
 
    return 1;
 }
@@ -114,8 +119,9 @@ static void fp_xpress(char *s, char *e)
                
                fpxpress_assemble(" $x_add ", s, p);
 
-               while (s = l2r_find('+', s, p))
+               while (s = next_operator(s, p, "+", 0))
                {
+                  s += ofield;
                   fpxpress_assemble(" $x_add ", s, p);
                }
 
@@ -132,8 +138,9 @@ static void fp_xpress(char *s, char *e)
 
                fpxpress_assemble(" $x_multiply ", s, p);
 
-               while (s = l2r_find('*', s, p))
+               while (s = next_operator(s, p, "*", 0))
                {
+                  s += ofield;
                   fpxpress_assemble(" $x_multiply ", s, p);
                }
 
@@ -195,3 +202,4 @@ static void fp_xpress(char *s, char *e)
 }
 
 #endif
+

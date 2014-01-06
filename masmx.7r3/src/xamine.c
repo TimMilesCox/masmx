@@ -189,12 +189,15 @@ static char *listed(char *p,  char *list)
 
 /* detect operator among subset of operators */
 
+#if 0
+
 static char *contains(char *s, char *e, char *list)
 {
-   int i = 0;
-   int sinquo = 0;
-   int quotype = 0;
-   int symbol;
+   int		 i = 0;
+   int		 sinquo = 0;
+   int		 quotype = 0;
+   int		 symbol;
+   int		 x;
 
    char *rightmost = NULL, *id;
    while (s < e)
@@ -219,8 +222,13 @@ static char *contains(char *s, char *e, char *list)
       {
 	 if (id = oper_ator(s, (long) e - (long) s))
 	 {
-	    if (listed(id, list)) rightmost = s;
-	    s+= strlen(id);
+            x = strlen(id);
+	    if (listed(id, list))
+            {
+               rightmost = s;
+               ofield = x;
+            }
+	    s+= x;
 	    continue;
 	 }
       }   
@@ -229,6 +237,83 @@ static char *contains(char *s, char *e, char *list)
 
    return rightmost;
 }
+
+#endif
+
+static char *next_operator(char *s, char *e, char *list, int exclude)
+{
+   int		 bdepth = 0;
+   int		 inquo  = 0;
+
+   int		 symbol;
+
+   char		*p;
+
+   while (s < e)
+   {
+      symbol = *s;
+      if (symbol == 0) break;
+
+      if (symbol == '\'')
+      {
+         if (!(inquo & 2)) inquo ^= 1;
+      }
+
+      if (symbol == '\"')
+      {
+         if (!(inquo & 1)) inquo ^= 2;
+      }
+
+      if (!inquo)
+      {
+         if (symbol == '(') bdepth++;
+         if (symbol == ')') bdepth--;
+
+         if (!bdepth)
+         {
+            if (p = oper_ator(s, e - s))
+            {
+               ofield = strlen(p);
+               if (!list) return s;
+
+               if (listed(p, list))
+               {
+                  if (exclude == 0) return s;
+               }
+               else
+               {
+                  if (exclude) return s;
+               }
+
+               s += ofield;
+               continue;
+            }
+         }
+      }
+
+      s++;
+   }
+
+   return NULL;
+}
+
+#if 1
+
+static char *contains(char *s, char *e, char *list)
+{
+   char		*rightmost = NULL;
+
+   while (s = next_operator(s, e, list, 0))
+   {
+       rightmost = s;
+       s += ofield;
+   }
+
+   return rightmost;
+} 
+
+#endif
+
 static char  *getop(char  *l)
 {
    #if 1

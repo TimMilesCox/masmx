@@ -121,6 +121,7 @@
 #define STORE	79
 
 #define	FP_XPRESS 80
+#define	ESPRESSO  81
 
 #define LABEL 'L'                      /* 0x4c = 76 */
 #define TEXT_SUBSTITUTE 'S'            /* 0x53 = 83 */
@@ -374,7 +375,7 @@ typedef struct { char		*name;
 static char tstring[] = ":, ";
 
 static int word = 24, byte = 8, address_size = 24, address_quantum = 24;
-
+static int ofield;
 
 #if RADIX==192
 static line_item zero_o = { 0,0,0, 0,0,0, 0,0,0, 0,0,0, 
