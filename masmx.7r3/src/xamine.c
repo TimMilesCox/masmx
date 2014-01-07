@@ -246,6 +246,7 @@ static char *next_operator(char *s, char *e, char *list, int exclude)
    int		 inquo  = 0;
 
    int		 symbol;
+   int		 x;
 
    char		*p;
 
@@ -273,11 +274,17 @@ static char *next_operator(char *s, char *e, char *list, int exclude)
          {
             if (p = oper_ator(s, e - s))
             {
-               ofield = strlen(p);
-               if (!list) return s;
+               x = strlen(p);
+
+               if (!list)
+               {
+                  ofield = x;
+                  return s;
+               }
 
                if (listed(p, list))
                {
+                  ofield = x;
                   if (exclude == 0) return s;
                }
                else
@@ -285,7 +292,7 @@ static char *next_operator(char *s, char *e, char *list, int exclude)
                   if (exclude) return s;
                }
 
-               s += ofield;
+               s += x;
                continue;
             }
          }
