@@ -353,6 +353,12 @@ typedef struct { char		*name;
 
 #endif
 
+enum	{	EQUAL, UNEQUAL, GREATER, LESS,
+		REMAINDER, COVERED_QUOTIENT, SHIFT_RIGHT, DIVIDE,
+		AND, SHIFT, EXPONENT_PLUS, EXPONENT_MINUS,
+		MULTIPLY, XOR, MINUS, OR, PLUS } ;
+
+
    #define OPERATORS 17
    static char *o[] = { "=",
 			"^=",
@@ -375,7 +381,8 @@ typedef struct { char		*name;
 static char tstring[] = ":, ";
 
 static int word = 24, byte = 8, address_size = 24, address_quantum = 24;
-static int ofield;
+static int		 ofield,
+			 otag;
 
 #if RADIX==192
 static line_item zero_o = { 0,0,0, 0,0,0, 0,0,0, 0,0,0, 

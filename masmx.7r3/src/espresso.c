@@ -78,6 +78,7 @@ static void i_xpress(char *s, char *e)
 
    int                   unary = *s;
    int			 symbol;
+   int			 this_operator;
 
 
    if (storage_addresses(s, e))
@@ -93,92 +94,87 @@ static void i_xpress(char *s, char *e)
       ||  (p = contains(q, e, "+\0-\0"))
       ||  (p = contains(q, e, "/\0//\0///\0*\0")))
       {
+         this_operator = otag;
          q = p + ofield;
          symbol = 0;
          if (ofield > 1) symbol = *(p + 1);
 
+
          if ((i_complex(q, e)) && (storage_addresses(q, e)))
          {
             i_xpress(q, e);
-
-            switch (*p)
+ 
+            switch (this_operator)
             {
-               case '=':
+               case EQUAL:
                   fpxpress_asmq(" $i_reserve ");
                   i_xpress(s, p);
                   fpxpress_asmq(" $i_retrieve_testequal ");
                   break;
 
-               case '^':
-                  if (symbol == '=')
-                  {
-                     fpxpress_asmq(" $i_reserve ");
-                     i_xpress(s, p);
-                     fpxpress_asmq(" $i_retrieve_testunequal ");
-                  }
+               case UNEQUAL:
+                  fpxpress_asmq(" $i_reserve ");
+                  i_xpress(s, p);
+                  fpxpress_asmq(" $i_retrieve_testunequal ");
 
                   break;
 
-               case '>':
+               case GREATER:
                   fpxpress_asmq(" $i_reserve ");
                   i_xpress(s, p);
                   fpxpress_asmq(" $i_retrieve_testgreater ");
                   break;
 
-               case '<':
+               case LESS:
                   fpxpress_asmq(" $i_reserve ");
                   i_xpress(s, p);
                   fpxpress_asmq(" $i_retrieve_testless ");
                   break;
 
-               case '-':
-                  if (symbol == '-')
+               case XOR:
+                  if ((i_complex_beyond_xor(s, p)) && (storage_addresses(s, p)))
                   {
-                     if ((i_complex_beyond_xor(s, p)) && (storage_addresses(s, p)))
-                     {
-                        fpxpress_asmq(" $i_reserve ");
-                        i_xpress(s, p);
-                        fpxpress_asmq(" $i_retrieve_xor ");
-                        break;
-                     }
-
-                     fpxpress_assemble(" $i_xor ", s, p);
-
-                     while (s = next_operator(s, p, "--\0", 0))
-                     {
-                        s += ofield;
-                        fpxpress_assemble(" $i_xor ", s, p);
-                     }
-
+                     fpxpress_asmq(" $i_reserve ");
+                     i_xpress(s, p);
+                     fpxpress_asmq(" $i_retrieve_xor ");
                      break;
                   }
 
+                  fpxpress_assemble(" $i_xor ", s, p);
+
+                  while (s = next_operator(s, p, "--\0", 0))
+                  {
+                     s += ofield;
+                     fpxpress_assemble(" $i_xor ", s, p);
+                  }
+
+                  break;
+
+               case MINUS:
                   fpxpress_asmq(" $i_reserve ");
                   i_xpress(s, p);
                   fpxpress_asmq(" $i_retrieve_subtract ");
                   break;
 
-               case '+':
-                  if (symbol == '+')
+               case OR:
+                  if ((i_complex_beyond_or(s, p)) && (storage_addresses(s, p)))
                   {
-                     if ((i_complex_beyond_or(s, p)) && (storage_addresses(s, p)))
-                     {
-                        fpxpress_asmq(" $i_reserve ");
-                        i_xpress(s, p);
-                        fpxpress_asmq(" $i_retrieve_or ");
-                        break;
-                     }
-
-                     fpxpress_assemble(" $i_or ", s, p);
-
-                     while (s = next_operator(s, p, "++\0", 0))
-                     {
-                        s += ofield;
-                        fpxpress_assemble(" $i_or ", s, p);
-                     }
+                     fpxpress_asmq(" $i_reserve ");
+                     i_xpress(s, p);
+                     fpxpress_asmq(" $i_retrieve_or ");
                      break;
                   }
 
+                  fpxpress_assemble(" $i_or ", s, p);
+
+                  while (s = next_operator(s, p, "++\0", 0))
+                  {
+                     s += ofield;
+                     fpxpress_assemble(" $i_or ", s, p);
+                  }
+                  break;
+
+               case PLUS:
                   if ((i_complex_beyond_add(s, p)) && (storage_addresses(s, p)))
                   {
                      fpxpress_asmq(" $i_reserve ");
@@ -197,36 +193,32 @@ static void i_xpress(char *s, char *e)
 
                   break;
 
-               case '*':
-                  if (symbol == '/')
+               case SHIFT:
+                  fpxpress_asmq(" $i_reserve ");
+                  i_xpress(s, p);
+                  fpxpress_asmq(" $i_retrieve_shift ");
+                  break;
+
+               case AND:
+                  if ((i_complex_beyond_and(s, p)) && (storage_addresses(s, p)))
                   {
                      fpxpress_asmq(" $i_reserve ");
                      i_xpress(s, p);
-                     fpxpress_asmq(" $i_retrieve_shift ");
+                     fpxpress_asmq(" $i_retrieve_and ");
                      break;
                   }
 
-                  if (symbol == '*')
+                  fpxpress_assemble(" $i_and ", s, p);
+
+                  while (s = next_operator(s, p, "**\0", 0))
                   {
-                     if ((i_complex_beyond_and(s, p)) && (storage_addresses(s, p)))
-                     {
-                        fpxpress_asmq(" $i_reserve ");
-                        i_xpress(s, p);
-                        fpxpress_asmq(" $i_retrieve_and ");
-                        break;
-                     }
-
+                     s += ofield;
                      fpxpress_assemble(" $i_and ", s, p);
-
-                     while (s = next_operator(s, p, "**\0", 0))
-                     {
-                        s += ofield;
-                        fpxpress_assemble(" $i_and ", s, p);
-                     }
-
-                     break;
                   }
 
+                  break;
+
+               case MULTIPLY:
                   if ((i_complex_beyond_multiply(s, p)) && (storage_addresses(s, p)))
                   {
                      fpxpress_asmq(" $i_reserve ");
@@ -245,31 +237,25 @@ static void i_xpress(char *s, char *e)
 
                   break;
 
-               case '/':
-                  if (symbol == '*')
-                  {
-                     fpxpress_asmq(" $i_reserve ");
-                     i_xpress(s, p);
-                     fpxpress_asmq(" $i_retrieve_shift_right ");
-                     break;
-                  }
+               case SHIFT_RIGHT:
+                  fpxpress_asmq(" $i_reserve ");
+                  i_xpress(s, p);
+                  fpxpress_asmq(" $i_retrieve_shift_right ");
+                  break;
 
-                  if (symbol == '/')
-                  {
-                     if (*(p + 2) == '/')
-                     {
-                        fpxpress_asmq(" $i_reserve ");
-                        i_xpress(s, p);
-                        fpxpress_asmq(" $i_retrieve_remainder ");
-                        break;
-                     }
+               case REMAINDER:
+                  fpxpress_asmq(" $i_reserve ");
+                  i_xpress(s, p);
+                  fpxpress_asmq(" $i_retrieve_remainder ");
+                  break;
 
-                     fpxpress_asmq(" $i_reserve ");
-                     i_xpress(s, p);
-                     fpxpress_asmq(" $i_retrieve_covered_quotient ");
-                     break;
-                  }
+               case COVERED_QUOTIENT:
+                  fpxpress_asmq(" $i_reserve ");
+                  i_xpress(s, p);
+                  fpxpress_asmq(" $i_retrieve_covered_quotient ");
+                  break;
 
+               case DIVIDE:
                   fpxpress_asmq(" $i_reserve ");
                   i_xpress(s, p);
                   fpxpress_asmq(" $i_retrieve_divide ");
@@ -280,83 +266,65 @@ static void i_xpress(char *s, char *e)
             i_xpress(s, p);
             if (*q == '(') q++;
 
-            switch(*p)
+            switch (this_operator)
             {
-               case '=':
+               case EQUAL:
                   fpxpress_assemble( "$i_testequal ", q, e);
                   break;
 
-               case '^':
-                  if (symbol == '-')
-                  {
-                     fpxpress_assemble( "$i_testunequal ", q, e);
-                  }
-
+               case UNEQUAL:
+                  fpxpress_assemble( "$i_testunequal ", q, e);
                   break;
 
-               case '>':
+               case GREATER:
                   fpxpress_assemble( "$i_testgreater ", q, e);
                   break;
 
-               case '<':
+               case LESS:
                   fpxpress_assemble( "$i_testless ", q, e);
                   break;
 
-               case '-':
-                  if (symbol == '-')
-                  {
-                     fpxpress_assemble( " $i_xor ", q, e);
-                     break;
-                  }
+               case XOR:
+                  fpxpress_assemble( " $i_xor ", q, e);
+                  break;
 
+               case MINUS:
                   fpxpress_assemble(" $i_subtract ", q, e);
                   break;
 
-               case '+':
-                  if (symbol == '+')
-                  {
-                     fpxpress_assemble( " $i_or ", q, e);
-                     break;
-                  }
+               case OR:
+                  fpxpress_assemble( " $i_or ", q, e);
+                  break;
 
+               case PLUS:
                   fpxpress_assemble(" $i_add ", q, e);
                   break;
 
-               case '*':
-                  if (symbol == '*')
-                  {
-                     fpxpress_assemble( " $i_and ", q, e);
-                     break;
-                  }
+               case AND:
+                  fpxpress_assemble( " $i_and ", q, e);
+                  break;
 
-                  if (symbol == '/')
-                  {
-                     fpxpress_assemble( " $i_shift ", q, e);
-                     break;
-                  }
+               case SHIFT:
+                  fpxpress_assemble( " $i_shift ", q, e);
+                  break;
 
+               case MULTIPLY:
                   fpxpress_assemble(" $i_multiply ", q, e);
                   break;
 
-               case '/':
-                  if (symbol == '*')
-                  {
-                     fpxpress_assemble( " $i_shift_right ", q, e);
-                     break;
-                  }
+               case SHIFT_RIGHT:
+                  fpxpress_assemble( " $i_shift_right ", q, e);
+                  break;
 
-                  if (symbol == '/')
-                  {
-                     if (*(p + 2) == '/')
-                     {
-                        fpxpress_assemble( " $i_remainder ", q, e);
-                        break;
-                     }
+               case REMAINDER:
+                  fpxpress_assemble( " $i_remainder ", q, e);
+                  break;
 
-                     fpxpress_assemble( " $i_covered_quotient ", q, e);
-                     break;
-                  }
+               case COVERED_QUOTIENT:
+                  fpxpress_assemble( " $i_covered_quotient ", q, e);
+                  break;
 
+               case DIVIDE:
                   fpxpress_assemble(" $i_divide ", q, e);
             }
          }

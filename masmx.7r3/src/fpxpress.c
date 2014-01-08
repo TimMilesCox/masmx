@@ -41,7 +41,8 @@ static int number(char *s, char *e)
 
    if (*s == '*') return 0;
 
-   l = findlabel(s, e);
+   if (s < e) l = findlabel(s, e);
+   else                  return 1;
 
    if (!l) return 1;
    if (l->l.valued == LOCATION) return 0;

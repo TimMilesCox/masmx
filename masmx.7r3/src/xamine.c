@@ -153,7 +153,7 @@ static char *edge(char *s, char *m)
 }
 
 
-static char *oper_ator(char *c, long len)
+static int oper_ator(char *c, long len)
 {
    char *q, *r;
    int i, j;
@@ -170,9 +170,9 @@ static char *oper_ator(char *c, long len)
 	 q++;
 	 j--;
       }
-      if (*r == 0) return o[i];
+      if (*r == 0) return i;	/* o[i];*/
    }
-   return NULL;
+   return -1; /* NULL; */
 }
 
 /* detect a string among a list of strings */ 
@@ -247,8 +247,10 @@ static char *next_operator(char *s, char *e, char *list, int exclude)
 
    int		 symbol;
    int		 x;
+   int		 y;
 
    char		*p;
+
 
    while (s < e)
    {
@@ -272,8 +274,13 @@ static char *next_operator(char *s, char *e, char *list, int exclude)
 
          if (!bdepth)
          {
-            if (p = oper_ator(s, e - s))
+            y = oper_ator(s, e - s);
+            if (y < 0)
             {
+            }
+            else
+            {
+               p = o[y];
                x = strlen(p);
 
                if (!list)
@@ -284,6 +291,7 @@ static char *next_operator(char *s, char *e, char *list, int exclude)
 
                if (listed(p, list))
                {
+                  otag = y;
                   ofield = x;
                   if (exclude == 0) return s;
                }
