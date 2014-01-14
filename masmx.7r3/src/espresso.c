@@ -1,50 +1,5 @@
 #ifdef	ESPRESSO
 
-static int i_complex(char *s, char *e)
-{
-   if (*s == '*') return complex(s + 1, e);
-   if (*s == '(') return complex(s + 1, e);
-
-   if (l2r_find('(', s, e)) return 1;
-   if (next_operator(s, e, "*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
-   return 0;
-}
-
-static int i_complex_beyond_or(char *s, char *e)
-{
-   if (l2r_find('(', s, e)) return 1;
-   if (next_operator(s, e, "++\0*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
-   return 0;
-}
-
-static int i_complex_beyond_xor(char *s, char *e)
-{  
-   if (l2r_find('(', s, e)) return 1;
-   if (next_operator(s, e, "--\0*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
-   return 0;
-}     
-
-static int i_complex_beyond_and(char *s, char *e)
-{  
-   if (l2r_find('(', s, e)) return 1;
-   if (next_operator(s, e, "**\0*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
-   return 0;
-}    
-
-static int i_complex_beyond_add(char *s, char *e)
-{  
-   if (l2r_find('(', s, e)) return 1;
-   if (next_operator(s, e, "+\0*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
-   return 0;
-}     
-
-static int i_complex_beyond_multiply(char *s, char *e)
-{  
-   if (l2r_find('(', s, e)) return 1;
-   if (next_operator(s, e, "*\0*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
-   return 0;
-}     
-
 static int storage_addresses(char *s, char *e)
 {
    char			*p;
@@ -71,6 +26,47 @@ static int storage_addresses(char *s, char *e)
    return 0;
 }
 
+static void trailing_integer_operation(int x, char *s, char *e)
+{
+   if (*s == '(') s++;
+
+   switch (x)
+   {
+      case OR:
+         fpxpress_assemble(" $i_or ", s, e);
+         break;
+
+      case XOR:
+         fpxpress_assemble(" $i_xor ", s, e);
+         break;
+
+      case PLUS:
+         fpxpress_assemble(" $i_add ", s, e);
+         break;
+
+      case MINUS:
+         fpxpress_assemble(" $i_subtract ", s, e);
+         break;
+
+      case MULTIPLY:
+         fpxpress_assemble(" $i_multiply ", s, e);
+         break;
+
+      case DIVIDE:
+         fpxpress_assemble(" $i_divide ", s, e);
+         break;
+
+      case COVERED_QUOTIENT:
+         fpxpress_assemble(" $i_covered_quotient ", s, e);
+         break;
+
+      case REMAINDER:
+         fpxpress_assemble(" $i_remainder ", s, e);
+         break;
+   }
+}
+
+
 static void i_xpress(char *s, char *e)
 {
    char                 *p,
@@ -94,13 +90,14 @@ static void i_xpress(char *s, char *e)
       ||  (p = contains(q, e, "+\0-\0"))
       ||  (p = contains(q, e, "/\0//\0///\0*\0")))
       {
-         this_operator = otag;
-         q = p + ofield;
+         this_operator = oper_ator(p, e - p);
+         q = p + ufield[this_operator];
+
          symbol = 0;
          if (ofield > 1) symbol = *(p + 1);
 
 
-         if ((i_complex(q, e)) && (storage_addresses(q, e)))
+         if ((complex(q, e)) && (storage_addresses(q, e)))
          {
             i_xpress(q, e);
  
@@ -132,7 +129,7 @@ static void i_xpress(char *s, char *e)
                   break;
 
                case XOR:
-                  if ((i_complex_beyond_xor(s, p)) && (storage_addresses(s, p)))
+                  if ((complex_beyond(s, p, "++\0--\0*+\0*-\0")) && (storage_addresses(s, p)))
                   {
                      fpxpress_asmq(" $i_reserve ");
                      i_xpress(s, p);
@@ -140,13 +137,14 @@ static void i_xpress(char *s, char *e)
                      break;
                   }
 
-                  fpxpress_assemble(" $i_xor ", s, p);
-
-                  while (s = next_operator(s, p, "--\0", 0))
+                  while (q = next_operator(s, p, "++\0--\0", 0))
                   {
-                     s += ofield;
-                     fpxpress_assemble(" $i_xor ", s, p);
+                     trailing_integer_operation(this_operator, s, q);
+                     this_operator = oper_ator(q, p - q);
+                     s = q + ufield[this_operator];
                   }
+
+                  trailing_integer_operation(this_operator, s, p);
 
                   break;
 
@@ -157,7 +155,7 @@ static void i_xpress(char *s, char *e)
                   break;
 
                case OR:
-                  if ((i_complex_beyond_or(s, p)) && (storage_addresses(s, p)))
+                  if ((complex_beyond(s, p, "++\0--\0*+\0*-\0")) && (storage_addresses(s, p)))
                   {
                      fpxpress_asmq(" $i_reserve ");
                      i_xpress(s, p);
@@ -165,17 +163,20 @@ static void i_xpress(char *s, char *e)
                      break;
                   }
 
-                  fpxpress_assemble(" $i_or ", s, p);
-
-                  while (s = next_operator(s, p, "++\0", 0))
+                  while (q = next_operator(s, p, "++\0--\0", 0))
                   {
-                     s += ofield;
-                     fpxpress_assemble(" $i_or ", s, p);
+                     trailing_integer_operation(this_operator, s, q);
+                     this_operator = oper_ator(q, p - q);
+                     s = q + ufield[this_operator];
                   }
+
+                  trailing_integer_operation(this_operator, s, p);
+
+
                   break;
 
                case PLUS:
-                  if ((i_complex_beyond_add(s, p)) && (storage_addresses(s, p)))
+                  if ((complex_beyond(s, p, "+\0-\0*+\0*-\0")) && (storage_addresses(s, p)))
                   {
                      fpxpress_asmq(" $i_reserve ");
                      i_xpress(s, p);
@@ -183,13 +184,16 @@ static void i_xpress(char *s, char *e)
                      break;
                   }
 
-                  fpxpress_assemble(" $i_add ", s, p);
 
-                  while (s = next_operator(s, p, "+\0", 0))
+                  while (q = next_operator(s, p, "+\0-\0", 0))
                   {
-                     s += ofield;
-                     fpxpress_assemble(" $i_add ", s, p);
+                     trailing_integer_operation(this_operator, s, q);
+                     this_operator = oper_ator(q, p - q);
+                     s = q + ufield[this_operator];
                   }
+
+                  trailing_integer_operation(this_operator, s, p);
+
 
                   break;
 
@@ -200,7 +204,7 @@ static void i_xpress(char *s, char *e)
                   break;
 
                case AND:
-                  if ((i_complex_beyond_and(s, p)) && (storage_addresses(s, p)))
+                  if ((complex_beyond(s, p, "**\0*+\0*-\0")) && (storage_addresses(s, p)))
                   {
                      fpxpress_asmq(" $i_reserve ");
                      i_xpress(s, p);
@@ -208,18 +212,18 @@ static void i_xpress(char *s, char *e)
                      break;
                   }
 
-                  fpxpress_assemble(" $i_and ", s, p);
-
-                  while (s = next_operator(s, p, "**\0", 0))
+                  while (q = next_operator(s, p, "**\0", 0))
                   {
-                     s += ofield;
-                     fpxpress_assemble(" $i_and ", s, p);
+                     fpxpress_assemble(" $i_and ",  s, q);
+                     s = q + ufield[AND];
                   }
+
+                  fpxpress_assemble(" $i_and ", s, p);
 
                   break;
 
                case MULTIPLY:
-                  if ((i_complex_beyond_multiply(s, p)) && (storage_addresses(s, p)))
+                  if ((complex_beyond(s, p, "*\0///\0//\0/\0*+\0*-\0")) && (storage_addresses(s, p)))
                   {
                      fpxpress_asmq(" $i_reserve ");
                      i_xpress(s, p);
@@ -227,13 +231,14 @@ static void i_xpress(char *s, char *e)
                      break;
                   }
 
-                  fpxpress_assemble(" $i_multiply ", s, p);
-
-                  while (s = next_operator(s, p, "*\0", 0))
+                  while (q = next_operator(s, p, "*\0///\0//\0/\0", 0))
                   {
-                     s += ofield;
-                     fpxpress_assemble(" $i_multiply ", s, p);
+                     trailing_integer_operation(this_operator, s, q);
+                     this_operator = oper_ator(q, p - q);
+                     s = q + ufield[this_operator]; 
                   }
+
+                  trailing_integer_operation(this_operator, s, p);
 
                   break;
 

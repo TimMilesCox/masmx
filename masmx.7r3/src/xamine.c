@@ -281,7 +281,7 @@ static char *next_operator(char *s, char *e, char *list, int exclude)
             else
             {
                p = o[y];
-               x = strlen(p);
+               x = ufield[y];
 
                if (!list)
                {

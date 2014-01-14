@@ -11,27 +11,47 @@ static char *l2r_find(int symbol, char *s, char *e)
 
 static int complex(char *s, char *e)
 {
-   if (*s == '*') return complex(s + 1, e);
-   if (*s == '(') return complex(s + 1, e);
+   char			*p = s,
+			*q;
 
-   if (l2r_find('(', s, e)) return 1;
+   if (*s == '*') return complex(s + 1, e);
+
+   while (p = l2r_find('(', p, e))
+   {
+      q = fendbe(p);
+
+      if (complex(p, q))
+      {
+          return 1;
+      }
+
+      p = q;
+   }
 
    if (next_operator(s, e, "*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
 
    return 0;
 }
 
-static int complex_beyond_add(char *s, char *e)
+static int complex_beyond(char *s, char *e, char *list)
 {
-   if (l2r_find('(', s, e)) return 1;
-   if (next_operator(s, e, "+\0*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
-   return 0;
-}
+   char			*p = s,
+			*q;
 
-static int complex_beyond_multiply(char *s, char *e)
-{
-   if (l2r_find('(', s, e)) return 1;
-   if (next_operator(s, e, "*\0*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
+   if (*s == '*') return complex(s + 1, e);
+
+   while (p = l2r_find('(', p, e))
+   {
+      q = fendbe(p);
+      if (complex_beyond(p, q, list))
+      {
+         return 1;
+      }
+      p = q;
+   }
+
+   if (p = next_operator(s, e, list, EXCLUDE_OPERATORS)) return 1;
+
    return 0;
 }
 
@@ -40,6 +60,7 @@ static int number(char *s, char *e)
    object		*l;
 
    if (*s == '*') return 0;
+   if (*s == '(') return number(s+1, e-1);
 
    if (s < e) l = findlabel(s, e);
    else                  return 1;
@@ -81,13 +102,37 @@ static void fpxpress_asmq(char *name)
    masm_level--;
 }
 
+static void trailing_fp_operation(int x, char *s, char *e)
+{
+   if (*s == '(') s++;
+
+   switch (x)
+   {
+      case PLUS:
+         fpxpress_assemble(" $x_add ", s, e);
+         break;
+
+      case MINUS:
+         fpxpress_assemble(" $x_subtract ", s, e);
+         break;
+
+      case MULTIPLY:
+         fpxpress_assemble(" $x_multiply ", s, e);
+         break;
+
+      case DIVIDE:
+         fpxpress_assemble(" $x_divide ", s, e);
+
+   }
+}
+
 static void fp_xpress(char *s, char *e)
 {
    char			*p,
                         *q = s;
 
-   char			 unary = *s;
-
+   int			 unary = *s;
+   int			 x;
 
 
    if ((unary == '+') || (unary == '-') || (unary == '*')) q++;
@@ -110,26 +155,30 @@ static void fp_xpress(char *s, char *e)
                break;
 
             case '+':
-               if (complex_beyond_add(s, p))
+
+               if (complex_beyond(s, p, "+\0-\0*+\0*-\0"))
                {
                   fpxpress_asmq(" $x_reserve ");
                   fp_xpress(s, p);
                   fpxpress_asmq(" $x_retrieve_add ");
                   break;
                }
-               
-               fpxpress_assemble(" $x_add ", s, p);
 
-               while (s = next_operator(s, p, "+", 0))
+
+               x = PLUS;
+
+               while (q = next_operator(s, p, "+\0-\0", 0))
                {
-                  s += ofield;
-                  fpxpress_assemble(" $x_add ", s, p);
+                  trailing_fp_operation(x, s, q);
+                  x = oper_ator(q, p - q);
+                  s = q + ufield[x];
                }
 
+               trailing_fp_operation(x, s, p);
                break;
 
             case '*':
-               if (complex_beyond_multiply(s, p))
+               if (complex_beyond(s, p, "*\0/\0*+\0*-\0"))
                {
                   fpxpress_asmq(" $x_reserve ");
                   fp_xpress(s, p);
@@ -137,14 +186,16 @@ static void fp_xpress(char *s, char *e)
                   break;
                }
 
-               fpxpress_assemble(" $x_multiply ", s, p);
+               x = MULTIPLY;
 
-               while (s = next_operator(s, p, "*", 0))
+               while (q = next_operator(s, p, "*\0/\0", 0))
                {
-                  s += ofield;
-                  fpxpress_assemble(" $x_multiply ", s, p);
+                  trailing_fp_operation(x, s, q);
+                  x = oper_ator(q, p - q);
+                  s = q + ufield[x];
                }
 
+               trailing_fp_operation(x, s, p);
                break;
 
             case '/':

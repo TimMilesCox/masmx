@@ -1,4 +1,4 @@
-	$path		../../freeware/RTA1/rta/t77.4
+	$path		../../../RTA1/rta/t77.4
 	$include	dq.def
 	$include	i_f.def
 	$path

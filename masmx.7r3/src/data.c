@@ -358,6 +358,16 @@ enum	{	EQUAL, UNEQUAL, GREATER, LESS,
 		AND, SHIFT, EXPONENT_PLUS, EXPONENT_MINUS,
 		MULTIPLY, XOR, MINUS, OR, PLUS } ;
 
+static char ufield[] = {	sizeof("=")   - 1,	sizeof("^=") - 1,
+				sizeof(">")   - 1,	sizeof("<")  - 1,
+				sizeof("///") - 1,	sizeof("//") - 1,
+				sizeof("/*")  - 1,	sizeof("/")  - 1,
+				sizeof("**")  - 1,	sizeof("*/") - 1,
+				sizeof("*+")  - 1,	sizeof("*-") - 1,
+				sizeof("*")   - 1,	sizeof("--") - 1,
+				sizeof("-")   - 1,	sizeof("++") - 1,
+				sizeof("+")   - 1			  } ;
+
 
    #define OPERATORS 17
    static char *o[] = { "=",
@@ -377,6 +387,8 @@ enum	{	EQUAL, UNEQUAL, GREATER, LESS,
 			"-",
 			"++",
 			"+"     } ;
+
+
 
 static char tstring[] = ":, ";
 
