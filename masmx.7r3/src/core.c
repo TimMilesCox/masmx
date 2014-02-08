@@ -1136,7 +1136,7 @@ static line_item *external_function(char *s, char *param, char *mark,
       y = x->h.length;
 
       #ifdef CLEATING
-      if (!y) cleat();
+      if (!y) cleat(1, x);
       #endif
 
       x = (object *) ((long) x + y);
@@ -1176,23 +1176,33 @@ static line_item *external_function(char *s, char *param, char *mark,
       }
       #endif
 
-      if (x->h.type == END) break;
-      if (x->h.type == LABEL) continue;   
-      if (x->h.type != TEXT_IMAGE)
+      j = x->h.type;
+
+      if (j == BYPASS_RECORD)
       {
-	 if (x->h.type == BYPASS_RECORD)
-	 {
-	    if (i = x->nextbdi.next) x = bank[i];
-	    else                     x = NULL;
-	    if ((!x) || ((x->h.type != TEXT_IMAGE)
-		     &&  (x->h.type != END)))
-	    {
-	       printf("Error %d Retrieving Function Text\n", j);
-	       break;
-	    }
-	    if (x->h.type == END) break;
-	 }
+         if (j = x->nextbdi.next) x = bank[j];
+         else                     x = NULL;
+
+         if (!x)
+         {
+            printf("Error %d Retrieving Function Text\n", j);
+            exit(0);
+         }
+
+         j = x->h.type;
       }
+
+      if (j == END) break;
+      if (j == LABEL) continue;
+
+      #if 0 
+      if (j != TEXT_IMAGE)
+      {
+         if (pass) printf("[%x]\n", j);
+         flag("unexpected token in function text");
+         break;
+      }
+      #endif
       
       j = 0;
       
@@ -9678,7 +9688,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             i = sr->h.length;
 
             #ifdef CLEATING
-            if (!i) cleat();
+            if (!i) cleat(2, sr);
             #endif
 
 	    x = (object *) ((long) x + i);
@@ -9712,6 +9722,22 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	    for (;;)
 	    {
                j = x->h.type;
+
+
+               if (j == BYPASS_RECORD)
+               {
+                  if (i = x->nextbdi.next) x = bank[i];
+                  else                     x = NULL;
+
+                  if (!x)
+                  {
+                     printf("Error %d Retrieving Procedure Text\n", j);
+                     exit(0);
+                  }
+
+                  j = x->h.type;
+               }
+
                if (j == END) break;
 
 	       nlabel = x->t.text;
@@ -9732,9 +9758,9 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       }
 
                i = x->h.length;
-            
+
                #ifdef CLEATING
-               if (!i) cleat();
+               if (!i) cleat(3, x);
                #endif
             
 	       x = (object *) ((long) x + i);
@@ -9761,10 +9787,34 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	 
 	 savepass = pass;
 	 if (pass) pass = tpp;
+
+         object *b4that = NULL;
+         object *b4 = NULL;
+         object *recent = NULL;
 	 
 	 for (;;)
 	 {
+            b4that = b4;
+            b4 = recent;
+	    recent = x;
+
 	    j = x->h.type;
+
+            if (j == BYPASS_RECORD)
+            {
+               if (i = x->nextbdi.next) x = bank[i];
+               else                     x = NULL;
+
+               if (!x) 
+               {
+                  printf("Error %d Retrieving Procedure Text\n", j);
+                  exit(0);
+               }
+
+               j = x->h.type;
+            }
+
+
             if (j == END) break;
 
 	    nlabel = x->t.text;
@@ -9800,7 +9850,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             i = x->h.length;
 
             #ifdef CLEATING
-            if (!i) cleat();
+            if (!i) cleat(4, x);
             #endif
 
 	    x = (object *) ((long) x + i);

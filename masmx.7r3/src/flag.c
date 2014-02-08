@@ -56,8 +56,9 @@ static void flag_either_pass(char *name, char *k)
 }
 
 #ifdef CLEATING
-static void cleat()
+static void cleat(int context, object *p)
 {
+   printf("[%x:%2.2x:%2.2x]\n", context, p->h.type, *p->t.text);
    flag_either_pass("macro", "line zero length\nabandon");
    exit(0);
 }

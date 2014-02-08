@@ -3,11 +3,11 @@ pushd ../test.map
 cp z5.txo ../test.o3/z5left.txo
 ./zferify	-w	-j
 cp z5.txo ../test.o3/z5right.txo
-cd ../test3.map
-./sure34	-wy
-cp p44.txo ../test.o3/p44left.txo
-./zure34	-w	-j
-cp p44.txo ../test.o3/p44right.txo
+#	cd ../test3.map
+#	./sure34	-wy
+#	cp p44.txo ../test.o3/p44left.txo
+#	./zure34	-w	-j
+#	cp p44.txo ../test.o3/p44right.txo
 cd ../test.gcc
 ./dothis	-wy
 cp outerm.txo ../test.o3

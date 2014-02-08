@@ -549,7 +549,7 @@ static void walktable(int order)
          else                      x = LOCATION;
       }
 
-      switch (sr->h.type)
+      switch (x)
       {
 	 case LABEL:
 
@@ -756,7 +756,7 @@ static void walktable(int order)
             break;
 
 	 case TEXT_IMAGE:
-	    if (selector['P'-65] | selector['Q'-65] | selector['R'-65])
+	    if (selector['p'-'a'] | selector['q'-'a'] | selector['r'-'a'])
             {
                #if 1
                print_macrotext(sr->t.length, sr->t.text, NULL);
@@ -822,7 +822,16 @@ static void walktable(int order)
 
       *********************************************************/
 
-      if (order == 2) sr = (object *) ((long) sr + sr->h.length);
+      if      (order == 2) sr = (object *) ((long) sr + sr->h.length);
+      else if (order == 3)
+      {
+         if (sr->h.type == LITERAL) y = sr->u.oblong;
+         else                       y = sr->h.length;
+
+         if (y == 0) break;
+
+         sr = (object *) ((long) sr + y);
+      }
       else sr = sr->l.along;
    }
 
