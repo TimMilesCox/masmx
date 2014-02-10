@@ -83,8 +83,9 @@ rm ../text.zo3/*
 ../masmz ll2 ../test.zo3/ll2.txo -lo> ../text.zo3/ll2.txt
 ../masmz luri ../test.zo3/luri.txo -lo> ../text.zo3/luri.txt
 ../masmz mafcol1 ../test.zo3/mafcol1.txo -lo> ../text.zo3/mafcol1.txt
-../masmz malfun ../test.zo3/malfun.txo -lo> ../text.zo3/malfun.txt
-../masmz malpro ../test.zo3/malpro.txo -lo> ../text.zo3/malpro.txt
+../masmz malfun ../test.zo3/malfun.txo -o> ../text.zo3/malfun.txt
+../masmz malpro ../test.zo3/malpro.txo -o> ../text.zo3/malpro.txt
+../masmz malprobe ../test.zo3/malprobe.txo -o> ../text.zo3/malprobe.txt
 ../masmz mango ../test.zo3/mango.txo -lo> ../text.zo3/mango.txt
 ../masmz map10g ../test.zo3/map10g.txo -lo> ../text.zo3/map10g.txt
 ../masmz map8g ../test.zo3/map8g.txo -lo> ../text.zo3/map8g.txt

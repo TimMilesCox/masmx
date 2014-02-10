@@ -1,0 +1,8 @@
+	$include	malprobe.def
+	$snap	2
+$(6:06000)
+$(5:05000)
+	$plist	6
+	$snap	3
+	+	malprobe
+

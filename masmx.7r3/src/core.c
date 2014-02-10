@@ -5499,7 +5499,19 @@ static void awake_procedure(int type, char *line, char *argument)
       #ifdef FOLLOW_RECURS
       printf("retrieve image %s\n", k);
       #endif
-      
+     
+      if (o->h.type == BYPASS_RECORD)
+      {
+         if (j = o->nextbdi.next) o = bank[j];
+         else                     o = NULL;
+
+         if (o == NULL)
+         {
+            printf("embedded macro underflow. abandon\n");
+            exit(0);
+         }
+      }
+ 
       #ifdef QNAMES
       j = o->h.type;
       #else
