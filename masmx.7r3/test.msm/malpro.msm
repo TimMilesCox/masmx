@@ -1,0 +1,6 @@
+	$include	malpro.def
+$(6:06000)
+$(5:05000)
+	$plist	6
+	+	malpro
+
