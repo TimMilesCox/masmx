@@ -84,9 +84,8 @@ for target architectures
 Building
 ________
 
-Immediately below this tree
 
-	masmx/masmx.7r2/README.txt
+	masmx/masmx.7r2/HOWTO.txt
 
 has some information about building masmx.7r2 for new targets
 
