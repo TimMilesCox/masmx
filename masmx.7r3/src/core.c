@@ -2616,6 +2616,10 @@ static line_item *xpression(char *s, char *e, char *param)
 
    if (d = contains(s, e, "*+\0*-\0"))
    {
+      #ifdef REVISE_UNARY
+      c = *s;
+      if ((c == '+') || (c == '-') || (c == '^')) c = *(s + 1);
+      #else 
       if ((*s == '-') || (*s == '^'))
       {
          xpression(s + 1, e, param);
@@ -2627,6 +2631,7 @@ static line_item *xpression(char *s, char *e, char *param)
          xpression(s + 1, e, param);
          return sp;
       }
+      #endif
 
       transient_floating_bits = fpwidth;
 
@@ -2645,7 +2650,9 @@ static line_item *xpression(char *s, char *e, char *param)
       }
       else
       {
+         #ifndef REVISE_UNARY
          c = *s;
+         #endif
 
          if (((c == '0') && (symbol ^ 'd') && (symbol ^ 'D'))
          ||  ((c == '0') && (octal))
@@ -2670,8 +2677,25 @@ static line_item *xpression(char *s, char *e, char *param)
          i -= expression(d+2, e, param);
          if (*(d + 1) == '-') i = 0 - i;
          sp++;
+
+         #ifdef REVISE_UNARY
+         if (sp->b[0] & 128)
+         {
+            operand_reverse(sp);
+            operand_addcarry(1, sp);
+            characterise(i, sp);
+            floating_position(transient_floating_bits, sp);
+            operand_reverse(sp);
+         }
+         else
+         {
+            characterise(i, sp);
+            floating_position(transient_floating_bits, sp);
+         }
+         #else
          characterise(i, sp);
          floating_position(transient_floating_bits, sp);
+         #endif
       }
 
       return sp;
@@ -7317,12 +7341,26 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
          return 0;
       }
    
-      unary = *directive;   
+      unary = *directive;
 
-      if ((unary == '+') || (unary == '-') || (unary == '^'))
+      #ifdef REVISE_UNARY
+      if ((unary > '0'-1) && (unary < '9'+1)) unary = 0;
+      #endif
+
+      if ((unary == '+') || (unary == '-') || (unary == '^') || (unary == 0))
       {
          argument = directive;
+
+         #ifdef REVISE_UNARY
+         if (unary)
+         {
+            if (*(argument + 1) == ' ') argument++;
+            else unary = '+';
+         }
+         else unary = '+';
+         #else
          argument++;
+         #endif
 
          #if 0
          if (*argument == '(')

@@ -56,6 +56,7 @@
 #undef	LOOKFOR
 #define	IN_EQUATE
 #define	GBASIS
+#define	REVISE_UNARY
 #define DRIFT_GUARD_1
 #define	EFLAG
 #define	XTENDA

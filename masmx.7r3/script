@@ -639,6 +639,9 @@ rm ../text.o3/*
 ../masmx around ../test.o3/around -loy > ../text.o3/around.txt
 ../masmx scala ../test.o3/scala -loy > ../text.o3/scala.txt
 ../masmx floating ../test.o3/floating -loy > ../text.o3/floating.txt
+../masmx unary ../test.o3/unary -loy > ../text.o3/unary.txt
+../masmx unary2 ../test.o3/unary2 -loy > ../text.o3/unary2.txt
+
 
 ../linkpart
 ../coldfire
