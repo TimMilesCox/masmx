@@ -637,7 +637,9 @@ rm ../text.o3/*
 
 ../masmx quibble ../test.o3/quibble -lynok > ../text.o3/quibble.txt
 ../masmx around ../test.o3/around -loy > ../text.o3/around.txt
+../masmx around ../test.o3/around_wrong -loyE > ../text.o3/around_wrong.txt
 ../masmx scala ../test.o3/scala -loy > ../text.o3/scala.txt
+../masmx scala ../test.o3/scala_wrong -loyE > ../text.o3/scala_wrong.txt
 ../masmx floating ../test.o3/floating -loy > ../text.o3/floating.txt
 ../masmx unary ../test.o3/unary -loy > ../text.o3/unary.txt
 ../masmx unary2 ../test.o3/unary2 -loy > ../text.o3/unary2.txt

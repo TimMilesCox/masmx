@@ -637,6 +637,10 @@ rm ../text.zo3/*
 
 ../masmz quibble ../test.zo3/quibble -lnok > ../text.zo3/quibble.txt
 ../masmz around ../test.zo3/around -lo > ../text.zo3/around.txt
+../masmz around ../test.zo3/around_wrong -loE > ../text.zo3/around_wrong.txt
 ../masmz scala ../test.zo3/scala -lo > ../text.zo3/scala.txt
+../masmz scala ../test.zo3/scala_wrong -loE > ../text.zo3/scala_wrong.txt
 ../masmz floating ../test.zo3/floating -lo > ../text.zo3/floating.txt
+../masmz unary ../test.zo3/unary -lo > ../text.zo3/unary.txt
+../masmz unary2 ../test.zo3/unary2 -lo > ../text.zo3/unary2.txt
 
