@@ -452,7 +452,7 @@ static long rfunction(int v,
    	    mapx->m.l.rel = j;
             #endif
 
-            if (q->flags & 1)
+            if ((q->flags & 1) && (uselector['W'-'A'] == 0))
             {
                note("GIANT SPACE: $(counter) returns "
                     "intrasegment part of counter only");
@@ -485,7 +485,7 @@ static long rfunction(int v,
          mapx->m.l.rel = counter_of_reference;
          #endif
 
-         if (actual->flags & 1)
+         if ((actual->flags & 1) && (uselector['W'-'A'] == 0))
          {
             note("GIANT SPACE: $ returns "
                  "intrasegment part of counter only");
