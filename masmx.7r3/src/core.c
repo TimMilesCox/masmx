@@ -10580,7 +10580,7 @@ main(int argc, char *_argv[])
       
       low = q->base;
       high = q->loc;
-      
+
       #ifdef GBASIS
       if (((q->flags & 129) == 128)
       &&  ( q->relocatable  ==   0))
