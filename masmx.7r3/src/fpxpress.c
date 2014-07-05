@@ -91,7 +91,18 @@ static void fpxpress_assemble(char *name, char *start, char *end)
    *p = 0;
 
    masm_level++;
-   assemble(assembly, NULL, NULL, NULL);
+
+   /******************************************************
+
+	it is not safe to have argument 2 parameter NULL
+	at macro depth > 0
+
+	because the pointer vlist[] does not then get set
+	but is nevertheless immediately referenced
+
+   ******************************************************/
+
+   assemble(assembly, "", NULL, NULL);
    masm_level--;
 }
 
