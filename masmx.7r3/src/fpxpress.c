@@ -109,7 +109,7 @@ static void fpxpress_assemble(char *name, char *start, char *end)
 static void fpxpress_asmq(char *name)
 {
    masm_level++;
-   assemble(name, NULL, NULL, NULL);
+   assemble(name, "", NULL, NULL);
    masm_level--;
 }
 

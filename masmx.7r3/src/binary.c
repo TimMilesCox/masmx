@@ -701,7 +701,7 @@ static void load_binary(char *p)
             if (!pass) break;
             if (!included) break;
 
-            assemble(assembly, NULL, NULL, NULL);
+            assemble(assembly, "", NULL, NULL);
       }
    }
 
