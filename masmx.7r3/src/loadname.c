@@ -44,33 +44,36 @@ static void load_name(char *s, char *limit)
    }
    else
    {
-      while (((symbol > 0x2F) && (symbol < 0x3A))
-      ||     ((symbol > 0x40) && (symbol < 0x5B))
-      ||     ((symbol > 0x60) && (symbol < 0x7B))
-      ||     (symbol == '_')
-      ||     (symbol == '?')
-      ||     (symbol == '!')
-      ||     (symbol == '@')
-      ||     (symbol == sterm)
-      ||     (symbol == '$'))
+      if ((symbol < '0') || (symbol > '9'))
       {
-	 if (s == limit) break;
-
-	 if ((!selector['k'-'a']) && (symbol > 0x60) && (symbol < 0x7B))
+         while (((symbol > 0x2F) && (symbol < 0x3A))
+         ||     ((symbol > 0x40) && (symbol < 0x5B))
+         ||     ((symbol > 0x60) && (symbol < 0x7B))
+         ||     (symbol == '_')
+         ||     (symbol == '?')
+         ||     (symbol == '!')
+         ||     (symbol == '@')
+         ||     (symbol == sterm)
+         ||     (symbol == '$'))
          {
-	    symbol &= 0x5F;
+            if (s == limit) break;
+
+	    if ((!selector['k'-'a']) && (symbol > 0x60) && (symbol < 0x7B))
+            {
+	       symbol &= 0x5F;
+            }
+
+	    name[i++] = symbol;
+
+	    if (i > 254)
+	    {
+	       if (limit) s = limit;
+	       break;
+	    }
+
+            s++;
+	    symbol = *s;
          }
-
-	 name[i++] = symbol;
-
-	 if (i > 254)
-	 {
-	    if (limit) s = limit;
-	    break;
-	 }
-
-         s++;
-	 symbol = *s;
       }
    }
 

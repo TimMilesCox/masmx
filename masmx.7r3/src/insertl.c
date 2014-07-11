@@ -361,7 +361,6 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
       }
    }
 
-
    if (o)
    {
       if (type == BLANK) return o;
@@ -528,13 +527,13 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
 
    if ((type == LOCATION) || (type == BLANK))
    {
-      o->l.r.l.rel = counter_of_reference;
+      o->l.r.l.rel = counter_of_reference | 128;
 
       if (actual->relocatable) o->l.r.l.y |= 1;
       else                     o->l.r.l.y &= 254;
    }
 
-   if (base_displacement) o->l.r.l.rel = counter_of_reference;
+   if (base_displacement) o->l.r.l.rel = counter_of_reference | 128;
 
    return o; 
 }

@@ -387,7 +387,7 @@ static void switch_locator(char *p, char *param)
         
          if (l)
          {
-            l->l.r.l.rel = counter_of_reference;
+            l->l.r.l.rel = counter_of_reference | 128;
             if (actual->flags & 128)
             {
                quadinsert1(actual->rbase, &l->l.value);
@@ -431,6 +431,13 @@ static long rfunction(int v,
          {
    	    limit = edge(s, ")");
 	    j = expression(s, limit, NULL);
+
+            if ((j < 0) || (j > 71))
+            {
+               flag("locator not in 0..71");
+               return 0;
+            }
+
             q = &locator[j];
 
             #ifdef RELOCATION
@@ -449,7 +456,7 @@ static long rfunction(int v,
             if (q->relocatable) mapx->m.l.y |= 1;
             #endif
 
-   	    mapx->m.l.rel = j;
+   	    mapx->m.l.rel = j | 128;
             #endif
 
             if ((q->flags & 1) && (uselector['W'-'A'] == 0))
@@ -482,7 +489,7 @@ static long rfunction(int v,
          if (actual->relocatable) mapx->m.l.y |= 1;
          #endif
 
-         mapx->m.l.rel = counter_of_reference;
+         mapx->m.l.rel = counter_of_reference | 128;
          #endif
 
          if ((actual->flags & 1) && (uselector['W'-'A'] == 0))
@@ -505,6 +512,13 @@ static long rfunction(int v,
          {
             limit = edge(s, ")");
             j = expression(s, limit, NULL);
+
+            if ((j < 0) || (j > 71))
+            {
+               flag("locator not in 0..71");
+               return 0;
+            }
+
             q = &locator[j];
             i = q->loc;
          }
@@ -520,7 +534,7 @@ static long rfunction(int v,
       case SIMPLE_BASE:
 
 	 #ifdef RELOCATION
-         mapx->m.l.rel = counter_of_reference;
+         mapx->m.l.rel = counter_of_reference | 128;
          if (actual->relocatable) mapx->m.l.y = 1;
          #endif
 
@@ -540,7 +554,7 @@ static long rfunction(int v,
 	 if ((!l)
 	 ||  (l->h.type != LABEL)
 	 ||  (l->l.valued == UNDEFINED)) return 0;
-	 return l->l.r.l.rel;
+	 return l->l.r.l.rel & 127;
 
 
       case TYPE:
@@ -602,6 +616,13 @@ static long rfunction(int v,
             #endif
 
 	    j = expression(s, limit, NULL);
+
+            if ((j < 0) || (j > 71))
+            {
+               flag("locator not in 0..71");
+               return 0;
+            }
+
 	    return locator[j].relocatable;
 	 }
 	 return actual->relocatable;
@@ -835,7 +856,7 @@ static long rfunction(int v,
                     ||  (l->l.valued ==      SET)
                     ||  (l->l.valued ==     EQUF)))
             {
-                  x = l->l.r.l.rel;
+                  x = l->l.r.l.rel & 127;
                   q = &locator[x];
             }
             else
@@ -846,7 +867,7 @@ static long rfunction(int v,
 
          #ifdef RELOCATION
 
-         mapx->m.l.rel = x;
+         mapx->m.l.rel = x | 128;
          if (q->relocatable)
          {
             mapx->m.l.y = 1;
@@ -937,8 +958,7 @@ static void pack_ltable(object *toplabel)
 	     pr->l.name, pr->l.r.l.xref, masm_level, pr->l.r.l.y, pr->h.length);
       #endif
       
-      if ((pr->h.type != LABEL)
-      ||  ((pr->l.r.l.xref < masm_level) && ((pr->l.r.l.y & 128) == 0))) 
+      if ((pr->h.type ^ LABEL) || (pr->l.r.l.xref < masm_level))
       {
          #ifdef TRACE_RECURS
 	 printf("save %s in compress[%d]\n", pr->l.name, pr->h.length);
@@ -3328,7 +3348,7 @@ static line_item *xpression(char *s, char *e, char *param)
 
             #ifdef LITERALS
          case LTAG:
-            i = l->l.r.l.rel;
+            i = l->l.r.l.rel & 127;
             ires = literal(label_margin, param, i);
             quadza(ires, sp);
 
@@ -3978,7 +3998,7 @@ static long expression(char *s, char *e, char *param)
             #ifdef LITERALS
             #ifdef LTAG
          case LTAG:
-            j = l->l.r.l.rel;
+            j = l->l.r.l.rel & 127;
             i = literal(label_margin, param, j);
             q = &locator[j];
             if (q->flags == 1) i += vextractq((object *) q->runbank);
@@ -4791,7 +4811,7 @@ static void output_linkage(int x, txo *image, txo *a_image)
    {
       if (y > IMAGE_SIZE-10) stop();
       image->d[y++] = '(';
-      rel = p->m.l.rel;
+      rel = p->m.l.rel & 127;
       if (code & 8) image->d[y++] = '-';
       image->d[y++] = left(rel);
       image->d[y++] = right(rel);
@@ -6449,6 +6469,7 @@ static void insequate(int how,
    }
 
    thislabel->l.valued = how;
+
    thislabel->l.value = *i;
    
    thislabel->l.r.l.y = 0;
@@ -7740,6 +7761,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                   }
 
                   i = mapx->m.l.rel;
+                  i &= 127;
 
                   #if 1
                   if ((!i)
@@ -7755,7 +7777,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                   i = 0;
                   sr = findlabel(argument, limit);
-                  if (sr) i = sr->l.r.l.rel;
+                  if (sr) i = sr->l.r.l.rel & 127;
 
                   #endif
 
@@ -10437,7 +10459,7 @@ main(int argc, char *_argv[])
 	 pushs(sr->l.name);
 	 write(ohandle, ":", 1);
 
-         i = sr->l.r.l.rel;
+         i = sr->l.r.l.rel & 127;
          q = &locator[i];
 
          j = sr->l.valued;
@@ -10517,7 +10539,7 @@ main(int argc, char *_argv[])
             ||  (!locator[0].relocatable))
             {
                write(ohandle, "$", 1);
-	       pushh2(sr->l.r.l.rel);
+	       pushh2(sr->l.r.l.rel & 127);
 	       write(ohandle, ":", 1);
             }
 

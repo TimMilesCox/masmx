@@ -92,7 +92,8 @@ static void outfactor(int counter_id)
 
 static void outcounter(int counter_id, long location, char *type)
 {
-   location_counter *q = &locator[counter_id];
+   int		     id = counter_id & 127;
+   location_counter *q = &locator[id];
    long		     running_bank = q->runbank;
    
    if (!pass) return;
@@ -104,9 +105,9 @@ static void outcounter(int counter_id, long location, char *type)
       if (q->flags & 2)
       {
          write(ohandle, "\n@:", 3);
-         pushh2(counter_id);
+         pushh2(id);
          write(ohandle, ":", 1);
-         xpushaddress(&((value *) q->runbank)->value, counter_id);
+         xpushaddress(&((value *) q->runbank)->value, id);
          q->flags &= 0xFD;
       }    
 
@@ -114,16 +115,16 @@ static void outcounter(int counter_id, long location, char *type)
 
       #else
 
-      pushxad(counter_id, location, type);
+      pushxad(id, location, type);
       return;
 
       #endif
    }
 
-   if (q->relocatable) outfactor(counter_id);
+   if (q->relocatable) outfactor(id);
 
    write(ohandle, type, 2);
-   pushh2(counter_id);
+   pushh2(id);
    write(ohandle, ":", 1);
 
    if (q->flags & 1)

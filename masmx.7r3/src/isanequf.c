@@ -42,7 +42,7 @@ static object *isanequf(char *field)
    #ifdef LITERALS
    if (l->l.valued == LTAG)
    {
-      c = &locator[l->l.r.l.rel];
+      c = &locator[l->l.r.l.rel & 127];
       
       if (c->flags & 128)
       {
@@ -88,7 +88,7 @@ static object *isanequf(char *field)
 
    if (l->l.valued == BLANK)
    {
-      c = &locator[l->l.r.l.rel];
+      c = &locator[l->l.r.l.rel & 127];
       if (c->flags & 128) return l;
    }
 

@@ -1,4 +1,5 @@
 #define EXCLUDE_OPERATORS 1
+#define	INDIRECTION_PMONOLITH
 
 #ifdef	FP_XPRESS
 
@@ -14,7 +15,11 @@ static int complex(char *s, char *e)
    char			*p = s,
 			*q;
 
+   #ifdef INDIRECTION_PMONOLITH
+   if (*s == '*') return 0;
+   #else
    if (*s == '*') return complex(s + 1, e);
+   #endif
 
    while (p = l2r_find('(', p, e))
    {
@@ -38,7 +43,11 @@ static int complex_beyond(char *s, char *e, char *list)
    char			*p = s,
 			*q;
 
+   #ifdef INDIRECTION_PMONOLITH
+   if (*s == '*') return 0;
+   #else
    if (*s == '*') return complex(s + 1, e);
+   #endif
 
    while (p = l2r_find('(', p, e))
    {
@@ -65,11 +74,29 @@ static int number(char *s, char *e)
    if (s < e) l = findlabel(s, e);
    else                  return 1;
 
-   if (!l) return 1;
+   if (!l)
+   {
+      if (label_highest_byte == 0) return 1;
+      return 0;
+   }
+
+   #if 1
+   if (l->l.r.l.rel) return 0;
+   if (l->l.valued == 0) return 0;
+   if (l->l.r.l.xref < 0) return 0;
+   if (l->l.valued == EQUF) return 0;
+   #else
    if (l->l.valued == LOCATION) return 0;
    if (l->l.valued ==     LTAG) return 0;
    if (l->l.valued ==     EQUF) return 0;
    if (l->l.r.l.xref < 0)       return 0;
+
+   if ((l->l.valued == EQU) || (l->l.valued == SET))
+   {
+      if (l->l.r.l.rel) return 0;
+      if (l->l.r.l.y)   return 0;
+   }
+   #endif
 
    return 1;
 }

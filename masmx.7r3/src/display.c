@@ -452,7 +452,7 @@ static void illustrate_linkage(int x)
 
    if (code & 1)
    {
-      rel = p->m.l.rel;
+      rel = p->m.l.rel & 127;
       if (code & 8) printf("(-%2.2x", rel);
       else          printf("(+%2.2x", rel);
 
@@ -543,7 +543,7 @@ static void walktable(int order)
 
       if (x == BLANK)
       {
-         y = sr->l.r.l.rel;
+         y = sr->l.r.l.rel & 127;
          section = &locator[y];
          if (section->flags & 128) x = EQUF;
          else                      x = LOCATION;
@@ -563,7 +563,7 @@ static void walktable(int order)
 
             if (x == BLANK)
             {
-               y = sr->l.r.l.rel;
+               y = sr->l.r.l.rel & 127;
                section = &locator[y];
                if (section->flags & 128) x = EQUF;
                else                      x = LOCATION;
@@ -582,6 +582,7 @@ static void walktable(int order)
 
 	       switch(x)
 	       {
+                     #if 0
 		  case LOCATION:
 		  
 		  #ifdef LINELABEL
@@ -590,6 +591,8 @@ static void walktable(int order)
 
 		     printf("$%2.2X:", sr->l.r.l.rel & 127);
 		     break;
+                     #endif
+
 		  case INTERNAL_FUNCTION:
 		     printf(":F:");
 		     break;
@@ -609,7 +612,7 @@ static void walktable(int order)
                      if (sr->l.passflag & 128) printf("P:");
                      #endif
 
-                     if (sr->l.r.l.y) printf("(%d)", sr->l.r.l.rel);
+                     if (sr->l.r.l.y) printf("(%d)", sr->l.r.l.rel & 127);
                      printf("%d:", sr->l.r.l.xref);
 		     break;
 		  case DIRECTIVE:
@@ -619,7 +622,7 @@ static void walktable(int order)
 		     printf("%x<", sr->l.r.l.rel);
 		     break;
 		  default:
-		     if (sr->l.r.l.y &   1) printf("$%2.2x:", sr->l.r.l.rel & 127);
+		     if (sr->l.r.l.rel) printf("$%2.2X:", sr->l.r.l.rel & 127);
                      if (sr->l.r.l.y & 128) printf("[%4.4x]", sr->l.r.l.xref);
 		     break;
 	       }
@@ -634,10 +637,12 @@ static void walktable(int order)
                   case EQUF:
                      i = 0;
 
+                     #if 0
                      if ((sr->l.r.l.y & 1) | sr->l.r.l.rel)
                      {
                         printf("$%2.2X:", sr->l.r.l.rel & 127);
                      }
+                     #endif
 
                      while (i < (RADIX/32-1))
                      {
