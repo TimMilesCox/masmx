@@ -9627,14 +9627,16 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                      if (v)
                      {
-                        printf("$(%d) %0*lX\n",
-                                counter_of_reference, apw, loc);
-
-                        flag("field out of range on relocation");
-
+                        flag("field out of range on relocation, -n flag for details");
 
                         if (selector['n'-'a'])
                         {
+                           printf("$%X:%0*lX [", counter_of_reference, apw, loc);
+
+                           i = (RADIX - subfunction) >> 3;
+                           while (i < RADIX/8) printf("%2.2x", sr->l.value.b[i++]);
+                           printf("]\n");
+
                            display_ra(0, &range_filter);
                            display_ra(0, &range_free);
                            display_ra(0, &range_sign);
