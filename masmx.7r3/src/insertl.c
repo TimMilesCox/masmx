@@ -150,7 +150,11 @@ static object *retrieve_label(char *margin)
          }
          #endif		/*	STRUCTURE_DEPTH	*/
 
+         #ifdef EQUAZE
+         if (next->l.valued ^ BLANK) return next;
+         #else
          return next;
+         #endif
       }
 
       #ifdef STRUCTURE_DEPTH
@@ -226,7 +230,11 @@ static object *retrieve_dynamic_label()
 
       #endif
 
+      #ifdef EQUAZE
+      if ((x == 0) && (next->l.valued ^ BLANK)) result = next;
+      #else
       if (x == 0) result = next;
+      #endif
 
       #ifdef SYNONYMS
       else
@@ -286,7 +294,7 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
 
    #ifdef STRUCTURE_DEPTH
 
-   if ((active_x) && ((type == LOCATION) || (type == EQUF) || (type == BLANK)))
+   if ((active_x) && ((type == LOCATION) || (type == EQUF) /* || (type == BLANK) */))
    {
       o = findlabel_in_node();
       #ifdef UNDERWATER_DEBRIS
@@ -378,6 +386,7 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
          {
             if ((pass) && ((type == LOCATION) || (base_displacement)))
             {
+               if ((x ^ PROC) && (x ^ FUNCTION) && (x ^ FORM))
                return o;
             }
 
@@ -424,7 +433,10 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
                   if (o->l.valued == UNDEFINED) o->l.valued = type;
                   else
                   #endif
-                  flagp1p(o->l.name, "may not be restated");
+                  {
+                     flagp1p(o->l.name, "may not be restated");
+                     return o;
+                  }
                }
             }
          }
@@ -432,6 +444,10 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
    }
    else
    {
+      #ifdef EQUAZE
+      if ((type == EQU) || (type == SET)) type = BLANK;
+      #endif
+
       size = sizeof(label) + label_length - PARAGRAPH;
 
       if (global > 0)
@@ -496,7 +512,7 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
       {
          #ifdef STRUCTURE_DEPTH
          if ((active_x)
-         && ((type == LOCATION) || (type == EQUF) || (type == BLANK)))
+         && ((type == LOCATION) || (type == EQUF) /* || (type == BLANK) */))
          {
             inslabel(o);
          }

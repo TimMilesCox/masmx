@@ -3515,6 +3515,7 @@ static line_item *xpression(char *s, char *e, char *param)
       }
    }
 
+
    if (!pass) return sp;
 
    if (l)

@@ -32,6 +32,7 @@
 #define	ROUNDING
 #define CLEATING
 #define CODED_EXPRESS
+#define	EQUAZE
 
 #ifdef	SUPERSET
 #else
