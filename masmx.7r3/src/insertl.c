@@ -380,17 +380,18 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
 
       *************************************/
  
-      if (x = o->l.valued)
+      if ((x = o->l.valued) && (x ^ BLANK))
       {
          if (type ^ x)
          {
             if ((pass) && ((type == LOCATION) || (base_displacement)))
             {
-               if ((x ^ PROC) && (x ^ FUNCTION) && (x ^ FORM))
+               if ((x == EQU) || (x == SET))
                return o;
             }
 
             flagp(o->l.name, "may not be retyped");
+            return o;
          }
       }
 

@@ -6418,6 +6418,7 @@ static void insequate(int how,
    #ifdef BINARY
    line_item		 v;
    int			 bits = 0;
+   int			 x;
    #endif
 
    #ifdef RELOCATION
@@ -6469,7 +6470,9 @@ static void insequate(int how,
       i = xpression(argument, limit, param);
    }
 
-   thislabel->l.valued = how;
+   x = thislabel->l.valued;
+   if (x == BLANK) thislabel->l.valued = how;
+   else if (x ^ how) return;
 
    thislabel->l.value = *i;
    
