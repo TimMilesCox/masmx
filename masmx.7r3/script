@@ -643,7 +643,7 @@ rm ../text.o3/*
 ../masmx floating ../test.o3/floating -loy > ../text.o3/floating.txt
 ../masmx unary ../test.o3/unary -loy > ../text.o3/unary.txt
 ../masmx unary2 ../test.o3/unary2 -loy > ../text.o3/unary2.txt
-
+../mamsx exporter ../test.o3/exporter -loy > ../text.o3/exporter.txt
 
 ../linkpart
 ../coldfire
