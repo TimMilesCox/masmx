@@ -475,16 +475,19 @@ static int frightmost(char *data, char *margin)
 
 static char *fendbe(char *s)
 {
-   int i = 1, quotype = 0, sinquo = 0, symbol;
+   int		 i = 1, sinquo = 0, symbol;
 
    while (symbol = *s)
    {
-      if ((symbol == qchar) || (symbol == 0x27))
+      if (symbol == qchar)
       {
-         if (!sinquo) quotype = symbol;
+         if ((sinquo & 1) == 0) sinquo ^= 2;
       }
 
-      if (symbol == quotype) sinquo ^= 1;
+      if (symbol == 0x27)
+      {
+         if ((sinquo & 2) == 0) sinquo ^= 1;
+      }
 
       if (!sinquo)
       {
@@ -499,24 +502,30 @@ static char *fendbe(char *s)
 
 static char *fendb(char *s, char *e)
 {
-   int i = 0;
-   int quotype = 0, sinquo = 0, symbol;
+   int		 i = 0;
+   int		 sinquo = 0, symbol;
 
    while (s != e)
    {
       symbol = *s;
       if (symbol == 0) break;
-      if ((symbol == qchar) || (symbol == 0x27))
+
+      if (symbol == qchar)
       {
-	 if (!sinquo) quotype = symbol;
+         if ((sinquo & 1) == 0) sinquo ^= 2;
       }
 
-      if (symbol == quotype) sinquo ^= 1;
+      if (symbol == 0x27)
+      {
+         if ((sinquo & 2) == 0) sinquo ^= 1;
+      }
+
       if (!sinquo)
       {
 	 if (symbol == '(') i++;
 	 if (symbol == ')') i--;
 	 if (!i) break;
+         if (i < 0) break;
       }
       s++;
    }

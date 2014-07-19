@@ -7,7 +7,13 @@ static int storage_addresses(char *s, char *e)
 
    while (s < e)
    {
-      if (*s == '(') return storage_addresses(s + 1, e - 1);
+      if (*s == '(')
+      {
+         p = fendb(s, e);
+         if (storage_addresses(s+1, p)) return 1;
+         return storage_addresses(p + 1, e);
+      }
+
       if (*s == '+') return storage_addresses(s + 1, e);
       if (*s == '-') return storage_addresses(s + 1, e);
 
