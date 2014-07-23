@@ -107,12 +107,16 @@ static void fpxpress_assemble(char *name, char *start, char *end)
    char			*p = assembly;
    int			 symbol;
 
-   int			 __literal = number(start, end);
+   int			 __literal;
 
+
+   if (start == end) return;
+
+   __literal = number(start, end);
 
    while (symbol = *name++) *p++ = symbol;
    if (__literal)           *p++ = '(';
-   while (start != end)     *p++ = *start++;
+   while ((start != end) && (symbol = *start++)) *p++ = symbol;
    if (__literal)           *p++ = ')';
 
    *p = 0;
