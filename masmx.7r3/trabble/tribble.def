@@ -38,7 +38,8 @@ data*	$set	((field**mask)*/scale)++(data**antimask)
 f	$func
 outer*	$name
 "20+"   $equ,signed        32
-	$return	$t("f(1, 1)")
+
+	$return	$t("f(2, 1)")
 	$end
 
 word	$do	p(),	superword	p(word, 1)
