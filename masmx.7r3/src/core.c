@@ -9897,16 +9897,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	 savepass = pass;
 	 if (pass) pass = tpp;
 
-         object *b4that = NULL;
-         object *b4 = NULL;
-         object *recent = NULL;
-	 
 	 for (;;)
 	 {
-            b4that = b4;
-            b4 = recent;
-	    recent = x;
-
 	    j = x->h.type;
 
             if (j == BYPASS_RECORD)
