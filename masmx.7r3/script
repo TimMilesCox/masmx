@@ -363,6 +363,7 @@ rm ../text.o3/*
 ../masmx netvalue ../test.o3/netvalue.txo -loy > ../text.o3/netvalue.txt
 ../masmx new ../test.o3/new.txo -loy > ../text.o3/new.txt
 ../masmx newby ../test.o3/newby.txo -loy > ../text.o3/newby.txt
+../masmx newdata ../test.o3/newdata.txo -loy > ../text.o3/newdata.txt
 ../masmx norkette ../test.o3/norkette.txo -loy > ../text.o3/norkette.txt
 ../masmx nosedive ../test.o3/nosedive.txo -loy > ../text.o3/nosedive.txt
 ../masmx noso ../test.o3/noso.txo -loy > ../text.o3/noso.txt

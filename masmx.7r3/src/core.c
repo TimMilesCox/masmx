@@ -7401,6 +7401,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
       #ifdef REVISE_UNARY
       if ((unary > '0'-1) && (unary < '9'+1)) unary = 0;
+      if (unary == '\'') unary = 0;
       #endif
 
       if ((unary == '+') || (unary == '-') || (unary == '^') || (unary == 0))

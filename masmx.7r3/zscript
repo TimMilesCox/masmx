@@ -361,6 +361,7 @@ rm ../text.zo3/*
 ../masmz netvalue ../test.zo3/netvalue.txo -lo> ../text.zo3/netvalue.txt
 ../masmz new ../test.zo3/new.txo -lo> ../text.zo3/new.txt
 ../masmz newby ../test.zo3/newby.txo -lo> ../text.zo3/newby.txt
+../masmz newdata ../test.zo3/newdata.txo -lo > ../text.zo3/newdata.txt
 ../masmz norkette ../test.zo3/norkette.txo -lo> ../text.zo3/norkette.txt
 ../masmz nosedive ../test.zo3/nosedive.txo -lo> ../text.zo3/nosedive.txt
 ../masmz noso ../test.zo3/noso.txo -lo> ../text.zo3/noso.txt
