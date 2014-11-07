@@ -424,6 +424,10 @@ static long rfunction(int v,
    value		*vbreak;
    #endif
 
+   #ifdef RELOCATION
+   link_profile		*mapxb4;
+   #endif
+
    switch(v)
    {
       case LOCTR:
@@ -633,9 +637,13 @@ static long rfunction(int v,
 	 {
 	    limit = fendbe(s);
 
+            #ifdef RELOCATION
+            mapxb4 = mapx;
+            #endif
 	    i = zxpression(s, limit, param);
 
 	    #ifdef RELOCATION
+            mapx = mapxb4;
 	    mapx->m.i = 0;
 	    #endif
 
@@ -4672,7 +4680,6 @@ static void map_linkages(int bits, int scale)
    if (!pass) return;
 
    if (mapx->m.l.y == 0) return;
-
 
    mapx->recursion = maprecursion;
    mapx->slice = bits;
