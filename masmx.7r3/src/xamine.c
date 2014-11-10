@@ -24,8 +24,10 @@ static void unwind()
    while (x < masm_level)
    {
       sr = entry[x++];
-      printf("%s ", sr->l.name);
+      if (sr) printf("%s ", sr->l.name);
+      else    printf("**** ");
    }
+   putchar('\n');
    exit(0);
 }
 
