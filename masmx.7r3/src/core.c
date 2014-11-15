@@ -7195,6 +7195,10 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             }
             else i = subfunction;
          }
+
+         #ifdef RECORD
+         if (known == RECORD) i = EQUF;
+         #endif
       }
 
       if (i == RES) i = LOCATION;
@@ -9703,6 +9707,13 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                limit = argument;
                while (*limit++);
                i_xpress(argument, limit);
+               break;
+               #endif
+
+               #ifdef RECORD
+            case RECORD:
+               if (argument) argument = substitute(argument, param);
+               record(thislabel, argument);
                break;
                #endif
 

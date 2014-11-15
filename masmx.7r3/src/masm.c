@@ -285,4 +285,5 @@ extern unsigned _stklen = 32*1024;
 #include "ilabels.c"
 #include "fpxpress.c"
 #include "espresso.c"
+#include "record.c"
 #include "core.c"

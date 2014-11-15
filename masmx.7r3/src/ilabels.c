@@ -175,6 +175,10 @@ static void internal_labels()
     { "$xqt_i", ESPRESSO, DIRECTIVE } ,
    #endif
 
+   #ifdef RECORD
+    { "$record", RECORD, DIRECTIVE } ,
+   #endif
+
    #ifdef ZENITH
     { "$zenith", ZENITH, INTERNAL_FUNCTION } ,
    #endif

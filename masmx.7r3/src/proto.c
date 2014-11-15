@@ -12,6 +12,7 @@ static char *fendb(char *s, char *e);
 static long literal(char *arg, char *gparam, int tlocator);
 #endif
 
+static void rshift(line_item *o, int distance);
 static void lshift(line_item *o, short distance);
 static int nline(char data[], int z);
 
@@ -19,6 +20,7 @@ static int nline(char data[], int z);
 static void out_standing(int tlocator);
 #endif
 
+static void operand_or(line_item *left, line_item *right);
 static void operand_add(line_item *left, line_item *right);
 
 static void produce(int bits, char dflag, line_item *item, txo *image);
@@ -115,4 +117,5 @@ static value *apply_value(int id);
 static void print_item(line_item *item);
 static void floating_position(int bits, line_item *item);
 static void floating_generate(char *a, char *margin, char *param, line_item *item);
+static int meaning(char *directive);
 

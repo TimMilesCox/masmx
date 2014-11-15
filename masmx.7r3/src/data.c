@@ -123,6 +123,10 @@
 #define	FP_XPRESS 80
 #define	ESPRESSO  81
 
+#ifdef	STRUCTURE_DEPTH
+#define	RECORD	82
+#endif
+
 #define LABEL 'L'                      /* 0x4c = 76 */
 #define TEXT_SUBSTITUTE 'S'            /* 0x53 = 83 */
 #define TEXT_IMAGE 'T'                 /* 0x54 = 84 */

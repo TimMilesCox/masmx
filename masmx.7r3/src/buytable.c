@@ -30,3 +30,20 @@ static object *buy_ltable()
    remainder = BANK-MARGIN;
    return sr;
 }
+
+object *buy_object(int size)
+{
+   object	*sr = lr;
+   long		 bucket = (size + PARAGRAPH - 1) & -PARAGRAPH;
+
+   if (remainder < size) sr = buy_ltable();
+   remainder -= bucket;
+
+   sr->h.length = bucket;
+ 
+   bucket += (long) lr;
+   lr = (object *) bucket;
+
+   return sr;
+}
+
