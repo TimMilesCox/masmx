@@ -57,9 +57,10 @@ static int precord(object *l, char *line, char **data, int bytes)
       if (x == ROOT)
       {
          active_x--;
-         if (selector['q'-'a']) printf("return on $root\n");
 
-         if (*data == NULL) loc = address + (bits + word - 1) / word;
+         if ((pass  == 0)
+         ||  (*data == NULL)) loc = address + (bits + word - 1) / word;
+         if (selector['q'-'a']) printf("return on $root $=%lx\n", loc);
 
          return -1;
       }
@@ -176,9 +177,15 @@ static int precord(object *l, char *line, char **data, int bytes)
             y = RADIX / word * word;
             y -= positions;
 
+            /********************************************
+
+		y = pending data bits
+
+            ********************************************/
+
             if (y)
             {
-               lshift(&stage, word - y % word);
+               if (x = y % word) lshift(&stage, word - x);
                produce(y, '+', &stage, NULL);
             }
 
@@ -199,7 +206,7 @@ static int record(object *l, char *data)
    int                   x,
                          y;
 
-   char                  line[1024];
+   char                  line[READSIZE];
 
 
 
@@ -219,7 +226,7 @@ static int record(object *l, char *data)
 
    for (;;)
    {
-      y = getline(line, 1020);
+      y = getline(line, READSIZE-1);
 
       if (y < 0)
       {

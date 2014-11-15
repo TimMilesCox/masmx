@@ -205,8 +205,8 @@ extern unsigned _stklen = 32*1024;
 #define DPA 24
 
 #define	DISPLAY_V
-#define IMAGE_SIZE 2048
-#define READSIZE 2048
+#define IMAGE_SIZE 4096
+#define READSIZE 8192
 #define DISPLAY_WIDTH 160
 #define	FUNCTION_SYMBOLS 2040
 
