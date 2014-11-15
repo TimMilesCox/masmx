@@ -33,6 +33,7 @@ static int precord(object *l, char *line, char **data, int bytes)
       rbase = actual->rbase;
       stage = zero_o;
       positions = RADIX / word * word;
+      outstanding = 1;
       return 0;
    }
 
