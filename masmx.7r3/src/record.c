@@ -154,10 +154,12 @@ static int precord(object *l, char *line, char **data, int bytes)
                   lshift(&temp, RADIX - x);
                   rshift(&temp, RADIX - y);
                   operand_or(&stage, &temp);
-                  produce(positions, '+', &stage, NULL);
-                  if (selector['q'-'a']) printf("[B %d]\n", positions);
-                  x -= y;
                }
+
+               produce(positions, '+', &stage, NULL);
+               if (selector['q'-'a']) printf("[B %d]\n", positions);
+               x -= y;
+               positions -= x;
             }
 
             lshift(&stage, x);
