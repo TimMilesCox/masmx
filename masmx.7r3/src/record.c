@@ -65,6 +65,8 @@ static int precord(object *l, char *line, char **data, int bytes)
          return -1;
       }
 
+      if (x == END) return RETURN;
+
       if (x == DO)
       {
          k = NULL;
@@ -99,22 +101,35 @@ static int precord(object *l, char *line, char **data, int bytes)
 
       if ((x == RECORD) && (argument = *data))
       {
-         line[bytes++] = ' ';
-         while (line[bytes++] = *argument++);
+         printf("[%s]\n", *data);
+         return record(l, data);
       }
 
       if (selector['q'-'a']) printf("[propose %s][D %p->%p]\n", line, data, *data);
 
-      if ((x == INCLUDE) || (x == RECORD))
+      if ((x == WORD) || (x == BYTE) || (x == AWIDTH) || (x == QUANTUM))
       {
-         assemble(line, NULL, NULL, NULL);
+         /**************************************************************
+		directive names which are also function names
+		and can be tokens in the bit-size expression
+                so drop thru
+         **************************************************************/
       }
-      else note("not processed within record template");
-
-      return 0;
+      else
+      {
+         if ((x == INCLUDE) || (x == RECORD) || (x==SNAP)
+         ||  (x == IF)      || (x == ELSEIF) || (x == ENDIF)
+         ||  (x == EXIT))
+         {
+            assemble(line, NULL, NULL, NULL);
+         }
+         else note("not processed within record template");
+         return 0;
+      }
    }
 
-   x = expression(op, NULL, NULL);
+   argument = first_at(op, " ");
+   x = expression(op, argument, NULL);
 
    if ((y = line[0]) && (y ^ ' '))
    {
@@ -132,13 +147,19 @@ static int precord(object *l, char *line, char **data, int bytes)
       if (selector['q'-'a']) printf("[**%p]", data);
       if (argument = *data)
       {
-         if (selector['q'-'a']) printf("[*%p]", argument);
+         if (selector['q'-'a'])
+         {
+            printf("[*%p]", argument);
+            if (argument) printf("[\"%s\"]", argument);
+         }
+
          if (*argument == qchar)
          {
          }
          else
          {
-            threshold = xpression(argument, NULL, NULL);
+            op = first_at(argument, " ");
+            threshold = xpression(argument, op, NULL);
             positions -= x;
 
             if (selector['q'-'a']) printf("[-%d=%d]\n", x, positions);
@@ -198,7 +219,7 @@ static int precord(object *l, char *line, char **data, int bytes)
    return 0;
 }
 
-static int record(object *l, char *data)
+static int record(object *l, char **data)
 {
    static int            nest;
 
@@ -206,7 +227,10 @@ static int record(object *l, char *data)
    int                   x,
                          y;
 
-   char                  line[READSIZE];
+   object		*o;
+   char			*p;
+
+   char                  line[124];
 
 
 
@@ -226,7 +250,21 @@ static int record(object *l, char *data)
 
    for (;;)
    {
-      y = getline(line, READSIZE-1);
+      if (masm_level)
+      {
+         o = next_image[masm_level];
+         y = o->t.length;
+/*         p = o->t.text; */
+         o = (object *) ((long) o + y);
+         next_image[masm_level] = o;
+         p = o->t.text;
+         y -= 2;
+      }
+      else
+      {
+         y = getline(line, 122);
+         p = line;
+      }
 
       if (y < 0)
       {
@@ -234,9 +272,11 @@ static int record(object *l, char *data)
          break;
       }
 
-      if (selector['p'-'a']) printf("%s>\n", line);
+      if (selector['p'-'a']) printf("%s>\n", p);
 
-      x = precord(l, line, &data, y);
+      x = precord(l, p, data, y);
+
+      if (x == RETURN) return RETURN;
 
       if (x < 0)
       {

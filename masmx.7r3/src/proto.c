@@ -119,3 +119,7 @@ static void floating_position(int bits, line_item *item);
 static void floating_generate(char *a, char *margin, char *param, line_item *item);
 static int meaning(char *directive);
 
+#ifdef RECORD
+static int record(object *l, char **data);
+#endif
+
