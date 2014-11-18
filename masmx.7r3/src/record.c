@@ -1,11 +1,13 @@
 #ifdef	RECORD
 
-static int precord(object *l, char *line, char **data, int bytes)
+static int precord(object *l, char *line, char **data, int nest)
 {
-   static int		 bits;
+   static long		 bits;
+   static long		 origin;
    static int		 positions;
    static long		 address;
    static long		 rbase;
+   static linkage	 rflags;
    static line_item	 stage;
 
 
@@ -15,8 +17,7 @@ static int precord(object *l, char *line, char **data, int bytes)
    object               *k;
 
    int                   x,
-                         y,
-                         field;
+                         y;
 
    char                 *op;
    char                 *argument;
@@ -28,12 +29,33 @@ static int precord(object *l, char *line, char **data, int bytes)
 		outermost record
       ***************************************************/
 
-      bits = 0;
-      address = loc;
-      rbase = actual->rbase;
-      stage = zero_o;
-      positions = RADIX / word * word;
-      outstanding = 1;
+      if (nest == 0)
+      {
+         if (selector['q'-'a']) printf("R %s %lx\n", l->l.name,
+                                        loc);
+         bits = 0;
+         address = loc;
+         rflags.l.rel = counter_of_reference | 128;
+         if (actual->relocatable) rflags.l.y = 1;
+         rbase = actual->rbase;
+         stage = zero_o;
+         positions = RADIX / word * word;
+         outstanding = 1;
+      }
+      else
+      {
+         if (selector['q'-'a']) printf("r %s %lx:%lx\n", l->l.name,
+                                        address + bits / word,
+                                        bits % word);
+
+         quadinsert(address + bits / word, &l->l.value);
+         quadinsert3(bits % word,          &l->l.value);
+      }
+
+      origin = bits;
+      l->l.valued = EQUF;
+      l->l.r = rflags;
+      quadinsert1(rbase, &l->l.value);
       return 0;
    }
 
@@ -56,16 +78,24 @@ static int precord(object *l, char *line, char **data, int bytes)
    {
       if (x == ROOT)
       {
-         active_x--;
+         nest--;
 
-         if ((pass  == 0)
-         ||  (*data == NULL)) loc = address + (bits + word - 1) / word;
-         if (selector['q'-'a']) printf("return on $root $=%lx\n", loc);
+         if (selector['q'-'a']) printf("return on $root b=%lx\n", bits);
 
+         if (nest == 0)
+         {
+            loc = address + (bits + word - 1) / word;
+            if (selector['q'-'a']) printf("$=%lx\n", loc);
+         }
+
+
+         quadinsert4(bits - origin, &l->l.value);
          return -1;
       }
 
+      /*
       if (x == END) return RETURN;
+      */
 
       if (x == DO)
       {
@@ -85,11 +115,10 @@ static int precord(object *l, char *line, char **data, int bytes)
             {
                y = expression(argument, op, NULL);
 
-               field = strlen(op+ 1);
                for (x = 0; x < y; x++)
                {
                   if (k) quadinsert(x + 1, &k->l.value);
-                  precord(l, op+1, data, field);
+                  precord(l, op+1, data, nest);
                }
             }
             else flag("[tag] $do count,text");
@@ -99,11 +128,13 @@ static int precord(object *l, char *line, char **data, int bytes)
          return 0;
       }
 
+      #if 0
       if ((x == RECORD) && (argument = *data))
       {
          printf("[%s]\n", *data);
          return record(l, data);
       }
+      #endif
 
       if (selector['q'-'a']) printf("[propose %s][D %p->%p]\n", line, data, *data);
 
@@ -135,6 +166,7 @@ static int precord(object *l, char *line, char **data, int bytes)
    {
       k = insert_qltable(line, bits / word + address, EQUF);
 
+      k->l.r = rflags;
       quadinsert1(rbase,       &k->l.value);         
       quadinsert3(bits % word, &k->l.value);
       quadinsert4(x,           &k->l.value);
@@ -219,7 +251,7 @@ static int precord(object *l, char *line, char **data, int bytes)
    return 0;
 }
 
-static int record(object *l, char **data)
+static int record(object *l, char *data)
 {
    static int            nest;
 
@@ -242,7 +274,7 @@ static int record(object *l, char **data)
 
    active_instance[active_x++] = l;
 
-   if (nest == 0) precord(l, NULL, NULL, 0);
+   precord(l, NULL, NULL, nest);
 
    if (selector['p'-'a']) printf("$record %s nest %d active %d\n", l->l.name, nest, active_x);
 
@@ -254,7 +286,6 @@ static int record(object *l, char **data)
       {
          o = next_image[masm_level];
          y = o->t.length;
-/*         p = o->t.text; */
          o = (object *) ((long) o + y);
          next_image[masm_level] = o;
          p = o->t.text;
@@ -274,18 +305,22 @@ static int record(object *l, char **data)
 
       if (selector['p'-'a']) printf("%s>\n", p);
 
-      x = precord(l, p, data, y);
+      x = precord(l, p, &data, nest);
 
+      /*
       if (x == RETURN) return RETURN;
+      */
 
       if (x < 0)
       {
          nest--;
+         active_x--;
          if (selector['p'-'a']) printf("action complete nest %d active %d\n", nest, active_x);
          break;
       }
    }
 
+   l->l.valued = EQUF;
    if (selector['p'-'a']) printf("end\n");
    return 0;
 }

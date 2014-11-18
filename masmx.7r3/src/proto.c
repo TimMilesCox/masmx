@@ -120,6 +120,6 @@ static void floating_generate(char *a, char *margin, char *param, line_item *ite
 static int meaning(char *directive);
 
 #ifdef RECORD
-static int record(object *l, char **data);
+static int record(object *l, char *data);
 #endif
 

@@ -9713,7 +9713,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                #ifdef RECORD
             case RECORD:
                if (argument) argument = substitute(argument, param);
-               record(thislabel, &argument);
+               record(thislabel, argument);
                break;
                #endif
 

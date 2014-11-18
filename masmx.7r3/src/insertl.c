@@ -387,7 +387,7 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
          {
             if ((pass) && ((type == LOCATION) || (base_displacement)))
             {
-               if ((x == EQU) || (x == SET))
+               if ((x == EQU) || (x == SET) || (x == EQUF))
                return o;
             }
 
