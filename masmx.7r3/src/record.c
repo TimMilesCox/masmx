@@ -1,10 +1,20 @@
 #ifdef	RECORD
 
+static int string_read(char *p)
+{
+   return '\"';
+}
+
+static int string_space()
+{
+   return ' ';
+}
+
 static int precord(object *l, char *line, char **data, int nest)
 {
    static long		 bits;
-   static long		 origin;
    static int		 positions;
+   static int		 cache_line;
    static long		 address;
    static long		 rbase;
    static linkage	 rflags;
@@ -18,6 +28,11 @@ static int precord(object *l, char *line, char **data, int nest)
 
    int                   x,
                          y;
+
+   int			 offset;
+
+   int			 symbol,
+			 lsword;
 
    char                 *op;
    char                 *argument;
@@ -39,7 +54,7 @@ static int precord(object *l, char *line, char **data, int nest)
          if (actual->relocatable) rflags.l.y = 1;
          rbase = actual->rbase;
          stage = zero_o;
-         positions = RADIX / word * word;
+         positions = cache_line = RADIX / word * word;
          outstanding = 1;
       }
       else
@@ -52,11 +67,10 @@ static int precord(object *l, char *line, char **data, int nest)
          quadinsert3(bits % word,          &l->l.value);
       }
 
-      origin = bits;
       l->l.valued = EQUF;
       l->l.r = rflags;
       quadinsert1(rbase, &l->l.value);
-      return 0;
+      return bits;
    }
 
    if (selector['q'-'a']) printf("%s<\n", line);
@@ -84,18 +98,33 @@ static int precord(object *l, char *line, char **data, int nest)
 
          if (nest == 0)
          {
+            if (pass)
+            {
+               y = cache_line - positions;
+
+               /********************************************
+
+                y = pending data bits
+
+               ********************************************/
+
+               if (y)
+               {
+                  x = bits % word;
+                  if (x) lshift(&stage, word - x);
+                  produce(y, '+', &stage, NULL);
+                  stage = zero_o;
+               }
+
+               if (selector['q'-'a']) printf("[b %x]\n", y);
+            }
+
             loc = address + (bits + word - 1) / word;
             if (selector['q'-'a']) printf("$=%lx\n", loc);
          }
 
-
-         quadinsert4(bits - origin, &l->l.value);
-         return -1;
+         return -bits;
       }
-
-      /*
-      if (x == END) return RETURN;
-      */
 
       if (x == DO)
       {
@@ -128,14 +157,6 @@ static int precord(object *l, char *line, char **data, int nest)
          return 0;
       }
 
-      #if 0
-      if ((x == RECORD) && (argument = *data))
-      {
-         printf("[%s]\n", *data);
-         return record(l, data);
-      }
-      #endif
-
       if (selector['q'-'a']) printf("[propose %s][D %p->%p]\n", line, data, *data);
 
       if ((x == WORD) || (x == BYTE) || (x == AWIDTH) || (x == QUANTUM))
@@ -150,7 +171,9 @@ static int precord(object *l, char *line, char **data, int nest)
       {
          if ((x == INCLUDE) || (x == RECORD) || (x==SNAP)
          ||  (x == IF)      || (x == ELSEIF) || (x == ENDIF)
-         ||  (x == EXIT))
+	 ||  (x == LIST)    ||  (x == PLIST)
+         ||  (x == SNAP)    ||  (x == TRACE)                        
+         ||  (x == NOTE)    ||  (x == FLAG)  ||  (x == EXIT))
          {
             assemble(line, NULL, NULL, NULL);
          }
@@ -172,80 +195,136 @@ static int precord(object *l, char *line, char **data, int nest)
       quadinsert4(x,           &k->l.value);
    }
 
+   y = cache_line - positions;
+   if (y == 0) loc = bits / word + address;
+   offset = bits % word;
    bits += x;
 
    if (pass)
    {
-      if (selector['q'-'a']) printf("[**%p]", data);
-      if (argument = *data)
+      argument = *data;
+
+      if (argument == NULL)
       {
-         if (selector['q'-'a'])
-         {
-            printf("[*%p]", argument);
-            if (argument) printf("[\"%s\"]", argument);
-         }
+         if (selector['q'-'a']) printf("[%x/%x/%lx]", nest, positions, bits);
+         if (y == 0) return 0;
 
-         if (*argument == qchar)
-         {
-         }
-         else
-         {
-            op = first_at(argument, " ");
-            threshold = xpression(argument, op, NULL);
-            positions -= x;
+         #if 0
+         y += offset;
 
-            if (selector['q'-'a']) printf("[-%d=%d]\n", x, positions);
+         /**************************************************
+		some bits are pending from previous
+		arguments
+         **************************************************/
+
+         if (y > 192)
+         {
+            /**********************************************
+		no more bits will get added to this row
+                move it thru
+            **********************************************/
+
+
+            if (selector['q'-'a']) printf("[i %x]\n", y);
+            if (x = bits % word) lshift(&stage, word - x);
+            produce(y, '+', &stage, NULL);
+            positions = cache_line;
+            outstanding = 1;
+            stage = zero_o;
+            return 0;
+         }
+         #endif
+
+         /************************************************
+		shift the cached data
+		deplete available cache bit positions
+         ************************************************/
+
+         argument = "";
+      }
+
+      if (y == 0) positions -= offset;
+
+      if (selector['q'-'a']) printf("[\"%s\" %lx:%x, %x]",
+                                     argument, loc, offset, positions);
+
+      if ((*argument == qchar) || (x > 192))
+      {
+         if (*argument == qchar) argument++;
+
+         while ((x - byte) > 0)
+         {
+            symbol = string_read(argument);
+            if (symbol == '\"') symbol = string_space();
+            else argument++;
+
+            x -= byte;
+            positions -= byte;
+            y = 0;
 
             if (positions < 0)
             {
-               y = x + positions;
-               positions = RADIX / word * word;
+               y = byte + positions;
+               positions = cache_line;
 
                if (y)
                {
                   lshift(&stage, y);
-                  temp = *threshold;
-                  lshift(&temp, RADIX - x);
-                  rshift(&temp, RADIX - y);
-                  operand_or(&stage, &temp);
+                  lsword = quadextract(&stage);
+                  lsword |= symbol >> (byte - y);
+                  quadinsert(lsword, &stage);
                }
 
-               produce(positions, '+', &stage, NULL);
-               if (selector['q'-'a']) printf("[B %d]\n", positions);
-               x -= y;
-               positions -= x;
+               produce(cache_line, '+', &stage, NULL);
+               stage = zero_o;
+               quadinsert(symbol, &stage);
+               positions += y - byte;
             }
 
-            lshift(&stage, x);
-            temp = *threshold;
-            lshift(&temp, RADIX - x);
-            rshift(&temp, RADIX - x);
-            operand_or(&stage, &temp);
+            lshift(&stage, byte);
+            lsword = quadextract(&stage);
+            lsword |= symbol;
+            quadinsert(lsword, &stage);                    
          }
+      }
+      else
+      {
+         positions -= x;
+         op = first_at(argument, " ");
+         threshold = xpression(argument, op, NULL);
 
-         *data = argument = getop(argument);
+         if (selector['q'-'a']) printf("[-%d=%d]\n", x, positions);
 
-         if (argument == NULL)
+         if (positions < 0)
          {
-            y = RADIX / word * word;
-            y -= positions;
-
-            /********************************************
-
-		y = pending data bits
-
-            ********************************************/
+            y = x + positions;
+            positions = cache_line;
 
             if (y)
             {
-               if (x = y % word) lshift(&stage, word - x);
-               produce(y, '+', &stage, NULL);
+               if (selector['q'-'a']) printf("[*/%x]", y);
+               lshift(&stage, y);
+               temp = *threshold;
+               lshift(&temp, RADIX - x);
+               rshift(&temp, RADIX - y);
+               operand_or(&stage, &temp);
             }
 
-            if (selector['q'-'a']) printf("[b %d]\n", y);
-
+            produce(positions, '+', &stage, NULL);
+            if (selector['q'-'a']) printf("[B %x]\n", positions);
+            x -= y;
+            positions -= x;
+            stage = zero_o;
          }
+
+         lshift(&stage, x);
+         temp = *threshold;
+         lshift(&temp, RADIX - x);
+         rshift(&temp, RADIX - x);
+         operand_or(&stage, &temp);
       }
+
+      if (argument = *data) *data = argument = getop(argument);
    }
 
    return 0;
@@ -255,7 +334,7 @@ static int record(object *l, char *data)
 {
    static int            nest;
 
-
+   long			 origin;
    int                   x,
                          y;
 
@@ -274,7 +353,7 @@ static int record(object *l, char *data)
 
    active_instance[active_x++] = l;
 
-   precord(l, NULL, NULL, nest);
+   origin = precord(l, NULL, NULL, nest);
 
    if (selector['p'-'a']) printf("$record %s nest %d active %d\n", l->l.name, nest, active_x);
 
@@ -307,15 +386,14 @@ static int record(object *l, char *data)
 
       x = precord(l, p, &data, nest);
 
-      /*
-      if (x == RETURN) return RETURN;
-      */
-
       if (x < 0)
       {
          nest--;
          active_x--;
-         if (selector['p'-'a']) printf("action complete nest %d active %d\n", nest, active_x);
+         if (selector['p'-'a']) printf("%ld %d action complete nest %d active %d\n",
+                                        origin,  x, nest, active_x);
+         x += origin;
+         quadinsert4(-x, &l->l.value);
          break;
       }
    }
