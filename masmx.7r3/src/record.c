@@ -252,13 +252,15 @@ static int precord(object *l, char *line, char **data, int nest)
       {
          if (*argument == qchar) argument++;
 
-         while ((x - byte) > 0)
+         for (;;)
          {
+            x -= byte;
+            if (x < 0) break;
+
             symbol = string_read(argument);
             if (symbol == '\"') symbol = string_space();
             else argument++;
 
-            x -= byte;
             positions -= byte;
             y = 0;
 
@@ -285,6 +287,24 @@ static int precord(object *l, char *line, char **data, int nest)
             lsword = quadextract(&stage);
             lsword |= symbol;
             quadinsert(lsword, &stage);                    
+         }
+
+         if (x += byte)
+         {
+            positions -= x;
+
+            if (positions < 0)
+            {
+               y = x + positions;
+               positions = cache_line;
+               if (y) lshift(&stage, y);
+               produce(cache_line, '+', &stage, NULL);
+               x -= y;
+               positions -= x;
+               stage = zero_o;
+            }
+
+            lshift(&stage, x);
          }
       }
       else
