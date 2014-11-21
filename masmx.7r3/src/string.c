@@ -46,7 +46,6 @@ static long string_read(char *q)
 
          if (*q == sterm) q++;
          else q = NULL;
-
          p = q;
          return symbol;
       }
@@ -77,7 +76,6 @@ static long string_read(char *q)
 
          if (*q == sterm) q++;
          else q = NULL;
-
          p = q;
          return symbol;
       }
