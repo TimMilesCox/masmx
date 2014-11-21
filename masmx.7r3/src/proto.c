@@ -122,4 +122,5 @@ static int meaning(char *directive);
 #ifdef RECORD
 static int record(object *l, char *data);
 #endif
+static long coded_character(int symbol);
 

@@ -1,13 +1,202 @@
 #ifdef	RECORD
 
-static int string_read(char *p)
+#define	HT	9
+#define	LF	10
+#define	CR	13
+
+#define	VT	11
+#define	FF	12
+#define	BS	8
+#define	BEL	7
+
+static long string_read(char *q)
 {
-   return '\"';
+   static char		*p;
+   static int		 out_of_band;
+
+   long			 symbol;
+   int			 x,
+			 y;
+
+
+   if (q)
+   {
+      symbol = *q;
+      if (symbol == 0) return 0;
+      out_of_band = 0;
+
+      if (symbol == qchar) q++;
+      else out_of_band = 1;
+
+      p = q;
+   }
+
+   if (p == NULL) return 0;
+   
+   if (out_of_band)
+   {
+      if (*p == qchar)
+      {
+         p++;
+         out_of_band = 0;
+      }
+      else
+      {
+         q = first_at(p, tstring);
+
+         symbol =  zxpression(p, q, NULL);
+
+         if (*q == sterm) q++;
+         else q = NULL;
+
+         p = q;
+         return symbol;
+      }
+   }
+
+   if (p == NULL) return 0;
+   symbol = *p++;
+
+   if (symbol == 0)
+   {
+      p = NULL;
+      return 0;
+   }
+
+
+   if (symbol == qchar)
+   {
+      symbol = *p++;
+
+      if (symbol == qchar) return qchar;
+
+      if (symbol == sterm)
+      {
+         out_of_band = 1;
+         q = first_at(p, tstring);
+
+         symbol =  zxpression(p, q, NULL);
+
+         if (*q == sterm) q++;
+         else q = NULL;
+
+         p = q;
+         return symbol;
+      }
+      p = NULL;
+      return 0;
+   }
+ 
+   if (symbol == '\\')
+   {
+      if (selector['c'-'a'] == 0) return coded_character('\\');
+      symbol = *p++;
+
+      if (symbol == qchar) return qchar;
+
+      if ((symbol >='0') && (symbol <= '7'))
+      {
+         symbol &= 7;
+         y = 2;
+
+         while (y--)
+         {
+            x = *p;
+            if (x < '0') break;
+            if (x > '7') break;
+            symbol <<= 3;
+            symbol |= x & 7;
+            p++;
+         }
+
+         if (symbol == 0) symbol == '\\\0';
+         return symbol;
+      }
+      
+
+      switch (symbol)
+      {
+         case 'n':
+            symbol = LF;
+            break;
+
+         case 'r':
+            symbol = CR;
+            break;
+
+         case 't':
+            symbol = HT;
+            break;
+
+         case 'f':
+            symbol = FF;
+            break;
+
+         case 'v':
+            symbol = VT;
+            break;
+
+         case 'b':
+            symbol = BS;
+            break;
+
+         case 'a':
+            symbol = BEL;
+            break;
+
+         case 'x':
+            symbol = 0;
+
+            for (;;)
+            {
+               x = *p;
+
+               if      ((x >= '0') && (x <= '9')) x &= 15;
+               else if ((x >= 'a') && (x <= 'f')) x += 10 - 'a';
+               else if ((x >= 'A') && (x <= 'F')) x += 10 - 'A';
+               else break;
+
+               symbol <<= 4;
+               symbol |= x;
+               p++;
+            }
+
+            if (symbol == 0) symbol = '\\\0';
+
+            return symbol;
+
+         case '\"':
+         case '\'':
+         case '\\':
+            break;
+
+         default:
+            note("extra \\escape value in line");
+      }
+   }
+
+   if (code == ASCII)
+   {
+      if (byte > 6) return symbol;
+      return  (symbol & 31) | ((symbol & 64) >> 1) | '\\\0';
+   }
+
+   symbol = code_set[symbol];
+   if (symbol == 0) symbol |= '\\\0';
+   return symbol;
 }
 
 static int string_space()
 {
-   return ' ';
+   if (selector['c'-'a'] ^ selector['z'-'a']) return 0;
+
+   if (code == ASCII)
+   {
+      if (byte > 6) return 32;
+      return 0;
+   }
+
+   return code_set[32];
 }
 
 static int precord(object *l, char *line, char **data, int nest)
@@ -31,7 +220,8 @@ static int precord(object *l, char *line, char **data, int nest)
 
    int			 offset;
 
-   int			 symbol,
+   long			 symbol,
+                         mask,
 			 lsword;
 
    char                 *op;
@@ -169,7 +359,7 @@ static int precord(object *l, char *line, char **data, int nest)
       }
       else
       {
-         if ((x == INCLUDE) || (x == RECORD) || (x==SNAP)
+         if ((x == INCLUDE) || (x == RECORD) || (x == BYTE)
          ||  (x == IF)      || (x == ELSEIF) || (x == ENDIF)
 	 ||  (x == LIST)    ||  (x == PLIST)
          ||  (x == SNAP)    ||  (x == TRACE)                        
@@ -209,32 +399,6 @@ static int precord(object *l, char *line, char **data, int nest)
          if (selector['q'-'a']) printf("[%x/%x/%lx]", nest, positions, bits);
          if (y == 0) return 0;
 
-         #if 0
-         y += offset;
-
-         /**************************************************
-		some bits are pending from previous
-		arguments
-         **************************************************/
-
-         if (y > 192)
-         {
-            /**********************************************
-		no more bits will get added to this row
-                move it thru
-            **********************************************/
-
-
-            if (selector['q'-'a']) printf("[i %x]\n", y);
-            if (x = bits % word) lshift(&stage, word - x);
-            produce(y, '+', &stage, NULL);
-            positions = cache_line;
-            outstanding = 1;
-            stage = zero_o;
-            return 0;
-         }
-         #endif
-
          /************************************************
 		shift the cached data
 		deplete available cache bit positions
@@ -250,7 +414,7 @@ static int precord(object *l, char *line, char **data, int nest)
 
       if ((*argument == qchar) || (x > 192))
       {
-         if (*argument == qchar) argument++;
+         mask = (1 << byte) - 1;
 
          for (;;)
          {
@@ -258,8 +422,19 @@ static int precord(object *l, char *line, char **data, int nest)
             if (x < 0) break;
 
             symbol = string_read(argument);
-            if (symbol == '\"') symbol = string_space();
-            else argument++;
+            argument = NULL;
+
+            if (symbol)
+            {
+               /******************************************
+				escaped zero
+               ******************************************/
+
+               if (symbol == '\\\0') symbol = 0;
+            }
+            else symbol = string_space();
+
+            symbol &= mask;
 
             positions -= byte;
             y = 0;
