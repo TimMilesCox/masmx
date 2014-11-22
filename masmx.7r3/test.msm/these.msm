@@ -48,6 +48,7 @@ f*      $func
         fo      100, 0, "aarg
         fo      100, 0, "aarg""
         $byte   6
+	$octal
         "aarg
         "aarg""
         fo      100, 0, "aarg

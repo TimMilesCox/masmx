@@ -144,7 +144,16 @@ static long string_read(char *q)
             p++;
          }
 
-         if (symbol == 0) symbol == zero_code_point;
+         if ((code == DATA_CODE) && (uselector['D'-'A']))
+         {
+            if (symbol & -256)
+            {
+               flag("-D flag \\translate input outside Latin-1 range");
+            }
+            else symbol = code_set[symbol];
+         }
+
+         if (symbol == 0) symbol = zero_code_point;
          return symbol;
       }
       
@@ -196,6 +205,15 @@ static long string_read(char *q)
                p++;
             }
 
+            if ((code == DATA_CODE) && (uselector['D'-'A']))
+            {
+               if (symbol & -256)
+               {
+                  flag("-D flag \\translate input outside Latin-1 range");
+               }
+               else symbol = code_set[symbol];
+            }
+         
             if (symbol == 0) symbol = zero_code_point;
 
             return symbol;
@@ -218,7 +236,10 @@ static long string_read(char *q)
 
    symbol = code_set[symbol];
 
-   if (symbol == zero_code_point) flag("reassign $zero_code_point to an unsused code point");
+   if (symbol == zero_code_point)
+   {
+      note("reassign $zero_code_point to an unused code point");
+   }
 
    if (symbol == 0) symbol = zero_code_point;
    return symbol;

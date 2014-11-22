@@ -348,6 +348,7 @@ rm ../text.o3/*
 ../masmx mbank1 ../test.o3/mbank1.txo -loy > ../text.o3/mbank1.txt
 ../masmx ml ../test.o3/ml.txo -loy > ../text.o3/ml.txt
 ../masmx mlingba ../test.o3/mlingba.txo -loy > ../text.o3/mlingba.txt
+lstring -b ../test.o3/mlingba.txo ../test.o3/mlingba
 ../masmx modest ../test.o3/modest.txo -loy > ../text.o3/modest.txt
 ../masmx mojo ../test.o3/mojo.txo -loy > ../text.o3/mojo.txt
 ../masmx mouli ../test.o3/mouli.txo -loy > ../text.o3/mouli.txt
@@ -494,6 +495,8 @@ rm ../text.o3/*
 ../masmx step2 ../test.o3/step2.txo -loy > ../text.o3/step2.txt
 ../masmx sterm ../test.o3/sterm.txo -loy > ../text.o3/sterm.txt
 ../masmx strahl ../test.o3/strahl.txo -loy > ../text.o3/strahl.txt
+../masmx strahler ../test.o3/strahler.txo -loy> ../text.o3/strahler.txt
+lstring -b ../test.o3/strahler.txo ../test.o3/strahler
 ../masmx strain ../test.o3/strain.txo -loy > ../text.o3/strain.txt
 ../masmx straling ../test.o3/straling.txo -loy > ../text.o3/straling.txt
 ../masmx strange ../test.o3/strange.txo -loy > ../text.o3/strange.txt

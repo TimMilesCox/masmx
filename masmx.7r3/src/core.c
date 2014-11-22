@@ -4178,6 +4178,7 @@ static void record_bits(int bits)
    }
 }
 
+#if 0
 #if 1
 static void stringline(char *directive, char *param, txo *image)
 #else
@@ -4465,6 +4466,7 @@ static void special_byte_output(char *directive, char *param, txo *image)
 
    record_bits(total);
 }
+#endif
 
 #if 0
 static void stringline(char *directive, char *param, txo *image)
@@ -8309,7 +8311,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 		        if (*argument == 0) break;
 		        limit = first_at(argument, ", ");
-		        code_set[v++] = expression(argument, limit, param);
+		        code_set[v++] = zxpression(argument, limit, param);
 		     }
 		  }
 	       }
@@ -8893,7 +8895,10 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                #endif
 
 	    case SET_OPTION:
+               #if 0
 	       if (pass) break;
+               #endif
+
 	       if (!argument) break;
 	       if (*argument++ == qchar)
 	       {
@@ -9717,6 +9722,17 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                break;
                #endif
 
+               #ifdef ZERO_CODE_POINT
+            case ZERO_CODE_POINT:
+               if (argument)
+               {
+                  limit = first_at(argument, " ");
+                  zero_code_point = zxpression(argument, limit, param);
+               }
+               else zero_code_point = DEFAULT_ZERO_CODE_POINT;
+               break;
+               #endif
+
             default:
 	       flagf("unknown directive ");
 
@@ -10228,6 +10244,9 @@ main(int argc, char *_argv[])
 
    internal_labels();
 
+   initial_flags = *(flag_box *) selector;
+   initial_uflags = *(flag_box *) uselector;
+
    list = 1;
 
    depth = -1;
@@ -10449,6 +10468,9 @@ main(int argc, char *_argv[])
          #endif
 
          fpwidth = 96;
+
+         *(flag_box *) selector = initial_flags;
+         *(flag_box *) uselector = initial_uflags;
          
 	 continue;
       }

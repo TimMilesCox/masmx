@@ -183,6 +183,10 @@ static void internal_labels()
     { "$zenith", ZENITH, INTERNAL_FUNCTION } ,
    #endif
 
+   #ifdef ZERO_CODE_POINT
+    { "$zero_code_point", ZERO_CODE_POINT, DIRECTIVE } ,
+   #endif
+
     { NULL, 0, 0 } } ;
 
    qui_tuple		*q = initial;

@@ -127,6 +127,8 @@
 #define	RECORD	82
 #endif
 
+#define ZERO_CODE_POINT	91
+
 #define LABEL 'L'                      /* 0x4c = 76 */
 #define TEXT_SUBSTITUTE 'S'            /* 0x53 = 83 */
 #define TEXT_IMAGE 'T'                 /* 0x54 = 84 */
@@ -222,6 +224,9 @@
 #endif
 #endif
 
+#define	DEFAULT_ZERO_CODE_POINT	0x00002700
+
+typedef struct {  char			   flag[26]; } flag_box;
 
 typedef union  {  unsigned long                   i;
 		  struct { char              y;
@@ -511,6 +516,7 @@ static int ohandle, depth, nhandle;
 static int lwidth = 60;
 static int tsubs, litloc;
 
+static long zero_code_point = DEFAULT_ZERO_CODE_POINT;
 static long ecount=0, ucount=0;
 static int suffix, code = ASCII; 
 static long code_set[256]
@@ -543,12 +549,15 @@ static char			*column_r;
 
 static char			 plix[DISPLAY_WIDTH + 4];
 
-static char			 selector[26];
-static char			uselector[26];
+static char			  selector[26];
+static char			 uselector[26];
+
+static flag_box			 initial_flags;
+static flag_box			initial_uflags;
 
 #ifdef ARRAY
-static atree			 tree[RECURSION];
-static atree			*vtree[RECURSION] = { tree };
+static atree			tree[RECURSION];
+static atree		      *vtree[RECURSION] = { tree };
 #endif
 
 #ifdef RELOCATION
