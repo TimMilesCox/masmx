@@ -4167,15 +4167,8 @@ static void record_bits(int bits)
 {
    object		*p = insert_qltable("$bits", bits, SET);
 
-   if (p)
-   {
-      p->l.valued = SET;
-      p->l.value.b[RADIX/8-1] = bits;
-   }
-   else
-   {
-      flag("$bits not added");
-   }
+   if (p) p->l.valued = SET;
+   else flag("$bits not added");
 }
 
 #if 0

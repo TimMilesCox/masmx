@@ -7,7 +7,7 @@
 #define	BS	8
 #define	BEL	7
 
-static long string_read(char *q)
+static inline long string_read(char *q)
 {
    static char		*p;
    static int		 out_of_band;
@@ -31,58 +31,11 @@ static long string_read(char *q)
 
    if (p == NULL) return 0;
    
-   if (out_of_band)
+   for (;;)
    {
-      while ((symbol = *p) == ' ') p++;
-
-      if (symbol == 0)
+      if (out_of_band)
       {
-            p = NULL;
-            return 0;
-      }
-
-      if (symbol == qchar)
-      {
-         p++;
-         out_of_band = 0;
-      }
-      else
-      {
-         q = first_at(p, tstring);
-
-         symbol =  zxpression(p, q, NULL);
-         if (symbol == 0) symbol = zero_code_point;
-
-         if (*q == sterm) q++;
-         else q = NULL;
-         p = q;
-         return symbol;
-      }
-   }
-
-   if (p == NULL) return 0;
-   symbol = *p++;
-
-   if (symbol == 0)
-   {
-      p = NULL;
-      return 0;
-   }
-
-
-   if (symbol == qchar)
-   {
-      symbol = *p++;
-
-      if (symbol == qchar) return qchar;
-
-      if (symbol == sterm)
-      {
-         out_of_band = 1;
-
          while ((symbol = *p) == ' ') p++;
-
-         if (symbol == qchar) return string_read(NULL);
 
          if (symbol == 0)
          {
@@ -90,33 +43,68 @@ static long string_read(char *q)
             return 0;
          }
 
-         q = first_at(p, tstring);
+         if (symbol == qchar)
+         {
+            p++;
+            out_of_band = 0;
+         }
+         else
+         {
+            q = first_at(p, tstring);
 
-         symbol =  zxpression(p, q, NULL);
-         if (symbol == 0) symbol = zero_code_point;
+            symbol =  zxpression(p, q, NULL);
 
-         if (*q == sterm) q++;
-         else q = NULL;
+            if (symbol == zero_code_point)
+            {
+               note("out-of-band expression equals $zero_code_point");
+            }
 
-         p = q;
-         return symbol;
+            if (symbol == 0) symbol = zero_code_point;
+
+            if (*q == sterm) q++;
+            else q = NULL;
+            p = q;
+            return symbol;
+         }
       }
-      p = NULL;
-      return 0;
-   }
- 
-   if (symbol == '\\')
-   {
-      if (selector['c'-'a'] == 0) return coded_character('\\');
+
+      if (p == NULL) return 0;
       symbol = *p++;
 
-      if (symbol == qchar) return qchar;
-
-      if ((symbol >='0') && (symbol <= '7'))
+      if (symbol == 0)
       {
-         symbol &= 7;
+         p = NULL;
+         return 0;
+      }
 
-         /*******************************************************************
+
+      if (symbol == qchar)
+      {
+         symbol = *p++;
+
+         if (symbol == qchar) return qchar;
+
+         if (symbol == sterm)
+         {
+            out_of_band = 1;
+            continue;
+         }
+         p = NULL;
+         return 0;
+      }
+ 
+      if (symbol == '\\')
+      {
+         if (selector['c'-'a'] == 0) break;
+         symbol = *p++;
+
+         if (symbol == qchar) return qchar;
+
+         if ((symbol >='0') && (symbol <= '7'))
+         {
+            symbol &= 7;
+
+            /*******************************************************************
 		one octal symbol is consumed
 		there may be 2 more for bytes 7..9 bits in size = 3 maximum
 			     3 more for bytes 10..12 bits in size = 4 maximum
@@ -130,78 +118,17 @@ static long string_read(char *q)
 
 		bytes may be any size 1..32 bits without regard to word
 		or address quantum
-         *******************************************************************/
+            *******************************************************************/
 
-         y = (byte - 1)/3;
+            y = (byte - 1)/3;
 
-         while (y--)
-         {
-            x = *p;
-            if (x < '0') break;
-            if (x > '7') break;
-            symbol <<= 3;
-            symbol |= x & 7;
-            p++;
-         }
-
-         if ((code == DATA_CODE) && (uselector['D'-'A']))
-         {
-            if (symbol & -256)
-            {
-               flag("-D flag \\translate input outside Latin-1 range");
-            }
-            else symbol = code_set[symbol];
-         }
-
-         if (symbol == 0) symbol = zero_code_point;
-         return symbol;
-      }
-      
-
-      switch (symbol)
-      {
-         case 'n':
-            symbol = LF;
-            break;
-
-         case 'r':
-            symbol = CR;
-            break;
-
-         case 't':
-            symbol = HT;
-            break;
-
-         case 'f':
-            symbol = FF;
-            break;
-
-         case 'v':
-            symbol = VT;
-            break;
-
-         case 'b':
-            symbol = BS;
-            break;
-
-         case 'a':
-            symbol = BEL;
-            break;
-
-         case 'x':
-            symbol = 0;
-
-            for (;;)
+            while (y--)
             {
                x = *p;
-
-               if      ((x >= '0') && (x <= '9')) x &= 15;
-               else if ((x >= 'a') && (x <= 'f')) x += 10 - 'a';
-               else if ((x >= 'A') && (x <= 'F')) x += 10 - 'A';
-               else break;
-
-               symbol <<= 4;
-               symbol |= x;
+               if (x < '0') break;
+               if (x > '7') break;
+               symbol <<= 3;
+               symbol |= x & 7;
                p++;
             }
 
@@ -213,19 +140,93 @@ static long string_read(char *q)
                }
                else symbol = code_set[symbol];
             }
-         
+
+            if (symbol == zero_code_point)
+            {
+               note("\\escaped expression equals $zero_code_point");
+            }
+
             if (symbol == 0) symbol = zero_code_point;
-
             return symbol;
+         }
+      
 
-         case '\"':
-         case '\'':
-         case '\\':
-            break;
+         switch (symbol)
+         {
+            case 'n':
+               symbol = LF;
+               break;
 
-         default:
-            note("extra \\escape value in line");
+            case 'r':
+               symbol = CR;
+               break;
+
+            case 't':
+               symbol = HT;
+               break;
+
+            case 'f':
+               symbol = FF;
+               break;
+
+            case 'v':
+               symbol = VT;
+               break;
+
+            case 'b':
+               symbol = BS;
+               break;
+
+            case 'a':
+               symbol = BEL;
+               break;
+
+            case 'x':
+               symbol = 0;
+
+               for (;;)
+               {
+                  x = *p;
+
+                  if      ((x >= '0') && (x <= '9')) x &= 15;
+                  else if ((x >= 'a') && (x <= 'f')) x += 10 - 'a';
+                  else if ((x >= 'A') && (x <= 'F')) x += 10 - 'A';
+                  else break;
+
+                  symbol <<= 4;
+                  symbol |= x;
+                  p++;
+               }
+
+               if ((code == DATA_CODE) && (uselector['D'-'A']))
+               {
+                  if (symbol & -256)
+                  {
+                     flag("-D flag \\translate input outside Latin-1 range");
+                  }
+                  else symbol = code_set[symbol];
+               }
+         
+               if (symbol == 0) symbol = zero_code_point;
+
+               if (symbol == zero_code_point)
+               {
+                  note("\\escaped expression equals $zero_code_point");
+               }
+
+               return symbol;
+
+            case '\"':
+            case '\'':
+            case '\\':
+               break;
+
+            default:
+               note("extra \\escape value in line");
+         }
       }
+
+      break;
    }
 
    if (code == ASCII)
@@ -251,10 +252,10 @@ static int string_space()
 
    if (code == ASCII)
    {
-      if (byte > 6) return 32;
+      if (byte > 6) return ' ';
       return 0;
    }
 
-   return code_set[32];
+   return code_set[' '];
 }
 

@@ -497,6 +497,7 @@ lstring -b ../test.zo3/mlingba.txo ../test.zo3/mlingba
 lstring -b ../test.zo3/strahler.txo ../test.zo3/strahler
 ../masmz strain ../test.zo3/strain.txo -lo> ../text.zo3/strain.txt
 ../masmz straling ../test.zo3/straling.txo -lo> ../text.zo3/straling.txt
+lstring -b ../test.zo3/straling.txo ../test.zo3/straling
 ../masmz strange ../test.zo3/strange.txo -lo> ../text.zo3/strange.txt
 ../masmz strial1 ../test.zo3/strial1.txo -lo> ../text.zo3/strial1.txt
 ../masmz strial2 ../test.zo3/strial2.txo -lo> ../text.zo3/strial2.txt
@@ -647,4 +648,7 @@ lstring -b ../test.zo3/strahler.txo ../test.zo3/strahler
 ../masmz floating ../test.zo3/floating -lo > ../text.zo3/floating.txt
 ../masmz unary ../test.zo3/unary -lo > ../text.zo3/unary.txt
 ../masmz unary2 ../test.zo3/unary2 -lo > ../text.zo3/unary2.txt
+../masmz norty ../test.zo3/norty -lo > ../text.zo3/norty.txt
+../masmz tessuele ../test.zo3/tessuele -lo > ../text.zo3/tessuele.txt
+../masmz gessuele ../test.zo3/gessuele -lo > ../text.zo3/gessuele.txt
 

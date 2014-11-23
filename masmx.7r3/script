@@ -499,6 +499,7 @@ lstring -b ../test.o3/mlingba.txo ../test.o3/mlingba
 lstring -b ../test.o3/strahler.txo ../test.o3/strahler
 ../masmx strain ../test.o3/strain.txo -loy > ../text.o3/strain.txt
 ../masmx straling ../test.o3/straling.txo -loy > ../text.o3/straling.txt
+lstring -b ../test.o3/straling.txo ../test.o3/straling
 ../masmx strange ../test.o3/strange.txo -loy > ../text.o3/strange.txt
 ../masmx strial1 ../test.o3/strial1.txo -lo > ../text.o3/strial1.txt
 ../masmx strial2 ../test.o3/strial2.txo -lo > ../text.o3/strial2.txt
@@ -648,6 +649,9 @@ lstring -b ../test.o3/strahler.txo ../test.o3/strahler
 ../masmx unary ../test.o3/unary -loy > ../text.o3/unary.txt
 ../masmx unary2 ../test.o3/unary2 -loy > ../text.o3/unary2.txt
 ../masmx exporter ../test.o3/exporter -loy > ../text.o3/exporter.txt
+../masmx norty ../test.o3/norty -loy > ../text.o3/norty.txt
+../masmx tessuele ../test.o3/tessuele -loy > ../text.o3/tessuele.txt
+../masmx gessuele ../test.o3/gessuele -loy > ../text.o3/gessuele.txt
 
 ../linkpart
 ../coldfire
