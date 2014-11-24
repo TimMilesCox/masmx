@@ -72,7 +72,24 @@ static int precord(object *l, char *line, char **data, int nest)
    if (op)
    {
       argument = getop(op);
+
+      #if 1
+      x = -1;
+      x = -1;
+      k = findlabel(op, NULL);
+      if (k)
+      {
+         y = k->l.valued;
+         if ((y == DIRECTIVE)
+         ||  (y == NAME)
+         ||  (y == PROC)) x = quadextract(&k->l.value);
+         /*
+         if (y == NAME)      x = 55555;
+         */
+      }
+      #else
       x = meaning(op);
+      #endif
    }
    else return 0;
 
@@ -162,9 +179,10 @@ static int precord(object *l, char *line, char **data, int nest)
       {
          if ((x == INCLUDE) || (x == RECORD) || (x == BYTE)
          ||  (x == IF)      || (x == ELSEIF) || (x == ENDIF)
-	 ||  (x == LIST)    ||  (x == PLIST)
-         ||  (x == SNAP)    ||  (x == TRACE)                        
-         ||  (x == NOTE)    ||  (x == FLAG)  ||  (x == EXIT))
+	 ||  (x == LIST)    || (x == PLIST)
+         ||  (x == SNAP)    || (x == TRACE)  || (x == NOP)                        
+         ||  (x == NOTE)    || (x == FLAG)   || (x == EXIT)
+         ||  (y == NAME)    || (y == PROC))
          {
             assemble(line, NULL, NULL, NULL);
          }
