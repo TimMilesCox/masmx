@@ -4167,7 +4167,12 @@ static void record_bits(int bits)
 {
    object		*p = insert_qltable("$bits", bits, SET);
 
-   if (p) p->l.valued = SET;
+
+   if (p)
+   {
+      p->l.valued = SET;
+      quadinsert(bits, &p->l.value);
+   }
    else flag("$bits not added");
 }
 
