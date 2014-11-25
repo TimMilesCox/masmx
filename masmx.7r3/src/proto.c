@@ -124,4 +124,5 @@ static int record(object *l, char *data);
 #endif
 static long coded_character(int symbol);
 static void record_bits(int bits);
+static void brake(char *what, char *why);
 

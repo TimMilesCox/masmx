@@ -4171,6 +4171,7 @@ static void record_bits(int bits)
    if (p)
    {
       p->l.valued = SET;
+      p->l.value = zero_o;
       quadinsert(bits, &p->l.value);
    }
    else flag("$bits not added");
@@ -9989,7 +9990,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 	    x = (object *) ((long) x + i);
 	 }
-	 
+
          if (plist > masm_level)
          {
             if (((pass) && (selector['P'-'A']))
@@ -10442,7 +10443,16 @@ main(int argc, char *_argv[])
 	 loc = 0;
 	 depth = 0;
 	 masm_level = 0;
+
+         word = 24;
+         address_quantum = 24;
+         address_size = 24;
+         xadw = 48;
+
 	 byte = 8;
+         apw = 6;
+         apwx = 6;
+         
 	 code = ASCII;         
          for (i = 0; i < 256; i++) code_set[i] = i;
 

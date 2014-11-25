@@ -117,6 +117,12 @@ static void stop()
    exit(0);
 }
 
+static void brake(char *what, char *why)
+{
+   flag_either_pass(what, why);
+   exit(0);
+}
+
 static int digitstring_fraction(char *left, char *right)
 {
    int		 symbol = *left;

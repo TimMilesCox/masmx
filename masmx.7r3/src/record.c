@@ -180,6 +180,7 @@ static int precord(object *l, char *line, char **data, int nest)
          if ((x == INCLUDE) || (x == RECORD) || (x == BYTE)
          ||  (x == IF)      || (x == ELSEIF) || (x == ENDIF)
 	 ||  (x == LIST)    || (x == PLIST)
+         ||  (x == OCTAL)   || (x == HEX)
          ||  (x == SNAP)    || (x == TRACE)  || (x == NOP)                        
          ||  (x == NOTE)    || (x == FLAG)   || (x == EXIT)
          ||  (y == NAME)    || (y == PROC))
@@ -217,6 +218,20 @@ static int precord(object *l, char *line, char **data, int nest)
       {
          if (selector['q'-'a']) printf("[%x/%x/%lx]", nest, positions, bits);
          if (y == 0) return 0;
+
+         if ((x + y) > cache_line)
+         {
+            /*********************************************
+		no new data to join to the cached data
+            *********************************************/
+
+            if (offset = y % word) lshift(&stage, word - offset);
+            produce(y, '+', &stage, NULL);
+            stage = zero_o;
+            positions = cache_line;
+            outstanding = 1;
+            return 0;
+         }
 
          /************************************************
 		shift the cached data
@@ -357,6 +372,7 @@ static int record(object *l, char *data)
 
    char                  line[124];
 
+   int			 active_b4 = active_x;
 
 
    if (l == NULL)
@@ -406,6 +422,13 @@ static int record(object *l, char *data)
          active_x--;
          if (selector['p'-'a']) printf("%ld %d action complete nest %d active %d\n",
                                         origin,  x, nest, active_x);
+         if (active_x ^ active_b4)
+         {
+            printf("name tree manipulated out of line %x %x\n", active_x, active_b4);
+            active_x = active_b4;
+         }
+         
+
          x += origin;
          quadinsert4(-x, &l->l.value);
          break;
