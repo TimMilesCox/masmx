@@ -259,6 +259,7 @@ extern unsigned _stklen = 32*1024;
 #include "csynonym.c"
 #include "proto.c"
 #include "xamine.c"
+#include "alteline.c"
 #include "flag.c"
 #include "quadd_u.c"
 #include "xi.c"

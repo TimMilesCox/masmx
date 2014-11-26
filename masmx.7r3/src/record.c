@@ -73,23 +73,27 @@ static int precord(object *l, char *line, char **data, int nest)
    {
       argument = getop(op);
 
-      #if 1
       x = -1;
       x = -1;
       k = findlabel(op, NULL);
+
       if (k)
       {
          y = k->l.valued;
-         if ((y == DIRECTIVE)
-         ||  (y == NAME)
-         ||  (y == PROC)) x = quadextract(&k->l.value);
-         /*
-         if (y == NAME)      x = 55555;
-         */
+
+         if ((y == NAME) || y == (PROC))
+         {
+            #if 1
+            assemble(line, argument, NULL, NULL);
+            #else
+            if (masm_level) flag("nested subassembly restricted within $record");
+            else assemble(line, argument, NULL, NULL);
+            #endif
+            return 0;
+         }
+
+         if (y == DIRECTIVE) x = quadextract(&k->l.value);
       }
-      #else
-      x = meaning(op);
-      #endif
    }
    else return 0;
 
@@ -182,10 +186,9 @@ static int precord(object *l, char *line, char **data, int nest)
 	 ||  (x == LIST)    || (x == PLIST)
          ||  (x == OCTAL)   || (x == HEX)
          ||  (x == SNAP)    || (x == TRACE)  || (x == NOP)                        
-         ||  (x == NOTE)    || (x == FLAG)   || (x == EXIT)
-         ||  (y == NAME)    || (y == PROC))
+         ||  (x == NOTE)    || (x == FLAG)   || (x == EXIT))
          {
-            assemble(line, NULL, NULL, NULL);
+            assemble(line, argument, NULL, NULL);
          }
          else note("not processed within record template");
          return 0;
