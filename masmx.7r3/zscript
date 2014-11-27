@@ -651,4 +651,5 @@ lstring -b ../test.zo3/straling.txo ../test.zo3/straling
 ../masmz norty ../test.zo3/norty -lo > ../text.zo3/norty.txt
 ../masmz tessuele ../test.zo3/tessuele -lo > ../text.zo3/tessuele.txt
 ../masmz gessuele ../test.zo3/gessuele -lo > ../text.zo3/gessuele.txt
+../masmz noczeesc ../test.zo3/noczeesc -lo > ../text.zo3/noczeesc.txt
 

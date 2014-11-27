@@ -7,6 +7,51 @@
 #define	BS	8
 #define	BEL	7
 
+static long simple_c_escape(int symbol)
+{
+   switch (symbol)
+   {
+      case 'n':
+         symbol = LF;
+         break;
+
+      case 'r':
+         symbol = CR;
+         break;
+
+      case 't':
+         symbol = HT;
+         break;
+
+      case 'v':
+         symbol = VT;
+         break;
+
+      case 'f':
+         symbol = FF;
+         break;
+
+      case 'b':
+         symbol = BS;
+         break;
+
+      case 'a':
+         symbol = BEL;
+         break;
+
+      case '\"':
+      case '\'':
+      case '\\':
+         break;
+
+      default:
+         note("extra \\escape value in line");
+
+   }
+
+   return symbol;
+}
+
 static inline long string_read(char *q)
 {
    static char		*p;
@@ -153,34 +198,6 @@ static inline long string_read(char *q)
 
          switch (symbol)
          {
-            case 'n':
-               symbol = LF;
-               break;
-
-            case 'r':
-               symbol = CR;
-               break;
-
-            case 't':
-               symbol = HT;
-               break;
-
-            case 'f':
-               symbol = FF;
-               break;
-
-            case 'v':
-               symbol = VT;
-               break;
-
-            case 'b':
-               symbol = BS;
-               break;
-
-            case 'a':
-               symbol = BEL;
-               break;
-
             case 'x':
                symbol = 0;
 
@@ -216,13 +233,9 @@ static inline long string_read(char *q)
 
                return symbol;
 
-            case '\"':
-            case '\'':
-            case '\\':
-               break;
-
             default:
-               note("extra \\escape value in line");
+               symbol = simple_c_escape(symbol);
+
          }
       }
 

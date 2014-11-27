@@ -1,0 +1,9 @@
+	$set_option	"c"
+
+	'aaaa'
+	'aaa\t'
+	'''\'\n\t\?\\\"no czeesc!'
+	'''\'\n\t\!\\\"\x6eo\040\x63zeesc!'
+
+	"\x6e"
+

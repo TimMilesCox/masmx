@@ -3,7 +3,7 @@
         $lterm  '#'
         $sterm  '.'
         $set_option "c"
-	$cont_char '\'
+	$cont_char '\\'
 
 
 ?	$set	0xAABBCC
