@@ -381,7 +381,7 @@ static int record(object *l, char *data)
    if (l == NULL)
    {
       flag("$record must have a label");
-      return;
+      return 0;
    }
 
    active_instance[active_x++] = l;

@@ -111,7 +111,6 @@ rm ../text.o3/*
 ../masmx qzuli ../test.o3/qzuli.txo -loy > ../text.o3/qzuli.txt
 ../masmx qzweli ../test.o3/qzweli.txo -loy > ../text.o3/qzweli.txt
 ../masmx random ../test.o3/random.txo -loy > ../text.o3/random.txt
-../masmx refine ../test.o3/refine.txo -loyk > ../text.o3/refine.txt
 ../masmx rel ../test.o3/rel.txo -loy > ../text.o3/rel.txt
 ../masmx rel2 ../test.o3/rel2.txo -loy > ../text.o3/rel2.txt
 ../masmx remindme ../test.o3/remindme.txo -loy > ../text.o3/remindme.txt
