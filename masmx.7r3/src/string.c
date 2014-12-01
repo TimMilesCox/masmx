@@ -224,13 +224,12 @@ static inline long string_read(char *q)
                   else symbol = code_set[symbol];
                }
          
-               if (symbol == 0) symbol = zero_code_point;
-
                if (symbol == zero_code_point)
                {
                   note("\\escaped expression equals $zero_code_point");
                }
 
+               if (symbol == 0) symbol = zero_code_point;
                return symbol;
 
             default:

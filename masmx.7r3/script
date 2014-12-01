@@ -652,6 +652,7 @@ lstring -b ../test.o3/straling.txo ../test.o3/straling
 ../masmx tessuele ../test.o3/tessuele -loy > ../text.o3/tessuele.txt
 ../masmx gessuele ../test.o3/gessuele -loy > ../text.o3/gessuele.txt
 ../masmx noczeesc ../test.o3/noczeesc -loy > ../text.o3/noczeesc.txt
+../masmx o ../test.o3/o -loy > ../text.o3/o.txt
 
 ../linkpart
 ../coldfire

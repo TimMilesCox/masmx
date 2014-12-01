@@ -652,4 +652,5 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz tessuele ..\test.zo3\tessuele -lo > ..\text.zo3\tessuele.txt
 ..\masmz gessuele ..\test.zo3\gessuele -lo > ..\text.zo3\gessuele.txt
 ..\masmz noczeesc ..\test.zo3\noczeesc -lo > ..\text.zo3\noczeesc.txt
+..\masmz o ..\test.zo3\o -lo > ..\text.zo3\o.txt
 
