@@ -27,7 +27,7 @@ static char *stack_string(char *q)
 
 static char *substitute_alternative(char *s, char *param)
 {
-   if (selector['q'-'a']) printf("[a::%p \"%s\"]\n", s, s);
+   if (selector['q'-'a']) printf("[%x:a::%p \"%s\"]\n", masm_level, s, s);
 
    if ((masm_level) && (s))
    {
@@ -36,6 +36,6 @@ static char *substitute_alternative(char *s, char *param)
       if (s) s = stack_string(s);
    }
 
-   if (selector['q'-'a']) printf("[A::%p \"%s\"]\n", s, s);
+   if (selector['q'-'a']) printf("[%X:A::%p \"%s\"]\n", masm_level, s, s);
    return s;
 }
