@@ -9895,6 +9895,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                #ifdef RECORD
             case RECORD:
+               if (masm_level) fields(param);
                argument = substitute_alternative(argument, param);
                record(thislabel, argument);
                break;

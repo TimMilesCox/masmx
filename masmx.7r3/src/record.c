@@ -28,6 +28,7 @@ static int precord(object *l, char *line, char **data, int nest)
    char                 *op;
    char                 *argument;
 
+
    if (line == NULL)
    {
       /***************************************************
@@ -83,12 +84,7 @@ static int precord(object *l, char *line, char **data, int nest)
 
          if ((y == NAME) || y == (PROC))
          {
-            #if 1
             assemble(line, argument, NULL, NULL);
-            #else
-            if (masm_level) flag("nested subassembly restricted within $record");
-            else assemble(line, argument, NULL, NULL);
-            #endif
             return 0;
          }
 
@@ -135,6 +131,8 @@ static int precord(object *l, char *line, char **data, int nest)
             if (selector['q'-'a']) printf("$=%lx\n", loc);
          }
 
+         if (bits == 0) return 0x80000000;
+
          return -bits;
       }
 
@@ -154,7 +152,7 @@ static int precord(object *l, char *line, char **data, int nest)
 
             if (*op == ',')
             {
-               y = expression(argument, op, NULL);
+               y = expression(argument, op, "");
 
                for (x = 0; x < y; x++)
                {
@@ -185,6 +183,7 @@ static int precord(object *l, char *line, char **data, int nest)
          ||  (x == IF)      || (x == ELSEIF) || (x == ENDIF)
 	 ||  (x == LIST)    || (x == PLIST)
          ||  (x == OCTAL)   || (x == HEX)
+	 ||  (x == SET)     || (x == EQU)
          ||  (x == SNAP)    || (x == TRACE)  || (x == NOP)                        
          ||  (x == NOTE)    || (x == FLAG)   || (x == EXIT))
          {
@@ -423,6 +422,7 @@ static int record(object *l, char *data)
       {
          nest--;
          active_x--;
+         if (x == 0x80000000) x = 0;
          if (selector['p'-'a']) printf("%ld %d action complete nest %d active %d\n",
                                         origin,  x, nest, active_x);
          if (active_x ^ active_b4)
