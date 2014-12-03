@@ -1,0 +1,45 @@
+		$include	coldfire.def
+
+p		$proc
+retrieve*	$name		;	load an unsigned field up to 16 bits
+D_REG		$set,"$d_reg"	d0+p(2, 1)
+BITS		$set	p(1, 5)
+OFFSET		$set	p(1, 4)
+	$if	BITS+(OFFSET**7)<9
+		move.b	p(1)+OFFSET/8, D_REG
+POSITIONS	$set	8-BITS-(OFFSET**7)
+	$do	POSITIONS^=0,	lsr	#POSITIONS, D_REG
+	$elseif	p(1, 4)+p(1, 5)>$word
+POSITIONS	$set	2*$word-OFFSET-BITS
+		move.l	p(1), D_REG
+	$do	POSITIONS/8,		lsr	#8, D_REG
+	$do	POSITIONS///8^=0,	lsr	#POSITIONS///8, D_REG
+	$else
+POSITIONS	$set	$word-OFFSET-BITS
+		move.w	p(1), D_REG
+	$do	POSITIONS/8,		lsr	#8, D_REG
+	$do	POSITIONS///8^=0,	lsr	#POSITIONS///8, D_REG
+	$endif
+	$do	BITS<$word,		andi	#+(1*/BITS)-1, D_REG
+		$end
+
+$(71::,a7)
+channel_status	$record
+active		1
+sense		3
+input_status	3
+output_status	3
+input_access_chain_head  16
+output_access_chain_head 16
+		$root
+
+$(0:64)
+
+	retrieve	channel_status.input_status
+	beq.b		no_input_traffic
+	retrieve	channel_status.input_access_chain_head d2
+	
+	
+no_input_traffic
+	move.w	channel_status, d3
+	move.l	channel_status.output_access_chain_head, d4
