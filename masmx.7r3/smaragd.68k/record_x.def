@@ -1,9 +1,37 @@
+p	$proc
+retrieve_d* $name
+D_REG	$set,"$d_reg"	d0+p(2, 1)
+BITS	$set	p(1, 5)
+OFFSET	$set	p(1, 4)
+	$do	BITS<17,	$flag	use retrieve for fields < 17 bits
+	$do	BITS<17,	$return
+	$if	BITS+OFFSET>32
+POSITIONS $set	BITS+OFFSET-32
+		move.l	p(1)+2, D_REG
+	$do	POSITIONS/8,	lsl	#8, D_REG
+	$do	POSITIONS**7^=0, lsl	POSITIONS**7, D_REG
+		swap		D_REG
+		move.w		D_REG,	D_REG+1**7
+		move.l		p(1),D_REG
+	$do     POSITIONS/8,		lsl     #8, D_REG
+	$do     POSITIONS**7^=0,	lsl     POSITIONS**7, D_REG
+		move.w		D_REG+1**7, D_REG
+	$else
+		move.l	p(1), D_REG
+POSITIONS $set	32-BITS-OFFSET
+	$do	POSITIONS/8,		lsr	#8, D_REG
+	$do	POSITIONS**7^=0,	lsr	#POSITIONS**7, D_REG
+	$endif
+	$do	(BITS<32)**(OFFSET^=0),	andi	#+(1*/BITS)-1, D_REG
+	$end
 
 p		$proc
 retrieve*	$name		;	load an unsigned field up to 16 bits
 D_REG		$set,"$d_reg"	d0+p(2, 1)
 BITS		$set	p(1, 5)
 OFFSET		$set	p(1, 4)
+	$do	BITS>16,	$flag	use retrieve_d for fields > 16 bits
+	$do	BITS>16,	$return
 	$if	BITS+(OFFSET**7)<9
 		move.b	p(1)+OFFSET/8, D_REG
 POSITIONS	$set	8-BITS-(OFFSET**7)
@@ -19,6 +47,6 @@ POSITIONS	$set	$word-OFFSET-BITS
 	$do	POSITIONS/8,		lsr	#8, D_REG
 	$do	POSITIONS///8^=0,	lsr	#POSITIONS///8, D_REG
 	$endif
-	$do	BITS<$word,		andi	#+(1*/BITS)-1, D_REG
+	$do	(BITS<$word)**(OFFSET^=0), andi	#+(1*/BITS)-1, D_REG
 		$end
 
