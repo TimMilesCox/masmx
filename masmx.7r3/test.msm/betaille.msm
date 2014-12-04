@@ -1,5 +1,7 @@
+	$path		../smaragd.68k
 	$include	coldfire.def
 	$include	record_x.def
+	$path
 
 p	$proc
 hameau*	$name
