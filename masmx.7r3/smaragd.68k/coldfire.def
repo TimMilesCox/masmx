@@ -212,6 +212,38 @@ ble*	$name	0x6F
 	$end
 
 p	$proc
+
+bra.b*    $name   0x60
+bsr.b*    $name   0x61
+bhi.b*    $name   0x62
+bls.b*    $name   0x63
+
+bcc.b*    $name   0x64
+bcs.b*    $name   0x65
+bne.b*    $name   0x66
+beq.b*    $name   0x67
+
+bvc.b*    $name   0x68
+bvs.b*    $name   0x69
+bpl.b*    $name   0x6A
+bmi.b*    $name   0x6B
+
+bge.b*    $name   0x6C
+blt.b*    $name   0x6D
+bgt.b*    $name   0x6E
+ble.b*    $name   0x6F
+
+"$target" $set	p(1, 1)-$-2
+
+	$do	$target<-128,   $flag   short branch too low
+	$do	$target>127,	$flag	short branch too high
+	$do	$target**255=255, $flag	short branch locked window
+	$do	$target**255=0,	$flag	short branch locked window
+
+	$b_cs	p(0, 0), $target
+	$end
+
+p	$proc
 lea*	$name	7*/4++4
 	$if		$t(p(1, 2))=$a_reg
 	  $if		$t(p(1, 1))=$a_reg_@
@@ -352,8 +384,9 @@ rte*	$name	0x4e73
 	+	p(0, 0)
 	$end
 
-p	$proc
+p	$proc				; 4,3,3,3,3,32
 cmpi*	$name	6*/4++2*/7++0*/10++0
+andi*	$name	1*/4++2*/7++0*/10++0	; 0000 0010 1000 0rrr
 
 	$do	$t(p(1, 2))^=$d_reg,	$flag must subtract from d0..d7
 	$do	p(1, #1)=0,		$flag must subtract immediate
@@ -396,10 +429,15 @@ move*	$name	move.l
 	    $i_rm 	p(0, 0), $base_a\p(1, 2:1), 5, $from, $fror,|
 			$displacement\p(1, 2)
 
+	  $elseif	($t(p(1, 2))="$equf")**(p(1, 3)^=0)
+	    $i_rm	p(0, 0), p(1, 3), 5, $from, $fror, p(1, 2)
+
+
 	  $elseif	$inside\p(1, 2:1)=3
 	    $i_rx	p(0, 0), $base_a\p(1, 2:1), 6, $from, $fror,|
 			$idx_d\p(1, 2:1), $idx_w\p(1, 2:1), 0,|
 			$displacement8\p(1, 2:1)
+
 	  $else
 
 	    $i_rl	p(0, 0), 1, 7, $from, $fror, p(1, 2)
@@ -410,6 +448,13 @@ move*	$name	move.l
 
 "$tom"	    $set	$tot**7	
 "$tor"	    $set	p(1, 2)
+"$last"	    $set	p(1)
+
+	$if	$t(p(1, 1))=$equf
+"$unload"	$equf	p(1, 1)
+	$else
+"$unload"	$equf	0
+	$endif
 
 	  $if		p(1, #1)
 
@@ -423,6 +468,10 @@ move*	$name	move.l
 
 	    $i_rm	p(0, 0), $tor, $tom, 5, $base_a\p(1, 1:1),|
 			$displacement\p(1, 1:1)
+
+	  $elseif	($t(p(1, 1))=$equf)**($unload\2^=0)
+
+	    $i_rm	p(0, 0), p(1, $last), $tom, 5, $unload\2, $unload\1
 
 	  $elseif $inside\p(1, 1:1)=3
 	    $i_rx	p(0, 0), $tor, $tom, 6, $base_a\p(1, 1:1),|
