@@ -401,7 +401,12 @@ static char ufield[] = {	sizeof("=")   - 1,	sizeof("^=") - 1,
 
 static char tstring[] = ":, ";
 
-static int word = 24, byte = 8, address_size = 24, address_quantum = 24;
+static int		 word = 24,
+			 byte = 8,
+			 address_size = 24,
+			 address_quantum = 24,
+			 quanta = 1;
+
 static int		 ofield,
 			 otag;
 

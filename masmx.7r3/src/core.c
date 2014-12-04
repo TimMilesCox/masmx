@@ -8656,6 +8656,22 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       {
 		  limit = edge(argument, " ");
 		  address_quantum = expression(argument, limit, param);
+                  quanta = word / address_quantum;
+
+                  if ((quanta == 0) || (word % address_quantum))
+                  {
+                     brake("", "$word and $quantum are not in a possible relation");
+                  }
+
+                  for (i = 0; i < 10; i++)
+                  {
+                     if ((address_quantum << i) == word) break;
+                  }
+
+                  if ((address_quantum << i) == word)
+                  {
+                  }
+                  else notep1("$word is not a log2 of $quantum");
 	       }
 	       break;
 	    case LWIDTH:
