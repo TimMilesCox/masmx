@@ -653,6 +653,10 @@ lstring -b ../test.o3/straling.txo ../test.o3/straling
 ../masmx gessuele ../test.o3/gessuele -loy > ../text.o3/gessuele.txt
 ../masmx noczeesc ../test.o3/noczeesc -loy > ../text.o3/noczeesc.txt
 ../masmx o ../test.o3/o -loy > ../text.o3/o.txt
+../masmx betaille ../test.o3/betaille -loy > ../text.o3/betaille.txt
+../masmx base_d ../test.o3/base_d -loy > ../text.o3/base_d.txt
+../masmx dryland ../test.o3/dryland -loy > ../text.o3/dryland.txt
+../masmx bang ../test.o3/bang -loy > ../text.o3/bang_d.txt
 
 ../linkpart
 ../coldfire
