@@ -1,52 +1,107 @@
+
 p	$proc
-retrieve_d* $name
-D_REG	$set,"$d_reg"	d0+p(2, 1)
+
+retrieve* $name	1
+retrieves* $name	2
+retrieveu* $name	0
+SIGNED	$set	p(1, *5)+p(0, 0)/*1
 BITS	$set	p(1, 5)
 OFFSET	$set	p(1, 4)
-	$do	BITS<17,	$flag	use retrieve for fields < 17 bits
-	$do	BITS<17,	$return
-	$if	BITS+OFFSET>32
-POSITIONS $set	BITS+OFFSET-32
-		move.l	p(1)+2, D_REG
-	$do	POSITIONS/8,	lsl	#8, D_REG
-	$do	POSITIONS**7^=0, lsl	POSITIONS**7, D_REG
-		swap		D_REG
-		move.w		D_REG,	D_REG+1**7
-		move.l		p(1),D_REG
-	$do     POSITIONS/8,		lsl     #8, D_REG
-	$do     POSITIONS**7^=0,	lsl     POSITIONS**7, D_REG
-		move.w		D_REG+1**7, D_REG
-	$else
-		move.l	p(1), D_REG
-POSITIONS $set	32-BITS-OFFSET
-	$do	POSITIONS/8,		lsr	#8, D_REG
-	$do	POSITIONS**7^=0,	lsr	#POSITIONS**7, D_REG
-	$endif
-	$do	(BITS<32)**(OFFSET^=0),	andi	#+(1*/BITS)-1, D_REG
+D_REG	$set,"$d_reg"	d0+p(2, 1)
+
+	$do	BITS>16,	$flag	use lretrieve for fields > 16 bits
+
+p	$proc
+SHIFT_LEFT* $name
+	$do	p(1, 1)/8,	lsl	#8, p(2, 1)
+	$do	p(1, 1)**7^=0,	lsl	#p(1, 1)**7, p(2, 1)
 	$end
 
-p		$proc
-retrieve*	$name		;	load an unsigned field up to 16 bits
-D_REG		$set,"$d_reg"	d0+p(2, 1)
-BITS		$set	p(1, 5)
-OFFSET		$set	p(1, 4)
-	$do	BITS>16,	$flag	use retrieve_d for fields > 16 bits
-	$do	BITS>16,	$return
-	$if	BITS+(OFFSET**7)<9
-		move.b	p(1)+OFFSET/8, D_REG
-POSITIONS	$set	8-BITS-(OFFSET**7)
-	$do	POSITIONS^=0,	lsr	#POSITIONS, D_REG
-	$elseif	p(1, 4)+p(1, 5)>$word
-POSITIONS	$set	2*$word-OFFSET-BITS
-		move.l	p(1), D_REG
-	$do	POSITIONS/8,		lsr	#8, D_REG
-	$do	POSITIONS///8^=0,	lsr	#POSITIONS///8, D_REG
-	$else
-POSITIONS	$set	$word-OFFSET-BITS
-		move.w	p(1), D_REG
-	$do	POSITIONS/8,		lsr	#8, D_REG
-	$do	POSITIONS///8^=0,	lsr	#POSITIONS///8, D_REG
-	$endif
-	$do	(BITS<$word)**(OFFSET^=0), andi	#+(1*/BITS)-1, D_REG
-		$end
+p	$proc
+SHIFT_RIGHT* $name
+	$do	p(1, 1)/8,	lsr	#8, p(2, 1)
+	$do	p(1, 1)**7^=0,	lsr	#p(1, 1)**7, p(2, 1)
+	$end
 
+	$if	BITS+OFFSET>16
+		move.l	p(1),	D_REG
+		$if	SIGNED
+		SHIFT_LEFT	OFFSET	D_REG
+		move.w	#32-BITS,	D_REG
+		asr	D_REG,	D_REG
+		$else
+		SHIFT_RIGHT	32-BITS-OFFSET	D_REG
+		$do	BITS<16,	andi	#+(1*/BITS)-1, D_REG
+		$endif
+	$else
+		$if	SIGNED
+		move.w	p(1),	D_REG
+		swap	D_REG
+		SHIFT_LEFT	OFFSET	D_REG
+		move.w	#32-BITS-OFFSET, D_REG
+		asr	D_REG,	D_REG
+		$else
+		move.w	p(1),	D_REG
+		SHIFT_RIGHT	16-BITS-OFFSET	D_REG
+		$do	BITS<16,	andi	#+(1*/BITS)-1, D_REG
+		$endif
+	$endif
+	$end
+
+
+p	$proc
+
+lretrieve* $name	1
+lretrieves* $name	2
+lretrieveu* $name	0
+
+SIGNED	$set	p(1, *5)+p(0, 0)/*1
+BITS	$set	p(1, 5)
+OFFSET	$set	p(1, 4)
+D_REG	$set,"$d_reg"	d0+p(2, 1)
+D_REGA	$set,"$d_reg"	D_REG+1**7
+
+	$do	BITS<17,	$flag	use retrieve for fields <= 16 bits
+
+p	$proc
+SHIFT_LEFT* $name
+	$do	p(1, 1)/8,	lsl	#8, p(2, 1)
+	$do	p(1, 1)**7^=0,	lsl	#p(1, 1)**7, p(2, 1)
+	$end
+
+p	$proc
+SHIFT_RIGHT* $name
+	$do	p(1, 1)/8,	lsr	#8, p(2, 1)
+	$do	p(1, 1)**7^=0,	lsr	#p(1, 1)**7, p(2, 1)
+	$end
+
+p	$proc
+SHIFT_ALGEBRAIC* $name
+	$do	p(1, 1)/8,	asr	#8, p(2, 1)
+	$do	p(1, 1)**7^=0,	asr	#p(1, 1)**7, p(2, 1)
+	$end
+
+	$if	BITS+OFFSET>32
+		$note		neighbouring d_register is also used
+		move.l	p(1)+1,	D_REGA
+		SHIFT_RIGHT	48-BITS-OFFSET	D_REGA
+		move.l	p(1),	D_REG
+		SHIFT_LEFT	OFFSET	D_REG
+		$if		SIGNED
+		SHIFT_ALGEBRAIC	32-BITS	D_REG
+		$else
+		SHIFT_RIGHT	32-BITS	D_REG
+		$endif
+		move.w		D_REGA, D_REG
+	$else
+		move.l	p(1),	D_REG
+		$if	SIGNED
+		SHIFT_LEFT	OFFSET	D_REG
+		SHIFT_ALGEBRAIC	32-BITS	D_REG
+		$else
+		SHIFT_LEFT	OFFSET	D_REG
+		SHIFT_RIGHT	32-BITS	D_REG
+		$endif
+	$endif
+
+	$end
