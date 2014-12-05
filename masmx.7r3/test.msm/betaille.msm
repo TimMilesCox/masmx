@@ -20,7 +20,7 @@ commune* $name
 	$end
 
 
-$(4:040000)
+$(5:050000)
 communes $record
 Vaux_les_Pres	commune	les_Cotards, 80, 5, 248	|
 			le_Charmelot, 660, 24, 79 |
@@ -33,6 +33,7 @@ Villers_Buzon	commune	centre, 10, 1, 30	|
 $(0:16384)
 
 	retrieve	communes.Villers_Buzon.Combe_au_Loup.moutons
-	retrieve	communes.Vaux_les_Pres.le_Charmelot.anes
+	retrieves	communes.Vaux_les_Pres.le_Charmelot.anes	d1
 
-	retrieve_d	communes.Villers_Buzon.Combe_au_Loup.oies
+	lretrieve	communes.Villers_Buzon.Combe_au_Loup.oies	d2
+	lretrieve	communes.Villers_Buzon.centre.oies	d3
