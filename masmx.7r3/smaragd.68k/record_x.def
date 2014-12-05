@@ -38,7 +38,7 @@ SHIFT_RIGHT* $name
 		move.w	p(1),	D_REG
 		swap	D_REG
 		SHIFT_LEFT	OFFSET	D_REG
-		move.w	#32-BITS-OFFSET, D_REG
+		move.w	#32-BITS,	D_REG
 		asr	D_REG,	D_REG
 		$else
 		move.w	p(1),	D_REG
