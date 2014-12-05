@@ -359,16 +359,18 @@ tst*	$name	tst.l
 	$end
 
 p	$proc
-lsr*	$name	2*/4++14	
-lsl*	$name	6*/4++14
+lsr*	$name	2*/4++14++1*/8	
+lsl*	$name	6*/4++14++1*/8
+asr*	$name	2*/4++14
+asl*	$name	6*/4++14
 
 	$if		$t(p(1, 2))=$d_reg
 	$if		p(1, #1)
 	  $do	p(1, 1)>8,	|
 	  $flag	immediate shift count may be 1..8
-	  $i_rr		p(0, 0), p(1, 1), p(0, 0)/*4, 1, p(1, 2)
+	  $i_rr		p(0, 0), p(1, 1), p(0, 0)/*4, 0++p(0, 0)/*8, p(1, 2)
 	$elseif		$t(p(1, 1))=$d_reg
-	  $i_rr		p(0, 0), p(1, 1), p(0, 0)/*4, 5, p(1, 2)
+	  $i_rr		p(0, 0), p(1, 1), p(0, 0)/*4, 4++p(0, 0)/*8, p(1, 2)
 	$else
 	  $flag		shift count must be 1..8 or d0..d7
 	$endif
@@ -582,3 +584,8 @@ mask	$set	((1*/f(1, 1:1))-1)--((512*/f(1, 1:2))-1)
 	$return	mask
 	$end
 
+p	$proc
+swap*	$name		4++4*/4++1*/8++0*/12
+	$do	$t(p(1, 1))^="$d_reg",	$flag	swap argument must be d0..d7
+	$i_rr		p(0, 0), p(0, 0)/*4, p(0, 0)/*8, p(0, 0)/*12, p(1, 1)
+	$end
