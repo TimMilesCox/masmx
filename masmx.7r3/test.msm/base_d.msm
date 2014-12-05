@@ -21,5 +21,3 @@ $(0:64)
 	
 	
 no_input_traffic
-	move.w	channel_status, d3
-	move.l	channel_status.output_access_chain_head, d4
