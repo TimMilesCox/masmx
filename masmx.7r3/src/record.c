@@ -29,6 +29,7 @@ static int precord(object *l, char *line, char **data, int nest)
    char                 *argument;
 
 
+
    if (line == NULL)
    {
       /***************************************************
@@ -55,8 +56,8 @@ static int precord(object *l, char *line, char **data, int nest)
                                         address + bits / word,
                                         bits % word);
 
-         quadinsert(address + bits / word, &l->l.value);
-         quadinsert3(bits % word,          &l->l.value);
+         quadinsert(address + bits / word * quanta, &l->l.value);
+         quadinsert3(bits % word,                   &l->l.value);
       }
 
       l->l.valued = EQUF;
@@ -127,7 +128,7 @@ static int precord(object *l, char *line, char **data, int nest)
                if (selector['q'-'a']) printf("[b %x]\n", y);
             }
 
-            loc = address + (bits + word - 1) / word;
+            loc = address + (bits + word - 1) / word * quanta;
             if (selector['q'-'a']) printf("$=%lx\n", loc);
          }
 
@@ -199,7 +200,7 @@ static int precord(object *l, char *line, char **data, int nest)
 
    if ((y = line[0]) && (y ^ ' '))
    {
-      k = insert_qltable(line, bits / word + address, EQUF);
+      k = insert_qltable(line, bits / word * quanta + address, EQUF);
 
       k->l.r = rflags;
       quadinsert1(rbase,       &k->l.value);         
@@ -208,7 +209,7 @@ static int precord(object *l, char *line, char **data, int nest)
    }
 
    y = cache_line - positions;
-   if (y == 0) loc = bits / word + address;
+   if (y == 0) loc = bits / word * quanta + address;
    offset = bits % word;
    bits += x;
 

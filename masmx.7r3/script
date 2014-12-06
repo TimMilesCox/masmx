@@ -657,6 +657,7 @@ lstring -b ../test.o3/straling.txo ../test.o3/straling
 ../masmx base_d ../test.o3/base_d -loy > ../text.o3/base_d.txt
 ../masmx dryland ../test.o3/dryland -loy > ../text.o3/dryland.txt
 ../masmx bang ../test.o3/bang -loy > ../text.o3/bang_d.txt
+../masmx questit ../test.o3/questit -lynok > ../text.o3/questit.txt
 
 ../linkpart
 ../coldfire

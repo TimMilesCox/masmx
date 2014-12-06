@@ -111,6 +111,7 @@ del ..\text.o3\*
 ..\masmx prelink ..\test.o3\prelink.txo -loy > ..\text.o3\prelink.txt
 ..\masmx q ..\test.o3\q.txo -loy > ..\text.o3\q.txt
 ..\masmx qb2i ..\test.o3\qb2i.txo -loy > ..\text.o3\qb2i.txt
+..\masmx questit ..\test.o3\questit -lnoky > ..\text.o3\questit.txt
 ..\masmx quicki ..\test.o3\quicki.txo -loy > ..\text.o3\quicki.txt
 ..\masmx qzuli ..\test.o3\qzuli.txo -loy > ..\text.o3\qzuli.txt
 ..\masmx qzweli ..\test.o3\qzweli.txo -loy > ..\text.o3\qzweli.txt

@@ -107,6 +107,7 @@ del ..\text.zo3\*
 ..\masmz prelink ..\test.zo3\prelink.txo -lo> ..\text.zo3\prelink.txt
 ..\masmz q ..\test.zo3\q.txo -lo> ..\text.zo3\q.txt
 ..\masmz qb2i ..\test.zo3\qb2i.txo -lo> ..\text.zo3\qb2i.txt
+..\masmz questit ..\test.zo3\questit -lnok > ..\text.zo3\questit.txt
 ..\masmz quicki ..\test.zo3\quicki.txo -lo> ..\text.zo3\quicki.txt
 ..\masmz qzuli ..\test.zo3\qzuli.txo -lo> ..\text.zo3\qzuli.txt
 ..\masmz qzweli ..\test.zo3\qzweli.txo -lo> ..\text.zo3\qzweli.txt
