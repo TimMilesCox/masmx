@@ -1,0 +1,14 @@
+questit	$equf	04000, 15,, 17, *30
+
+p	$proc
+extra*	$name
+	+	p(1, *5)
+	+	p(1, 5)
+star	$set	p(1, *5)
+value	$set	p(1, 5)
+	+	star
+	+	value
+	$end
+
+	extra	questit
+

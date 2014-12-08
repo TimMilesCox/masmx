@@ -33,12 +33,31 @@ static int precord(object *l, char *line, char **data, int nest)
    if (line == NULL)
    {
       /***************************************************
+		**data nonzero is an overlay or union
+      ***************************************************/
+
+      #ifdef RECORD_BRANCH
+      if (data)
+      {
+         bits = (long) data;
+         if (nest < 0) return bits;
+
+         /***********************************************
+		starting a 2nd or subsequent branch
+         ***********************************************/
+      }
+      #endif
+
+      /***************************************************
 		initialising call
-		outermost record
       ***************************************************/
 
       if (nest == 0)
       {
+         /***********************************************
+		outermost record
+         ***********************************************/
+
          if (selector['q'-'a']) printf("R %s %lx\n", l->l.name,
                                         loc);
          bits = 0;
@@ -52,6 +71,10 @@ static int precord(object *l, char *line, char **data, int nest)
       }
       else
       {
+         /***********************************************
+		nested  record
+         ***********************************************/
+
          if (selector['q'-'a']) printf("r %s %lx:%lx\n", l->l.name,
                                         address + bits / word,
                                         bits % word);
@@ -362,11 +385,19 @@ static int precord(object *l, char *line, char **data, int nest)
    return 0;
 }
 
-static int record(object *l, char *data)
+static int record(object *l, char *data, int subfunction)
 {
    static int            nest;
 
+   #ifdef RECORD_BRANCH
+   static int		 branch_record;
+   static long		 offset[STRUCTURE_DEPTH];
+   static long		 record_high[STRUCTURE_DEPTH];
+   #endif
+
+
    long			 origin;
+
    int                   x,
                          y;
 
@@ -377,6 +408,9 @@ static int record(object *l, char *data)
 
    int			 active_b4 = active_x;
 
+   union { long	  p;
+	   char	**q; }	 startp = { 0 } ;		
+
 
    if (l == NULL)
    {
@@ -384,11 +418,43 @@ static int record(object *l, char *data)
       return 0;
    }
 
-   active_instance[active_x++] = l;
+   if (active_x == STRUCTURE_DEPTH)
+   {
+      for (x = 0; x < STRUCTURE_DEPTH; x++)
+      {
+         flag_either_pass(active_instance[x]->l.name,
+                          "$record nesting runaway");
+      }
 
-   origin = precord(l, NULL, NULL, nest);
+      brake("", "abandon");
+   }
 
-   if (selector['p'-'a']) printf("$record %s nest %d active %d\n", l->l.name, nest, active_x);
+   #ifdef RECORD_BRANCH
+   if (!(branch_record & (1 << active_x))) record_high[active_x] = 0;
+
+   if (subfunction == BRANCH)
+   {
+      if (selector['p'-'a']) printf("[SF]");
+      if ((branch_record & (1 << active_x))
+      &&  (o = active_instance[active_x]))
+      {
+         l->l.value = o->l.value;
+         loc = qextractv(o);
+         outstanding = 1;
+         startp.p = offset[active_x]; 
+      }
+
+      branch_record |= 1 << active_x;
+   }
+   else branch_record &= (-1 ^ (1 << active_x));
+   #endif
+
+   active_instance[active_x] = l;
+   offset[active_x] = origin = precord(l, NULL, startp.q, nest);
+   active_x++;
+
+   if (selector['p'-'a']) printf("$record %s nest %d active %d origin %ld\n",
+       l->l.name, nest, active_x, origin);
 
    nest++;
 
@@ -419,25 +485,58 @@ static int record(object *l, char *data)
 
       x = precord(l, p, &data, nest);
 
-      if (x < 0)
-      {
-         nest--;
-         active_x--;
-         if (x == 0x80000000) x = 0;
-         if (selector['p'-'a']) printf("%ld %d action complete nest %d active %d\n",
-                                        origin,  x, nest, active_x);
-         if (active_x ^ active_b4)
-         {
-            printf("name tree manipulated out of line %x %x\n", active_x, active_b4);
-            active_x = active_b4;
-         }
-         
-
-         x += origin;
-         quadinsert4(-x, &l->l.value);
-         break;
-      }
+      if (x < 0) break;
    }
+
+   #ifdef RECORD_BRANCH
+   branch_record &= (1 << active_x) - 1;
+   #endif
+
+   nest--;
+   active_x--;
+   if (x == 0x80000000) x = 0;
+   if (selector['p'-'a']) printf("%ld %d action complete nest %d active %d\n",
+                                  origin,  x, nest, active_x);
+
+   if (active_x ^ active_b4)
+   {
+      printf("name tree manipulated out of line %x %x\n", active_x, active_b4);
+      active_x = active_b4;
+   }
+         
+   #ifdef RECORD_BRANCH
+   if (branch_record & (1 << active_x))
+   {
+      /*************************************************************
+		these numbers are positives represented as negatives
+		so less is comparatively more
+      *************************************************************/
+
+      y = record_high[active_x];
+      if (x < y) record_high[active_x] = y = x;
+      else 
+      {
+         /*********************************************************
+		force the global bits count to the highest
+		it has been
+         *********************************************************/
+
+         precord(l, NULL, (char **) (long) -y, -1);
+         if (selector['p'-'a']) printf("[< %d]\n", x);
+         outstanding = 1;
+      }
+
+      if (nest == 0) loc = qextractv(l) - (y - word + 1) / word * quanta;
+
+      /*************************************************************
+		less is still more
+      *************************************************************/
+   } 
+   #endif
+
+   x += origin;
+   if (selector['p'-'a']) printf("[o %ld %d %s]\n", origin, x, l->l.name);
+   quadinsert4(-x, &l->l.value);
 
    l->l.valued = EQUF;
    if (selector['p'-'a']) printf("end\n");

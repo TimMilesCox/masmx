@@ -125,6 +125,7 @@
 
 #ifdef	STRUCTURE_DEPTH
 #define	RECORD	82
+#define	RECORD_BRANCH
 #endif
 
 #define ZERO_CODE_POINT	91
