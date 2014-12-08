@@ -40,7 +40,17 @@ static int precord(object *l, char *line, char **data, int nest)
       if (data)
       {
          bits = (long) data;
-         if (nest < 0) return bits;
+         if (nest < 0)
+         {
+            if (y = cache_line - positions)
+            {
+               if (x = y % word) lshift(&stage, word - x);
+               produce(y, '+', &stage, NULL);
+               stage = zero_o;
+               positions = cache_line;
+            }
+            return bits;
+         }
 
          /***********************************************
 		starting a 2nd or subsequent branch
@@ -521,12 +531,12 @@ static int record(object *l, char *data, int subfunction)
 		it has been
          *********************************************************/
 
-         precord(l, NULL, (char **) (long) -y, -1);
          if (selector['p'-'a']) printf("[< %d]\n", x);
          outstanding = 1;
       }
 
       if (nest == 0) loc = qextractv(l) - (y - word + 1) / word * quanta;
+      else precord(l, NULL, (char **) (long) -y, -1);
 
       /*************************************************************
 		less is still more
