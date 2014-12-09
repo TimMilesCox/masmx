@@ -123,6 +123,7 @@ static int precord(object *l, char *line, char **data, int nest)
          }
 
          if (y == DIRECTIVE) x = quadextract(&k->l.value);
+         if (x == END) brake("", "$end in unsafe position");
       }
    }
    else return 0;
@@ -228,7 +229,7 @@ static int precord(object *l, char *line, char **data, int nest)
       }
    }
 
-   argument = first_at(op, " ");
+   argument = first_at(op, "su ");
    x = expression(op, argument, NULL);
 
    if ((y = line[0]) && (y ^ ' '))
@@ -239,6 +240,11 @@ static int precord(object *l, char *line, char **data, int nest)
       quadinsert1(rbase,       &k->l.value);         
       quadinsert3(bits % word, &k->l.value);
       quadinsert4(x,           &k->l.value);
+      symbol = *argument;
+      y = uselector['Y'-'A'];
+      if (symbol == 'u') y = 0;
+      if (symbol == 's') y = 1;
+      if (y) k->l.value.b[RADIX/8-5*4] = 128;
    }
 
    y = cache_line - positions;

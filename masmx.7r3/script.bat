@@ -658,6 +658,8 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx gessuele ..\test.o3\gessuele -loy > ..\text.o3\gessuele.txt
 ..\masmx noczeesc ..\test.o3\noczeesc -loy > ..\text.o3\noczeesc.txt
 ..\masmx o ..\test.o3\o -loy > ..\text.o3\o.txt
+..\masmx questit ..\test.o3\questit -lyok > ..\text.o3\questit.txt
+..\masmx stamp ..\test.o3\stamp -lyok > ..\text.o3\stamp.txt
 
 call ..\linkpart
 call ..\coldfire
