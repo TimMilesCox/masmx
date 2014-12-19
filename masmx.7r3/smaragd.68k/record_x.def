@@ -29,7 +29,11 @@ SHIFT_ALGEBRAIC* $name
 	asr	p(2, 1),	p(2, 1)
 	$end
 
-	$if	BITS+OFFSET>$word
+	$if	(SIGNED=0)**((OFFSET**7)+BITS<9)
+		move.b	p(1)++OFFSET**8/*3,	D_REG
+		$do	BITS+(OFFSET**7)<8, SHIFT_RIGHT	8-BITS-(OFFSET**7) D_REG
+		andi	#+(1*/BITS)-1,	D_REG
+	$elseif	BITS+OFFSET>$word
 		move.l	p(1),	D_REG
 		$if	SIGNED
 		SHIFT_LEFT	OFFSET	D_REG
