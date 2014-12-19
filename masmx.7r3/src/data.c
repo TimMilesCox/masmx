@@ -181,37 +181,6 @@
 #define PROCLOC
 
 #ifdef	DOS
-#ifdef	DOS_LINKER
-
-#undef	LITERALS
-#undef	AUTOMATIC_LITERALS
-#undef	OVERLAY_LITERALS
-#undef	LITS
-#undef	FLOATING_POINT
-#undef	SYNONYMS
-#undef	STRUCTURE_DEPTH
-#undef	INLINE_T
-#undef	TREE
-#undef	ROOT
-#undef	BRANCH
-#undef	LROOT
-
-#define	RELOCATION
-#define	BINARY	250
-#define	VOID	248
-#define	LONG_ABSOLUTE 220
-#define	XREFS	1024
-
-#define	PUSHREL	77
-#define	BLANK	78
-
-#define	OFFSET	1
-#undef	BASE	16
-#define LONG_TRAILER
-
-#define	VERY_STACKED_XPRESSION
-
-#else
 
 #undef	BINARY
 #undef	VOID
@@ -222,7 +191,6 @@
 #define	LONG_TRAILER
 #undef	INFO
 
-#endif
 #endif
 
 #define	DEFAULT_ZERO_CODE_POINT	0x00002700

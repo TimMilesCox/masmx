@@ -54,7 +54,6 @@
 #define LITERALS
 #define PRINTBYREAD
 #define	QNAMES
-#undef	LOOKFOR
 #define	IN_EQUATE
 #define	GBASIS
 #define	REVISE_UNARY

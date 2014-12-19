@@ -27,7 +27,7 @@ static int precord(object *l, char *line, char **data, int nest)
 
    char                 *op;
    char                 *argument;
-
+   char			*p;
 
 
    if (line == NULL)
@@ -229,7 +229,34 @@ static int precord(object *l, char *line, char **data, int nest)
       }
    }
 
-   argument = first_at(op, "su ");
+
+   argument = first_at(op, " ");
+   symbol = 0;
+
+   if (argument > op)
+   {
+      p = argument - 1;
+      symbol = *p;
+
+      if ((symbol == 'u') || (symbol == 's'))
+      {
+         y = frightmost(op, argument);
+
+         if ((y < '0') || (y > '9' + 1))
+         {
+            if (p > op)
+            {
+               p--;
+               y = *p;
+               if ((y == ')') || (y == ':') || (y == '\'') || (y == qchar)) argument = p;
+               else y = 0;
+            }
+            else y = 0;
+         }
+         else argument = p;
+      }
+   }
+
    x = expression(op, argument, NULL);
 
    if ((y = line[0]) && (y ^ ' '))
@@ -240,10 +267,9 @@ static int precord(object *l, char *line, char **data, int nest)
       quadinsert1(rbase,       &k->l.value);         
       quadinsert3(bits % word, &k->l.value);
       quadinsert4(x,           &k->l.value);
-      symbol = *argument;
       y = uselector['Y'-'A'];
-      if (symbol == 'u') y = 0;
       if (symbol == 's') y = 1;
+      if (symbol == 'u') y = 0;
       if (y) k->l.value.b[RADIX/8-5*4] = 128;
    }
 

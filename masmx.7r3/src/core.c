@@ -445,21 +445,7 @@ static long rfunction(int v,
             q = &locator[j];
 
             #ifdef RELOCATION
-
-            #if 0
-            if (q->relocatable)
-            {
-               /******************************************
-                      if base+displacement the function is
-                      not relocatable
-               ******************************************/
-
-               if ((q->flags & 128) == 0) mapx->m.l.y |= 1;
-            }
-            #else
             if (q->relocatable) mapx->m.l.y |= 1;
-            #endif
-
    	    mapx->m.l.rel = j | 128;
             #endif
 
@@ -478,21 +464,7 @@ static long rfunction(int v,
          }
 
          #ifdef RELOCATION
-
-         #if 0
-         if (actual->relocatable)
-         {
-            /******************************************
-                   if base+displacement the function is
-                   not relocatable
-            ******************************************/
-
-            if ((actual->flags & 128) == 0) mapx->m.l.y |= 1;
-         }
-         #else
          if (actual->relocatable) mapx->m.l.y |= 1;
-         #endif
-
          mapx->m.l.rel = counter_of_reference | 128;
          #endif
 
@@ -3503,7 +3475,6 @@ static line_item *xpression(char *s, char *e, char *param)
 	    return sp;
 
 	 case NAME:
-	    #ifdef ESC
 
 	    if (l == entry[masm_level])
             {
@@ -3523,43 +3494,7 @@ static line_item *xpression(char *s, char *e, char *param)
             #endif
             
 
-	    #else
-
-	    l2 = (object *) l->l.down;
-	    if ((!l2)
-	    ||  (l2->l.type != LABEL)
-	    ||  (l2->l.valued != FUNCTION)
-	    ||  (l2 == active_procedure[masm_level]))
-	    {
-	       *sp = l->l.value;
-	       return sp;
-	    }
-	    #endif
 	 case FUNCTION:
-
-            #ifndef ESC
-
-	    if (l == active_procedure[masm_level]) 
-	    {
-	       #if 1
-	    
-	       return extract_xparam(label_margin, param);
-
-	       #else
-	    
-               #ifdef PARAM
-	       ires = rfunction(PARAM, label_margin, param, e, l);
-	       #else
-	       ires = extract_gparam(label_margin, param);
-	       #endif
-	       
-	       if (ires < 0) *sp = minus_o;
-               quadinsert(ires, sp);	       
-	       return sp;
-	       #endif
-	    }
-
-            #endif
 
             if ((uselector['Q'-'A'] == 0) &&  (*s == qchar))
             {
@@ -3571,41 +3506,9 @@ static line_item *xpression(char *s, char *e, char *param)
 
 	 case PROC:
 
-            #ifdef ESC
-
             *sp = l->l.value;
             return sp;
 
-            #else
-
-	    if (l != active_procedure[masm_level])
-            {
-               *sp = l->l.value;
-               return sp;
-            }
-	    
-	    #if 1
-	    return extract_xparam(label_margin, param);
-
-	    #else
-	    
-            #ifdef PARAM
-	    ires = rfunction(PARAM, label_margin, param, e, l);
-	    #else
-	    ires = extract_gparam(label_margin, param);
-	    #endif
-	    if (ires < 0) *sp = minus_o;
-	    sp->b[RADIX/8-1] = ires;
-	    sp->b[RADIX/8-2] = ires >> 8;
-	    
-	    sp->b[RADIX/8-3] = ires >> 16;
-	    sp->b[RADIX/8-4] = ires >> 24;
-
-	    return sp;
-
-            #endif
-	    #endif
-	
 	 default:
 	    if (l->l.valued > 127)
 	    {
@@ -4201,7 +4104,6 @@ static long expression(char *s, char *e, char *param)
 	    return rfunction(i, label_margin, param, e, l);
 
 	 case NAME:
-	    #ifdef ESC
 
 	    if (l == entry[masm_level]) return qextractv(l);            
 
@@ -4215,19 +4117,7 @@ static long expression(char *s, char *e, char *param)
             }
             #endif
 
-	    #else
-	    l2 = (object *) l->l.down;
-	    if ((!l2)
-	    ||  (l2->h.type != LABEL)
-	    ||  (l2->l.valued != FUNCTION)
-	    ||  (l2 == active_procedure[masm_level]))
-	    {
-	       (long) i = qextractv(l);
-	       return (long) i;
-	    }
-	    #endif
 	 case FUNCTION:
-            #ifdef ESC
 
             if ((uselector['Q'-'A'] == 0)
             &&  (*s == qchar)) return qextractv(l);
@@ -4235,35 +4125,9 @@ static long expression(char *s, char *e, char *param)
 
             return i;
 
-            #else
-            #ifdef PARAM
-	    if (l == active_procedure[masm_level]) 
-	       return rfunction(PARAM, label_margin, param, e, l);
-	    #else
-	    if (l == active_procedure[masm_level])
-	       return extract_gparam(label_margin, param);
-	    #endif
-
-            i = quadextract(external_function(label_margin, param, e, l));
-
-	    return i;
-            #endif
 	 case PROC:
-            #ifdef ESC
             return qextractv(l);
-            #else
-	    if (l != active_procedure[masm_level])
-	    {
-	       i = qextractv(l);
-	       return i;
-	    }
-	    
-	    #ifdef PARAM
-	    return rfunction(PARAM, label_margin, param, e, l);
-	    #else
-	    return extract_gparam(label_margin, param);
-	    #endif
-            #endif
+
 	 default:
 	    if (l->l.valued > 127)
 	    {
@@ -5485,8 +5349,6 @@ static void store_form(object *thislabel,
    thislabel->l.value.b[i] = 0;
 }
 
-#ifdef ESC
-
 static object *store_proc_index(char *line_label, char *directive, object *pid)
 {
    char				*limit = NULL;
@@ -5500,10 +5362,6 @@ static object *store_proc_index(char *line_label, char *directive, object *pid)
    object *l;
 
    char *argument = NULL;
-
-   #ifndef DEEP_RECURS
-   if (pass) return;
-   #endif
 
    argument = getop(directive);
    
@@ -5521,12 +5379,8 @@ static object *store_proc_index(char *line_label, char *directive, object *pid)
       return l;
    }
  
-   #ifdef DEEP_RECURS
    l->l.r.l.y = pid->l.r.l.y;
    l->l.r.l.rel = pid->l.r.l.rel;
-   #else
-   l->l.r.i = pid->l.r.i;
-   #endif
    
    l->l.passflag = pid->l.passflag;
 
@@ -5539,9 +5393,6 @@ static object *store_proc_index(char *line_label, char *directive, object *pid)
    if (pid->l.valued == FUNCTION) l->l.passflag |=  64;
    #endif
 
-   /*
-   l->l.down = (void *) index - 1;
-   */
 
    #ifdef FOLLOW_RECURS
    printf("%s @ %d/%d t %d\n",
@@ -5664,8 +5515,6 @@ static int encode(char *x, char *f, char *n)
    
    return t - x;
 }
-
-#ifdef DEEP_RECURS
 
 static object *procedure_head(char *line, int id, int type, char *argument)
 {
@@ -5960,18 +5809,7 @@ static void embed_procedure(int type, char *line, char *argument)
                   notep1("zero length macro label");
                }
 
-               #ifdef LOOKFOR
-               if (nest > 2) i = encode(lr->t.text,slipline,name[nest-3]);
-               else          i = encode(lr->t.text,slipline, l->l.name);
-
-               #if 1
-               printf("encode3 %s for %s\n", slipline,
-               (nest > 2) ? name[nest-3] : l->l.name);
-               #endif
-
-               #else
                strcpy(lr->t.text, slipline);
-               #endif
             }
             else
             {
@@ -6013,393 +5851,7 @@ static void embed_procedure(int type, char *line, char *argument)
    #endif
 }
    
-#else		/*	DEEP_RECURS	*/
 
-static void store_function(object *thislabel, int passflag)
-{
-   static int function_id;
-   
-   char *directive;
-   int  size, i, j;
-
-   char slipline[256];
-
-   if (!thislabel)
-   {
-      flagp1("FUNCtion requires a label.");
-      exit(0);
-   }
-   
-   if (!pass)
-   {
-      i = function_id++;
-      quadza(i, &thislabel->l.value);
-      thislabel->l.r.i = 0;
-
-      /*
-      thislabel->l.r.l.xref = i;
-      */
-
-      thislabel->l.passflag = passflag;
-
-      /*
-      thislabel->l.down = thislabel;
-      */
-   }
-   
-   for (;;)
-   {
-     /*
-      k = slipline;
-      if (!pass)
-      {
-	 if (remainder < 256)
-	 {
-	    flagp1("Text for Store Too Late in Assembly");
-	    break;
-	 }
-	 k = lr->t.text;
-      }
-      
-      i = getline(k, 250);
-      */
-
-      i = getline(slipline, 250);
-
-      if (!i) continue;
-
-      if (i < 0)
-      {
-         depth = 0;
-	 flag_either_pass(name, "Fatal Error: Func Auto End.");
-	 exit(-112);
-      }
-      
-      directive = getop(slipline);
-      j = TEXT_IMAGE;
-      if (directive) j = meaning(directive);
-
-      if (!pass)
-      {
-         if (j == NAME)
-         {
-	    store_proc_index(slipline, directive, thislabel);
-	    continue;
-         }
-
-         if (j != END) j = TEXT_IMAGE;
-	 
-	 size = sizeof(header_word) + i + (1+PARAGRAPH-1); 
-	 size &= -PARAGRAPH;
-
-	 if (remainder < size) buy_ltable();
-   
-         i = encode(lr->t.text, slipline, thislabel->l.name);
-
-	 lr->h.type = j;
-	 lr->h.length = size;
-
-	 (long) lr += size;
-	 remainder -= size;
-	 
-      }
-      if (j == END) break;
-   }
-}
-
-static void store_proc_text(object *thislabel)
-{
-   static int procname = 0;
-   
-   int i, j, size;
-   
-   char *directive, slipline[256];
-
-   
-   if (!thislabel)
-   {
-      flagp1("PROC requires a label.");
-      exit(0);
-   }
-   
-   if (!pass)
-   {
-      thislabel->l.valued = PROC;
-      i = procname++;
-      quadza(i, &thislabel->l.value);
-      
-      thislabel->l.r.l.xref = i;
-
-      /*
-      thislabel->l.down = thislabel;
-      */
-   }
-   
-   for (;;)
-   {
-      /*
-      k = slipline;
-      
-      if (!pass)
-      {
-	 if (remainder < 256) 
-	 {
-	    flagp1("Text for Store Too Late in Assembly");
-	    break;
-	 }
-	 k = lr->t.text;
-      }
-      
-      i = getline(k, 250);
-      */
-
-      i = getline(slipline, 250);
-
-      if (!i) continue;
-      
-      if (i < 0)
-      {
-         depth = 0;
-	 flag_either_pass(name "Fatal Error:Proc Auto End.");
-	 exit(-111);
-      }
-      
-      directive = getop(slipline);
-      
-      j = TEXT_IMAGE;
-      if  (directive) j = meaning(directive);
-      
-      if (!pass)
-      {
-         if (j == NAME)
-         {
-	    store_proc_index(slipline, directive, thislabel);
-	    continue;
-         }
-
-         if (j != END) j = TEXT_IMAGE;
-
-	 size = sizeof(header_word) + i + (1+PARAGRAPH-1);
-	 size &= -PARAGRAPH;
-
-	 if (remainder < size) buy_ltable();
-
-         i = encode(lr->t.text, slipline, thislabel->l.name);
-
-         lr->h.type = j;
-	 lr->h.length = size;
-	 (long) lr += size;
-	 remainder -= size;
-      }
-      if (j == END) break;
-   }
-}
-
-#endif		/* DEEP_RECURS	*/
-
-#else		/*	ESC	*/
-
-static void store_proc_index(char *line_label, char *directive, int passes,
-			     object *pid)
-{
-   char *limit;
-   line_item *i = &zero_o;
-
-   object *l;
-
-   char *argument = NULL;
-
-   if (pass) return;
-
-   argument = getop(directive);
-   
-   if (argument)
-   {
-      limit = edge(argument, ", ");
-      i = xpression(argument, limit, NULL);
-   }
-   else note("Value Expected with $NAME");
-
-   l = insert_ltable(line_label, limit, i, NAME);
-   
-   if (!l)
-   {
-      flagp1("Failed to Store SubAssembly(P) Entry Point");
-      return;
-   }
-   
-   l->l.r.i = 0;
-   l->l.passflag = passes;
-   
-   l->l.down = pid;
-   l->l.r = pid->l.r;
-}
-
-static void store_function(object *thislabel, int passflag)
-{
-   static int function_id;
-   
-   char *directive;
-   int  size, i, j;
-
-   char *k, slipline[256];
-
-   if (!thislabel)
-   {
-      flagp1("FUNCtion requires a label.");
-      exit(0);
-   }
-   
-   if (!pass)
-   {
-      /*
-      thislabel->l.valued = EXTERNAL_FUNCTION;
-      */
-      quadza(function_id++, &thislabel->l.value);
-      thislabel->l.r.i = 0;
-      thislabel->l.r.l.xref = masm_level;
-      thislabel->l.passflag = passflag;
-      thislabel->l.down = qextractv(thislabel);
-   }
-   
-   for (;;)
-   {
-      k = slipline;
-      if (!pass)
-      {
-	 if (remainder < 256)
-	 {
-	    flagp1("Text for Store Too Late in Assembly");
-	    break;
-	 }
-	 k = lr->t.text;
-      }
-      
-      i = getline(k, 250);
-      if (!i) continue;
-      
-      if (i < 0)
-      {
-         depth = 0;
-	 flag_either_pass(name, "Fatal Error: Func Auto End.");
-	 exit(-112);
-      }
-      
-      directive = getop(k);
-      j = TEXT_IMAGE;
-      if (directive) j = meaning(directive);
-      if (j == NAME)
-      {
-	 store_proc_index(lr->t.text, directive, passflag, thislabel);
-	 continue;
-      }
-      if (j != END) j = TEXT_IMAGE;
-
-      if (!pass)
-      {
-	 size = sizeof(header_word) + i + (1+PARAGRAPH-1); 
-	 size &= -PARAGRAPH;
-	 
-	 if (remainder < size) buy_ltable();
-	 
-	 lr->h.type = j;
-	 lr->h.length = size;
-
-	 (long) lr += size;
-	 remainder -= size;
-	 
-      }
-      if (j == END) break;
-   }
-}
-
-static void store_proc_text(object *thislabel)
-{
-   static int procname = 0;
-   
-   int i, j, passes = 1, size;
-   
-   char *directive, *k, slipline[256];
-
-   
-   if (!thislabel)
-   {
-      flagp1("PROC requires a label.");
-      exit(0);
-   }
-   
-   if (!pass)
-   {
-      thislabel->l.valued = PROC;
-      quadza(procname++, &thislabel->l.value);
-      if (*label_margin == '*') passes = 2; 
-      
-      thislabel->l.r.l.xref = 0;
-      /*
-      thislabel->l.r.l.xref = masm_level;
-      */
-
-      thislabel->l.passflag = passes;
-      thislabel->l.down = qextractv(thislabel);
-   }
-   
-   for (;;)
-   {
-      k = slipline;
-      
-      if (!pass)
-      {
-	 if (remainder < 256) 
-	 {
-	    flagp1("Text for Store Too Late in Assembly");
-	    break;
-	 }
-	 k = lr->t.text;
-      }
-      
-      i = getline(k, 250);
-      if (!i) continue;
-      
-      if (i < 0)
-      {
-         depth = 0;
-	 flag_either_pass(name, "Fatal Error:Proc Auto End.");
-	 exit(-111);
-      }
-      
-      directive = getop(k);
-      
-      j = TEXT_IMAGE;
-      if  (directive) j = meaning(directive);
-      
-      if (!pass)
-      {
-	 switch (j)
-	 {
-	    case NAME:
-	       store_proc_index(lr->t.text, directive, passes, thislabel);
-	       continue;
-	    case END:
-	       lr->h.type = END;
-	       break;
-	    default:
-	       lr->h.type = TEXT_IMAGE;
-	       break;
-	 }
-	 size = sizeof(header_word) + i + (1+PARAGRAPH-1);
-	 size &= -PARAGRAPH;
-
-	 if (remainder < size) buy_ltable();
-
-	 lr->h.length = size;
-	 (long) lr += size;
-	 remainder -= size;
-      }
-      if (j == END) break;
-   }
-}
-
-#endif		/*	ESC	*/
 
 
 static void decide(char *arg, char *param)
@@ -7189,35 +6641,6 @@ static void floating_position(int bits, line_item *item)
    #endif
 }
 
-#ifdef FFLOATING_POINT
-static void floating_point(int bits, char unary, char *a, char *search, char *param,
-                           line_item *item, txo *image)
-{
-   floating_generate(a, search, param, item);
-
-   if (transient_floating_bits)
-   {
-      if (bits)
-      {
-         if (bits ^ transient_floating_bits) note("receiving field resized");
-      }
-
-      bits = transient_floating_bits;
-      transient_floating_bits = 0;
-   }
-
-   if (!bits) bits = fpwidth;
-   if (bits > RADIX) bits = RADIX;
-   bits = bits / word * word;
-
-   floating_position(bits, item);
-
-   if ((unary == '-')
-   ||  (unary == '^')) lproduce(bits, '^', item, image);
-   else                lproduce(bits, '+', item, image);
-}
-
-#endif	/* FFLOATING_POINT*/
 #endif	/* FLOATING_POINT */
 
 
@@ -7491,14 +6914,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	    ndirect = substitute(name, param);
          }
 
-         #ifdef DEEP_RECURS
          if ((i == PROC) || (i == FUNCTION))
          {
-            #ifdef LOOKFOR
-            ndirect = substitute(ndirect, param);
-            directive = getop(ndirect);
-            #endif
-
             x = floatop;
             masm_level++;
 
@@ -7518,7 +6935,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             
             return 0;
          }
-         #endif
 
          if ((type == PROC)
          || ((type == NAME) && (sr->l.passflag & 128)))
@@ -7647,11 +7063,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	    if (*search == '(') parenthesised++;
  	    if ((*search == ')') && (parenthesised)) parenthesised--;
 
-            #ifdef FFLOATING_POINT
-	    if ((*search == '.') && (*argument > 0x2f) && (*argument < 0x3a))
-	       spotted = 1;
-            #endif
-
 	    if ((*search == ',') && (!parenthesised) && (!squoted)) commas++;
 	    search++;
          }
@@ -7661,8 +7072,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
          bits = 0;
          i = frightmost(argument, search);
-
-         #if 1
 
          spotted = *(search-1);
          symbol = *search;
@@ -7680,30 +7089,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             if (spotted == ':') search--;
          }
          else search++;
-
-         #else
-
-         if ((*(search - 1) == ':') 
-         ||  (*(search - 1) == ')')
-         ||  ((i > 0x30) && (i < 0x3a)) 
-         ||  ((i == '0') && (*search != 'd') && (*search != 'D'))
-         ||  ((i == '0') && (octal))
-         ||  (*(search - 1) == 0x27)
-         ||  (*(search - 1) == qchar))
-         /*
-         ||  ((*argument > 0x2f) && (*argument < 0x3a))
-         ||  (*argument == 0x27)
-         ||  (*argument == qchar))
-         */
-         {
-            bits = length_mark(*search);
-         }
-
-
-         if (!bits) search++;
-         if (*(search-1) == ':') search--;
-
-         #endif
 
          #ifdef FPASS1
          if ((!pass) && (bits)) 
@@ -7810,35 +7195,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	    return 0;
          }
 
-         #ifdef FLOATING_POINT
-
-	 #ifdef FFLOATING_POINT
-         if (spotted)
-         {
- 	    floating_point(bits, unary, argument, search, param, &item, image);
-	    return 0;
-         }
-         #endif
-
-         #if 0
-         fpo = contains(argument, search, "*+\0*-\0");
-
-         if (fpo)
-         {
-            if (!bits) bits = fpwidth;
-            item = *xpression(argument, search, param);
-
-            #if 0
-            floating_position(bits, &item);
-            #endif
-
-            if (unary == '-') unary = '^';
-            lproduce(bits, unary, &item, image);
-            return 0;
-         }
-         #endif
-         #endif
-   
          #ifdef AUTOMATIC_LITERALS
 
          if ((*argument   == '(')
@@ -8061,93 +7417,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       store_form(thislabel, directive, argument);
 	       break;
 
-               #ifndef DEEP_RECURS
-	    case PROC:
-	       #ifdef PROCLOC
-	       #if 1
-	       if (!pass)
-	       {
-	 	  thislabel->l.r.i = 0;
-                  thislabel->l.passflag = 1;
-		  if (argument)
-		  {
-                     if (*argument == '*')
-                     {
-                        thislabel->l.passflag = 2;
-                        argument++;
-                        while (*argument == 32) argument++;
-                     }
-
-                     if (*argument)
-                     {
- 		        limit = edge(argument, "(");
-		        i = expression(argument, limit, param);
-		        if ((*limit == '(')
-		        &&  (sr = findlabel(argument, limit))
-		        &&  (sr->l.valued == INTERNAL_FUNCTION)
-		        &&  (sr->l.value.b[RADIX/8-1] == LOCTR))
-		        {
-		           argument = limit+1;
-		           limit = edge(argument, ")");
-		           i = expression(argument, limit, param);
-
-                           #ifdef WALKP
-                           printf("$%d\n", i);
-                           #endif
-
-		           if ((i < 0) || (i > 71))
-		           {
-			      flagp1("Proc Automatic Locator Out of Range");
-		           }
-		           else
-		           {
-			      thislabel->l.r.l.y |= 1;
-			      thislabel->l.r.l.rel = i;
-                           }
-		        }
-                        else
-   		        {
-                           if (!pass) printf("[%2.2x]%s::",
-                                      *argument, argument);
-		           notep1("Non-Location Counter Argument on Proc" 
-		           " Declaration");
-                           notep1(argument);
-		        }
-		     }
-		  }
-	       }
-	       #else
-	       if ((!pass) && (argument))
-	       {
-	 	  thislabel->l.r.i = 0;
-
-		  if (selector['n'-'a'])
-		  {
-		     notep1("Option /N    -Automatic Proc Locator Suppressed");
-		  }
-		  else
-		  {
-		     limit = edge(argument, " ");
-		     i = expression(argument, limit, param);
-		     if ((i < 0) || (i > 71))
-		     {
-		        flagp1("Proc Automatic Locator Out of Range");
-		     }
-		     else
-		     {
-		        thislabel->l.r.l.y |= 1;
-		        thislabel->l.r.l.rel = i;
-		     }
-		  }
-	       }
-	       #endif
-	       #endif
-
-	       store_proc_text(thislabel);  /* memorise the subassembly text */
-
-	       break;
-
-               #endif		/* #ifndef DEEP_RECURS  */
 
 	    case NAME:
 
@@ -8190,15 +7459,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       return iterate(argument, param, thislabel, image);
 
                #if 0
-	       break;
-               #endif
-
-
-               #ifndef DEEP_RECURS
-	    case FUNCTION:
-	       j = 0;
-	       if (subfunction > -1) j = subfunction;
-	       store_function(thislabel, j);
 	       break;
                #endif
 
@@ -10018,11 +9278,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	 entry[masm_level] = sr;
 	 x = sr;
          
-         #ifdef DEEP_RECURS
          if (sr->l.down) x = sr->l.down;
 	 else
-         #endif
-	 
          {
             i = sr->h.length;
 
