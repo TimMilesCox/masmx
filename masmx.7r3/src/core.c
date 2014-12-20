@@ -6668,7 +6668,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
    char			*argument, *search = line_label,
                          unary = 0, tpp;
    
-   int			 i, j, bits = 0, spotted,
+   int			 x, j, bits = 0, spotted,
                          commas = 0, slice,
                          known = -1, type = -1;
                          
@@ -6678,7 +6678,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
    char *fpo;
    char			*v_argument = NULL;
 
-   object		*toplabel, *x, *depx;
+   object		*toplabel, *txp, *depx;
    line_item		*ii;
    long			 savelocator[LOCATORS];
    long			 savelocatorl[LOCATORS];
@@ -6785,30 +6785,30 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
    if ((*line_label) && (*line_label != 32))
    {
-      i = LOCATION;
+      x = LOCATION;
 
       if (type == DIRECTIVE)
       {
-         i = known;
+         x = known;
 
-         if (i == EQU)
+         if (x == EQU)
          {
             if (subfunction < 0)
             {
             }
-            else i = subfunction;
+            else x = subfunction;
          }
 
          #ifdef RECORD
-         if (known == RECORD) i = EQUF;
+         if (known == RECORD) x = EQUF;
          #endif
       }
 
-      if (i == RES) i = LOCATION;
+      if (x == RES) x = LOCATION;
 
       #ifdef STRUCTURE_DEPTH
-      if (i == BRANCH) i = LOCATION;
-      if (i == TREE)   i = LOCATION;
+      if (x == BRANCH) x = LOCATION;
+      if (x == TREE)   x = LOCATION;
 
       if ((type  == DIRECTIVE)
       &&  (known ==    BRANCH)
@@ -6819,13 +6819,13 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
       #endif
 	    
       #ifdef FPEQU
-      if (i == FPEQU) i = SET;
+      if (x == FPEQU) x = SET;
       #endif
 
-      if (i == DO) i = SET;
+      if (x == DO) x = SET;
 
       #ifdef BINARY
-      if (i == PUSHREL) i = EQUF;
+      if (x == PUSHREL) x = EQUF;
       #endif
 
       #if 0
@@ -6844,23 +6844,23 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 
             j = thislabel->l.valued;
-            thislabel->l.valued = i;
+            thislabel->l.valued = x;
 
 
-	    if (i == LOCATION)
+	    if (x == LOCATION)
 	    {
                thislabel->l.r.l.y = 0;
                quadza(loc, &item);
 
-               if (i = actual->flags & 129)
+               if (x = actual->flags & 129)
                {
-                  if (i & 128)
+                  if (x & 128)
                   {
                      item.b[RADIX/8-5] = actual->rbase;
                      thislabel->l.valued = EQUF;
                   }
 
-                  if (i  == 1)
+                  if (x  == 1)
                   {
                      operand_add(&item, &((value *) actual->runbank)->value);
                   }
@@ -6914,9 +6914,9 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	    ndirect = substitute(name, param);
          }
 
-         if ((i == PROC) || (i == FUNCTION))
+         if ((x == PROC) || (x == FUNCTION))
          {
-            x = floatop;
+            txp = floatop;
             masm_level++;
 
             #ifdef TRACE_RECURS
@@ -6927,9 +6927,9 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             printf("++%s:%d\n", ndirect, masm_level);
             #endif
 
-            embed_procedure(i, ndirect, getop(directive));
+            embed_procedure(x, ndirect, getop(directive));
 
-            pack_ltable(x);
+            pack_ltable(txp);
 
             masm_level--;
             
@@ -6980,7 +6980,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             
             ******************************************************/
 
-            if (sr->l.r.l.y   &  1) i = BLANK;
+            if (sr->l.r.l.y   &  1) x = BLANK;
          }
 
          #if 0
@@ -6990,7 +6990,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
          &&  (sr = active_instance[active_x])) loc = qextractv(sr);
          #endif
 
-	 thislabel = insert_qltable(ndirect, loc, i);
+	 thislabel = insert_qltable(ndirect, loc, x);
       }
    }
 
@@ -7071,16 +7071,52 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
          while (*search == 32) search--;
 
          bits = 0;
-         i = frightmost(argument, search);
+
+
+         #if 1
+
+         limit = search++;
+         symbol = *limit;
+
+         if (j = length_mark(symbol))
+         {
+            x = frightmost(argument, search);
+            if (((x  > '0') && (x < '9' + 1))
+            ||  ((x == '0') && (octal))
+            ||  ((x == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
+            {
+               bits = j;
+               if ((limit > argument) && (*(limit - 1) == ':')) limit--;
+               search = limit;
+            }
+            else
+            {
+               if (limit > argument)
+               {
+                  limit--;
+                  x = *limit;
+                  if ((x == ':') || (x == ')') || (x == '\'') || (x == qchar))
+                  {
+                     if (x ^ ':') limit++;
+                     bits = j;
+                     search = limit;
+                  }
+               }
+            }
+         }
+
+         #else
+
+         x = frightmost(argument, search);
 
          spotted = *(search-1);
          symbol = *search;
 
          if ((spotted == ':')
          ||  (spotted == ')')
-         ||  ((i  > '0') && (i < '9'+1))
-         ||  ((i == '0') && (symbol ^ 'd') && (symbol ^ 'D'))
-         ||  ((i == '0') && (octal))
+         ||  ((x  > '0') && (x < '9'+1))
+         ||  ((x == '0') && (symbol ^ 'd') && (symbol ^ 'D'))
+         ||  ((x == '0') && (octal))
          ||  (spotted == '\'')
          ||  (spotted == qchar)) bits = length_mark(symbol);
 
@@ -7089,6 +7125,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             if (spotted == ':') search--;
          }
          else search++;
+
+         #endif
 
          #ifdef FPASS1
          if ((!pass) && (bits)) 
@@ -7158,21 +7196,21 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	          #endif
 
 	          oo = xpression(argument, limit, param);
-	          i = slice & 7;
+	          x = slice & 7;
 	          j = slice >> 3;
-  	          xmask = 255 << i;
+  	          xmask = 255 << x;
 	          ymask = xmask ^ 255;
-	          i = RADIX/8;
+	          x = RADIX/8;
 	          while (j--)
 	          {
-		     i--;
-		     item.b[i] = oo->b[i];
+		     x--;
+		     item.b[x] = oo->b[x];
 	          }
 	          if (ymask)
 	          {
-		     i--;
-	 	     item.b[i] &= xmask;
-		     item.b[i] |= oo->b[i] & ymask;
+		     x--;
+	 	     item.b[x] &= xmask;
+		     item.b[x] |= oo->b[x] & ymask;
 	          }
 	       
 	          #ifdef RELOCATION
@@ -7312,11 +7350,11 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                      return END;
                   }
 
-                  i = mapx->m.l.rel;
-                  i &= 127;
+                  x = mapx->m.l.rel;
+                  x &= 127;
 
                   #if 1
-                  if ((!i)
+                  if ((!x)
                   &&  (!(mapx->m.l.y & 1))
                   &&  (locator[0].relocatable))
                   {
@@ -7327,13 +7365,13 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                   #else
 
-                  i = 0;
+                  x = 0;
                   sr = findlabel(argument, limit);
-                  if (sr) i = sr->l.r.l.rel & 127;
+                  if (sr) x = sr->l.r.l.rel & 127;
 
                   #endif
 
-                  qq = &locator[i];
+                  qq = &locator[x];
                   j = qq->flags;
 
                   if (qq->breakpoint > 1)
@@ -7354,17 +7392,17 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                      }
 
                      write(ohandle, "\n>", 2);
-                     pushh2(i);
+                     pushh2(x);
 
                      write(ohandle, "::", 2);
 
-                     xpushaddress(oo, i);
+                     xpushaddress(oo, x);
                      write(ohandle, "\n", 1);
                      return END;
                   }
 
                   v = quadextract(oo);
-                  outcounter(i, v, "\n>");
+                  outcounter(x, v, "\n>");
 	       }
 
 	       return END;
@@ -7472,8 +7510,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       #endif
 
 	    case EQU:
-	       i = EQU;
-	       if (subfunction > -1) i = subfunction;
+	       x = EQU;
+	       if (subfunction > -1) x = subfunction;
 
 	       if (thislabel)
 	       {
@@ -7491,14 +7529,14 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		  }
 		  */
 
-		  insequate(i, thislabel, argument, param);
+		  insequate(x, thislabel, argument, param);
 	       }
 
 	       break;
 
 	    case SET:
-	       i = SET;
-	       if (subfunction > -1) i = subfunction;
+	       x = SET;
+	       if (subfunction > -1) x = subfunction;
 
 	       if (thislabel)
 	       {
@@ -7511,7 +7549,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		  }
 		  */
 
-		  insequate(i, thislabel, argument, param);
+		  insequate(x, thislabel, argument, param);
 	       }
 
 	       break;
@@ -7569,7 +7607,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 	       if (argument)
 	       {
-	 	  i = RADIX/8;
+	 	  x = RADIX/8;
 		  #if 0
 		  v_argument = argument;
 		  #else
@@ -7595,14 +7633,14 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         }
 		     }
 
-                     i  -= 4;
+                     x  -= 4;
                      if (v_argument == limit)
                      {
                      }
                      else
                      {
                         #if 1
-                        if (i == RADIX/8-4)
+                        if (x == RADIX/8-4)
                         {
                            #ifdef AUTOMATIC_LITERALS
                            if ((*v_argument == '(') && (selector['a'-'a']))
@@ -7646,7 +7684,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
      		        #ifdef RELOCATION
                         if (mapx->m.l.y)
                         {
-		           if (i == RADIX/8-4)
+		           if (x == RADIX/8-4)
 		           {
 		              thislabel->l.r = mapx->m;
 		           }
@@ -7674,16 +7712,16 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         #endif
 
                         #ifdef INTEL
-                        item.b[i]   = v >> 24;
-                        item.b[i+1] = v >> 16;
-                        item.b[i+2] = v >>  8;
-                        item.b[i+3] = v;
+                        item.b[x]   = v >> 24;
+                        item.b[x+1] = v >> 16;
+                        item.b[x+2] = v >>  8;
+                        item.b[x+3] = v;
                         #else
-                        item.i[i>>2] = v;
+                        item.i[x>>2] = v;
                         #endif
                      }
 
-		     if (!i) break;
+		     if (!x) break;
 		     if (*limit != ',') break;
 		     v_argument = limit;
 		     v_argument++;
@@ -7788,19 +7826,19 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	    
                #ifdef PATH
             case PATH:
-               i = 0;
+               x = 0;
                
                if (argument) argument = substitute(argument, param);
                else          argument = "";
 
                while (symbol = *argument++) 
                {
-                  if (i > 117) break;
-                  path[i++] = symbol;
+                  if (x > 117) break;
+                  path[x++] = symbol;
                }
 
-               if (i) path[i++] = PATH_SEPARATOR;
-               path[i] = 0;
+               if (x) path[x++] = PATH_SEPARATOR;
+               path[x] = 0;
                
                break;
                #endif
@@ -7903,13 +7941,13 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	    case SNAP:
 	       if ((!pass) && (subfunction != 1)) break;
                if (( pass) && (subfunction == 1)) break;
-	       i = 0;
+	       x = 0;
 	       if (argument)
 	       {
 		  limit = edge(argument, " ");
-		  i = expression(argument, limit, param);
+		  x = expression(argument, limit, param);
 	       }
-	       walktable(i);
+	       walktable(x);
 	       break;
 	    case QUANTUM:
 	       if (argument)
@@ -7923,12 +7961,12 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                      brake("", "$word and $quantum are not in a possible relation");
                   }
 
-                  for (i = 0; i < 10; i++)
+                  for (x = 0; x < 10; x++)
                   {
-                     if ((address_quantum << i) == word) break;
+                     if ((address_quantum << x) == word) break;
                   }
 
-                  if ((address_quantum << i) == word)
+                  if ((address_quantum << x) == word)
                   {
                   }
                   else notep1("$word is not a log2 of $quantum");
@@ -7972,7 +8010,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       break;
 
 	    case STERM:
-	       i = sterm;
+	       x = sterm;
 	       if (argument)
 	       {
 		  limit = edge(argument, " ");
@@ -8071,7 +8109,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       search = argument;
 	       limit = search;
 	       limit++;
-	       i = 0;
+	       x = 0;
 
 	       if (remainder < 256)
 	       {
@@ -8081,29 +8119,29 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	      
 	       while ((*limit) && (*limit != *search))
 	       {
-		  lr->t.text[i] = *limit;
+		  lr->t.text[x] = *limit;
 		  if ((!selector['k'-'a'])
 		  &&  (*limit > 0x60) 
-		  &&  (*limit < 0x7b)) lr->t.text[i] &= 0x5f;
-		  i++;
+		  &&  (*limit < 0x7b)) lr->t.text[x] &= 0x5f;
+		  x++;
 		  limit++;
 	       }
 	       if (*limit == 0) break;
-	       lr->t.text[i++] = 0;
+	       lr->t.text[x++] = 0;
 	       limit++;
 	       while ((*limit) && (*limit != *search))
 	       {
-		  lr->t.text[i] = *limit;
+		  lr->t.text[x] = *limit;
 		  if ((!selector['k'-'a'])
 		  &&  (*limit > 0x60) 
-		  &&  (*limit < 0x7b)) lr->t.text[i] &= 0x5f;
-		  i++;
+		  &&  (*limit < 0x7b)) lr->t.text[x] &= 0x5f;
+		  x++;
 		  limit++;
 	       }
-	       lr->t.text[i++] = 0;
-	       if (i > 250) break;
+	       lr->t.text[x++] = 0;
+	       if (x > 250) break;
 	       lr->h.type = TEXT_SUBSTITUTE;
-	       lr->h.length = sizeof(header_word) + i + (PARAGRAPH-1);
+	       lr->h.length = sizeof(header_word) + x + (PARAGRAPH-1);
 	       lr->h.length &= -PARAGRAPH;
 	       if (!tsubs) earliest_tsub = lr;
 	       tsubs++;
@@ -8239,8 +8277,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         cache in scalar i and table for later
                         *******************************************/
 
-                        i = range_check_position_bit;
-                        range_free.b[range_check_position_byte] |= i;
+                        x = range_check_position_bit;
+                        range_free.b[range_check_position_byte] |= x;
                      }
                      else
                      {
@@ -8249,16 +8287,16 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         truncate. Cache in scalar i
                         *******************************************/
 
-                        i = range_free.b[range_check_position_byte]
+                        x = range_free.b[range_check_position_byte]
                                         & range_check_position_bit;
                      } 
 
-                     if ((i) || (range_check_descant < 0))
+                     if ((x) || (range_check_descant < 0))
                      {
                         /******************************************
                         cancel any earlier range check fail because
 
-                        (i) means this field should not be checked,
+                        (x) means this field should not be checked,
                         therefore also abandon this check.
 
                         or
@@ -8276,7 +8314,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         range_filter.b[range_check_position_byte]
                         &=            ~range_check_position_bit;
 
-                        if (i) break;
+                        if (x) break;
                      }
 
 
@@ -8297,19 +8335,19 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                            range_sign.b[range_check_position_byte]
                            |=           range_check_position_bit;
 
-                           i = range_check_bits - 1;
+                           x = range_check_bits - 1;
 
                            if (ii->b[0] & 128)
                            {
                               range_limit = minus_o;
-                              lshift(&range_limit, i);
+                              lshift(&range_limit, x);
                               j = operand_compare(ii, &range_limit);
                            } 
                            else
                            {
                               range_limit = zero_o;
-                              range_limit.b[RADIX / 8 - (i >> 3) - 1]
-                              =                    1 << (i  & 7);
+                              range_limit.b[RADIX / 8 - (x >> 3) - 1]
+                              =                    1 << (x  & 7);
 
                               j = operand_compare(ii, &range_limit);
                               j ^= -1;                         
@@ -8356,21 +8394,21 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       if (!argument) break;
 	       if (*argument++ == qchar)
 	       {
-		  while (i = *argument++)
+		  while (x = *argument++)
 		  {
-		     if (i == qchar) break;
+		     if (x == qchar) break;
 
-		     if      ((i > 0x40) && (i < 0x5B))
+		     if      ((x > 0x40) && (x < 0x5B))
                      {
-                        uselector[i-'A'] = 1;
+                        uselector[x-'A'] = 1;
                      }
-		     else if ((i > 0x60) && (i < 0x7B))
+		     else if ((x > 0x60) && (x < 0x7B))
                      {
-                        if ((i == 'k')
-                        ||  (i == 's')
-                        ||  (i == 'y')) notep1("flags -ksy are actioned "
+                        if ((x == 'k')
+                        ||  (x == 's')
+                        ||  (x == 'y')) notep1("flags -ksy are actioned "
                                                "at command line only");
-                        else selector[i-'a'] = 1;
+                        else selector[x-'a'] = 1;
                      }
 		  }
 	       }
@@ -8389,8 +8427,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 	       if (active_x == STRUCTURE_DEPTH)
 	       {
-		  for (i = 0; i < active_x; i++)
-		    printf("%s:", active_instance[i]->l.name);
+		  for (x = 0; x < active_x; x++)
+		    printf("%s:", active_instance[x]->l.name);
 		  flag_either_pass("structure too deep", "abandon");
 		  exit(0);
 	       }
@@ -8502,11 +8540,11 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	    case CHARACTERISTIC:
 	       if (!argument) break;
 	       limit = edge(directive, ", ");
-	       i = fpwidth;
-	       if (subfunction > -1) i = subfunction;
-	       i /= word;
+	       x = fpwidth;
+	       if (subfunction > -1) x = subfunction;
+	       x /= word;
 	       limit = edge(argument, " ");
-	       characteristic_width[i-1] = expression(argument, limit, param);
+	       characteristic_width[x - 1] = expression(argument, limit, param);
 	       break;
                #endif
               
@@ -8570,8 +8608,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                            search++;
                         }
 
-                        i = strict_locator(search, symbol);
-                        qq = &locator[i];
+                        x = strict_locator(search, symbol);
+                        qq = &locator[x];
                         xrefl = file_label[depth]->l.down;
                         v = qq->runbank;
 
@@ -8587,7 +8625,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                               {
                                  thislabel->l.value = ((value *) v)->value;
 
-                                 if (xrefl) quadd_u(xrefl->segments.base[i],
+                                 if (xrefl) quadd_u(xrefl->segments.base[x],
                                                    &thislabel->l.value);
 
                                  if (unary == 8)
@@ -8608,7 +8646,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                               }
                            }
 
-                           if (xrefl) v = xrefl->segments.base[i];
+                           if (xrefl) v = xrefl->segments.base[x];
                            quadza(v, &thislabel->l.value);
 
                            if (unary == 8)
@@ -8622,7 +8660,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         }
                         #endif
 
-                        if (xrefl) v = xrefl->segments.base[i];
+                        if (xrefl) v = xrefl->segments.base[x];
                         quadinsert(v, &thislabel->l.value);
 
                         if (unary == 8)
@@ -8693,7 +8731,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                         #endif
 
-                        if (locator[i].relocatable)
+                        if (locator[x].relocatable)
                         {
                            if (j < 0)
                            {
@@ -8712,11 +8750,11 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                            }
 
                            mapx->m.l.y = unary | 1;
-                           mapx->m.l.rel = i;
+                           mapx->m.l.rel = x;
                            mapx->m.l.xref = 0;
                            map_linkages(bits, rvalue);
                            thislabel->l.valued = EQUF;
-                           thislabel->l.r.l.rel = i;
+                           thislabel->l.r.l.rel = x;
                            break;
                         }
 
@@ -8759,7 +8797,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         #endif
 
                         thislabel->l.valued = EQUF;
-                        thislabel->l.r.l.rel = i;
+                        thislabel->l.r.l.rel = x;
                         break;
 
                      case '[':
@@ -8774,7 +8812,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                            search++;
                         }
 
-                        i = strict_quartets(4, search);
+                        x = strict_quartets(4, search);
 
                         xrefl = file_label[depth]->l.down;
 
@@ -8784,13 +8822,13 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                            break;
                         }
 
-                        if ((i < 0) || (i > XREFS - 1))
+                        if ((x < 0) || (x > XREFS - 1))
                         {
                            flag("external name index out of range1");
                            break;
                         }
 
-                        sr = xrefl->pointer_array[i];
+                        sr = xrefl->pointer_array[x];
 
                         if (!sr)
                         {
@@ -9108,8 +9146,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         {
                            printf("$%X:%0*lX [", counter_of_reference, apw, loc);
 
-                           i = (RADIX - subfunction) >> 3;
-                           while (i < RADIX/8) printf("%2.2x", sr->l.value.b[i++]);
+                           x = (RADIX - subfunction) >> 3;
+                           while (x < RADIX/8) printf("%2.2x", sr->l.value.b[x++]);
                            printf("]\n");
 
                            display_ra(0, &range_filter);
@@ -9276,18 +9314,18 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	 if (masm_level == RECURSION) unwind();
 
 	 entry[masm_level] = sr;
-	 x = sr;
+	 txp = sr;
          
-         if (sr->l.down) x = sr->l.down;
+         if (sr->l.down) txp = sr->l.down;
 	 else
          {
-            i = sr->h.length;
+            x = sr->h.length;
 
             #ifdef CLEATING
-            if (!i) cleat(2, sr);
+            if (!x) cleat(2, sr);
             #endif
 
-	    x = (object *) ((long) x + i);
+	    txp = (object *) ((long) txp + x);
          }
 
 	 #if 1
@@ -9306,37 +9344,37 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	 if ((tpp & 2) && (pass))
 	 {
 	    actual->loc = loc;
-	    for (i = 0; i < LOCATORS; i++) 
+	    for (x = 0; x < LOCATORS; x++) 
 	    {
-	       savelocator[i] = locator[i].loc;
-	       savelocatorl[i] = locator[i].litlocator;
+	       savelocator[x] = locator[x].loc;
+	       savelocatorl[x] = locator[x].litlocator;
 	    }
 	    savepass = pass;
 	    pass = 0;
-	    depx = x;
+	    depx = txp;
 
 	    for (;;)
 	    {
-               j = x->h.type;
+               j = txp->h.type;
 
 
                if (j == BYPASS_RECORD)
                {
-                  if (i = x->nextbdi.next) x = bank[i];
-                  else                     x = NULL;
+                  if (x = txp->nextbdi.next) txp = bank[x];
+                  else                       txp = NULL;
 
-                  if (!x)
+                  if (!txp)
                   {
                      printf("Error %d Retrieving Procedure Text\n", j);
                      exit(0);
                   }
 
-                  j = x->h.type;
+                  j = txp->h.type;
                }
 
                if (j == END) break;
 
-	       nlabel = x->t.text;
+	       nlabel = txp->t.text;
 
                #ifdef QNAMES
                #ifdef REPORT_QNAMES
@@ -9348,26 +9386,26 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 	       if (j == TEXT_IMAGE)
 	       {
-		  next_image[masm_level] = x;
+		  next_image[masm_level] = txp;
 		  rvalue = assemble(nlabel, v_argument, thislabel, image);
-		  x = next_image[masm_level];
+		  txp = next_image[masm_level];
 	       }
 
-               i = x->h.length;
+               x = txp->h.length;
 
                #ifdef CLEATING
-               if (!i) cleat(3, x);
+               if (!x) cleat(3, txp);
                #endif
             
-	       x = (object *) ((long) x + i);
+	       txp = (object *) ((long) txp + x);
 	    }
 
-	    x = depx;
+	    txp = depx;
 	    pass = savepass;
-	    for (i = 0; i < LOCATORS; i++)
+	    for (x = 0; x < LOCATORS; x++)
 	    {
-	       locator[i].loc = savelocator[i];
-	       locator[i].litlocator = savelocatorl[i];
+	       locator[x].loc = savelocator[x];
+	       locator[x].litlocator = savelocatorl[x];
 	    }
 	    loc = actual->loc;
 
@@ -9386,26 +9424,26 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 	 for (;;)
 	 {
-	    j = x->h.type;
+	    j = txp->h.type;
 
             if (j == BYPASS_RECORD)
             {
-               if (i = x->nextbdi.next) x = bank[i];
-               else                     x = NULL;
+               if (x = txp->nextbdi.next) txp = bank[x];
+               else                       txp = NULL;
 
-               if (!x) 
+               if (!txp) 
                {
                   printf("Error %d Retrieving Procedure Text\n", j);
                   exit(0);
                }
 
-               j = x->h.type;
+               j = txp->h.type;
             }
 
 
             if (j == END) break;
 
-	    nlabel = x->t.text;
+	    nlabel = txp->t.text;
 	    
             #ifdef QNAMES
             #ifdef REPORT_QNAMES
@@ -9417,14 +9455,14 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 	    if (j == TEXT_IMAGE)
 	    {
-	       next_image[masm_level] = x;
+	       next_image[masm_level] = txp;
                
 	       if (plist > masm_level)
                {
 	          if (((pass) && (selector['P'-'A']))
                   || ((!pass) && (selector['r'-'a'])))
 	          {
-                     print_macrotext(x->t.length, x->t.text, sr->l.name);
+                     print_macrotext(txp->t.length, txp->t.text, sr->l.name);
                      putchar(10);
 	          }
 	       }
@@ -9432,16 +9470,16 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       rvalue = assemble(nlabel, v_argument, thislabel, image);
                
                if (rvalue == RETURN) break;
-	       x = next_image[masm_level];
+	       txp = next_image[masm_level];
 	    }
             
-            i = x->h.length;
+            x = txp->h.length;
 
             #ifdef CLEATING
-            if (!i) cleat(4, x);
+            if (!x) cleat(4, txp);
             #endif
 
-	    x = (object *) ((long) x + i);
+	    txp = (object *) ((long) txp + x);
 	 }
 
          if (plist > masm_level)
@@ -9449,7 +9487,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             if (((pass) && (selector['P'-'A']))
             || ((!pass) && (selector['r'-'a'])))
             {
-                printf(":::end proc:%s\n", x->t.text);
+                printf(":::end proc:%s\n", txp->t.text);
             }
          }
 
@@ -9528,11 +9566,11 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       {
 		  if (bits) lshift(&item, slice);
 		  limit = first_at(argument, ":, ");
-		  i = slice & 7;
+		  x = slice & 7;
 		  j = slice >> 3;
-		  xmask = 255 << i;
+		  xmask = 255 << x;
 		  ymask = xmask ^ 255;
-		  i = RADIX/8;
+		  x = RADIX/8;
 		  
 		  #ifdef RELOCATION
 		  mapx->m.i = 0; /* global change 3ix2008 */
@@ -9568,14 +9606,14 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		     
 		     while (j--)
 		     {
-			i--;
-			item.b[i] = oo->b[i];
+			x--;
+			item.b[x] = oo->b[x];
 		     }
 		     if (ymask)
 		     {
-			i--;
-			item.b[i] &= xmask;
-			item.b[i] |= oo->b[i] & ymask;
+			x--;
+			item.b[x] &= xmask;
+			item.b[x] |= oo->b[x] & ymask;
 		     }
 		  }
 		  
