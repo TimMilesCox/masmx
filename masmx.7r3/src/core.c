@@ -7075,32 +7075,72 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
          #if 1
 
+         /*************************************************
+		the default case, *search must be the last
+		column of expression + 1 and it wasn't
+         *************************************************/
+
          limit = search++;
          symbol = *limit;
 
          if (j = length_mark(symbol))
          {
-            x = frightmost(argument, search);
-            if (((x  > '0') && (x < '9' + 1))
-            ||  ((x == '0') && (octal))
-            ||  ((x == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
+            x = 0;
+            if (limit > argument) x = *(limit - 1);
+            
+            if (x == ':')
             {
+               /********************************************
+		: is not part of the expression. *search must
+		point to the column after the expression = :
+               ********************************************/
+
+               search = limit - 1;
                bits = j;
-               if ((limit > argument) && (*(limit - 1) == ':')) limit--;
+            }
+            else if ((x == ')') || (x == '\'') || (x == qchar))
+            {
+               /*******************************************
+		'") is part of the expression
+		*search goes where it was
+               *******************************************/
+
                search = limit;
+               bits = j;
             }
             else
             {
-               if (limit > argument)
+               /*******************************************
+		is the last token in the expression
+		a label or a number string? Motorola $hex
+		looks like a label, so it  needs : or )'"
+		if you want to add a length flag
+
+		Intel-style notation suffix OQDHoqhd looks
+		like a length flag but you can follow it
+		with another length flag
+
+		The circumstance of encountering $hex or
+		Intel suffix is always in a macro with a
+		name like DW or DD or DB or .byte or .word
+		or .long, so application code can always
+		be accommodated without change
+               *******************************************/
+
+               x = frightmost(argument, search);
+
+               if (((x  > '0') && (x < '9' + 1))
+               ||  ((x == '0') && (octal))
+               ||  ((x == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
                {
-                  limit--;
-                  x = *limit;
-                  if ((x == ':') || (x == ')') || (x == '\'') || (x == qchar))
-                  {
-                     if (x ^ ':') limit++;
-                     bits = j;
-                     search = limit;
-                  }
+                  /****************************************
+			digit string other than
+			hex ending in D
+                        *search goes where it was
+                  ****************************************/
+
+                  bits = j;
+                  search = limit;
                }
             }
          }

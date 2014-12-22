@@ -248,10 +248,11 @@ static int precord(object *l, char *line, char **data, int nest)
             {
                p--;
                y = *p;
-               if ((y == ')') || (y == ':') || (y == '\'') || (y == qchar)) argument = p;
-               else y = 0;
+               if (y == ':') argument = p;
+               else if ((y == ')') || (y == '\'') || (y == qchar)) argument = p + 1;
+               else symbol = 0;
             }
-            else y = 0;
+            else symbol = 0;
          }
          else argument = p;
       }
