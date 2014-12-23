@@ -2618,49 +2618,38 @@ static line_item *xpression(char *s, char *e, char *param)
 
    if (d = contains(s, e, "*+\0*-\0"))
    {
-      #ifdef REVISE_UNARY
-      c = *s;
-      if ((c == '+') || (c == '-') || (c == '^')) c = *(s + 1);
-      #else 
-      if ((*s == '-') || (*s == '^'))
-      {
-         xpression(s + 1, e, param);
-         operand_reverse(sp);
-         return sp;
-      }
-      else if (*s == '+')
-      {
-         xpression(s + 1, e, param);
-         return sp;
-      }
-      #endif
-
       transient_floating_bits = fpwidth;
 
       margin = d;
-      override = *(margin - 2);
-      symbol   = *(margin - 1);
 
-      if ((override == ')')  || (override == ':')
-      ||  (override == '\'') || (override == qchar))
+      override = 0;
+      symbol = 0;
+
+      if (margin > s)
       {
-         if (x = length_mark(symbol))
+         symbol = *(margin - 1);
+         if (margin > (s + 1)) override = *(margin - 2);
+      }
+
+      if (x = length_mark(symbol))
+      {
+         if (override == ':')
          {
             margin -= 2;
             transient_floating_bits = x;
          }
-      }
-      else
-      {
-         #ifndef REVISE_UNARY
-         c = *s;
-         #endif
-
-         if (((c == '0') && (symbol ^ 'd') && (symbol ^ 'D'))
-         ||  ((c == '0') && (octal))
-         ||  ((c  > '0') && (c < '9'+1)))
+         else if ((override == ')') || (override == '\'') || (override == qchar))
          {
-            if (x = length_mark(symbol))
+            margin--;
+            transient_floating_bits = x;
+         }
+         else
+         {
+            c = frightmost(s, d);
+
+            if (((c >  '0') && (c < '9' + 1))
+            ||  ((c == '0') && (octal))
+            ||  ((c == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
             {
                margin--;
                transient_floating_bits = x;
@@ -2680,7 +2669,6 @@ static line_item *xpression(char *s, char *e, char *param)
          if (*(d + 1) == '-') i = 0 - i;
          sp++;
 
-         #ifdef REVISE_UNARY
          if (sp->b[0] & 128)
          {
             operand_reverse(sp);
@@ -2694,10 +2682,6 @@ static line_item *xpression(char *s, char *e, char *param)
             characterise(i, sp);
             floating_position(transient_floating_bits, sp);
          }
-         #else
-         characterise(i, sp);
-         floating_position(transient_floating_bits, sp);
-         #endif
       }
 
       return sp;
@@ -2815,7 +2799,6 @@ static line_item *xpression(char *s, char *e, char *param)
             c = transient_floating_bits;
 	    right = xpression(d+1, e, param);
 
-            #ifdef REVISE_UNARY
             if ((c == 0) && (transient_floating_bits))
             {
                /*****************************************
@@ -2843,7 +2826,6 @@ static line_item *xpression(char *s, char *e, char *param)
 
                if (twoscomp) flag("floating cast to integer yields a wrong value");
             }
-            #endif
 
 	    operand_add_negative(left, right);
 	    sp++;
@@ -3006,39 +2988,9 @@ static line_item *xpression(char *s, char *e, char *param)
 
    #undef FP_LATER
    #ifdef FP_LATER
-   if (d = contains(s, e, "*+\0*-\0"))
-   {
-      if ((*s == '-') || (*s == '^'))
-      {
-         xpression(s + 1, e, param);
-         operand_reverse(sp);
-         return sp;
-      }
-
-      xpression(s, d, param);
-      sp--;
-      i -= expression(d+1, e, param);
-      sp++;
-      characterise(i, sp);
-
-      #if 1
-      floating_position(transient_floating_width, sp);
-      #else
-      if (sp < &o[XPRESSION])
-      {
-         floating_position(fpwidth, sp);
-      }
-      #endif
-
-      return sp;
-   }
    #endif	/*	FP_LATER	*/
 
    #ifdef PROMOTE_UNARY
-   /*
-   if (*s == '!') return expression(++s, e, param) ^ -1;
-   if (*s == '-') return 0 - expression(++s, e, param);
-   */
    
    if (*s == '^')
    {
@@ -7006,36 +6958,19 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
    
       unary = *directive;
 
-      #ifdef REVISE_UNARY
       if ((unary > '0'-1) && (unary < '9'+1)) unary = 0;
       if (unary == '\'') unary = 0;
-      #endif
 
       if ((unary == '+') || (unary == '-') || (unary == '^') || (unary == 0))
       {
          argument = directive;
 
-         #ifdef REVISE_UNARY
          if (unary)
          {
             if (*(argument + 1) == ' ') argument++;
             else unary = '+';
          }
          else unary = '+';
-         #else
-         argument++;
-         #endif
-
-         #if 0
-         if (*argument == '(')
-         {
-  	    unary = '+';
-	    argument--;
-         }
-
-         while (*argument == 32) argument++;
-
-         #else
 
          symbolb4 = unary;
 
@@ -7044,8 +6979,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             symbolb4 = symbol;
             argument++;
          }
-
-         #endif
 
          search = argument;
          parenthesised = 0;
