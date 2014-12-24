@@ -87,10 +87,6 @@ static void internal_labels()
 
     { "$suffix", SUFFIX, DIRECTIVE } ,
 
-   #ifdef FPEQU
-    { "$fpequ", FPEQU, DIRECTIVE } ,
-   #endif
-
    #ifdef EQUF
     { "$equf", EQUF, DIRECTIVE } ,
    #endif

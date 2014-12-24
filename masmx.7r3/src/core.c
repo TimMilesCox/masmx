@@ -2663,11 +2663,16 @@ static line_item *xpression(char *s, char *e, char *param)
 
       if (pass)
       {
+         floating_conversion = 0;
          xpression(s, margin, param);
          sp--;
          i -= expression(d+2, e, param);
          if (*(d + 1) == '-') i = 0 - i;
          sp++;
+
+         if (floating_conversion) flag("overloaded floating conversion "
+                                       "caused by expression nesting "
+                                       "between fraction and exponent");
 
          if (sp->b[0] & 128)
          {
@@ -6499,6 +6504,8 @@ static void floating_generate(char *a, char *margin, char *param, line_item *ite
    {
       places -= expression(a, margin, param);
    }
+
+   floating_conversion++;
    
    if (pass) characterise(places, item);
 }
@@ -6770,10 +6777,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
       #endif
 	    
-      #ifdef FPEQU
-      if (x == FPEQU) x = SET;
-      #endif
-
       if (x == DO) x = SET;
 
       #ifdef BINARY
@@ -7535,36 +7538,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                #endif
 
-               #ifdef FPEQU
-	    case FPEQU:
-	       if (argument)
-	       {
-	 	  v_argument = substitute(argument, param);
-		  argument = v_argument;
-		 
-		  if ((*argument == '-') || (*argument == '+')) 
-					  unary = *argument++;
-		  floating_generate(argument, search, param, &item);
-		  if (unary == '-') operand_reverse(&item);
-		  if (thislabel)
-		  {
-		     /*
-		     if (thislabel->l.valued != SET)
-		     {
-		        if (!pass) printf(thislabel->l.name);
-		        flagp1(" This label cannot be changed to an FPEQUate\n");
-		        break;
-		     }
-		     */
-		     thislabel->l.valued = SET;
-		     thislabel->l.value = item;
-		     #if 0
-		     thislabel->l.r.i = 0;
-		     #endif
-		  }
-	       }
-	       break;
-               #endif
 
 	       #ifdef EQUF
 	    case EQUF:

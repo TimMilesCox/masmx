@@ -73,7 +73,6 @@
 #define NOTE 58
 #define	NOP 60
 #define SUFFIX 61
-#undef	FPEQU 62
 
 #ifdef	STRUCTURE_DEPTH
 #define	BRANCH 63
@@ -481,6 +480,7 @@ static int linex, list, plist;
 
 static int fpwidth = 96;
 static int transient_floating_bits = 0;
+static int floating_conversion = 0;
 
 static int characteristic_width[12] = { 8, 12, 24, 24, 24, 24,
 				       24, 24, 24, 24, 24, 24 } ;
