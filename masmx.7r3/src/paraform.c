@@ -292,8 +292,6 @@ static char *text_image(paraform_code sample, char *gparam)
 
                if (o = isanequf(pq))
                {
-                  #if 1
-
                   #ifdef INTEL
 
                   quartet = &o->l.value.b[RADIX/8-((y - x) << 2)];
@@ -334,23 +332,6 @@ static char *text_image(paraform_code sample, char *gparam)
                   }
 
                   return dynamic_name;
-
-                  #else
-                  printf("[WEPS %2.2x]", sample.level);
-                  if (sample.level == STAR_SUBFIELD)
-                  {
-                     printf("[weps]");
-                     if (o->l.value.b[RADIX/8-((y - x) << 2)] & 128)
-                     {
-                        return "1";
-                     }
-
-                     return    "0";
-                  }
-
-                  sprintf(dynamic_name, "%s\\%d", o->l.name, y - x);
-                  return dynamic_name;
-                  #endif
                }
 
                #else

@@ -119,23 +119,8 @@ static void transfer_address(char *p)
    long		 z = strict_address(p+4);
    xref_list	*q = file_label[depth]->l.down;
    
-   #if 1
-
    if (q) z += q->segments.base[x];
    outcounter(x, z, "\n>");
-
-   #else
-
-   if (q) z += q->segments.base[x];
-
-   write(ohandle, "\n>", 2);
-   pushh2(x);
-   write(ohandle, ":", 1);
-   
-   pushaddress(z);
-   write(ohandle, "\n", 1);
-
-   #endif
 }
 
 static xref_list *assure_xlist(object *f)
@@ -166,20 +151,12 @@ static void load_long_breakpoint(char *p)
    value		*v = (value *) q->runbank;
    xref_list		*xrefs = file_label[depth]->l.down;
 
-   #if 0
-   printf("[$%x:%x:%x]\n", x, q->loc, q->runbank);
-   #endif
 
    if ((q->flags & 1) == 0)
    {
       if (q->touch_base)
       {
          flag("change to large absolute address");
-
-         #if 0
-         note("conflict with previous inclusion in this section");
-         #endif
-
          return;
       }
    }
@@ -220,9 +197,7 @@ static int binary_switch_locator(char *p, short ordered,
       }
    }
 
-   #if 1
    actual->loc = loc;	/* ???????????? */
-   #endif
 
    counter_of_reference = x;
    actual = &locator[x];
@@ -235,13 +210,6 @@ static int binary_switch_locator(char *p, short ordered,
    loc = strict_address(p + 4);
 
    if (q) loc += q->segments.base[x];
-
-   /*
-   if (q) base = q->segments.base[x];
-   loc += base;
-   actual->loc = loc;
-   actual->bias = 0;
-   */
 
    actual->touch_base = 1;
    outstanding = 1;
@@ -275,10 +243,6 @@ static int load_binary_summary(char *p)
    low       = strict_address(p + 5 + apw + 1);
    high      = strict_address(p + 5 + 2 * apw + 2);
 
-   #if 0
-   q = &locator[x];
-   #endif
-
    q->relocatable = alignment;
 
    if (q->flags & 1)
@@ -296,9 +260,7 @@ static int load_binary_summary(char *p)
 
    q->loc = high;
 
-   #if 1
    if ((x == counter_of_reference) && (q->flags & 1)) loc = high;
-   #endif
       
    return x;
 }
@@ -349,11 +311,6 @@ static object *binary_load_label(char *p, short ordered,
    q = &locator[y];
 
    load_quartets(p + 4, &v);
-
-   #if 0
-   if (q->bias) quadd_u(q->runbank, &v);
-   #endif
-
 
    o = insert_ltable(lname + 1, &lname[x], &v, LOCATION);
 
@@ -447,11 +404,6 @@ static void load_binary(char *p)
 
    xref_list	*q = f->l.down;
 
-   #if 0
-   object	*minus = findlabel("$minus", NULL);
-   object	*plus  = findlabel("$plus",  NULL);
-   #endif
-
    location_counter *sample;
 
    char		*s, *limit;
@@ -534,7 +486,6 @@ static void load_binary(char *p)
    {
       x = nline(&assembly[6], 148);
 
-      #if 1
       if (x < 0)
       {
          close(handle[depth]);
@@ -549,10 +500,6 @@ static void load_binary(char *p)
          actual_block = block[depth];
          break;
       }
-
-      #else
-      if (x < 0) break;
-      #endif
 
       ll[depth]++;
       plix[lix] = 0;
@@ -674,14 +621,12 @@ static void load_binary(char *p)
             if (!pass) break;
             if (!included) break;
 
-            #if 1
             if (assembly[10] == ':')
             {
                write(ohandle, "\n", 1);
                write(ohandle, assembly + 6, x);
                break;
             }
-            #endif
 
             transfer_address(&assembly[6]);
             break;
@@ -724,11 +669,7 @@ static void load_binary(char *p)
 
             if (alignment)
             {
-               #if 1
-               
                touched.base[x] = 4;
-
-               #endif
 
                /***********************************************
                here the transition from a relocatable segment
@@ -772,11 +713,7 @@ static void load_binary(char *p)
                }
                else
                {
-                  #if 1
                   loc = actual->lroot;
-                  #else
-                  loc = actual->breakpoint;
-                  #endif
 
                   loc = (loc + alignment - 1) & -alignment;
                   v = loc;
@@ -786,11 +723,7 @@ static void load_binary(char *p)
                   loc += actual->loc;
                   actual->loc = loc;
 
-                  #if 1
                   actual->lroot = loc;
-                  #else
-                  actual->breakpoint = loc;
-                  #endif
 
                   absolute = 0;
                }
@@ -808,16 +741,8 @@ static void load_binary(char *p)
                else
                {
                   if (actual->loc < loc) flag("code address moved back");
-
-                  #if 1
                   if (!actual->touch_base) actual->base = actual->runbank;
-                  #endif
-
-                  #if 1
                   v = actual->base;
-                  #else                  
-                  v = actual->runbank;
-                  #endif
                }
 
                absolute = 1;
@@ -890,11 +815,7 @@ static void load_binary(char *p)
         
             if ((q) && (q->segments.base[x]))
             {
-               #if 1
                quadd_u(q->segments.base[x], &o->l.value);
-               #else
-               quadd_u(sample->runbank, &o->l.value);
-               #endif
             }
          }
 

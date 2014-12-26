@@ -64,20 +64,13 @@ static void illustrate(long location,
 
    if ((list > depth) && (pass) && (selector['L'-'A']))
    {
-      #ifdef OCTALPRINT
       if (octal)
       {
          printf("%3.3o:", counter_id);
 
          if (q->flags & 1)
          {
-            #if 0
-            illustrate_xad_triplets(q, location);
-            printf(":");
-            v = xadw/3+5;
-            #endif
          }
-
          else
          {
             v = apw + 5;
@@ -142,17 +135,10 @@ static void illustrate(long location,
          }
       }
 
-      #else
-      printf("%2.2X:%0*lX ", counter_id, apw, location);
-      #endif
-
       if (encode)
       {
-	 #ifdef OCTALPRINT
 	 if (octal)
 	 {
-            #if 1
-
             i = 96;
             while (words--)
             {
@@ -197,102 +183,10 @@ static void illustrate(long location,
                }
             }
             while (i < 96) putchar(o[i++]);
-
-            #else
-	    i = 96;
-	    if (selector['e'-'a'])
-	    {
-	       j = 0;
-	       while (j < bits)
-	       {
-		  aside = *item;
-
-		  j += word;
-		  lshift(&aside, RADIX-j);
-		  rshift(&aside, RADIX-word);
-		  mask = (word);
-		  while (mask > 0)
-		  {
-		     i--;
-		     o[i] = (aside.b[RADIX/8-1] & 7) | '0';
-		     rshift(&aside, 3);
-		     mask -= 3;
-		  }
-		  i--;
-		  o[i] = 32;
-	       }
-	    }
-	    else
-	    {
-	       aside = *item;
-	       j = bits;
-	       while (j > 0) 
-	       {
-		  i--;
-
-                  #if 1
-                  symbol = aside.b[RADIX/8-1];
-                  symbol &= 7;
-                  symbol |= '0';
-                  o[i] = symbol;
-                  #else
-		  o[i] = (aside.b[RADIX/8-1] & 7) | '0';
-                  /*
-                  printf("[%2.2x%2.2x]", aside.b[RADIX/8-2],
-                                         aside.b[RADIX/8-1]);
-                  */
-                  #endif
-
-		  rshift(&aside, 3);
-		  j -= 3;
-	       }
-	    }
-	    while (i < 96) putchar(o[i++]);
-            #endif
 	 }
 	 else
 	 {
-            #if 1
-
             i = 96;
-
-            #ifdef BYTE_BLOCK
-
-            if (byte_block)
-            {
-               words = (bits + address_quantum - 1) / address_quantum;
-               while (words--)
-               {
-                  slice += address_quantum;
-
-                  while (slice)
-                  {
-                     if (bits_cached < 4)
-                     {
-                        x--;
-                        serial_bits |= (item->b[x]) << bits_cached;
-                        bits_cached += 8;
-                     }
-
-                     symbol = serial_bits & 15;
-                     serial_bits >>= 4;
-                     bits_cached -= 4;               
-                     slice -= 4;
-
-                     symbol |= '0';
-                     if (symbol > '9') symbol += 7;
-
-                     i--;
-                     o[i] = symbol;
-                 
-                     if (slice < 0) break;
-                  }
-               }
-            }
-
-            else
-
-            #endif
 
             while (words--)
             {
@@ -340,51 +234,7 @@ static void illustrate(long location,
                }
             }
             while (i < 96) putchar(o[i++]);
-
-            #else
-
-	    if (selector['e'-'a'])
-	    {
-	       j = bits;
-	       while (j)
-	       {
-		  j -= word;
-		  aside = *item;
-		  rshift(&aside, j);
-		  i = RADIX/8-((word+7)>>3);
-		  if (mask = word & 7) aside.b[i] &= (1 << mask) - 1;
-		  while (i < RADIX/8) printf("%2.2x", aside.b[i++]);
-		  putchar(32);
-	       }
-	    }
-	    else
-	    {
-	       while (i < RADIX/8) printf("%2.2X",item->b[i++]);
-	    }
-            #endif
 	 }
-	 
-	 #else
-      
-	 if (selector['e'-'a'])
-	 {
-	    j = bits;
-	    while (j)
-	    {
-	       j -= word;
-	       aside = *item;
-	       rshift(&aside, j);
-	       i = RADIX/8-((word+7)>>3);
-	       if (mask = word & 7) aside.b[i] &= (1 << mask) - 1;
-	       while (i < RADIX/8) printf("%2.2x", aside.b[i++]);
-	       putchar(32);
-	    }
-	 }
-	 else
-	 {
-	    while (i < RADIX/8) printf("%2.2X",item->b[i++]);
-	 }
-	 #endif
 	 
 	 if (octal) v += (bits + 2) / 3;
          else       v += bytes * 2;
@@ -582,16 +432,6 @@ static void walktable(int order)
 
 	       switch(x)
 	       {
-                     #if 0
-		  case LOCATION:
-		  
-		  #ifdef LINELABEL
-		  case LINELABEL: 
-		  #endif
-
-		     printf("$%2.2X:", sr->l.r.l.rel & 127);
-		     break;
-                     #endif
 
 		  case INTERNAL_FUNCTION:
 		     printf(":F:");
@@ -636,13 +476,6 @@ static void walktable(int order)
 		     break;
                   case EQUF:
                      i = 0;
-
-                     #if 0
-                     if ((sr->l.r.l.y & 1) | sr->l.r.l.rel)
-                     {
-                        printf("$%2.2X:", sr->l.r.l.rel & 127);
-                     }
-                     #endif
 
                      while (i < (RADIX/32-1))
                      {
@@ -763,12 +596,7 @@ static void walktable(int order)
 	 case TEXT_IMAGE:
 	    if (selector['p'-'a'] | selector['q'-'a'] | selector['r'-'a'])
             {
-               #if 1
                print_macrotext(sr->t.length, sr->t.text, NULL);
-               #else
-	       printf(sr->t.text);
-               #endif
-
 	       putchar(10);
             }
 	    break;
@@ -785,11 +613,6 @@ static void walktable(int order)
 	 
 	 #ifdef OVERLAY_LITERALS
 	 case LITERAL:
-            #if 0
-	    printf("$%2.2x:%0*lx:%s\n", sr->u.rel,
-					apw, sr->u.loc,
-					sr->u.d);
-	    #endif
             break;
 	 #endif
          

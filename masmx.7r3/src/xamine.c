@@ -197,56 +197,6 @@ static char *listed(char *p,  char *list)
 
 /* detect operator among subset of operators */
 
-#if 0
-
-static char *contains(char *s, char *e, char *list)
-{
-   int		 i = 0;
-   int		 sinquo = 0;
-   int		 quotype = 0;
-   int		 symbol;
-   int		 x;
-
-   char *rightmost = NULL, *id;
-   while (s < e)
-   {
-      symbol = *s;
-      if (symbol == 0) return rightmost;
-      if ((symbol == 0x27) || (symbol == qchar))
-      {
-	 if (!quotype) quotype = symbol;
-      }
-      if (symbol == quotype) sinquo ^= 1;
-      if (sinquo)
-      {
-	 s++;
-	 continue;
-      }
-
-      if (symbol == '(') i++;
-      if (symbol == ')') i--;
-
-      if (!i)
-      {
-	 if (id = oper_ator(s, (long) e - (long) s))
-	 {
-            x = strlen(id);
-	    if (listed(id, list))
-            {
-               rightmost = s;
-               ofield = x;
-            }
-	    s+= x;
-	    continue;
-	 }
-      }   
-      s++;
-   }
-
-   return rightmost;
-}
-
-#endif
 
 static char *next_operator(char *s, char *e, char *list, int exclude)
 {
@@ -320,8 +270,6 @@ static char *next_operator(char *s, char *e, char *list, int exclude)
    return NULL;
 }
 
-#if 1
-
 static char *contains(char *s, char *e, char *list)
 {
    char		*rightmost = NULL;
@@ -335,11 +283,8 @@ static char *contains(char *s, char *e, char *list)
    return rightmost;
 } 
 
-#endif
-
 static char  *getop(char  *l)
 {
-   #if 1
    int			 symbol;
 
    l = first_at(l, " ");
@@ -352,28 +297,6 @@ static char  *getop(char  *l)
 
    if (!symbol) return NULL;
    return l;
-
-   #else
-
-   register int symbol = *l++;
-   if (symbol == qchar)
-   {
-      while (symbol = *l++)
-      {
-	 if (symbol == qchar)
-	 {
-	    symbol = *l++;
-	    if (symbol != qchar) break;
-	 }
-      }
-   }
-   while ((symbol) && (symbol != ' ')) symbol = *l++;
-   if (!symbol) return NULL;
-   while (*l == ' ') l++;
-   if (*l == 0) return NULL;
-   return l;
-
-   #endif
 }
 
 static char *first_at(char *data, char *mask)
@@ -540,228 +463,6 @@ static char *fendb(char *s, char *e)
    return s;
 }
 
-#if 0
-static int fields(char *g)
-{
-   int i = 0, j;   
-   atree *a = vtree[masm_level-1];
-   array *b = a->field;
-
-
-   if (a->ready) return a->count;
-
-   #ifdef WALKP
-   printf("PSetup :%s\n", g);
-   #endif
-
-   a->ready = 1;
-   a->count = i;
-
-   a->field[0].image[0] = NULL;
-   a->field[0].count = 0;
-
-   g = getop(g);   
-
-   if (!g)
-   {
-      vtree[masm_level] = (atree *) b;
-      return 0;
-   }
-   
-   for (;;)
-   {
-      j = 1;
-      b->image[0] = g;
-      g = first_at(g, ", ");
-
-      while (*g == ',')
-      {
-	 g++;
-	 while(*g == 32) g++;
-         if (*g == 0) break;
-         b->image[j] = g;
-	 g = first_at(g, ", ");
-         j++;
-      }
-
-      b->count = j;
-      b = (array *) &b->image[j];
-
-      while (*g == 32) g++;
-      if (*g == 0) break;
-      i++;
-   }
-
-   a->ready = 1;
-   a->count = i;
-
-   vtree[masm_level] = (atree *) b;
-   b->ready = 0;
-   b->count = 0;
-
-   return i;
-}
-
-static array *field(int i)
-{
-   atree *b = vtree[masm_level-1];
-   array *a = b->field;
-
-   if (i > b->count) return NULL;
-
-   while (i--) a = (array *) &a->image[a->count];
-   return a;
-}
-
-static int substrings(char *g)
-{
-   int i = 0;
-   if (!g) return 0;
-   for (;;)
-   {
-      i++;
-      g = first_at(g, tstring);
-      if (*g++ != sterm) return i;
-   }
-}
-
-static char *substring(char *g, int i)
-{
-   if (!g) return NULL;
-
-   for (;;)
-   {
-      i--;
-      if (!i) break;
-      g = first_at(g, tstring);
-      if (*g++ != sterm) return NULL;
-   }
-   return g;
-}
-
-
-/********************************************
-
-#define BAD_PARAFORM	0
-#define COMPLETE_LINE	1
-#define ALL_FIELDS	2
-#define	FIELD		3
-#define SUBFIELD	4
-#define STAR_SUBFIELD	4+128
-#define HASH_SUBFIELD	4+64
-#define	SUBSTRING	5
-#define STAR_OR_HASH_	128+64
-#define STAR__		128
-#define HASH__		64
-
-#ifndef BASIC_SCAN
-#define UNBOUND_STRING	6
-#define UNBOUND_SUBFIELD 7
-#define STAR_UNBOUND_SUBFIELD 7+128
-#define HASH_UNBOUND_SUBFIELD 7+64
-#define UNSAFE_FIELD	8
-#endif
-
-typedef struct { char level,field,subfield,sustring; } paraform_code;
-
-********************************************/
-
-
-static paraform_code encode_paraform(char *p, char **s)
-{
-   paraform_code	 z = { COMPLETE_LINE, 0, 0, 0 } ;
-
-   int			 symbol;
-   char			*q;
-
-   if (!p) return z;
-
-   if (symbol = *p)
-   {
-      #ifdef SLIPSHO
-      printf("[%c][%s]", symbol, p);
-      #endif
-      p++;
-      if (symbol == '(')
-      {
-         if (*p == ')')
-         {
-            p++;
-            z.level = ALL_FIELDS;
-         }
-         else
-         {
-            q = edge(p, ",)");
-            z.field = expression(p, q, NULL);
-            p = q;
-            z.level = FIELD;
-
-            if (symbol = *p)
-            {
-               p++;
-               if (symbol == ',')
-               {
-                  q = edge(p, ":)");
-                  while(*p == 32) p++;
-                  z.level = SUBFIELD;
-
-                  if (*p == '*')
-                  {
-                     z.level = STAR_SUBFIELD;
-                     p++;
-                  }
-
-                  if (*p == '#')
-                  {
-                     z.level = HASH_SUBFIELD;
-                     p++;
-                  }
-
-                  z.subfield = expression(p, q, NULL);
-                  p = q;
-
-                  if (symbol = *p)
-                  {
-                     p++;
-                     if (symbol == ')')
-                     {
-                     }
-                     else
-                     {
-                        if (symbol == ':')
-                        {
-                           q = edge(p, ")");
-                           while (*p == 32) p++;
-
-                           z.sustring = expression(p, q, NULL);
-                           z.level = SUBSTRING;
-                           p = q;
-
-                           if (symbol = *p)
-                           {
-                              p++;
-                           }
-                        }
-                        else
-                        {
-                           z.level = BAD_PARAFORM;
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   #ifdef SLIPSHO
-   printf("[encode %d %8.8x]", z.level, z);
-   #endif
-
-   if (s) *s = p;
-   return z;
-}
-#endif
 
 static char *past_parentheses(char *s)
 {

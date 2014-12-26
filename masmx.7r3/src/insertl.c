@@ -115,13 +115,6 @@ static object *retrieve_label(char *margin)
 
             continue;
          }
- 
-         #if 0
-         if (selector['y'-'a'])
-         {
-            if (x < 0) break;
-         }
-         #endif
       }
       #endif
 

@@ -80,23 +80,10 @@ static int number(char *s, char *e)
       return 0;
    }
 
-   #if 1
    if (l->l.r.l.rel) return 0;
    if (l->l.valued == 0) return 0;
    if (l->l.r.l.xref < 0) return 0;
    if (l->l.valued == EQUF) return 0;
-   #else
-   if (l->l.valued == LOCATION) return 0;
-   if (l->l.valued ==     LTAG) return 0;
-   if (l->l.valued ==     EQUF) return 0;
-   if (l->l.r.l.xref < 0)       return 0;
-
-   if ((l->l.valued == EQU) || (l->l.valued == SET))
-   {
-      if (l->l.r.l.rel) return 0;
-      if (l->l.r.l.y)   return 0;
-   }
-   #endif
 
    return 1;
 }

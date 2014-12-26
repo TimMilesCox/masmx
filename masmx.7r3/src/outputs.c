@@ -173,9 +173,6 @@ static void produce(int bits, char dflag, line_item *item, txo *a_image)
 
    int			 granule = word;
 
-   #ifdef BYTE_BLOCK
-   if (byte_block) granule = address_quantum;
-   #endif
 
    if (a_image) image = a_image; 
    
@@ -205,11 +202,6 @@ static void produce(int bits, char dflag, line_item *item, txo *a_image)
    
    bytes = (bits+EIGHT-1) >> 3;
    
-   #if 0
-   i = RADIX/8 - bytes;
-   if (mask = bits & 7) item->b[i] &= (1<<mask)-1;
-   #endif
-
    if ((actual->flags & 128)
    &&  (actual->base == 0)
    &&  (actual->relocatable == 0)
@@ -302,14 +294,12 @@ static void produce(int bits, char dflag, line_item *item, txo *a_image)
       if (outstanding) linex = 0;
       */
 
-      #if 1
       if (mask = bits & 7)
       {
          datum = item->b[i++] & ((1 << mask) - 1);
 	 if (mask > 4) image->d[x++] = left(datum);
 	 image->d[x++] = right(datum);         
       }
-      #endif
 
       while (i < RADIX/8)
       {

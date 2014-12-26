@@ -315,19 +315,6 @@ static long literal(char *arg, char *gparam, int tlocator)
 	  x =  strcmp(sr->d, image.d); 
 	  if (x == 0)
 	  {
-	     #if 0
-	     mapx->m.l.y = sr->y;
-	     mapx->m.l.rel = sr->rel;
-	     #endif
-
-             #if 0
-	     linex = lxb;
-             #endif
-             
-	     /*
-	     maprecursion--;
-	     */
-             
              #ifdef LITWISE
              printf("[hit return %x]\n", sr->loc);
              #endif
@@ -347,21 +334,11 @@ static long literal(char *arg, char *gparam, int tlocator)
    printf("[miss insert %x/%x]\n", v, tloc->litlocator);
    #endif
    
-   #if 0
-   outstanding = 1;
-   linex = 0;
-   #endif
-
    while (t & PARAGRAPH-1) image.d[t++] = 0;
    t += 16;
    
    image.oblong = t;
    
-   /*
-   image.length = t;
-   if (t > 252) image.length = 255;
-   */
-
    image.loc = v;
    
    image.rel = tlocator;

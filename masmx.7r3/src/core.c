@@ -98,24 +98,11 @@ static void switch_locator(char *p, char *param)
    w = actual->loc;
    loc = w;
 
-   #if 0
-   out_standing(counter_of_reference);
-   #endif
-
    if (*limit == ':')
    {
       line_label = limit+1;
       
       limit = first_at(line_label, ",:/)");
-
-      #if 0
-      putchar('[');
-      {
-         char *x = line_label;
-         while (x < limit) putchar(*x++);
-      }
-      putchar(']');
-      #endif
 
       if (*line_label == '*')
       {
@@ -170,10 +157,6 @@ static void switch_locator(char *p, char *param)
             w = actual->loc;
             if (v < w) flag("location_overlay");
             actual->loc = v;
-
-            #if 0
-            if (!actual->touch_base) actual->base = v;
-            #endif
          }
       }     
       else
@@ -259,9 +242,7 @@ static void switch_locator(char *p, char *param)
             }
 
             actual->base = v;
-            #if 1
             actual->breakpoint++;
-            #endif
          }
          else
          {
@@ -680,13 +661,6 @@ static long rfunction(int v,
             {
                x = memcmp(name, l->l.name, h);
 
-               #if 0
-               if (selector['y'-'a'])
-               {
-                  if (x < 0) break;
-               }
-               #endif
-
                if (x)
                {
                }
@@ -1090,10 +1064,8 @@ static line_item *external_function(char *s, char *param, char *mark,
 
    if (!vtree[masm_level])
    {
-      #if 1
       for (j = 0; j < masm_level; j++)
       printf("[L %d %s V %p]\n", j, entry[j]->l.name, vtree[j]);
-      #endif
 
       flag_either_pass(l->l.name, "internal error possibly caused by parameter "
                                   "reference on a macro header line\n");
@@ -1121,9 +1093,7 @@ static line_item *external_function(char *s, char *param, char *mark,
    
    entry[masm_level] = l;
 
-   #if 1
    prelif = ifdepth;
-   #endif
 
    preskip = skipping;
    skipping = 0;
@@ -1160,11 +1130,7 @@ static line_item *external_function(char *s, char *param, char *mark,
                case FUNCTION:
                case NAME:
 	       case TEXT_IMAGE:
-                  #if 1
                   print_macrotext(x->t.length, x->t.text, l->l.name);
-                  #else
-	          printf("%s", x->t.text);
-                  #endif
 	          break;
 	       default:
 	          printf("[%d*]", x->h.type);
@@ -1195,15 +1161,6 @@ static line_item *external_function(char *s, char *param, char *mark,
       if (j == END) break;
       if (j == LABEL) continue;
 
-      #if 0 
-      if (j != TEXT_IMAGE)
-      {
-         if (pass) printf("[%x]\n", j);
-         flag("unexpected token in function text");
-         break;
-      }
-      #endif
-      
       j = 0;
       
       dir = getop(x->t.text);
@@ -1246,11 +1203,6 @@ static line_item *external_function(char *s, char *param, char *mark,
                function_scope = scope;
                if (loc != start) flag("Function Adding Code Inline");
 
-               #if 0
-               i = vvalue;
-               vvalue = prevalue;
-               #endif
-
                if (plist > (masm_level + 1))
                {
                   if (((pass) && (selector['q'-'a']))
@@ -1270,10 +1222,8 @@ static line_item *external_function(char *s, char *param, char *mark,
       }
    }
    
-   #if 1
    if (ifdepth != prelif) note("Automatic Endif");
    ifdepth = prelif;
-   #endif
 
    skipping = preskip;
    
@@ -1291,14 +1241,6 @@ static line_item *external_function(char *s, char *param, char *mark,
    
 
    function_scope = scope;
-
-   #if 0
-   vvalue = prevalue;
-   #endif
-
-   #ifdef POPREL
-   mapinfo = savel;
-   #endif
 
    if (!skipping) note("Automatic Function Return Value");
    if (loc != start) flag("Function Adding Code Inline");
@@ -1414,13 +1356,11 @@ static object *compose_filename(char *from, char *extension, int prefix)
 
 static void loadfile(char *arg, char *qual)
 {
-   #if 1
    if ((lix) && (pass) && (list > depth) && (selector['L'-'A']))
       printf("  :                            %d: %s\n", ll[depth], plix);
 
    lix = 0;
    plix[0] = 0;
-   #endif
 
    depth++;
 
@@ -1870,22 +1810,6 @@ static void operand_add(line_item *left, line_item *right)
    if (!twoscomp) operand_addcarry(c, left);
 }
 
-#if 0
-static void operand_add_upper(line_item *left, line_item *right)
-{
-   unsigned short c = 0;
-   int i = 12;
-   while (i--)
-   {
-      c += left->b[i];
-      c += right->b[i];
-      left->b[i] = c;
-      c >>= 8;
-   }
-   if (!twoscomp) operand_addcarry(c, left);
-}
-#endif
-
 static void operand_add_negative(line_item *left, line_item *right)
 {
    unsigned short c = twoscomp;
@@ -2087,22 +2011,6 @@ static void operand_add(line_item *left, line_item *right)
    if (!twoscomp) operand_addcarry(c, left);
 }
 
-#if 0
-static void operand_add_upper(line_item *left, line_item *right)
-{
-   unsigned short c = 0;
-   int i = 12;
-   while (i--)
-   {
-      c += left->b[i];
-      c += right->b[i];
-      left->b[i] = c;
-      c >>= 8;
-   }
-   if (!twoscomp) operand_addcarry(c, left);
-}
-#endif
-
 static void operand_add_negative(line_item *left, line_item *right)
 {
    unsigned long	 c = twoscomp;
@@ -2269,11 +2177,7 @@ static line_item *xpression(char *s, char *e, char *param)
 
    if (s == STACK_TOP_VALUE) return sp;
 
-   #if 1
    *sp = zero_o;
-   #else
-   *sp = o[0];
-   #endif
    
    #ifdef RELOCATION
    mapx->m.i = 0;
@@ -2701,22 +2605,12 @@ static line_item *xpression(char *s, char *e, char *param)
          getting mistaken for add/subtract operators
       *******************************************************/
 
-      #if 1
       symbol = *(d-1);
       if ((symbol != '*')
       &&  (symbol != '/')
       &&  (symbol != '+')
       &&  (symbol != '-'))
       {
-      #endif
-	    /*
-	    if (*d == '+') return expression(s, d, param)
-				+ expression(d+1, e, param);
-      
-	    if (*d == '-') return expression(s, d, param)
-				- expression(d+1, e, param);
-	    */
-      
 	 if (*d == '+')
 	 {
 	    left = xpression(s, d, param);
@@ -2735,10 +2629,6 @@ static line_item *xpression(char *s, char *e, char *param)
 
 	    if (mapx->m.l.y)
             {
-               #if 0
-               link_profile *zu = mapinfo;
-               #endif
-
                mapx->scale = 0;
 
                if (left_side.l.y)
@@ -2779,22 +2669,6 @@ static line_item *xpression(char *s, char *e, char *param)
 	 
 	 if (*d == '-')
 	 {
-            #ifdef MULTUPLES
-            {
-               #if 0
-               link_profile *u7 = mapinfo;
-               while (u7 <= mapx)
-               {
-                  printf("[F %2.2x R %2.2x X %4.4x]\n",
-                  u7->m.l.y,
-                  u7->m.l.rel,
-                  u7->m.l.xref);
-                  u7++;
-               }
-               #endif
-            }
-            #endif
-
 	    left = xpression(s, d, param);
 	    sp--;
 	    
@@ -2902,34 +2776,12 @@ static line_item *xpression(char *s, char *e, char *param)
 
 	    return sp; 
 	 }
-      #if 1
       }
-      #endif
    }
    
 
    if (d = contains(s, e, "///\0//\0/\0*\0"))
    {
-      /*
-      if (*d == '*') return expression(s, d, param)
-			  * expression(d+1, e, param);
-
-      if ((*d == '/') && (*(d+1) == '/') && (*(d+2) == '/'))
-		     return expression(s, d, param)
-			  % expression(d+3, e, param);
-      
-      if ((*d == '/') && (*(d+1) == '/'))
-      {                  
-			i = expression(s, d, param);
-			j = expression(d+2, e, param);
-			i += j-1;
-			return i/j;
-      }
-
-      if (*d == '/') return expression(s, d, param)
-			  / expression(d+1, e, param);
-      */
-      
       sp--;
       left = xpression(s, d, param);
       sp--;
@@ -3291,13 +3143,6 @@ static line_item *xpression(char *s, char *e, char *param)
                   if (l->l.value.b[RADIX/8 - i*4] & 128) *sp = minus_o;
                   sp->i[RADIX/32-1] = l->l.value.i[RADIX/32-i];
                }
-
-               #if 0
-               else
-               {
-                  sp->i[RADIX/32-1] = (long) 0;	/* it is already */
-               }
-               #endif
 
                return sp;
             }
@@ -3991,14 +3836,10 @@ static long expression(char *s, char *e, char *param)
             return i;
 
 	 #endif
+
 	 case EQU:
 	 case SET:
 	 case LOCATION:
-	 
-	 #if 0
-	 case LINELABEL:
-	 #endif         
-
 	 case DIRECTIVE:
             if (l->l.valued == DIRECTIVE)
             {
@@ -4177,503 +4018,6 @@ static void record_bits(int bits)
    else flag("$bits not added");
 }
 
-#if 0
-#if 1
-static void stringline(char *directive, char *param, txo *image)
-#else
-static void special_byte_output(char *directive, char *param, txo *image)
-#endif
-{
-   line_item		 item = zero_o;
-   int			 i = RADIX;
-   
-   int			 j, target, upward;
-   int			 total = 0;
-
-   line_item		 next;
-
-   char			*limit;
-   
-   long			 datum, mask = ((long) 1 << byte) - (long) 1;
-
-   #ifdef C_U
-   int			 symbol, symbols;
-   #endif
-
-   directive = substitute(directive, param);
-
-   for (;;)
-   {
-      if (*directive == qchar)
-      {
-	 directive++;
-	 for (;;)
-	 {
-	    if (i < byte) 
-	    {
-	       target = RADIX-i;
-	       if (upward=target%word)
-	       {
-		  next = item;
-		  rshift(&item, upward);
-		  target = target/word*word;
-	       }
-	       produce(target, '+', &item, image);
-               total += target;
-	       if (upward) item = next;
-	       i = RADIX-upward;
-	    }
-	    if (*directive == qchar)
-	    {  if (*(directive+1) == qchar) directive++;
-	       else                               break;
-	    }
-	    if (*directive == 0) break;
-	    lshift(&item, byte);
-	    datum = *directive++;
-
-            #ifdef C_U
-            if (datum == '\\')
-            {
-               if (selector['c'-'a'])
-               {
-                  if (datum = *directive++)
-                  {
-                     switch (datum)
-                     {
-                        case 'n':
-                           datum = 10;
-                           break;
-                        case 'r':
-                           datum = 0x0d;
-                           break;
-                        case 'f':
-                           datum = 12;
-                           break;
-                        case 't':
-                           datum = 9;
-                           break;
-                        case 'v':
-                           datum = 11;
-                           break;
-                        case 'b':
-                           datum = 8;
-                           break;
-                        case 'a':
-                           datum = 7;
-                           break;
-
-                        case 'x':
-                           symbols = (byte+3)/4;
-                           j = symbols;
-
-                           datum = 0;
-
-                           while (j--)
-                           {
-                              symbol = *directive;
-                              if ((symbol > 0x60) && (symbol < 0x67))
-                              {
-                                 symbol &= 0x5F;
-                              }
-
-                              if ((symbol > 0x2F) && (symbol < 0x3A))
-                              {
-                                 symbol &= 15;
-                              }
-                              else
-                              {
-                                 if ((symbol  > 0x40) && (symbol < 0x47))
-                                 {
-                                    symbol -= 55;
-                                 }
-                                 else
-                                 {
-                                    if (pass)
-                                    printf("byte = %d: %d hex symbols\n",
-                                            byte, symbols);
-
-                                    note("exact number of hexadecimal "
-                                         "symbols expected here");
-                                    break;
-                                 }
-                              }
-                              datum <<= 4;
-                              datum |= symbol;
-                              directive++;
-                           }
-
-                           break;
-
-                        default:
-                           if (datum < '0') break;
-                           if (datum > '7') break;
-
-                           datum &= 7;
-
-                           symbols = (byte-1)/3;
-                           j = symbols;
-
-                           while (j--)
-                           {
-                              symbol = *directive;
-
-                              if ((symbol < '0') || (symbol > '7'))
-                              {
-                                    if (pass)
-                                    printf("byte = %d: %d octal symbols\n",
-                                            byte, symbols + 1);
-
-                                    note("exact number of octal "
-                                         "symbols expected here");
-
-                                    break;
-                              }
-
-                              datum <<= 3;
-                              datum |= symbol & 7;
-                              directive++;
-                           }
-
-                     }
-                  }
-               }
-            }
-            #endif
-
-            #ifdef CODED_EXPRESS
-            datum = coded_character(datum);
-            #else
-	    if (code == DATA_CODE) datum = code_set[datum];
-	    if ((byte < 7) && (code == ASCII)) datum =
-		      ((datum & 64)>>1) | (datum & 31);
-            #endif
-
-	    datum &= mask;
-	    
-	    #ifdef INTEL
-	    item.b[RADIX/8-1] |= datum;
-	    item.b[RADIX/8-2] |= datum>>8;
-	    item.b[RADIX/8-3] |= datum>>16;
-	    item.b[RADIX/8-4] |= datum>>24;
-	    #else
-	    item.i[RADIX/32-1] |= datum;
-	    #endif
-
-	    i -= byte;
-	 }
-	 directive++;
-      }
-      if (*directive == sterm)
-      {
-	 directive++;
-	 while (*directive == 32) directive++;
-	 if (*directive == 0) return;
-	 if (*directive != qchar)
-	 {
-	    limit = directive;
-	    while ((*limit) && (*limit != sterm) && (*limit != 32)) limit++;
-	    lshift(&item, byte);
-            
-            #ifdef RESOLVE_ULTRA
-            datum = zxpression(directive, limit, param);
-            #else
-	    datum = expression(directive, limit, param);
-            #endif
-            
-	    if ((byte < 7) && (code == ASCII)) datum =
-		      ((datum & 64)>>1) | (datum & 31);
-	    datum &= mask;
-	    
-	    #ifdef INTEL
-	    item.b[RADIX/8-1] |= datum;
-	    item.b[RADIX/8-2] |= datum>>8;
-	    item.b[RADIX/8-3] |= datum>>16;
-	    item.b[RADIX/8-4] |= datum>>24;
-	    #else
-	    item.i[RADIX/32-1] |= datum;
-	    #endif
-
-	    i -= byte;
-	    directive = limit;
-	    if (i < byte)
-	    {
-	       target = RADIX-i;
-	       if (upward=target%word)
-	       {
-		  next = item;
-		  rshift(&item, upward);
-		  target = target/word*word;
-	       }
-	       produce(target, '+', &item, image);
-               total += target;
-	       if (upward) item = next;
-	       i = RADIX-upward;
-	    }
-	 }   
-      }
-      if ((*directive != qchar) && (*directive != sterm)) break;
-   }
-
-   total += RADIX - i;
-   
-   while (j = (RADIX-i) % word)
-   {
-      if ((word-j) < byte) break;
-      i -= byte;
-      lshift(&item, byte);
-
-      if (selector['c'-'a'] ^ selector['z'-'a'])
-      {
-      }
-      else
-      {
-         if (code == ASCII)
-         {
-	    if (byte > 6) item.b[RADIX/8-1] |= 32;
-         }
-         else
-         {
-	    datum = code_set[32] & mask;
-
-	    #ifdef INTEL
-	    item.b[RADIX/8-1] |= datum;
-	    item.b[RADIX/8-2] |= datum>>8;
-	    item.b[RADIX/8-3] |= datum>>16;
-	    item.b[RADIX/8-4] |= datum>>24;
-	    #else
-	    item.i[RADIX/32-1] |= datum;
-	    #endif
-         }
-      }
-   }
-
-   target = RADIX - i;
-
-   if (target)
-   {
-      if (upward = target%word)
-      {
-	 lshift(&item, word-upward);
-	 note("trailing zero bits in last data word of string");
-      }
-      produce(target, '+', &item, image);
-   }
-
-   /*
-   i = RADIX;
-   */
-
-   record_bits(total);
-}
-#endif
-
-#if 0
-static void stringline(char *directive, char *param, txo *image)
-{
-   line_item			 item = zero_o;
-   int				 i = 0;
-
-   int				 bits, j;
-   char				*limit;
-   register int			 datum;
-
-   #ifdef C_U
-   register int			 symbol;
-   #endif
-
-   
-   directive = substitute(directive, param);
-   
-   
-   if ((byte != EIGHT) || (word % 8))
-   {
-      special_byte_output(directive, param, image);
-      return;
-   }
-
-   for (;;)
-   {
-      if (*directive == qchar)
-      {
-	 directive++;
-	 for (;;)
-	 {
-	    if (i == RADIX/8) 
-	    {
-	       produce(RADIX, '+', &item, image);
-	       i = 0;
-	    }
-	    if (*directive == qchar)
-	    {  if (*(directive+1) == qchar) directive++;
-	       else                               break;
-	    }
-	    if (*directive == 0) break;
-	    datum = *directive++;
-
-            #ifdef C_U
-            if (datum == '\\')
-            {
-               if (selector['c'-'a'])
-               {
-                  if (datum = *directive++)
-                  {
-                     switch (datum)
-                     {
-                        case 'n':
-                           datum = 10;
-                           break;
-                        case 'r':
-                           datum = 0x0d;
-                           break;
-                        case 'f':
-                           datum = 12;
-                           break;
-                        case 't':
-                           datum = 9;
-                           break;
-                        case 'v':
-                           datum = 11;
-                           break;
-                        case 'b':
-                           datum = 8;
-                           break;
-                        case 'a':
-                           datum = 7;
-                           break;
-
-                        case 'x':
-                           j = 2;
-                           datum = 0;
-
-                           while (j--)
-                           {
-                              symbol = *directive;
-                              if ((symbol > 0x60) && (symbol < 0x67))
-                              {
-                                 symbol &= 0x5F;
-                              }
-
-                              if ((symbol > 0x2F) && (symbol < 0x3A))
-                              {
-                                 symbol &= 15;
-                              }
-                              else
-                              {
-                                 if ((symbol  > 0x40) && (symbol < 0x47))
-                                 {
-                                    symbol -= 55;
-                                 }
-                                 else
-                                 {
-                                    note("exactly 2 hexadecimal symbols "
-                                         "expected here");
-                                    break;
-                                 }
-                              }
-                              datum <<= 4;
-                              datum |= symbol;
-                              directive++;
-                           }
-
-                           break;
-
-                        default:
-                           if (datum < '0') break;
-                           if (datum > '7') break;
-
-                           datum &= 7;
-
-                           j = 2;
-
-                           while (j--)
-                           {
-                              symbol = *directive;
-
-                              if ((symbol < '0') || (symbol > '7'))
-                              {
-                                 note("exactly 3 octal symbols expected here");
-                                 break;
-                              }
-
-                              datum <<= 3;
-                              datum |= symbol & 7;
-                              directive++;
-                           }
-
-                     }
-                  }
-               }
-            }
-            #endif
-
-	    if (code == DATA_CODE) datum = code_set[datum];
-	    item.b[i++] = datum;
-	 }
-	 directive++;
-      }
-      
-      if (*directive == sterm)
-      {
-	 directive++;
-	 while (*directive == 32) directive++;
-
-	 if (*directive == 0) break;
-
-	 if (*directive != qchar)
-	 {
-	    limit = directive;
-	    while ((*limit) && (*limit != sterm) && (*limit != 32)) limit++;
-            
-            #ifdef RESOLVE_ULTRA
-            item.b[i++] = zxpression(directive, limit, param);
-            #else
-	    item.b[i++] = expression(directive, limit, param);
-            #endif
-            
-	    directive = limit;
-	    if (i == RADIX/8)
-	    {
-	       produce(RADIX, '+', &item, image);
-	       i = 0;
-	    }
-	 }   
-      }
-      if ((*directive != qchar) && (*directive != sterm)) break;
-   }
-
-
-   #ifdef BYTE_BLOCK
-   if (byte_block)
-   {
-   }
-   else
-   #endif
-
-   while (i%(word/EIGHT))
-   {
-      if (selector['c'-'a'])
-      {
-         item.b[i++] = 0;
-      }
-      else
-      {
-         if (code == ASCII)
-         {
-   	    item.b[i++] = 32;
-         }
-         else
-         {
-	    item.b[i++] = code_set[32];
-         }
-      }
-   }
-   
-   bits = i * 8;
-   j = RADIX/8;
-   while (i) item.b[--j] = item.b[--i];
-   if (bits) produce(bits, '+', &item, image);
-}
-#endif
 
 #ifdef RELOCATION
 static void map_linkages(int bits, int scale)
@@ -5227,17 +4571,12 @@ static int getline(char *k, int max)
    ll[depth]++;
    plix[lix] = 0;
 
-   #if 0
-   if (!(x|lix)) lix = 1;
-   #else
    if ((!x) && (pass) && (list > depth) && (selector['L'-'A']))
    {
       printf("  :                            %d %s\n", ll[depth], plix);
       lix = 0;
       plix[0] = 0;
    }
-
-   #endif
 
    return x;
 }
@@ -5694,12 +5033,6 @@ static void embed_procedure(int type, char *line, char *argument)
                   
                continue;
             }
-            #if 0
-            else
-            {
-               j = TEXT_IMAGE;
-            }
-            #endif
          }
             
          #ifdef TRACE_RECURS
@@ -5833,16 +5166,9 @@ static void decide(char *arg, char *param)
    }
    
 
-//   skipping = 1;
-
    limit = first_at(arg, " ");
    
-   #if 1
    i = ixpression(arg, limit, param);
-   #else
-   if (selector['V'-65]) i = ixpression(arg, limit, param);
-   else                  i = expression(arg, limit, param);
-   #endif
 
    skipping = 1;
    if (!i) return;
@@ -5860,13 +5186,11 @@ static void newdecide(char *arg, char *param)
 
    int				 mask, unmask;
    
-//   skipping = 0;
    
    if (!ifdepth) return;
    
    mask = 1 << ifdepth;
 
-//   skipping = 1;
    skipstate |= mask;
 
    if (satisficed & mask)
@@ -5881,12 +5205,7 @@ static void newdecide(char *arg, char *param)
 
    skipping = 0;
    
-   #if 1
    i = ixpression(arg, limit, param);
-   #else
-   if (selector['V'-65]) i = ixpression(arg, limit, param);
-   else                  i = expression(arg, limit, param);
-   #endif
 
    skipping = 1;
    if (!i) return;
@@ -6092,9 +5411,7 @@ static void insequate(int how,
 
       #else
 
-      #if 1
       thislabel->l.r.i   = 0;
-      #endif
 
       for (;;)
       {
@@ -6174,37 +5491,6 @@ static void lhbx(char *from, int bits, line_item *item)
       bits -= byte;
    }
    
-   #if 0
-   if (zero_fill == 0)
-   {
-      for (;;)
-      {
-         if (byte > bits) break;
-         bits -= byte;
-         lshift(item, byte);
-         if (code == ASCII)
-         {
-	    if (byte > 6) item->b[RADIX/8-1] |= 32;
-         }
-         else
-         {
-	    datum = code_set[32] & mask;
-
-            #ifdef INTEL
-	    item->b[RADIX/8-1] |= datum;
-	    item->b[RADIX/8-2] |= datum >>  8;
-            item->b[RADIX/8-3] |= datum >> 16;
-            item->b[RADIX/8-4] |= datum >> 24;
-            #else
-            item->i[RADIX/32-1] |= datum;
-            #endif
-         }
-      }
-
-      if (bits) note("byte string inexact fit");
-   }
-   #endif
-
    lshift(item, bits);
 }
 
@@ -6334,12 +5620,6 @@ static void characterise(long places, line_item *item)
 {
    unsigned long	 bias;
 
-   #if 0
-   int			 sign = item->b[0] & 128;
-
-   if (sign) operand_reverse(item);
-   #endif
-
    bias = 0x00400000 + RADIX - operand_shift_count(item);
    if (bias == 0x00400000) return;
 
@@ -6412,10 +5692,6 @@ static void characterise(long places, line_item *item)
    item->b[0] = bias >> 16;
    item->b[1] = bias >>  8;
    item->b[2] = bias;
-
-   #if 0
-   if (sign) operand_reverse(item);
-   #endif
 }
 
 static void floating_generate(char *a, char *margin, char *param, line_item *item)
@@ -6783,14 +6059,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
       if (x == PUSHREL) x = EQUF;
       #endif
 
-      #if 0
-      if ((type == PROC)
-      || ((type == NAME) && (sr->l.passflag & 128)))
-      {
-         if (sr->l.r.l.rel != counter_of_reference) i = BLANK;
-      }
-      #endif
-
       if (*line_label == '*') 
       {
 	 if (above)
@@ -6938,13 +6206,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             if (sr->l.r.l.y   &  1) x = BLANK;
          }
 
-         #if 0
-         if ((type  == DIRECTIVE)
-         &&  (known ==    BRANCH)
-         &&  (branch_present & (1 << active_x))
-         &&  (sr = active_instance[active_x])) loc = qextractv(sr);
-         #endif
-
 	 thislabel = insert_qltable(ndirect, loc, x);
       }
    }
@@ -7008,8 +6269,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
          bits = 0;
 
-
-         #if 1
 
          /*************************************************
 		the default case, *search must be the last
@@ -7081,40 +6340,12 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             }
          }
 
-         #else
-
-         x = frightmost(argument, search);
-
-         spotted = *(search-1);
-         symbol = *search;
-
-         if ((spotted == ':')
-         ||  (spotted == ')')
-         ||  ((x  > '0') && (x < '9'+1))
-         ||  ((x == '0') && (symbol ^ 'd') && (symbol ^ 'D'))
-         ||  ((x == '0') && (octal))
-         ||  (spotted == '\'')
-         ||  (spotted == qchar)) bits = length_mark(symbol);
-
-         if (bits)
-         {
-            if (spotted == ':') search--;
-         }
-         else search++;
-
-         #endif
-
          #ifdef FPASS1
          if ((!pass) && (bits)) 
          {
 	    produce(bits, '+', &item, image);
 	    return 0;
          }
-         #endif
-
-         #if 0
-         transient_floating_width = fpwidth;
-         if (bits) transient_floating_width = bits;
          #endif
 
          if (commas)
@@ -7125,10 +6356,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	    {
 	       commas++;
 	       slice = bits/commas;
-
-               #if 0
-               transient_floating_width = slice;
-               #endif
 
 	       while (commas--)
 	       {
@@ -7281,19 +6508,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
    {
       case DIRECTIVE:
       
-         #if 0
-	 subfunction = -1;
-	 limit = edge(directive, ", ");
-
-	 if (*limit++ == ',')
-	 {
-	    while (*limit == 32) limit++; 
-	    search = edge(limit, " ");
-	    subfunction = expression(limit, search, param);
-	    argument = getop(search);
-	 }
-         #endif
-         
 	 switch (known)
 	 {
 	    #ifdef LITORG
@@ -7329,7 +6543,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                   x = mapx->m.l.rel;
                   x &= 127;
 
-                  #if 1
                   if ((!x)
                   &&  (!(mapx->m.l.y & 1))
                   &&  (locator[0].relocatable))
@@ -7337,7 +6550,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                      flag("absolute transfer address in relocatable $(0)");
                      return END;
                   }
-                  #endif
 
                   #else
 
@@ -7472,10 +6684,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	    case DO:
 	       return iterate(argument, param, thislabel, image);
 
-               #if 0
-	       break;
-               #endif
-
 	       #ifdef EXIT
 	    case EXIT:
 	       if (argument) argument = substitute(argument, param);
@@ -7491,20 +6699,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 	       if (thislabel)
 	       {
-	 	  /*
-		  if (thislabel->l.valued != EQU)
-		  {
-		     if (!pass) printf(thislabel->l.name);
-		     flagp1(" This label cannot be changed to an EQUate\n");
-		     break;
-		  }
-		  if (thislabel->l.valued == EQU)
-		  {
-		     if (!pass) printf(thislabel->l.name);
-		     notep1(" Restated");
-		  }
-		  */
-
 		  insequate(x, thislabel, argument, param);
 	       }
 
@@ -7516,15 +6710,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 	       if (thislabel)
 	       {
-		  /*
-		  if (thislabel->l.valued != SET)
-		  {
-		     if (!pass) printf(thislabel->l.name);
-		     flagp1(" This label cannot be changed to a SET\n");
-		     break;
-		  }
-		  */
-
 		  insequate(x, thislabel, argument, param);
 	       }
 
@@ -7554,14 +6739,10 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       if (argument)
 	       {
 	 	  x = RADIX/8;
-		  #if 0
-		  v_argument = argument;
-		  #else
 
 		  v_argument = substitute(argument, param);
                   if (sr = isanequf(v_argument)) item = sr->l.value;
 
-		  #endif
 		  for (;;)
 		  {
 		     limit = first_at(v_argument, ", ");
@@ -7585,7 +6766,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                      }
                      else
                      {
-                        #if 1
                         if (x == RADIX/8-4)
                         {
                            #ifdef AUTOMATIC_LITERALS
@@ -7614,48 +6794,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         mapx = b4;
                         mapx->m.i = 0;
 
-                        #else
-
-                        #ifdef AUTOMATIC_LITERALS
-                        if ((*v_argument == '(') && (selector['a'-'a']))
-                        {
-                           v |= literal(v_argument, param, litloc);
-                        }
-                        else
-                        #endif
-
-         	        v |= zxpression(v_argument, limit, param);
-
-
-     		        #ifdef RELOCATION
-                        if (mapx->m.l.y)
-                        {
-		           if (x == RADIX/8-4)
-		           {
-		              thislabel->l.r = mapx->m;
-		           }
-
-                           #ifndef DOS
-                           else
-                           {
-                              note("relocation attributes not stored "
-                                   "for fields 2..6 of $equf");
-                           }
-                           #endif
-                        }
-
-                        #if 1
-                        if (mapx - b4)
-                        {
-                           flag("too many relocatable targets in $equf");
-                        }
-                        #endif
-
-                        mapx = b4;
-                        mapx->m.i = 0;
-		        #endif
-
-                        #endif
 
                         #ifdef INTEL
                         item.b[x]   = v >> 24;
@@ -8333,9 +7471,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                #endif
 
 	    case SET_OPTION:
-               #if 0
-	       if (pass) break;
-               #endif
 
 	       if (!argument) break;
 	       if (*argument++ == qchar)
@@ -8402,10 +7537,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                   &&  (loc == qextractv(sr))
                   &&  (thislabel))
                   {
-                     #if 0
-                     thislabel->l.value = sr->l.value;
-                     #endif
-
                      outstanding = 1;
                   }
 
@@ -8432,10 +7563,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                   if (branch_present & (1 << active_x))
                   {
-                     #if 0
-                     printf("%x ? %x\n", loc, branch_high[active_x]);
-                     #endif
-
                      if (loc > branch_high[active_x])
                      {
                         branch_high[active_x] = loc;
@@ -8443,11 +7570,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                      else
                      {
                         loc = branch_high[active_x];
-
-                        #if 0
-                        printf("loc = high = %x\n", loc);
-                        #endif
-
                         outstanding = 1;
                      }
 
@@ -8460,10 +7582,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                   */
                }
 	       else flagp1("You are already at the root of roots");
-
-	       #if 0
-	       if (selector['Q'-'A']) putchar('^');
-	       #endif
 
 	       break;
 
@@ -8494,15 +7612,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       break;
                #endif
               
-
-
-               #ifdef BYTE_BLOCK
-            case BYTE_BLOCK:
-               if (!argument) break;
-               byte_block = expression(argument, NULL, param);
-               break;
-               #endif
-
             case STORE:
                #ifdef NO_STORE_OVERRIDE
                filename[1] = NULL;
@@ -8718,13 +7827,11 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                            map_offset(j, &item);
 
-                           #if 1
                            propagate_upwards(j, rvalue, bits);
 
                            offset_frame(&item);
                            thislabel->l.value.i[RADIX/32-4]
                            =             item.i[RADIX/32-1];
-                           #endif
 
                            mapx->m.i = 0;
                            mapx->m.l.y = unary & 4;
@@ -8871,12 +7978,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         if (sr->l.valued == UNDEFINED)
                         {
                           
-                           #if 1
                            thislabel->l.value.i[RADIX/32-1] = 0;
                            thislabel->l.valued = EQUF;
-                           #else
-                           thislabel->l.valued = SET;
-                           #endif
 
                            if (sr->l.r.l.xref < 0)
                            {
@@ -8918,13 +8021,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                               need not be applied
                               ***********************************/
 
-                              #if 1
                               thislabel->l.valued = EQUF;
                               thislabel->l.value.i[RADIX/32-1] = 0;
-                              #else
-                              thislabel->l.valued = SET;
-                              thislabel->l.r.i = 0;
-                              #endif
 
                               /********************************
                               optionally advertise the relocatable
@@ -8981,10 +8079,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                               to the originally known offset.
                               This satisfies "label+something"
                               *********************************/
-
-                              #if 0
-                              operand_add(&item, &sr->l.value);
-                              #endif
 
                               map_offset(j, &item);
 
@@ -9069,13 +8163,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                {
                   if (sr = findlabel(argument, NULL))
                   {
-                     #if 0
-                     printf("[$%x:%x REWRITE %2.2x%2.2x%2.2x%2.2x]\n",
-                          counter_of_reference, loc,
-                          sr->l.value.b[20], sr->l.value.b[21],
-                          sr->l.value.b[22], sr->l.value.b[23]);
-                     #endif
-
                      #ifdef RANGE_FLAGS
                      v = range_filter.i[0]
                        | range_filter.i[1]
@@ -9186,16 +8273,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	 return 0;
       
       case NAME:
-         #if 0
-         if (plist > masm_level)
-         {
-            if (((pass) && (selector['p'-'a']))
-            || ((!pass) && (selector['r'-'a'])))
-            {
-               printf("::::name:::: [%s]->\n", sr->l.name);
-            }
-         }
-         #endif
 
          #ifdef ABOUND
          if (tpp & 128)
@@ -9274,7 +8351,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	    txp = (object *) ((long) txp + x);
          }
 
-	 #if 1
          if (plist > masm_level)
          {
 	    if (((pass) && (selector['P'-'A']))
@@ -9283,7 +8359,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       printf("::::PROC:::: %s [%s]\n", sr->l.name,  v_argument);
             }
 	 }
-	 #endif
 	 
 	 toplabel = floatop;
 
@@ -9588,16 +8663,12 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	 return 0;
 
       default:
-         #if 1
          if (selector['f'-'a'] | pass)
          {
             load_name(directive, NULL);
             if (name[0]) printf("[%s]", name);
             else         printf("[%s]", directive);
          }
-         #else
-	 if (selector['f'-'a'] | pass) printf(":%s:", sr->l.name);
-         #endif
 
 	 flagf("not a command");
 	 return 0;
@@ -9733,14 +8804,7 @@ main(int argc, char *_argv[])
 
       #endif       
 
-      #if 1
-
       if ((i < 0) || ((!depth) && ((i == END) || (i == RETURN))))
-      #else
-      b = getop(&line[0]);
-      if ((i < 0) 
-      ||  ((!depth) && (b) && (!skipping) && (meaning(b) == END)))
-      #endif
       {
          #ifdef PRINTBYREAD
 
@@ -9800,10 +8864,6 @@ main(int argc, char *_argv[])
 
 	    q->loc = 0;
 
-            #if 0
-            q->flags = 0;
-            #endif
-
             q->touch_base = 0;
             q->breakpoint = 0;
             q->bias       = 0;
@@ -9826,17 +8886,8 @@ main(int argc, char *_argv[])
             #endif
 
 	    close(nhandle);
-	    
-	    #if 0
-	    close(handle[0]);
-	    
-	    if (selector['X'-65]) walktable(0);
-	    if (selector['Y'-65]) walktable(1);
-	    return 0;
-	    #endif
 	 }
 	
-         #if 1
          if (depth < 0)
          {
          }
@@ -9849,7 +8900,6 @@ main(int argc, char *_argv[])
             block[0]->w = 0;
             #endif
 	 }
-	 #endif
 	 
 	 if (ecount | selector['h'-'a']) return 0; 
 	 pass = 2;
@@ -10072,9 +9122,6 @@ main(int argc, char *_argv[])
    #endif
    #endif
    
-   #if 0
-   close(handle[0]);
-   #endif
    
    if (selector['X'-'A']) walktable(0);
    
@@ -10095,25 +9142,7 @@ main(int argc, char *_argv[])
       }
       #endif
 
-      #if 0
-      if (q->runbank)
-      {
-         if ((q->flags & 1) | selector['v'-'a'])
-         {
-         }
-         else
-         {
-            low = q->runbank;
-            high = q->loc + q->runbank/* - q->base*/;
-         }
-      }
-      #endif
-      
-      #if 0
-      if ((q->touch_base) || (q->loc))
-      #else
       if ((q->loc) || (q->flags & 1))
-      #endif
       {
          #ifdef LONG_TRAILER
          if (q->flags & 1)
@@ -10140,26 +9169,6 @@ main(int argc, char *_argv[])
             }
          }
 
-         #ifdef TWITCH_ALOT
-         else
-         {
-            if (((q->flags & 1) == 0) && (q->breakpoint))
-            {
-               low  -= q->base;
-               high -= q->base;
-               low  += q->runbank;
-               high += q->runbank;         
-            }
-         }
-         #endif
-         #endif
-
-         #if 0
-         if (q->bias)
-         {
-            low  += q->runbank;
-            high += q->runbank;
-         }
          #endif
 
 	 write(ohandle, "\n:$", 3);
@@ -10173,14 +9182,10 @@ main(int argc, char *_argv[])
 
 	 if (!selector['w'-'a'])
          {
-            #ifdef OCTALPRINT
 	    if (octal)
 	    printf(":$(%o):%0*lo:%0*lo ", i, apw, low, apw, high);
 	    else
 	    printf(":$(%2.2X):%0*lX:%0*lX ", i, apw, low, apw, high);
-	    #else
-	    printf(":$(%2.2x):%0*lX:%0*lX ", i, apw, low, apw, high);
-	    #endif
          }
       }
    }

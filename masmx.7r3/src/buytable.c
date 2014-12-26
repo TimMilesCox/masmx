@@ -12,10 +12,6 @@ static object *buy_ltable()
       exit(-1);
    }   
    
-   #if 0
-   if (selector['Z'-65]) printf("#%d.\n", banx);
-   #endif
-   
    sr = (object *) malloc(BANK);
    
    if (!sr) 

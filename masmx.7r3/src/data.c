@@ -428,10 +428,6 @@ static object *lr, *floatable, *floatop, *earliest_tsub;
 static object *entry[RECURSION]; 
 static object *next_image[RECURSION];
 
-#ifdef	BYTE_BLOCK
-static int		 byte_block;
-#endif
-
 static int banx; 
 static unsigned remainder = BANK-MARGIN, flotsam = BANK-MARGIN;
 

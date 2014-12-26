@@ -208,8 +208,6 @@ extern unsigned _stklen = 32*1024;
 #define DISPLAY_WIDTH 160
 #define	FUNCTION_SYMBOLS 2040
 
-#define OCTALPRINT
-
 #define XPRESSION 64
 #define MAPSTACK RECURSION
 #define PROMOTE_UNARY

@@ -35,10 +35,6 @@ static object *isanequf(char *field)
    l  = findlabel(field, NULL);
    if (!l) return NULL;
 
-   #if 0
-   printf("[is %x::%s a $equf?]", l->l.valued, name);
-   #endif
-
    #ifdef LITERALS
    if (l->l.valued == LTAG)
    {
@@ -46,7 +42,6 @@ static object *isanequf(char *field)
       
       if (c->flags & 128)
       {
-         #if 1
          v = quadextract1(&l->l.value);
          if (v != c->rbase) flag("not in scope of this literal tag");
 
@@ -55,31 +50,6 @@ static object *isanequf(char *field)
          #endif
 
          return l;
-
-         #else
-
-         if (v = c->rbase)
-         {
-            #ifdef LITWISE
-            printf("[in isanequf idxv %d]\n", v);
-            #endif
-            
-            #if 0
-            l->l.value.b[19] = v;
-            l->l.value.b[18] = v >>  8;
-            l->l.value.b[17] = v >> 16;
-            l->l.value.b[16] = v >> 24;
-            #endif
-            
-            #ifdef RELOCATION
-            mapx->m.i = 0; /* global change 3ix2008 */
-            #endif
-
-            return l;
-         }
-
-         #endif
-
       }
    }
    #endif

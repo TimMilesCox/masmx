@@ -133,10 +133,6 @@ static void internal_labels()
 
     { "$store", STORE, DIRECTIVE } ,
 
-   #ifdef BYTE_BLOCK
-    { "$byte_block", BYTE_BLOCK, DIRECTIVE } ,
-   #endif
-
     { "$", LOCTR, INTERNAL_FUNCTION } ,
     { "$n", PNAME, INTERNAL_FUNCTION } ,
    

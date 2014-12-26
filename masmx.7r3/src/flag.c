@@ -110,19 +110,6 @@ static void notep1p(char *n, char *k)
            k);
 }
 
-#if 0
-static void notep(char *n, char *k)
-{
-   if (!pass) return;
-   if (!k) return;
-   printf("Note: %s Line %d: %s %s\n",
-           file_label[depth]->l.name,
-           ll[depth],
-           n,
-           k);
-}
-#endif
-
 static void note(char *k)
 {
    if (!pass) return;
