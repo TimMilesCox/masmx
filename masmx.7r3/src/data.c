@@ -226,13 +226,11 @@ typedef union  { header_word                      h;
 
 typedef struct { char                  b[PARAGRAPH]; } paragraph;
 
-#ifdef ARRAY
 typedef struct { unsigned short        ready, count;
                  char                 *image[ARRAY]; } array;
 
 typedef struct { unsigned short        ready, count;
                  array                 field[ARRAY]; } atree; 
-#endif
 
 #ifdef XREFS
 
@@ -256,14 +254,6 @@ typedef struct { char		     base[LOCATORS]; } touch_table;
 #define STAR_OR_HASH_	128+64
 #define STAR__		128
 #define HASH__		64
-
-#ifndef BASIC_SCAN
-#define UNBOUND_STRING	6
-#define UNBOUND_SUBFIELD 7
-#define STAR_UNBOUND_SUBFIELD 7+128
-#define HASH_UNBOUND_SUBFIELD 7+64
-#define UNSAFE_FIELD	8
-#endif
 
 
 typedef struct { char level,field,subfield,sustring; } paraform_code;
@@ -476,10 +466,8 @@ static char			 uselector[26];
 static flag_box			 initial_flags;
 static flag_box			initial_uflags;
 
-#ifdef ARRAY
 static atree			tree[RECURSION];
 static atree		      *vtree[RECURSION] = { tree };
-#endif
 
 #ifdef RELOCATION
 static int		 maprecursion;

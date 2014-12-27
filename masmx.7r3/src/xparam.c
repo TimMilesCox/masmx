@@ -42,10 +42,6 @@ static line_item *extract_xparam(char *s, char *gparam)
 
       switch (stem)
       {
-         #ifndef BASIC_SCAN
-         case UNBOUND_SUBFIELD:
-            note("damaged subfield paraform accepted");
-         #endif
 
          case SUBFIELD:
             x = sample.subfield;
@@ -179,11 +175,6 @@ static line_item *extract_xparam(char *s, char *gparam)
             break;
 
 
-         #ifndef BASIC_SCAN
-         case UNBOUND_STRING:
-            note("damaged substring paraform accepted");
-         #endif
-
          case SUBSTRING:
             x = sample.subfield;
             if (x < 0) break;
@@ -213,11 +204,6 @@ static line_item *extract_xparam(char *s, char *gparam)
             v = xpression(p, limit, NULL);
 
             break;
-
-         #ifndef BASIC_SCAN
-         case UNSAFE_FIELD:
-            note("damaged field paraform accepted");
-         #endif
 
          case FIELD:
             v->b[RADIX/8-1] = y;

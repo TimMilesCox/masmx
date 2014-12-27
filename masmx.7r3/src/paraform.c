@@ -110,6 +110,9 @@ static char *substring(char *g, int i)
 
 /********************************************
 
+	this is a comment and reminder
+	of definitions in data.c
+
 #define BAD_PARAFORM	0
 #define COMPLETE_LINE	1
 #define ALL_FIELDS	2
@@ -121,14 +124,6 @@ static char *substring(char *g, int i)
 #define STAR_OR_HASH_	128+64
 #define STAR__		128
 #define HASH__		64
-
-#ifndef BASIC_SCAN
-#define UNBOUND_STRING	6
-#define UNBOUND_SUBFIELD 7
-#define STAR_UNBOUND_SUBFIELD 7+128
-#define HASH_UNBOUND_SUBFIELD 7+64
-#define UNSAFE_FIELD	8
-#endif
 
 typedef struct { char level,field,subfield,sustring; } paraform_code;
 
@@ -267,12 +262,6 @@ static char *text_image(paraform_code sample, char *gparam)
       case STAR_SUBFIELD:
       case HASH_SUBFIELD:
 
-      #ifndef BASIC_SCAN
-      case UNBOUND_SUBFIELD:
-      case STAR_UNBOUND_SUBFIELD:
-      case HASH_UNBOUND_SUBFIELD:
-      #endif
-
          y = sample.subfield;
          if (y < 0) return "";
          if (!y) y = 1;
@@ -368,10 +357,6 @@ static char *text_image(paraform_code sample, char *gparam)
 
       case SUBSTRING:
 
-      #ifndef BASIC_SCAN
-      case UNBOUND_STRING:
-      #endif
-
          y = sample.subfield;
          if (y < 0) return "";
          if (!y) y = 1;
@@ -387,10 +372,6 @@ static char *text_image(paraform_code sample, char *gparam)
          return gparam;
 
       case FIELD:
-
-      #ifndef BASIC_SCAN
-      case UNSAFE_FIELD:
-      #endif
 
          return a->image[0];
 
@@ -428,9 +409,7 @@ static char *substitute(char *search, char *param)
 
    if (!param) return search;
 
-   #ifdef ARRAY
    fields(param);
-   #endif
 
    #ifdef WALKP
    printf("-PARAMSUB-%s/%s\n", search, param);
@@ -458,10 +437,6 @@ static char *substitute(char *search, char *param)
                
          switch (sample.level & 63)
          {
-            #ifndef BASIC_SCAN
-            case UNBOUND_SUBFIELD:
-               note("damaged subfield paraform accepted");
-            #endif
 
             case SUBFIELD:
  
@@ -508,11 +483,6 @@ static char *substitute(char *search, char *param)
 	          *v++ = symbol;
 	       }
                break;
-
-            #ifndef BASIC_SCAN
-            case UNBOUND_STRING:
-               note("damaged substring paraform accepted");
-            #endif
 
             case SUBSTRING:
 
@@ -575,13 +545,7 @@ static char *substitute(char *search, char *param)
 
                break;
 
-            #ifndef BASIC_SCAN
-            case UNSAFE_FIELD:
-               note("damaged field paraform accepted");
-            #endif
-
             case FIELD:
-
 
                #ifdef PARAFORM_TRACE
                if (plist > masm_level)

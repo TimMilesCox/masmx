@@ -1049,8 +1049,6 @@ static line_item *external_function(char *s, char *param, char *mark,
       }
    }
    
-   #ifdef ARRAY
-
    if (!vtree[masm_level])
    {
       for (j = 0; j < masm_level; j++)
@@ -1066,10 +1064,6 @@ static line_item *external_function(char *s, char *param, char *mark,
 
    #ifdef WALKP
    printf("FClear::");
-   #endif
-
-   #else  
-   masm_level++;
    #endif
 
    if (masm_level == RECURSION) unwind();
@@ -8201,15 +8195,10 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	 
 	 v_argument = substitute(line_label, param);
 
-         #ifdef ARRAY
          vtree[masm_level++]->ready = 0;
 
          #ifdef WALKP
          printf("PClear::%s\n", sr->l.name);
-         #endif
-
-         #else  
-         masm_level++;
          #endif
 
 	 if (masm_level == RECURSION) unwind();
