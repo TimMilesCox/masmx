@@ -263,11 +263,6 @@ static void switch_locator(char *p, char *param)
          {
             if (actual->flags & 128)
             {
-               #ifdef REBASE           
-               actual->base += w;
-               loc = 0;
-               actual->loc = 0;
-               #else
                if ((v) && (v != actual->base))
                flag("base+displacement segment may not be reconstructed");
                if (actual->breakpoint)
@@ -281,7 +276,6 @@ static void switch_locator(char *p, char *param)
                       actual->loc = 0;
                    }
                }
-               #endif
             }
             else
             {
@@ -399,11 +393,6 @@ static long rfunction(int v,
 
    line_item		*item;
    line_item		*breakpoint_base;
-
-   #ifdef BASE
-   xref_list		*xrefl;
-   value		*vbreak;
-   #endif
 
    #ifdef RELOCATION
    link_profile		*mapxb4;
@@ -1579,8 +1568,6 @@ static void operand_xor(line_item *left, line_item *right)
 
 #else
 
-#ifdef	LINEAR
-
 static void operand_reverse(line_item *o)
 {
    o->i[0] ^= 0xffffFFFF;
@@ -1632,50 +1619,6 @@ static void operand_xor(line_item *left, line_item *right)
    left->i[5] ^= right->i[5];
    #endif
 }
-
-#else	/* LINEAR	*/
-
-static void operand_reverse(line_item *o)
-{
-   int i = RADIX/32;
-
-   while (i--)
-   {
-      o->i[i] ^= 0xffffFFFF;
-   }
-}
-
-static void operand_or(line_item *left, line_item *right)
-{
-   int i = RADIX/32;
-
-   while (i--)
-   {
-      left->i[i] |= right->i[i];
-   }
-}
-
-static void operand_and(line_item *left, line_item *right)
-{
-   int i = RADIX/32;
-
-   while (i--)
-   {
-      left->i[i] &= right->i[i];
-   }
-}
-
-static void operand_xor(line_item *left, line_item *right)
-{
-   int i = RADIX/32;
-
-   while (i--)
-   {
-      left->i[i] ^= right->i[i];
-   }
-}
-
-#endif	/* LINEAR	*/
 
 #endif	/* DOS		*/
 
@@ -3389,7 +3332,7 @@ static long ixpression(char *s, char *e, char *param)
    #endif
 }
 
-#if defined(RESOLVE_ULTRA)||defined(ULTRA_RESOLVE)
+#ifdef ULTRA_RESOLVE
 
 /*********************************************************
 
@@ -6510,19 +6453,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
       
 	 switch (known)
 	 {
-	    #ifdef LITORG
-	    case LITORG:
-	       if (!pass) break;
-	       if (actual->litlocator > loc)
-	       loc = actual->litlocator;
-	       if (loc > actual->litlocator)
-	       actual->litlocator = loc;
-	       actual->locator = loc;
-	       printf("[%8.8lx/%8.8lx]", loc, actual->litlocator);
-	       outstanding = 1; /* outcounter(1); */
-	       linex = 0;
-	       break;
-	       #endif
 
 	    case END:
 	       if ((argument) && (pass))
@@ -6819,22 +6749,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       break;
 	       #endif
 
-               #ifdef CASE
-	    case CASE:
-	       if (argument)
-                    selector['k'-'a'] = expression(argument,NULL,param);
-	       else selector['k'-'a'] = 1;
-
-	       break;
-	    
-               #endif
-
-	       #ifdef NOCASE
-	    case NOCASE:
-	       selector['k'-'a'] = 0;
-	       break;
-	       #endif
-
 	    case DATA_CODE:
                code = DATA_CODE;
 
@@ -6936,17 +6850,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       else plist = 0;
 	       break;
 	    
-	       #ifdef SAVE_OBJECT
-	    case SAVE_OBJECT:
-	       save_object(argument);
-	       break;
-	       #endif
-
-	       #ifdef PAGE
-	    case PAGE:
-	       break;
-	       #endif
-	    
 	    case RES:
 	       if (argument)
 	       {
@@ -6971,32 +6874,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 	       outstanding = 1;
 
-               /*
-	       linex = 0;
-               */
-
-               /*********************************************************
-               only output the literals at bank step and at end
-               that's a bit more deterministic
-               *********************************************************/   
-   
-               #ifdef OUTPUT_LITERALS_ON_ADDRESS_HIGH
-               if (loc == actual_lbase)
-               {
-                  output_literals(counter_of_reference);
-                  loc = actual->litlocator;
-               }
-               #endif
-
 	       break;
-
-	       #ifdef OBJECT
-	    case OBJECT:
-	       /*
-	       generate = expression(argument, limit, param);
-	       */
-	       break;
-	       #endif
 
                #ifdef LITERALS
 	       #ifdef LITS
@@ -8573,12 +8451,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	 {
 	    if ((argument) && (pass))
 	    {
-	       #ifdef LEADING_EDGE
-	       v_argument = leading_edge(argument, param);
-	       if (*v_argument == qchar)
-	       #else
 	       if (*argument == qchar)
-	       #endif
 	       {
 		  v_argument = substitute(argument, param);
 		  lhbx(v_argument, slice, &item);

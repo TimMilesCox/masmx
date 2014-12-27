@@ -1,11 +1,7 @@
 
 #define UNDEFINED	0		/* label not in this assembly	*/
-#define IMAGE		128
 #define EIGHT		8
-#define SIXTEEN		16
 
-#undef	THISPLATFORM	16*2
-#undef	BLANK		126
 #define LOCATION	127		/* automatic label type		*/
 
 #define FORM			59	/* directive name + label type	*/
@@ -13,7 +9,6 @@
 #define NAME 2				/* directive names		*/
 #define END 3
 #define DO 4
-#undef	ENDO 5
 #define IF 6
 #define ELSE 7
 #define ELSEIF 8
@@ -23,32 +18,19 @@
 #define INCLUDE 12
 #define FUNCTION		13	/* directive name + label type */
 #define EXIT 14
-#undef	LITORG 15
 #define EQU			16	/* directive name + label type */
 #define SET			17	/* directive name + label type */
-#undef	CASE 18
-#undef NOCASE 19
 #define DATA_CODE 20
 #define ASCII 21
-#undef PUSHCSET 23
-#undef POPCSET 24
 #define WORD 25
 #define BYTE 26
 #define RETURN 27
 #define LIST 28
-#undef something 29
 #define	PATH	29
 #define PLIST	30
-#undef NOPLIST 31
 
-#undef SAVE_NAMES 32
-#undef SAVE_OBJECT 33
 #define RES 34
-#undef PAGE 35
 
-#undef XLIST 36
-#undef NOXLIST 37
-#undef OBJECT 38
 #define LITS 123
 #define SNAP 40
 #define QUANTUM 41
@@ -56,19 +38,12 @@
 #define AWIDTH 43
 #define LTERM 44
 #define STERM 45
-#undef LDIRECT 46
 #define TWOSCOMP 47
-#undef STEPPING 46
-#undef MICROSTEPPING 47
 #define CONT_CHAR 48
-#undef NOT_STEPPING 49
-#undef NOT_MICROSTEPPING 50
 #define FLAG 51
 #define FLOATING_POINT 52
 #define CHARACTERISTIC 53
 #define QUOTEC 54
-#undef DEFINE 55
-#undef IFEQU 56
 #define TRACE 57
 #define NOTE 58
 #define	NOP 60
@@ -88,10 +63,6 @@
 #define TREE 70
 #define ROOT 71
 #endif
-
-#undef INLINE_T 72
-#undef FREE 73
-#undef INLINE_SPACE 74
 
 #define	SYM 75
 #define	LOAD 76
@@ -113,7 +84,6 @@
 
 #ifdef	BINARY
 #define	PUSHREL	77			/* directive */
-#undef	ZBASE	80
 #endif
 
 #define BLANK   78
@@ -139,22 +109,13 @@
 
 #define INTERNAL_FUNCTION	125
 
-#define	TALLY			122
-
 #define DIRECTIVE		126
 #define FILE_LABEL		124
 #define LTAG			LITS	/* 123				*/
 
 #define LOCTR 0				/* internal function names	*/
 #define PNAME 1
-#undef PARAM 2
 
-#ifdef ENDO
-#define DCOUNT 3
-#endif
-
-#undef	DEPTH 4
-#undef	MASM_LEVEL 5
 #define REGION 6
 #define LITERAL 7
 #define TYPE 8
@@ -413,11 +374,6 @@ static txo *ltag[LOCATORS];
 
 static breakpoint *lpart[LOCATORS];
 
-#ifdef PROCLOC_ASIDE
-static txo *outline[LOCATORS];
-#endif
-
-
 static long loc;
 static long actual_lbase;
 static int counter_of_reference;
@@ -456,12 +412,7 @@ static int masm_level, pass, background_pass;
 
 static int ifdepth, skipping;
 
-#ifdef TIGHTER
 static int		 skipstate, satisficed = 1;
-#else
-static char skipstate[32] = { 0 } ;
-static char satisficed[32] = { 1 } ;
-#endif
 
 static int function_scope;
 static int traverse_id;
@@ -568,11 +519,6 @@ static int		 xadw = 48;
 static rcb *actual_block;
 static rcb *block[INCLUDE_MAXDEPTH];
 
-#endif
-
-#ifdef INLINE_T
-static char *inline_p;
-static int inline_x;
 #endif
 
 static int		 outstanding = 1;

@@ -16,10 +16,6 @@ static void rshift(line_item *o, int distance);
 static void lshift(line_item *o, short distance);
 static int nline(char data[], int z);
 
-#ifdef PROCLOC_ASIDE
-static void out_standing(int tlocator);
-#endif
-
 static void operand_or(line_item *left, line_item *right);
 static void operand_add(line_item *left, line_item *right);
 

@@ -18,17 +18,12 @@
 #undef	WALKP
 #define BLOCK 4096
 #define DEEP_RECURS	7
-#undef	UNREF
-#define LEVELUP
-#define PREVENTION
 #define ABOUND
-#define SLIPGUARD
 #define USING_NO_REL
 #undef	TRACE_RECURS
 #undef	TRACE_STORAGE_BRANCH
 #define GEOMETRIC_FUNCTIONS
 #define	QUI_TUPLE
-#define	TIGHTER
 #define	ROUNDING
 #define CLEATING
 #define CODED_EXPRESS
@@ -41,13 +36,11 @@
 #endif
 #endif
 
-#undef	TRAILING_POINTER
 #define BASIC_SCAN
 
 #define	FILE_ARGUMENTS	2
 
 #define STACKED_XPRESS
-#undef	BACKSLASH_FUN
 #define STACK_TOP_VALUE	NULL
 #define	STACK_TOP_CLEAR (char *) 0xFFFFFFFF
 
@@ -140,9 +133,7 @@ extern unsigned _stklen = 32*1024;
 #define getline getaline
 #endif
 
-#define	LINEAR
 #define	TEST_B4
-#define C_U
 
 #define	ROUND2
 #define	ROUND3
@@ -157,9 +148,6 @@ extern unsigned _stklen = 32*1024;
 #define	RELOCATION
 #endif
 
-#undef	PROCLOC_ASIDE
-
-#undef	RESOLVE_ULTRA
 #define	ULTRA_RESOLVE
 
 #undef	RANGE_WARNING
@@ -177,9 +165,6 @@ extern unsigned _stklen = 32*1024;
 #define	RELOCATION
 #endif
 
-#undef	PROCLOC_ASIDE
-
-#undef	RESOLVE_ULTRA
 #define	ULTRA_RESOLVE
 
 #undef	STRUCTURE_DEPTH 8
@@ -214,9 +199,6 @@ extern unsigned _stklen = 32*1024;
 #define LROOT
 #define FILENAME_LIMIT 64
 #define INCLUDE_MAXDEPTH 12
-
-#undef	LEADING_EDGE
-#undef	DISPLAY_F
 
 #ifdef	DOS
 #define HASH	4096
