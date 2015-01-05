@@ -51,7 +51,7 @@
 #define	GBASIS
 #define DRIFT_GUARD_1
 #define	EFLAG
-#define	XTENDA
+#undef	XTENDA
 
 		/********Developer Platform may be Intel even when Unix*/
 

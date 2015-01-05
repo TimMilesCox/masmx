@@ -84,6 +84,7 @@ static line_item *extract_xparam(char *s, char *gparam)
 
                      z = l->l.value.i[y];
 
+                     #ifdef XTENDA
                      if (selector['i'-'a'])
                      {
                         #ifdef INTEL
@@ -93,6 +94,7 @@ static line_item *extract_xparam(char *s, char *gparam)
                         #endif
                      }
                      else
+                     #endif
                      {
                         if (address_size < 32)
                         {

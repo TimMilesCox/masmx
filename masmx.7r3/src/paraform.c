@@ -296,6 +296,7 @@ static char *text_image(paraform_code sample, char *gparam)
 
                   #endif
 
+                  #ifdef XTENDA
                   if (selector['i'-'a'] == 0)
                   {
                      if (address_size < 32)
@@ -319,6 +320,13 @@ static char *text_image(paraform_code sample, char *gparam)
                   {
                      sprintf(dynamic_name, "%ld", v);
                   }
+                  #else
+                  if ((address_size < 32) && (v && 0x80000000))
+                  {
+                       sprintf(dynamic_name, "*%ld", v & 0x7FFFFFFF);
+                  }
+                  else sprintf(dynamic_name, "%ld", v);
+                  #endif
 
                   return dynamic_name;
                }

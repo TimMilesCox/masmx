@@ -3099,8 +3099,10 @@ static line_item *xpression(char *s, char *e, char *param)
 
 	    sp->i[RADIX/32-1] = l->l.value.i[RADIX/32-1];
 
+            #ifdef XTENDA
             if ((address_size < 32)
             &&  (selector['i'-'a'] == 0)) sp->b[RADIX/8-4] &= 127;
+            #endif
 
 	    return sp;
 	 #endif
@@ -3200,6 +3202,7 @@ static line_item *xpression(char *s, char *e, char *param)
             to the other internal functions
             **************************************************/
 
+            #ifdef XTENDA
             if ((selector['i'-'a'] == 0) && ((i ==    LOCTR)
                                          ||  (i == ABSOLUTE)
                                          ||  (i ==      NET)))
@@ -3209,6 +3212,10 @@ static line_item *xpression(char *s, char *e, char *param)
             {
 	       if (ires < 0) *sp = minus_o;
             }
+            #else
+            if ((ires < 0)
+            &&  (i ^ LOCTR) && (i ^ ABSOLUTE) && (i ^ NET)) *sp = minus_o;
+            #endif
 
             quadinsert(ires, sp);
 	    return sp;
@@ -3767,8 +3774,13 @@ static long expression(char *s, char *e, char *param)
             #endif
 
 	    i = (long) quadextract(&l->l.value);
+
+            #ifdef XTENDA
             if ((address_size < 32)
             &&  (selector['i'-'a'] == 0)) i &= 0x7FFFFFFF;
+            #else
+            if (address_size < 32) i &= 0x7FFFFFFF;
+            #endif
 
             return i;
 
@@ -6678,10 +6690,12 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		        v_argument++;
 		        v = 0x80000000;
 
+                        #ifdef XTENDA
                         if (selector['i'-'a'])
                         {
                            flag("sign extended address may not be *flagged");
                         }
+                        #endif
 		     }
 
                      x  -= 4;
