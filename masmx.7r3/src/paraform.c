@@ -321,7 +321,7 @@ static char *text_image(paraform_code sample, char *gparam)
                      sprintf(dynamic_name, "%ld", v);
                   }
                   #else
-                  if ((address_size < 32) && (v && 0x80000000))
+                  if ((address_size < 32) && (v & 0x80000000))
                   {
                        sprintf(dynamic_name, "*%ld", v & 0x7FFFFFFF);
                   }

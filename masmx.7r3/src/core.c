@@ -3102,6 +3102,8 @@ static line_item *xpression(char *s, char *e, char *param)
             #ifdef XTENDA
             if ((address_size < 32)
             &&  (selector['i'-'a'] == 0)) sp->b[RADIX/8-4] &= 127;
+            #else
+            if (address_size < 32) sp->b[RADIX/8-4] &= 127;
             #endif
 
 	    return sp;
