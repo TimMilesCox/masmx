@@ -84,26 +84,13 @@ static line_item *extract_xparam(char *s, char *gparam)
 
                      z = l->l.value.i[y];
 
-                     #ifdef XTENDA
-                     if (selector['i'-'a'])
+                     if (address_size < 32)
                      {
                         #ifdef INTEL
-                        if (z & 0x80) *v = minus_o;
+                        z &= 0xFFFFFF7F;
                         #else
-                        if (z < 0) *v = minus_o;
+                        z &= 0x7FFFFFFF;
                         #endif
-                     }
-                     else
-                     #endif
-                     {
-                        if (address_size < 32)
-                        {
-                           #ifdef INTEL
-                           z &= 0xFFFFFF7F;
-                           #else
-                           z &= 0x7FFFFFFF;
-                           #endif
-                        }
                      }
 
                      v->i[RADIX/32-1] = z;

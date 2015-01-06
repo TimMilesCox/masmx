@@ -299,7 +299,6 @@ rm ../text.o3/*
 ../masmx j3 ../test.o3/j3.txo -loy > ../text.o3/j3.txt
 ../masmx justname ../test.o3/justname.txo -loy > ../text.o3/justname.txt
 ../masmx keeptry ../test.o3/keeptry.txo -loy > ../text.o3/keeptry.txt
-../masmx kette ../test.o3/kette.txo -loy > ../text.o3/kette.txt
 ../masmx keyword ../test.o3/keyword.txo -loy > ../text.o3/keyword.txt
 ../masmx l ../test.o3/l.txo -loy > ../text.o3/l.txt
 ../masmx langobar ../test.o3/langobar.txo -loy > ../text.o3/langobar.txt
@@ -459,8 +458,6 @@ lstring -b ../test.o3/mlingba.txo ../test.o3/mlingba
 ../masmx scally2 ../test.o3/scally2.txo -loy > ../text.o3/scally2.txt
 ../masmx scally3 ../test.o3/scally3.txo -loy > ../text.o3/scally3.txt
 ../masmx scally4 ../test.o3/scally4.txo -loy > ../text.o3/scally4.txt
-../masmx scandal ../test.o3/scandal.txo -loy > ../text.o3/scandal.txt
-../masmx scrabble ../test.o3/scrabble.txo -loy > ../text.o3/scrabble.txt
 ../masmx see2it ../test.o3/see2it.txo -loy > ../text.o3/see2it.txt
 ../masmx seomac ../test.o3/seomac.txo -loy > ../text.o3/seomac.txt
 ../masmx set ../test.o3/set.txo -loy > ../text.o3/set.txt
@@ -625,7 +622,6 @@ lstring -b ../test.o3/straling.txo ../test.o3/straling
 ../masmx dimsort ../test.o3/dimsort.txo -loy > ../text.o3/dimsort.txt
 ../masmx notawdim ../test.o3/notawdim.txo -loy > ../text.o3/notawdim.txt
 
-../masmx hinge ../test.o3/hinge.txo -loy > ../text.o3/hinge.txt
 ../masmx hubert ../test.o3/hubert.txo -loy > ../text.o3/hubert.txt
 ../masmx prango ../test.o3/prango.txo -loy > ../text.o3/prango.txt
 ../masmx prango32 ../test.o3/prango32.txo -loy > ../text.o3/prango32.txt
@@ -659,6 +655,7 @@ lstring -b ../test.o3/straling.txo ../test.o3/straling
 ../masmx bang ../test.o3/bang -loy > ../text.o3/bang_d.txt
 ../masmx questit ../test.o3/questit -lyok > ../text.o3/questit.txt
 ../masmx stamp ../test.o3/stamp -lyok > ../text.o3/stamp.txt
+../masmx nuficsee ../test.o3/nuficsee -lyok > ../text.o3/nuficsee.txt
 
 ../linkpart
 ../coldfire

@@ -499,19 +499,11 @@ static void walktable(int order)
 
                         if ((v) || (y == 1))
                         {
-                           #ifdef XTENDA
-                           if ((address_size < 32) && (selector['i'-'a'] == 0))
-                           {
-                              if (v & 0x80000000) printf("*");
-                              v &= 0x7FFFFFFF;
-                           }
-                           #else
                            if ((address_size < 32) && (v & 0x80000000))
                            {
                               printf("*");
                               v &= 0x7FFFFFFF;
                            }
-                           #endif
 
                            printf("%0*lX", apw, v);
                         }

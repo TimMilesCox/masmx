@@ -296,37 +296,11 @@ static char *text_image(paraform_code sample, char *gparam)
 
                   #endif
 
-                  #ifdef XTENDA
-                  if (selector['i'-'a'] == 0)
-                  {
-                     if (address_size < 32)
-                     {
-                        #ifdef INTEL
-                        if (*quartet & 128) sprintf(dynamic_name, "*%ld",
-                                                  v & 0x7FFFFFFF);
-                        else          sprintf(dynamic_name, "%ld", v);
-                        #else
-                        if (v & 0x80000000) sprintf(dynamic_name, "*%ld",
-                                                  v & 0x7FFFFFFF);
-                        else          sprintf(dynamic_name, "%ld", v);
-                        #endif
-                     }
-                     else
-                     {
-                        sprintf(dynamic_name, "%ld", (unsigned long) v);
-                     }
-                  }
-                  else
-                  {
-                     sprintf(dynamic_name, "%ld", v);
-                  }
-                  #else
                   if ((address_size < 32) && (v & 0x80000000))
                   {
                        sprintf(dynamic_name, "*%ld", v & 0x7FFFFFFF);
                   }
                   else sprintf(dynamic_name, "%ld", v);
-                  #endif
 
                   return dynamic_name;
                }

@@ -299,7 +299,6 @@ rm ../text.zo3/*
 ../masmz j3 ../test.zo3/j3.txo -lo> ../text.zo3/j3.txt
 ../masmz justname ../test.zo3/justname.txo -lo> ../text.zo3/justname.txt
 ../masmz keeptry ../test.zo3/keeptry.txo -lo> ../text.zo3/keeptry.txt
-../masmz kette ../test.zo3/kette.txo -lo> ../text.zo3/kette.txt
 ../masmz l ../test.zo3/l.txo -lo> ../text.zo3/l.txt
 ../masmz langobar ../test.zo3/langobar.txo -lo> ../text.zo3/langobar.txt
 ../masmz largle ../test.zo3/largle.txo -lo> ../text.zo3/largle.txt
@@ -458,8 +457,6 @@ lstring -b ../test.zo3/mlingba.txo ../test.zo3/mlingba
 ../masmz scally2 ../test.zo3/scally2.txo -lo> ../text.zo3/scally2.txt
 ../masmz scally3 ../test.zo3/scally3.txo -lo> ../text.zo3/scally3.txt
 ../masmz scally4 ../test.zo3/scally4.txo -lo> ../text.zo3/scally4.txt
-../masmz scandal ../test.zo3/scandal.txo -lo> ../text.zo3/scandal.txt
-../masmz scrabble ../test.zo3/scrabble.txo -lo> ../text.zo3/scrabble.txt
 ../masmz see2it ../test.zo3/see2it.txo -lo> ../text.zo3/see2it.txt
 ../masmz seomac ../test.zo3/seomac.txo -lo> ../text.zo3/seomac.txt
 ../masmz set ../test.zo3/set.txo -lo> ../text.zo3/set.txt
@@ -624,7 +621,6 @@ lstring -b ../test.zo3/straling.txo ../test.zo3/straling
 ../masmz dimsort ../test.zo3/dimsort.txo -lo > ../text.zo3/dimsort.txt
 ../masmz notawdim ../test.zo3/notawdim.txo -lo > ../text.zo3/notawdim.txt
 
-../masmz hinge ../test.zo3/hinge.txo -loy > ../text.zo3/hinge.txt
 ../masmz hubert ../test.zo3/hubert.txo -loy > ../text.zo3/hubert.txt
 ../masmz prango ../test.zo3/prango.txo -loy > ../text.zo3/prango.txt
 ../masmz prango32 ../test.zo3/prango32.txo -loy > ../text.zo3/prango32.txt
@@ -654,5 +650,5 @@ lstring -b ../test.zo3/straling.txo ../test.zo3/straling
 ../masmz noczeesc ../test.zo3/noczeesc -lo > ../text.zo3/noczeesc.txt
 ../masmz o ../test.zo3/o -lo > ../text.zo3/o.txt
 ../masmz questit ../test.zo3/questit -lok > ../text.zo3/questit.txt
-
+../masmz nuficsee ../test.zo3/nuficsee -lok > ../text.zo3/nuficsee.txt
 
