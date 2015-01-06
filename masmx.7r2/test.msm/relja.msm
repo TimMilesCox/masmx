@@ -1,5 +1,0 @@
-        $include        "8051_3r1.def"
-
-down    sjmp    up
-        $do     124,        +	5
-up      jc      down

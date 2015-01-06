@@ -6871,13 +6871,6 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                      while (v--) produce(address_quantum, '+', &zero_o, image);
                   }
                   else loc += v;
-
-                  #ifdef LONG_MOVING_COUNTER
-                  if (actual->flags & 1)
-                  {
-                     quadd(v, &((label *) actual->runbank)->value);
-                  }
-                  #endif
 	       }
 
 	       if (!pass) break;

@@ -1,3 +1,0 @@
-"$v_buy1"	$equ	02000
-"$v_sell1"	$equ	02001
-"$v_initpool"	$equ	02002

@@ -1,4 +1,0 @@
-	$include	"ppc64map.def"
-	$include,$binary ../result.txo/ppcuvast	$(54, 55)
-	+	run
-

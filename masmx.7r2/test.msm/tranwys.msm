@@ -1,2 +1,0 @@
-        $include        "8051_3r1.def"
-        include          sfr.inc

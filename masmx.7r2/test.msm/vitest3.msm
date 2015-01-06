@@ -1,3 +1,0 @@
-	$include	"ppc_603.def"
-	$include	"vitest.msm"
-	$include	"vitest2.msm"

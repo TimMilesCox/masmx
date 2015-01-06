@@ -1,2 +1,0 @@
-read$   $equ    sym:0
-print$  $equ    sym:1

@@ -1,8 +1,0 @@
-	$plist	5
-
-prongo*	$proc
-"prongo"*	+99
-	$end
-$(0:256)
-	prongo
-	$end

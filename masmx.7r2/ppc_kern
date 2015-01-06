@@ -1,8 +1,0 @@
-pushd ../kern.ppc
-rm ./*.txo
-../masmx yield -w
-../masmx idle -w
-../masmx ppc_kern.map -w
-../mmx ppc_kern.txo ppc_kern.hex
-cp ppc_kern.hex ../test.o3
-popd

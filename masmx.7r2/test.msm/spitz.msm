@@ -1,9 +1,0 @@
-        $if     $o('z')
-        $data_code  255:'@','a'
-        $else
-        $data_code  255:'@'
-        $endif
-
-        $set_option "c"
-
-        "\377"

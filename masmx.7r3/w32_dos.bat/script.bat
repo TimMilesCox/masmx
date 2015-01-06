@@ -1,5 +1,5 @@
-del ..\test.o3\*.*
-del ..\text.o3\*.*
+del ..\test.o3\*
+del ..\text.o3\*
 ..\masmx 1101 ..\test.o3\1101.txo -loy > ..\text.o3\1101.txt
 ..\masmx 1103 ..\test.o3\1103.txo -loy > ..\text.o3\1103.txt
 ..\masmx 14 ..\test.o3\14.txo -loy > ..\text.o3\14.txt
@@ -19,6 +19,9 @@ del ..\text.o3\*.*
 ..\masmx aqt ..\test.o3\aqt.txo -loy > ..\text.o3\aqt.txt
 ..\masmx azuli ..\test.o3\azuli.txo -loy > ..\text.o3\azuli.txt
 ..\masmx balance ..\test.o3\balance.txo -loy > ..\text.o3\balance.txt
+..\masmx bang ..\test.o3\bang -loy > ..\text.o3\bang.txt
+..\masmx base_d ..\test.o3\base_d -loy > ..\text.o3\base_d.txt
+..\masmx betaille ..\test.o3\betaille -loy > ..\text.o3\betaille.txt
 ..\masmx big48 ..\test.o3\big48.txo -loy > ..\text.o3\big48.txt
 ..\masmx bogle ..\test.o3\bogle.txo -loy > ..\text.o3\bogle.txt
 ..\masmx btest ..\test.o3\btest.txo -loy > ..\text.o3\btest.txt
@@ -36,6 +39,7 @@ del ..\text.o3\*.*
 ..\masmx dollar ..\test.o3\dollar.txo -loy > ..\text.o3\dollar.txt
 ..\masmx dollar1 ..\test.o3\dollar1.txo -loy > ..\text.o3\dollar1.txt
 ..\masmx drat ..\test.o3\drat.txo -loy > ..\text.o3\drat.txt
+..\masmx dryland ..\test.o3\dryland -loy > ..\text.o3\dryland.txt
 ..\masmx dup ..\test.o3\dup.txo -loy > ..\text.o3\dup.txt
 ..\masmx dx ..\test.o3\dx.txo -loy > ..\text.o3\dx.txt
 ..\masmx edit ..\test.o3\edit.txo -loy > ..\text.o3\edit.txt
@@ -83,6 +87,9 @@ del ..\text.o3\*.*
 ..\masmx ll2 ..\test.o3\ll2.txo -loy > ..\text.o3\ll2.txt
 ..\masmx luri ..\test.o3\luri.txo -loy > ..\text.o3\luri.txt
 ..\masmx mafcol1 ..\test.o3\mafcol1.txo -loy > ..\text.o3\mafcol1.txt
+..\masmx malfun ..\test.o3\malfun.txo -oy > ..\text.o3\malfun.txt
+..\masmx malpro ..\test.o3\malpro.txo -oy > ..\text.o3\malpro.txt
+..\masmx malprobe ..\test.o3\malprobe.txo -oy > ..\text.o3\malprobe.txt
 ..\masmx mango ..\test.o3\mango.txo -loy > ..\text.o3\mango.txt
 ..\masmx map10g ..\test.o3\map10g.txo -loy > ..\text.o3\map10g.txt
 ..\masmx map8g ..\test.o3\map8g.txo -loy > ..\text.o3\map8g.txt
@@ -104,6 +111,7 @@ del ..\text.o3\*.*
 ..\masmx prelink ..\test.o3\prelink.txo -loy > ..\text.o3\prelink.txt
 ..\masmx q ..\test.o3\q.txo -loy > ..\text.o3\q.txt
 ..\masmx qb2i ..\test.o3\qb2i.txo -loy > ..\text.o3\qb2i.txt
+..\masmx questit ..\test.o3\questit -lnoky > ..\text.o3\questit.txt
 ..\masmx quicki ..\test.o3\quicki.txo -loy > ..\text.o3\quicki.txt
 ..\masmx qzuli ..\test.o3\qzuli.txo -loy > ..\text.o3\qzuli.txt
 ..\masmx qzweli ..\test.o3\qzweli.txo -loy > ..\text.o3\qzweli.txt
@@ -344,6 +352,7 @@ del ..\text.o3\*.*
 ..\masmx mbank1 ..\test.o3\mbank1.txo -loy > ..\text.o3\mbank1.txt
 ..\masmx ml ..\test.o3\ml.txo -loy > ..\text.o3\ml.txt
 ..\masmx mlingba ..\test.o3\mlingba.txo -loy > ..\text.o3\mlingba.txt
+lstring -b ..\test.o3\mlingba.txo ..\test.o3\mlingba
 ..\masmx modest ..\test.o3\modest.txo -loy > ..\text.o3\modest.txt
 ..\masmx mojo ..\test.o3\mojo.txo -loy > ..\text.o3\mojo.txt
 ..\masmx mouli ..\test.o3\mouli.txo -loy > ..\text.o3\mouli.txt
@@ -359,6 +368,7 @@ del ..\text.o3\*.*
 ..\masmx netvalue ..\test.o3\netvalue.txo -loy > ..\text.o3\netvalue.txt
 ..\masmx new ..\test.o3\new.txo -loy > ..\text.o3\new.txt
 ..\masmx newby ..\test.o3\newby.txo -loy > ..\text.o3\newby.txt
+..\masmx newdata ..\test.o3\newdata.txo -loy > ..\text.o3\newdata.txt
 ..\masmx norkette ..\test.o3\norkette.txo -loy > ..\text.o3\norkette.txt
 ..\masmx nosedive ..\test.o3\nosedive.txo -loy > ..\text.o3\nosedive.txt
 ..\masmx noso ..\test.o3\noso.txo -loy > ..\text.o3\noso.txt
@@ -489,8 +499,11 @@ del ..\text.o3\*.*
 ..\masmx step2 ..\test.o3\step2.txo -loy > ..\text.o3\step2.txt
 ..\masmx sterm ..\test.o3\sterm.txo -loy > ..\text.o3\sterm.txt
 ..\masmx strahl ..\test.o3\strahl.txo -loy > ..\text.o3\strahl.txt
+..\masmx strahler ..\test.o3\strahler.txo -loy> ..\text.o3\strahler.txt
+lstring -b ..\test.o3\strahler.txo ..\test.o3\strahler
 ..\masmx strain ..\test.o3\strain.txo -loy > ..\text.o3\strain.txt
 ..\masmx straling ..\test.o3\straling.txo -loy > ..\text.o3\straling.txt
+lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx strange ..\test.o3\strange.txo -loy > ..\text.o3\strange.txt
 ..\masmx strial1 ..\test.o3\strial1.txo -lo > ..\text.o3\strial1.txt
 ..\masmx strial2 ..\test.o3\strial2.txo -lo > ..\text.o3\strial2.txt
@@ -613,6 +626,9 @@ del ..\text.o3\*.*
 ..\masmx strangely ..\test.o3\strangely.txo -loy > ..\text.o3\strangely.txt
 ..\masmx stretch ..\test.o3\stretch.txo -loy > ..\text.o3\stretch.txt
 ..\masmx wirr ..\test.o3\wirr.txo -loy > ..\text.o3\wirr.txt
+..\masmx twinset ..\test.o3\twinset.txo -loy > ..\text.o3\twinset.txt
+..\masmx dimsort ..\test.o3\dimsort.txo -loy > ..\text.o3\dimsort.txt
+..\masmx notawdim ..\test.o3\notawdim.txo -loy > ..\text.o3\notawdim.txt
 
 ..\masmx hinge ..\test.o3\hinge.txo -loy > ..\text.o3\hinge.txt
 ..\masmx hubert ..\test.o3\hubert.txo -loy > ..\text.o3\hubert.txt
@@ -628,11 +644,24 @@ del ..\text.o3\*.*
 ..\masmx a1 ..\test.o3\a4 -loczy > ..\text.o3\a4.txt
 ..\masmx reappear ..\test.o3\reappear -lnyo > ..\text.o3\reappear.txt
 
+..\masmx quibble ..\test.o3\quibble -lynok > ..\text.o3\quibble.txt
+..\masmx around ..\test.o3\around -loy > ..\text.o3\around.txt
+..\masmx around ..\test.o3\around_wrong -loyE > ..\text.o3\around_wrong.txt
+..\masmx scala ..\test.o3\scala -loy > ..\text.o3\scala.txt
+..\masmx scala ..\test.o3\scala_wrong -loyE > ..\text.o3\scala_wrong.txt
+..\masmx floating ..\test.o3\floating -loy > ..\text.o3\floating.txt
+..\masmx unary ..\test.o3\unary -loy > ..\text.o3\unary.txt
+..\masmx unary2 ..\test.o3\unary2 -loy > ..\text.o3\unary2.txt
+..\masmx exporter ..\test.o3\exporter -loy > ..\text.o3\exporter.txt
+..\masmx norty ..\test.o3\norty -loy > ..\text.o3\norty.txt
+..\masmx tessuele ..\test.o3\tessuele -loy > ..\text.o3\tessuele.txt
+..\masmx gessuele ..\test.o3\gessuele -loy > ..\text.o3\gessuele.txt
+..\masmx noczeesc ..\test.o3\noczeesc -loy > ..\text.o3\noczeesc.txt
+..\masmx o ..\test.o3\o -loy > ..\text.o3\o.txt
+..\masmx questit ..\test.o3\questit -lyok > ..\text.o3\questit.txt
+..\masmx stamp ..\test.o3\stamp -lyok > ..\text.o3\stamp.txt
+
 call ..\linkpart
 call ..\coldfire
 call ..\ppc_kern
-
-pushd ..\emulate
-..\masmx xdr_lib8 ..\test.o3\xdr_lib8 -loyFG > ..\text.o3\xdr_lib8.txt
-popd
 

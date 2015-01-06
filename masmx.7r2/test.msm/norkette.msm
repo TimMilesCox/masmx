@@ -1,5 +1,0 @@
-	$list	0
-	$include	"map_ppc.def"
-        $list   2
-	$include,$binary ../result.txo/iside1
-

@@ -25,9 +25,8 @@ static void illustrate_xad(location_counter *q, long location)
 
    int				 y = (xadw+7)>>3, x = RADIX/8 - y;
 
-   #ifndef LONG_MOVING_COUNTER
+
    quadd_u(location, &p);
-   #endif
    
    if (y > RADIX/8)
    {

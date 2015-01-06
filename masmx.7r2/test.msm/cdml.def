@@ -1,4 +1,0 @@
-c$dml   $equ    0
-bm      $equ    "c$dml:10"
-bc      $equ    "c$dml:12"
-

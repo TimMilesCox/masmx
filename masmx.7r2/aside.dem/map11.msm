@@ -1,3 +1,0 @@
-	$include		"map_ppc.def"
-	$include,$binary	image1
-	$include,$binary	zactor

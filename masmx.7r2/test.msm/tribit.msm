@@ -1,6 +1,0 @@
-fruitfool(1)	$equ	05000
-funilabel	$equ	04000
-$(5:fruitfool(1)+100)
-	+	$
-$(6:funilabel+100)
-	+	$

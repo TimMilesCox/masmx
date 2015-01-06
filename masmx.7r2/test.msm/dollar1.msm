@@ -1,6 +1,0 @@
-        $word           16
-$(6:06000)
-"$handle"
-        $res    10
-        +       $-$handle
-

@@ -1,3 +1,0 @@
-	$include	"ppc_603.def"
-$(65:0x3000)
-hard*	blr
