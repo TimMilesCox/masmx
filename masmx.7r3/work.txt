@@ -124,440 +124,439 @@ masmx is cost-free and for any target.
 <pre>
 
 
-1.  What masmx can do						1
+1.  What masmx can do							1
 
-    1.	Any Target Architecture					1.1
-    2.	Any Input Syntax					1.2
+    1.	Any Target Architecture						1.1
+    2.	Any Input Syntax						1.2
 
 	-Legacy Source Code Unchanged
 
-	1.  Legacy Automatic Macros				1.2.1
-	2.  Number String Notation				1.2.2
-	3.  A Complete Aside about Repeat Data			1.2.3
+	1.  Legacy Automatic Macros					1.2.1
+	2.  Number String Notation					1.2.2
+	3.  A Complete Aside about Repeat Data				1.2.3
 
-    3.	Any Word Size						1.3
-    4.	Any Address Space					1.4
-    5.	Any Floating Point Format				1.5
-    6.	Link-up with GNU tools					1.6
+    3.	Any Word Size							1.3
+    4.	Any Address Space						1.4
+    5.	Any Floating Point Format					1.5
+    6.	Bit-Aligned Structured Data Manipulation			1.6
+    7.	Link-up with GNU tools						1.7
 
-2.  masmx is hosted on						2
+2.  masmx is hosted on							2
 
-    1.	Unix Proprietary Platforms				2.1
-	1.  Mac OS X / G4 Power PC				2.1.1
-	2.  Mac OS X / Intel ix86				2.1.2
-	3.  Sun SPARC Solaris					2.1.3
+    1.	Unix Proprietary Platforms					2.1
+	1.  Mac OS X / G4 Power PC					2.1.1
+	2.  Mac OS X / Intel ix86					2.1.2
+	3.  Sun SPARC Solaris						2.1.3
 
-    2.	Linux Platforms						2.2
-	1.  UBUNTU Linux / ix86					2.2.1
-	1.  DEBIAN Linux / ix86					2.2.2
+    2.	Linux Platforms							2.2
+	1.  UBUNTU Linux / x86						2.2.1
+	1.  DEBIAN Linux / ix86						2.2.2
 
-    3.	Microsoft Platforms					2.3
-	1.  DOS							2.3.1
-	2.  Windows 						2.3.2
+    3.	Microsoft Platforms						2.3
+	1.  DOS								2.3.1
+	2.  Windows							2.3.2
 
-3.  Getting Started						3
+3.  Getting started							3
 
-    1.	Command Line						3.1
-    2.	Command Line Options					3.2
+4.  The Core of masmx							4
 
+    1.	The Assembly Language Source Line				4.1
 
-4.  The Core of masmx						4
+	1.  Labels							4.1.1
 
-    1.	The Assembly Language Source Line			4.1
+	2.  The Command Field						4.1.2
 
-	1.  Label, Command, Operands				4.1.1
+	    1.  Directives						4.1.2.1
 
+	    2.  -Data Constants						4.1.2.2
 
-	2.  The Label Field					4.1.2
+		1.  -Integer Items					4.1.2.2.1
+		2.  -Split Integer Items				4.1.2.2.2
+		3.  -$FORM Items					4.1.2.2.3
+		4.  -Floating Point Numbers				4.1.2.2.4
 
-	    1.  Describing Address Spaces:
-	        Location Counter Controls			4.1.2.1
+		5.  -The Decimal Scale Operator *+ *-			4.1.2.2.5
 
-		1.  Absolute Location Counters			4.1.2.1.1
+		6.  -Text Strings					4.1.2.2.6
 
-		    1.	The Breakpointed Location Counter:
-			Hardware Segmentation			4.1.2.1.1.1
+	    3.  $proc macros -instructions and structures		4.1.2.3
 
-		    2.  The Breakpointed Location Counter:
-			-v Option				4.1.2.1.1.2
+	3.  The Operand Field						4.1.3
 
-		    3.	Simple Location Counter without Breakpoint:
-			Base+Displacement in Flat Address Spaces
-								4.1.2.1.1.3
+	    1.	-Fields, Subfields and Substrings			4.1.3.1
+	    2.	-Expressions						4.1.3.2
+		1.  -operators						4.1.3.2.1
+		    1.	Operators Used on Relocatable Tokens		4.1.3.2.1.1
 
-		    4.	The Breakpointed Location Counter:
-             		Base+Displacement in Translated Address Spaces
-								4.1.2.1.1.4
+		2.  -tokens in expressions				4.1.3.2.2
+		    1.  -number strings					4.1.3.2.2.1
+			1.  masmx default number strings		4.1.3.2.1.1.1
+			2.  C language syntax number strings		4.1.3.2.1.1.2
+			3.  Motorola old number notation		4.1.3.2.1.1.3
+			4.  Suffix-determined number notation		4.1.3.2.1.1.4
+		    2.  -label references				4.1.3.2.2.2
+		    3.  -macro parameters				4.1.3.2.2.3
 
-		    5.	Void Segments				4.1.2.1.1.5
-
-		    6.	The Breakpointed Location Counter:
-			Giant Address Spaces			4.1.2.1.1.6
-
-			1.  Very Large
-			    Direct Addressed Segments	4.1.2.1.1.6.1
-
-			2.  Very Large Load Address
-			    Base-Displacement Examples	4.1.2.1.1.6.2
-
-		            1.  Giant Absolute Address Base-Displacement
-			        Example (static referencing)
-							4.1.2.1.1.6.2.1
-
-			    2.  Giant Absolute Address Base-Displacement
-			        Example (dynamic referencing)
-							4.1.2.1.1.6.2.2
-
-		    7.	Literal Pool Tag			4.1.2.1.1.7
-
-		2.  Relocatable Location Counters		4.1.2.1.2
-
-    2.  Lines of Code Generally					4.2
-
-	1.  Labels						4.2.1
-
-	2.  The Command Field					4.2.2
-
-	    1.  Directives					4.2.2.1
-
-	    2.  -Data Constants					4.2.2.2
-
-		1.  -Integer Items				4.2.2.2.1
-		2.  -Split Integer Items			4.2.2.2.2
-		3.  -$FORM Items				4.2.2.2.3
-		4.  -Floating Point Numbers			4.2.2.2.4
-
-		5.  -The Decimal Scale Operator *+ *-		4.2.2.2.5
-
-		6.  -Text Strings				4.2.2.2.6
-
-	    3.  -Macro Calls -instructions and structures	4.2.2.3
-
-	3.  The Operand Field					4.2.3
-
-	    1.	-Fields, Subfields and Substrings	4.2.3.1
-	    2.	-Expressions				4.2.3.2
-		1.  -operators				4.2.3.2.1
-		    1.	Operators Used on Relocatable Tokens
-							4.2.3.2.1.1
-
-		2.  -tokens in expressions		4.2.3.2.2
-		    1.  -number strings			4.2.3.2.2.1
-		    2.  -label references		4.2.3.2.2.2
-		    3.  -macro parameters		4.2.3.2.2.3
-
-		    4.  -assembler-supplied functions 	4.2.3.2.2.4
+		    4.  -assembler-supplied functions		 	4.1.3.2.2.4
 	
-                        1.  $ -this location counter	4.2.3.2.2.4.1
+                        1.  $ -this location counter			4.1.3.2.2.4.1
 
-                        2.  $(..) -a location counter	4.2.3.2.2.4.2
+                        2.  $(..) -a location counter			4.1.3.2.2.4.2
 
-			3.  $a -absolute address in
-			    base+displacement space	4.2.3.2.2.4.3
-
-			4.  $b -section base address
-			    or -segment base address	4.3.3.2.2.4.4
+			3.  $a -absolute address			4.1.3.2.2.4.3
                     	  
-			5.  $bank_index -absolute or virtual
-			    memory space identifier	4.2.3.2.2.4.5
+			4.  $b -section base address			4.1.3.2.2.4.4
+                    	  
+			5.  $bank_index -memory block identifier	4.1.3.2.2.4.5
 
+			6.  $n -short token for macro reference name	4.1.3.2.2.4.6
 
-			6.  $n -short token for macro reference name
-							4.2.3.2.2.4.6
+			7.  $net(..) -unrelocated value of expression	4.1.3.2.2.4.7
 
-			7.  $net(..) -unrelocated value of expression
- 							4.2.3.2.2.4.7
-
-			8.  $o(..) -value of an option flag
-							4.2.3.2.2.4.8
+			8.  $o(..) -value of an option flag		4.1.3.2.2.4.8
 
 			9.  $r -region:
 
-                     	  1.  -identity of current location counter
-							4.2.3.2.2.4.9.1
+                     	  1.  -identity of current location counter	4.1.3.2.2.4.9.1
 
-			  2.   $r(..) identity of target locator
-                               				4.2.3.2.2.4.9.2
+			  2.   $r(..) identity of implied locator	4.1.3.2.2.4.9.2
 
 			10. $rel(..) 
-                            -is locator relocatable?	4.2.3.2.2.4.10
+                            -is locator relocatable?			4.1.3.2.2.4.10
 
-			11. $t(..) -type of a label	4.2.3.2.2.4.11
+			11. $t(..) -type of a label			4.1.3.2.2.4.11
 
-                          1.   -undefined		4.2.3.2.2.4.11.1
-                          2.   -location		4.2.3.2.2.4.11.2
-                          3.   $EQU			4.2.3.2.2.4.11.3
-                          4.   $SET			4.2.3.2.2.4.11.4
-                          5.   $EQUF			4.2.3.2.2.4.11.5
-                          6.   $DIRECTIVE		4.2.3.2.2.4.11.6
-                          7.   $FUNCTION (of masmx)	4.2.3.2.2.4.11.7
-                          8.   $PROC (macro)		4.2.3.2.2.4.11.8
-                          9.   $NAME			4.2.3.2.2.4.11.9
-                         10.   $FUNC (macro)		4.2.3.2.2.4.11.10
-                         11.   $FORM			4.2.3.2.2.4.11.11
-                         12.   -user assigned label types
-							4.2.3.2.2.4.11.12
+			    1.   -undefined				4.1.3.2.2.4.11.1
+                            2.   -location				4.1.3.2.2.4.11.2
+                            3.   $EQU					4.1.3.2.2.4.11.3
+                            4.   $SET					4.1.3.2.2.4.11.4
+                            5.   $EQUF					4.1.3.2.2.4.11.5
+                            6.   $DIRECTIVE				4.1.3.2.2.4.11.6
+                            7.   $FUNCTION (of masmx)			4.1.3.2.2.4.11.7
+                            8.   $PROC (macro)				4.1.3.2.2.4.11.8
+                            9.   $NAME					4.1.3.2.2.4.11.9
+                           10.   $FUNC (macro)				4.1.3.2.2.4.11.10
+                           11.   $FORM					4.1.3.2.2.4.11.11
+                           12.   -user assigned label types		4.1.3.2.2.4.11.12
 
-		   5.  Function Macros			4.2.3.2.2.5
+			12. $zenith -high adress of section + literals	4.1.3.2.2.4.12
 
-	    3.  Literals					4.2.3.3
+			    1.  $zenith	  -this section			4.1.3.2.2.4.12.1
+			    2.  $zenith(..) -named section		4.1.3.2.2.4.12.2
 
-5.  Functions and Literals					5
 
-    1.	User-written Functions					5.1
-        1.  -a function is					5.1.1
-	2.  -directives for constructing functions		5.1.2
-	    1.  $FUNC -head of function				5.1.2.1
-            2.	$NAME -entry point and invocation tag		5.1.2.2
-	    3.	$RETURN -value of result			5.1.2.3
-	    4.	$END -foot of function				5.1.2.4
-	3.  -code generated during function evaluation		5.1.3
-	    1.  idempotent functions				5.1.3.1
-            2.  last-pass-only functions			5.1.3.2
+		    5.	Function Macros					4.1.3.2.2.5
+			1.  -a user function is				4.1.3.2.2.5.1.
+			2.  -directives for constructing functions	4.1.3.2.2.5.2
+			    1.  $FUNC -head of function			4.1.3.2.2.5.2.1
+        		    2.	$NAME -entry point and invocation tag	4.1.3.2.2.5.2.2
+			    3.	$RETURN -value of result		4.1.3.2.2.5.2.3
+			    4.	$END -foot of function			4.1.3.2.2.5.2.4
+			3.  -code generated during function evaluation	4.1.3.2.2.5.3
+			    1.  idempotent functions			4.1.3.2.2.5.3.1
+			    2.  last-pass-only functions		4.1.3.2.2.5.3.2
 
-    2.	Literals						5.2
-	1.  -a literal is					5.2.1
-	2.  The Literal Pools					5.2.2
-	3.  Literal Pool Tags					5.2.3
-	4.  Re-use of Literals					5.2.4
-	5.  Automatic Literals					5.2.5
+		    6.  Literals					4.1.3.2.2.6
+			1.  -a literal is				4.1.3.2.2.6.1
+			2.  The Literal Pools				4.1.3.2.2.6.2
+			3.  Literal Pool Tags				4.1.3.2.2.6.3
+			4.  Re-use of Literals				4.1.3.2.2.6.4
+			5.  Automatic Literals				4.1.3.2.2.6.5
 
-6.  Describing Target Architecture in Text			6
 
-    1.  Establishing Your Syntax				6.1
-    2.	Describing the Target Architecture			6.2
-	1.  $WORD, $BYTE, $QUANTUM, $AWIDTH			6.2.1
-	2.  $FORM, $PROC, $NAME, $END				6.2.2
-	    1.	The $FORM Template				6.2.2.1
-	    2.	The $PROC Header				6.2.2.2
-	    3.	The $NAME Entry Point				6.2.2.3
-	    4.	The $END Macro Footer				6.2.2.4
-	    5.  Minimal Instruction Macro Example		6.2.2.5
-	    6.	The Two-pass $PROC				6.2.2.6
-	    7.	The Out of Line $PROC				6.2.2.7
-	    8.	Nested Macro Descriptions			6.2.2.8
+    2.  $proc -Constructing Command Macros				4.2				
+    3.  Iterated Code and Structured Data				4.3
 
-	3.  Ready Made Target Descriptions			6.3
+	    1.	$DO and macros						4.3.1
 
-            1.	-8051						6.3.1
+	    2.	Subscripted Labels					4.3.2
+		1.  Subscripted Labels plus functional subscript	4.3.2.1
 
-            2.	-PowerPC					6.3.2
+	    3.	Structured Data and Structured Code Name Spaces		4.3.3
 
-	    3.	Fragment Samples - ColdFire/68000, MIPS, ARM	6.3.3
+		1.  Word-Aligned Structures $TREE / $BRANCH..$ROOT	4.3.3.1
+		    1.  Simple Structures $TREE..$ROOT			4.3.3.1.1
+		    2.  Overlaid Structures $BRANCH..$ROOT		4.3.3.1.2
+		    3.  Complex Structures				4.3.3.1.3
 
-		1.  68000 and ColdFire				6.3.3.1
-		2.  MIPS					6.3.3.2
-		3.  ARM						6.3.3.3
+		2.  Bit-Aligned Structures $RECORD..$ROOT		4.3.3.2
+		    1.	Simple Structures $RECORD..$ROOT		4.3.3.2.1
+		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.3.3.2.2
 
-7.  Iterated Code and Structured Data				7
+    4.  Constructing Program Sections					4.4
 
-    1.	$DO and macros						7.1
+	    1.  Absolute Location Counters				4.4.1
 
-    2.	Subscripted Labels					7.2
-        1.  Subscripted Labels plus functional subscript	7.2.1
+		1.  The Breakpointed Location Counter
+		    and Hardware Segmentation				4.4.1.1
 
-    3.	Structured Data and Structured Code Name Spaces		7.3
+		2.  The Breakpointed Location Counter: -v Option	4.4.1.2
 
-	1.  Simple Structures $TREE..$ROOT			7.3.1
-	2.  Branched Structures $BRANCH..$ROOT			7.3.2
-	3.  Complex Structures					7.3.3
+		3.  Simple Location Counter without Breakpoint:
+		    Base+Displacement in Flat Address Spaces		4.4.1.3
 
-8.  The Directives:						8
+		4.  The Breakpointed Location Counter:
+             	    Base+Displacement in Translated Address Spaces	4.4.1.4
 
-    1.	$ASCII		set character code to ASCII		8.1
-    2.	$AWIDTH		set address width			8.2
-    3.  $BLANK		set the globality of a future label	8.3
-    4.	$BRANCH		branch of a structured name space	8.4
-    5.	$BYTE		set the width of a text byte		8.5
+		5.  Void Segments					4.4.1.5
 
-    6.	$CHARACTERISTIC	-set exponent field size
-			per floating point number size		8.6
+		6.  The Breakpointed Location Counter:
+		    Giant Address Spaces				4.4.1.6
 
-    7.	$CONT_CHAR	change line continue character		8.7
-    8.	$DATA_CODE	define/select alternate character set	8.8
-    9.	$DO		generate repeated code			8.9
-    10.	$ELSE		conditional assembly			8.10
-    11.	$ELSEIF		conditional assembly			8.11
-    12.	$END		foot of macro or assembly		8.12
-    13.	$ENDIF		conditional assembly			8.13
-    14.	$EQU		assign a value to label			8.14
-    15.	$EQUF		assign a list of values to label	8.15
-    16.	$EXIT		abandon assembly with a message		8.16
-    17.	$FLAG		diagnostic, mark assembly in error	8.17
+		    1.  Very Large
+			Direct Addressed Segments			4.4.1.6.1
 
-    18.	$FLAGF		first pass diagnostic,
-			mark assembly in error			8.18
+		    2.  Very Large Load Address
+			Base-Displacement Examples			4.4.1.6.2
 
-    19.	$FLOATING_POINT set default floating number size	8.19
+		        1.  Giant Absolute Address Base-Displacement
+			    Example (static referencing)		4.4.1.6.2.1
 
-    20.	$FORM		layout of bit structure,
-			typically an instruction layout		8.20
+			2.  Giant Absolute Address Base-Displacement
+			    Example (dynamic referencing)		4.4.1.6.2.2
 
-    21.	$FUNC		user macro to produce an operand value	8.21
-    22.	$HEX		set binary notation to hex		8.23
+		7.   Literal Pool Tag					4.4.1.7
 
-    23.	$IF		conditional assembly			8.23
+	    2.  Relocatable Location Counters				4.4.2
 
-    24. $INCLUDE	include a source file or a binary file	8.24
 
-	1.	$INCLUDE	read a nested source file	8.24.1
 
-	2.	$INCLUDE,$BINARY linking directive:
+5.  Run-Time Algorithm Plotter
+
+    1.  Run-Time Integer Algorithm Plotter				5.1
+
+    2.  Run-Time Floating Algorith Plotter				5.2
+
+
+6.  Describing Target Architecture in Text				6
+
+    1.  Establishing Your Syntax					6.1
+    2.	Describing the Target Architecture				6.2
+	1.  $WORD, $BYTE, $QUANTUM, $AWIDTH				6.2.1
+	2.  $FORM, $PROC, $NAME, $END					6.2.2
+	    1.	The $FORM Template					6.2.2.1
+	    2.	The $PROC Header					6.2.2.2
+	    3.	The $NAME Entry Point					6.2.2.3
+	    4.	The $END Macro Footer					6.2.2.4
+	    5.  Minimal Instruction Macro Example			6.2.2.5
+	    6.	The Two-pass $PROC					6.2.2.6
+	    7.	The Out of Line $PROC					6.2.2.7
+	    8.	Nested Macro Descriptions				6.2.2.8
+
+7.  Target Descriptions							7
+
+    1.	-8051								7.1
+
+    2.	-PowerPC							7.2
+
+    3.	Fragment Samples - ColdFire/68000, MIPS, ARM			7.3
+
+	1.  68000 and ColdFire						7.3.1
+	2.  MIPS							7.3.2
+	3.  ARM								7.3.3
+
+8.  masmx Directives							8
+
+    1.	$ascii		set character code to ASCII			8.1
+    2.	$awidth		set address width				8.2
+    3.  $blank		set the globality of a future label		8.3
+    4.	$branch		branch of a structured name space		8.4
+    5.	$byte		set the width of a text byte			8.5
+
+    6.	$characteristic	-set exponent field size
+			per floating point number size			8.6
+
+    7.	$cont_char	change line continue character			8.7
+    8.	$data_code	define/select alternate character set		8.8
+    9.	$do		generate repeated code				8.9
+    10.	$else		conditional assembly				8.10
+    11.	$endif		conditional assembly				8.11
+    12.	$end		foot of macro or assembly			8.12
+    13.	$endif		conditional assembly				8.13
+    14.	$equ		assign a value to label				8.14
+    15.	$equf		assign a list of values to label		8.15
+    16.	$exit		abandon assembly with a message			8.16
+    17.	$flag		diagnostic, mark assembly in error		8.17
+
+    18.	$flagf		first pass diagnostic, mark assembly in error	8.18
+
+    19.	$floating_point set default floating number size		8.19
+
+    20.	$form		bit fields layout template
+				typically an instruction layout		8.20
+
+    21.	$func		user macro to produce an operand value		8.21
+    22.	$hex		set binary notation to hex			8.23
+
+    23.	$if		conditional assembly				8.23
+
+    24. $include	include a source file or a binary file		8.24
+
+	1.	$include	read a nested source file		8.24.1
+
+	2.	$include,$binary linking directive:
 
 			include a text-encoded binary file
 			and process the relocation information
-			within it				8.24.2
+			within it					8.24.2
 
-	3.	$INCLUDE,$VOID	linking directive:
+	3.	$include,$void	linking directive:
 
 			include addresses from a text-encoded
 			binary file, but do not include the
-			code inside it				8.24.3
+			code inside it					8.24.3
 
-    25.	$INFO		linking directive:			8.25
+    25.	$info		linking directive:				8.25
 
-	1.	$INFO,$OFFSET					8.25.1
+	1.	$info,$offset						8.25.1
 
 			update the relocation information
 			from the input binary and write the
 			new relocation information to the
 			output binary
 
-	2.	$INFO,$RANGE_CHECK
-		$INFO,$RANGE_CHECK1
+	2.	$info,$range_check
+		$info,$range_check1
 
-			Request Linker Automatic Range-Checking	8.25.2
+			Request Linker Automatic Range-Checking		8.25.2
 
-    26.	$LINEWIDTH	control layout in text encoded binary	8.26
+    26.	$linewidth	control layout in text encoded binary		8.26
 
-    27.	$LIST		set inclusion nest level for listing	8.27
+    27.	$list		set inclusion nest level for listing		8.27
 			$list 0, masking names from list/export
 
-    28.	$LIT		select default location counter for literals
-			-optionally declare literal tag		8.28
+    28.	$lit		select default location counter for literals
+			-optionally declare literal tag			8.28
 
-    29. $LOAD		linking directive:
+    29. $load		linking directive:
 			write revised binary information in
-			output text-encoded binary file		8.30
+			output text-encoded binary file			8.30
 
-    30.	$LTERM		change comment character		8.30
-    31.	$NAME		macro call name and value		8.31
-    32.	$NOP		do nothing [+ comment]			8.32
-    33.	$NOTE		informative diagnostic, not error	8.33
-    34.	$NOTEF		first pass informative diagnostic	8.34
-    35.	$OCTAL		set binary notation to octal		8.35
-    36.	$PATH		alter include path			8.36
-    37.	$PLIST		nest depth for listing macro expansion	8.37
-    38.	$PROC		head of procedural macro		8.38
+    30.	$lterm		change comment character			8.30
+    31.	$name		macro call name and value			8.31
+    32.	$nop		do nothing [+ comment]				8.32
+    33.	$note		informative diagnostic, not error		8.33
+    34.	$notef		first pass informative diagnostic		8.34
+    35.	$octal		set binary notation to octal			8.35
+    36.	$path		alter include path				8.36
+    37.	$plist		nest depth for listing macro expansion		8.37
+    38.	$proc		head of procedural macro			8.38
 
-    39. $PUSHREL	linking directive:
+    39. $pushrel	linking directive:
 
 			scan a relocation tuples applied to a
 			word group in the text-encoded binary.
 
 			Stack an unresolved relocation tuple
-			for replay to the $MAP linking macro	8.39
+			for replay to the $MAP linking macro		8.39
 
-    40.	$QUANTUM	set address quantum			8.40
+    40.	$quantum	set address quantum				8.40
 
-    41.	$QUOTE		change quote mark			8.41
+    41.	$quote		change quote mark				8.41
 
         1.  		quoted strings and labels
-			within macro expansions			8.42.1
+			within macro expansions				8.41.1
 
-    42.	$RES		declare a storage buffer		8.42
+    42.	$record								8.42
 
-    43.	$RETURN							8.43
+	1. $record		bit-aligned data structures		8.42.1
+	2. $record,$branch	bit-aligned structure overlay		8.42.2
 
-	1.		return a value from within $FUNC..$END	8.43.1
-	2.		return from within $PROC..$END		8.43.2
+    43.	$res		declare a storage buffer			8.43
 
-    44.	$ROOT		end of a structured name space which was
-			begun with $TREE or $BRANCH		8.44
+    44.	$return								8.44
 
-    45.	$SET		assign value to a reassignable label	8.45
+	1.		return a value from within $FUNC..$END		8.44.1
+	2.		return from within $PROC..$END			8.44.2
 
-    46.	$SET_OPTION						8.46
+    45.	$root		end of a structured name space which was	
+			begun with $TREE or $BRANCH			8.45
 
-	1.		set option flags			8.46.1
+    46.	$set		assign value to a reassignable label		8.46
+
+    47.	$set_option							8.47
+
+	1.		set option flags				8.47.1
 
 	2.		Interaction of Run Options
-			and List Directives			8.46.2
+			and List Directives				8.47.2
 
-    47.	$SNAP		list the label table			8.47
+    48.	$snap		list the label table				8.48
 
-    48.	$STERM		set the substring sentinel symbol	8.48
-    49.	$STORE		set the default output file name	8.49
+    49.	$sterm		set the substring sentinel symbol		8.49
+    50.	$store		set the default output file name		8.50
 
-    50.	$SUFFIX		interpret number string notation
-			by suffix				8.50
+    51.	$suffix		interpret number string notation
+			by suffix					8.51
 
-    51.	$TEXT		translate input text patterns		8.51
-    52.	$TRACE		display value of expression		8.52
-    53.	$TREE		simple structured name space		8.53
+    52.	$text		translate input text patterns			8.52
+    53.	$trace		display value of expression			8.53
+    54.	$tree		simple structured name space			8.54
 
-    54.	$TWOS_COMPLEMENT
-			change negative integer representation	8.54
+    55.	$twos_complement
+			change negative integer representation		8.55
 			-default is twos-complement
 
-    55.	$WORD		declare size of target computer word	8.55
-
+    56.	$word		declare size of target computer word		8.56
+    57.	$xqt_i		run-time integer algorithm plotter		8.57
+    58. $xqt_fp		run-time floating algorith plotter		8.58
 
 
 9.  Output File Formats, Relocation and Linking
-    Giant Address Spaces, Interfacing with GNU Tools		9
+    Giant Address Spaces, Interfacing with GNU Tools			9
 
     1.	Text Encoded Binary Format, S-Records
-	and Intel Hex Records					9.1
+	and Intel Hex Records						8.1
 
     2.	Relocation, Linking, Giant Address Space
-	and Interfacing with GNU Tools				9.2
+	and Interfacing with GNU Tools					8.2
 
-	1.  Relocation Information in Text Encoded Binary	9.2.1
+	1.  Relocation Information in Text Encoded Binary		8.2.1
 
-	2.  masmx Linking in Principle				9.2.2
+	2.  masmx Linking in Principle					8.2.2
 
-	3.  Demonstration Links					9.2.3
+	3.  Demonstration Links						8.2.3
 
-	    1.	The Simplest Link				9.2.3.1
+	    1.	The Simplest Link					8.2.3.1
 
-	    2.	Link Collected by Sections			9.2.3.2
+	    2.	Link Collected by Sections				9.2.3.2
 
-	    3.	Link Specific Segments				9.2.3.3
+	    3.	Link Specific Segments					9.2.3.3
 
-	    4.	Link an Output Relocatable			9.2.3.4
+	    4.	Link an Output Relocatable				9.2.3.4
 
 	    5.	Link an Accumulated Relocatable
-		plus a New Relocatable				9.2.3.5
+		plus a New Relocatable					9.2.3.5
 
-	    6.	The Incremental Link				9.2.3.6
+	    6.	The Incremental Link					9.2.3.6
 
-	    7.	The Link in Giant Address Space			9.2.3.7
+	    7.	The Link in Giant Address Space				9.2.3.7
 
-	    8.	The Incremental Link in Giant Address Space	9.2.3.8
+	    8.	The Incremental Link in Giant Address Space		9.2.3.8
 
-	    9.	Linking with Void Inclusion			9.2.3.9
+	    9.	Linking with Void Inclusion				9.2.3.9
 
 	    10.	Linking With void Inclusion
-		in Giant Address Space				9.2.3.10
+		in Giant Address Space					9.2.3.10
 
 10. Byte-Addressing Machines with 32 and 64 Bit Bus
-    Managing Alignments						10
+    Managing Alignments							10
 
-11. Tuning Macro Language and Fixing Problems			11
+11. Tuning Macro Language and Fixing Problems				11
 
-    1	Fixing a Macro Parameter Reference			11.1
-    2	Label Cannot Be Referenced				11.2
-    3	Changed Label Value Disappears				11.3
-    4	Tracing Macro Expansion					11.4
-    5	Aliasing masmx Internal Functions			11.5
-    6	Diagnostic about a Label Address			11.6
-    7	Label fails to be Exported				11.7
-
-Appendix A: What's new in 7r2?
-Appendix B: The masmx Product Road Map
-Appendix C: masmx's Potential for High Level Languages
-Appendix D: Disclaimer and Contact
+    1	Fixing a Macro Parameter Reference				11.1
+    2	Label Cannot Be Referenced					11.2
+    3	Changed Label Value Disappears					11.3
+    4	Tracing Macro Expansion						11.4
+    5	Aliasing masmx Internal Functions				11.5
+    6	Diagnostic about a Label Address				11.6
+    7	Label fails to be Exported					11.7
+	
+Appendix A: masmx Command Line
+Appendix B: What's new in 7r2?
+Appendix C: The masmx Product Road Map
+Appendix D: masmx's Potential for High Level Languages
+Appendix E: Disclaimer and Contact
 
 
 </pre>
