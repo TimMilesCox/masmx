@@ -112,27 +112,21 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 1.  What masmx can do							1
 
     1.	Any Target Architecture						1.1
-    2.	Any Input Syntax						1.2
+    2.	Any Input Syntax: Legacy Source Code Unchanged			1.2
+    3.  Number String Notations						1.3
+    4.	Any Word Size							1.4
+    5.	Any Address Space						1.5
+    6.	Any Floating Point Format					1.6
+    7.  Structured Data and Repeat Data					1.7
+	1.  Structured Data						1.7.1
+	2.  Bit-Aligned Structured Data					1.7.2
+    	3.  Accessing Bit-Aligned Structured Data			1.7.3
+	4.  Repeat Data							1.7.4
+    8.	Run-Time Algorithm Plotting					1.8
+	1.  Run-Time Integer Algorithms					1.8.1
+	2.  Run-Time Floating Algorithms				1.8.2
 
-	-Legacy Source Code Unchanged
-
-	1.  Legacy Automatic Macros					1.2.1
-	2.  Number String Notation					1.2.2
-	3.  A Complete Aside about Repeat Data				1.2.3
-
-    3.	Any Word Size							1.3
-    4.	Any Address Space						1.4
-    5.	Any Floating Point Format					1.5
-    6.	Bit-Aligned Structured Data Manipulation			1.6
-    7.	Link-up with GNU tools						1.7
-
-2.  masmx is hosted on							2
-
-    1.	Unix Proprietary Platforms					2.1
-
-    2.	Linux Platforms							2.2
-
-    3.	Microsoft Platforms						2.3
+2.  Developer Environment						2
 
 3.  Getting started							3
 
@@ -148,14 +142,11 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	    2.  -Data Constants						4.1.2.2
 
-		1.  -Integer Items					4.1.2.2.1
-		2.  -Split Integer Items				4.1.2.2.2
-		3.  -$FORM Items					4.1.2.2.3
-		4.  -Floating Point Numbers				4.1.2.2.4
+		1.  -Number Items					4.1.2.2.1
+		2.  -Split Number Items					4.1.2.2.2
 
-		5.  -The Decimal Scale Operator *+ *-			4.1.2.2.5
-
-		6.  -Text Strings					4.1.2.2.6
+		3.  -Text Strings					4.1.2.2.3
+		4.  -$FORM Items					4.1.2.2.4
 
 	    3.  $proc macros -instructions and structures		4.1.2.3
 
@@ -234,72 +225,71 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 			    1.  idempotent functions			4.1.3.2.2.5.3.1
 			    2.  last-pass-only functions		4.1.3.2.2.5.3.2
 
-		    6.  Literals					4.1.3.2.2.6
-			1.  -a literal is				4.1.3.2.2.6.1
-			2.  The Literal Pools				4.1.3.2.2.6.2
-			3.  Literal Pool Tags				4.1.3.2.2.6.3
-			4.  Re-use of Literals				4.1.3.2.2.6.4
-			5.  Automatic Literals				4.1.3.2.2.6.5
+	    3.  Literals						4.1.3.3
+		1.  A literal is					4.1.3.3.1
+		2.  The Literal Pools					4.1.3.3.2
+		3.  Literal Pool Tags					4.1.3.3.3
+		4.  Re-use of Literals					4.1.3.3.4
+		5.  Automatic Literals					4.1.3.3.5
 
 
-    2.  $proc -Constructing Command Macros				4.2				
-    3.  Iterated Code and Structured Data				4.3
+    2.  Iterated Code and Structured Data				4.2
 
-	    1.	$DO and macros						4.3.1
+	    1.	$DO and macros						4.2.1
 
-	    2.	Subscripted Labels					4.3.2
-		1.  Subscripted Labels plus functional subscript	4.3.2.1
+	    2.	Subscripted Labels					4.2.2
+		1.  Subscripted Labels plus functional subscript	4.2.2.1
 
-	    3.	Structured Data and Structured Code Name Spaces		4.3.3
+	    3.	Structured Data and Structured Code Name Spaces		4.2.3
 
-		1.  Word-Aligned Structures $TREE / $BRANCH..$ROOT	4.3.3.1
-		    1.  Simple Structures $TREE..$ROOT			4.3.3.1.1
-		    2.  Overlaid Structures $BRANCH..$ROOT		4.3.3.1.2
-		    3.  Complex Structures				4.3.3.1.3
+		1.  Word-Aligned Structures $TREE / $BRANCH..$ROOT	4.2.3.1
+		    1.  Simple Structures $TREE..$ROOT			4.2.3.1.1
+		    2.  Overlaid Structures $BRANCH..$ROOT		4.2.3.1.2
+		    3.  Complex Structures				4.2.3.1.3
 
-		2.  Bit-Aligned Structures $RECORD..$ROOT		4.3.3.2
-		    1.	Simple Structures $RECORD..$ROOT		4.3.3.2.1
-		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.3.3.2.2
+		2.  Bit-Aligned Structures $RECORD..$ROOT		4.2.3.2
+		    1.	Simple Structures $RECORD..$ROOT		4.2.3.2.1
+		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.2.3.2.2
 
-    4.  Constructing Program Sections					4.4
+    3.  Constructing Program Sections					4.3
 
-	    1.  Absolute Location Counters				4.4.1
+	    1.  Absolute Location Counters				4.3.1
 
 		1.  The Breakpointed Location Counter
-		    and Hardware Segmentation				4.4.1.1
+		    and Hardware Segmentation				4.3.1.1
 
-		2.  The Breakpointed Location Counter: -v Option	4.4.1.2
+		2.  The Breakpointed Location Counter: -v Option	4.3.1.2
 
 		3.  Simple Location Counter without Breakpoint:
-		    Base+Displacement in Flat Address Spaces		4.4.1.3
+		    Base+Displacement in Flat Address Spaces		4.3.1.3
 
 		4.  The Breakpointed Location Counter:
-             	    Base+Displacement in Translated Address Spaces	4.4.1.4
+             	    Base+Displacement in Translated Address Spaces	4.3.1.4
 
-		5.  Void Segments					4.4.1.5
+		5.  Void Segments					4.3.1.5
 
 		6.  The Breakpointed Location Counter:
-		    Giant Address Spaces				4.4.1.6
+		    Giant Address Spaces				4.3.1.6
 
 		    1.  Very Large
-			Direct Addressed Segments			4.4.1.6.1
+			Direct Addressed Segments			4.3.1.6.1
 
 		    2.  Very Large Load Address
-			Base-Displacement Examples			4.4.1.6.2
+			Base-Displacement Examples			4.3.1.6.2
 
 		        1.  Giant Absolute Address Base-Displacement
-			    Example (static referencing)		4.4.1.6.2.1
+			    Example (static referencing)		4.3.1.6.2.1
 
 			2.  Giant Absolute Address Base-Displacement
-			    Example (dynamic referencing)		4.4.1.6.2.2
+			    Example (dynamic referencing)		4.3.1.6.2.2
 
-		7.   Literal Pool Tag					4.4.1.7
+		7.   Literal Pool Tag					4.3.1.7
 
-	    2.  Relocatable Location Counters				4.4.2
+	    2.  Relocatable Location Counters				4.3.2
 
 
 
-5.  Run-Time Algorithm Plotter
+5.  Run-Time Algorithm Plotter						5
 
     1.  Run-Time Integer Algorithm Plotter				5.1
 
@@ -320,10 +310,9 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    6.	The Two-pass $PROC					6.2.2.6
 	    7.	The Out of Line $PROC					6.2.2.7
 	    8.	Nested Macro Descriptions				6.2.2.8
-
-    3.  Legacy Automatic Macros						6.3
-	1.  Legacy Functional Macros					6.3.1
-	2.  Legacy Command and Data Macros				6.3.2
+    3.  Synthesising Legacy Automatic Macros				6.3
+	1.  Synthesising Legacy Functional Macros			6.3.1
+	2.  Synthesising Legacy Command Macros				6.3.2
 
 7.  Target Descriptions							7
 
@@ -374,33 +363,27 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     24. $include	include a source file or a binary file		8.24
 
-	1.	$include	read a nested source file		8.24.1
+	1.  $include		read a nested source file		8.24.1
 
-	2.	$include,$binary linking directive:
+	2.  $include,$binary 	linking directive:
+				read a text-encoded binary file
+				process its relocation information
+				output the linked code			8.24.2
 
-			include a text-encoded binary file
-			and process the relocation information
-			within it					8.24.2
+	3.  $include,$void	linking directive:
+				include addresses from a text-encoded
+				binary file, but no code from it	8.24.3
 
-	3.	$include,$void	linking directive:
+    25.	$info			linking directive:			8.25
 
-			include addresses from a text-encoded
-			binary file, but do not include the
-			code inside it					8.24.3
+	1.  $info,$offset	update a tuple of relocation information
+				rewrite it to output binary		8.25.1
 
-    25.	$info		linking directive:				8.25
+	2.  $info,$range_check		
+	    $info,$range_check1	
 
-	1.	$info,$offset						8.25.1
-
-			update the relocation information
-			from the input binary and write the
-			new relocation information to the
-			output binary
-
-	2.	$info,$range_check
-		$info,$range_check1
-
-			Request Linker Automatic Range-Checking		8.25.2
+			request linker Automatic range-checking
+			of an updated field of output binary		8.25.2
 
     26.	$linewidth	control layout in text encoded binary		8.26
 
@@ -533,13 +516,19 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     5	Aliasing masmx Internal Functions				11.5
     6	Diagnostic about a Label Address				11.6
     7	Label fails to be Exported					11.7
-	
+
+12. masmx Abstract Floating Format and Alternative Floating Formats	12
+    1.  masmx Floating Format						12.1
+    2.  IEEE754 Floating Values						12.2
+	1. Differences between masmx FLoating Format and IEEE754 Floating Formats
+									12.2.1
+	2. Macro Language Generation of IEEE754 Floating Constants	12.2.2
+
 Appendix A: masmx Command Line
-Appendix B: What's new in 7r2?
+Appendix B: What's new in 7r3?
 Appendix C: The masmx Product Road Map
 Appendix D: masmx's Potential for High Level Languages
 Appendix E: Disclaimer and Contact
-
 
 </pre>
 
