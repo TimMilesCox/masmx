@@ -112,19 +112,20 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 1.  What masmx can do							1
 
     1.	Any Target Architecture						1.1
-    2.	Any Input Syntax: Legacy Source Code Unchanged			1.2
-    3.  Number String Notations						1.3
-    4.	Any Word Size							1.4
-    5.	Any Address Space						1.5
-    6.	Any Floating Point Format					1.6
-    7.  Structured Data and Repeat Data					1.7
-	1.  Structured Data						1.7.1
-	2.  Bit-Aligned Structured Data					1.7.2
-    	3.  Accessing Bit-Aligned Structured Data			1.7.3
-	4.  Repeat Data							1.7.4
-    8.	Run-Time Algorithm Plotting					1.8
-	1.  Run-Time Integer Algorithms					1.8.1
-	2.  Run-Time Floating Algorithms				1.8.2
+    2.	Any Input Syntax
+	1  Legacy Source Code Unchanged					1.2.1
+    	2  Number and Character String Notation				1.2.2
+    3.	Any Word Size							1.3
+    4.	Any Address Space						1.4
+    5.	Any Floating Point Format					1.5
+    6.  Structured Data and Repeat Data					1.6
+	1.  Structured Data						1.6
+	2.  Bit-Aligned Structured Data					1.6.1
+    	3.  Accessing Bit-Aligned Structured Data			1.6.2
+	4.  Repeat Data							1.6.2
+    7.	Run-Time Algorithm Plotting					1.6.4
+	1.  Run-Time Integer Algorithms					1.7.1
+	2.  Run-Time Floating Algorithms				1.7.2
 
 2.  Developer Environment						2
 
@@ -142,13 +143,12 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	    2.  -Data Constants						4.1.2.2
 
-		1.  -Number Items					4.1.2.2.1
-		2.  -Split Number Items					4.1.2.2.2
+		1.  Number Items					4.1.2.2.1
+		2.  Split Number Items					4.1.2.2.2
+		3.  Text Strings					4.1.2.2.3
+		4.  $form Items						4.1.2.2.4
 
-		3.  -Text Strings					4.1.2.2.3
-		4.  -$FORM Items					4.1.2.2.4
-
-	    3.  $proc macros -instructions and structures		4.1.2.3
+	    3.  $proc macro calls: instructions and structures		4.1.2.3
 
 	3.  The Operand Field						4.1.3
 
@@ -215,13 +215,13 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 
 		    5.	Function Macros					4.1.3.2.2.5
-			1.  -a user function is				4.1.3.2.2.5.1.
-			2.  -directives for constructing functions	4.1.3.2.2.5.2
+			1.  a user function is				4.1.3.2.2.5.1.
+			2.  directives for constructing functions	4.1.3.2.2.5.2
 			    1.  $FUNC -head of function			4.1.3.2.2.5.2.1
         		    2.	$NAME -entry point and invocation tag	4.1.3.2.2.5.2.2
 			    3.	$RETURN -value of result		4.1.3.2.2.5.2.3
 			    4.	$END -foot of function			4.1.3.2.2.5.2.4
-			3.  -code generated during function evaluation	4.1.3.2.2.5.3
+			3.  code generated during function evaluation	4.1.3.2.2.5.3
 			    1.  idempotent functions			4.1.3.2.2.5.3.1
 			    2.  last-pass-only functions		4.1.3.2.2.5.3.2
 
@@ -237,19 +237,16 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	    1.	$DO and macros						4.2.1
 
-	    2.	Subscripted Labels					4.2.2
-		1.  Subscripted Labels plus functional subscript	4.2.2.1
+	    2.	Structured Data and Structured Code Name Spaces		4.2.2
 
-	    3.	Structured Data and Structured Code Name Spaces		4.2.3
+		1.  Word-Aligned Structures $TREE / $BRANCH..$ROOT	4.2.2.1
+		    1.  Simple Structures $TREE..$ROOT			4.2.2.1.1
+		    2.  Overlaid Structures $BRANCH..$ROOT		4.2.2.1.2
+		    3.  Complex Structures				4.2.2.1.3
 
-		1.  Word-Aligned Structures $TREE / $BRANCH..$ROOT	4.2.3.1
-		    1.  Simple Structures $TREE..$ROOT			4.2.3.1.1
-		    2.  Overlaid Structures $BRANCH..$ROOT		4.2.3.1.2
-		    3.  Complex Structures				4.2.3.1.3
-
-		2.  Bit-Aligned Structures $RECORD..$ROOT		4.2.3.2
-		    1.	Simple Structures $RECORD..$ROOT		4.2.3.2.1
-		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.2.3.2.2
+		2.  Bit-Aligned Structures $RECORD..$ROOT		4.2.2.2
+		    1.	Simple Structures $RECORD..$ROOT		4.2.2.2.1
+		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.2.2.2.2
 
     3.  Constructing Program Sections					4.3
 
@@ -465,6 +462,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     56.	$word		declare size of target computer word		8.56
     57.	$xqt_i		run-time integer algorithm plotter		8.57
     58. $xqt_fp		run-time floating algorith plotter		8.58
+    59. $zero_code_point  escaped zero character string value		8.59
 
 
 9.  Output File Formats, Relocation and Linking
@@ -501,7 +499,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	    9.	Linking with Void Inclusion				9.2.3.9
 
-	    10.	Linking With void Inclusion
+	    10.	Linking with void Inclusion
 		in Giant Address Space					9.2.3.10
 
 10. Byte-Addressing Machines with 32 and 64 Bit Bus

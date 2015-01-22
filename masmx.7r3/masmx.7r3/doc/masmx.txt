@@ -88,13 +88,9 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 1.  What masmx can do							1
 
     1.	Any Target Architecture						1.1
-    2.	Any Input Syntax						1.2
-
-	-Legacy Source Code Unchanged
-
-	1.  Legacy Automatic Macros					1.2.1
-	2.  Number String Notation					1.2.2
-
+    2.	Any Input Syntax
+	1  Legacy Source Code Unchanged					1.2.1
+    	2  Number String Notations					1.2.2
     3.	Any Word Size							1.3
     4.	Any Address Space						1.4
     5.	Any Floating Point Format					1.5
@@ -125,11 +121,10 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 		1.  -Number Items					4.1.2.2.1
 		2.  -Split Number Items					4.1.2.2.2
-
 		3.  -Text Strings					4.1.2.2.3
 		4.  -$FORM Items					4.1.2.2.4
 
-	    3.  $proc macros -instructions and structures		4.1.2.3
+	    3.  $proc macro calls -instructions and structures		4.1.2.3
 
 	3.  The Operand Field						4.1.3
 
@@ -218,19 +213,16 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	    1.	$DO and macros						4.2.1
 
-	    2.	Subscripted Labels					4.2.2
-		1.  Subscripted Labels plus functional subscript	4.2.2.1
+	    2.	Structured Data and Structured Code Name Spaces		4.2.2
 
-	    3.	Structured Data and Structured Code Name Spaces		4.2.3
+		1.  Word-Aligned Structures $TREE / $BRANCH..$ROOT	4.2.2.1
+		    1.  Simple Structures $TREE..$ROOT			4.2.2.1.1
+		    2.  Overlaid Structures $BRANCH..$ROOT		4.2.2.1.2
+		    3.  Complex Structures				4.2.2.1.3
 
-		1.  Word-Aligned Structures $TREE / $BRANCH..$ROOT	4.2.3.1
-		    1.  Simple Structures $TREE..$ROOT			4.2.3.1.1
-		    2.  Overlaid Structures $BRANCH..$ROOT		4.2.3.1.2
-		    3.  Complex Structures				4.2.3.1.3
-
-		2.  Bit-Aligned Structures $RECORD..$ROOT		4.2.3.2
-		    1.	Simple Structures $RECORD..$ROOT		4.2.3.2.1
-		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.2.3.2.2
+		2.  Bit-Aligned Structures $RECORD..$ROOT		4.2.2.2
+		    1.	Simple Structures $RECORD..$ROOT		4.2.2.2.1
+		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.2.2.2.2
 
     3.  Constructing Program Sections					4.3
 
@@ -291,6 +283,9 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    6.	The Two-pass $PROC					6.2.2.6
 	    7.	The Out of Line $PROC					6.2.2.7
 	    8.	Nested Macro Descriptions				6.2.2.8
+    3.  Synthesising Legacy Automatic Macros				6.3
+	1.  Synthesising Legacy Functional Macros			6.3.1
+	2.  Synthesising Legacy Command Macros				6.3.2
 
 7.  Target Descriptions							7
 
@@ -443,6 +438,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     56.	$word		declare size of target computer word		8.56
     57.	$xqt_i		run-time integer algorithm plotter		8.57
     58. $xqt_fp		run-time floating algorith plotter		8.58
+    59. $zero_code_point  escaped zero character string value		8.59
 
 
 9.  Output File Formats, Relocation and Linking
@@ -479,7 +475,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	    9.	Linking with Void Inclusion				9.2.3.9
 
-	    10.	Linking With void Inclusion
+	    10.	Linking with void Inclusion
 		in Giant Address Space					9.2.3.10
 
 10. Byte-Addressing Machines with 32 and 64 Bit Bus
@@ -527,45 +523,27 @@ Target architecture is described to masmx in macro language. See
 
 
 
-1.2: Any Syntax: Legacy Source Code Unchanged
-_____________________________________________
+1.2: Any Syntax
+_______________
 
-masmx has a slender native syntax described in Section
-4: The Core of masmx. There is no need to convert 
-existing source code before masmx can assemble it, 
-because the definitions in the include header files are used to 
-explain the syntax of other assemblers to masmx.
+1.2.1: Legacy Source Code Unchanged
+____________________________________
 
-Programmable syntax particles include
+masmx has a slender native syntax described in Section 4: The Core of
+masmx. There is no need to convert  existing source code before masmx
+can assemble it, because include files define imported syntax to masmx.
 
-	the comment character
+Text string translation enables masmx to scan differently written
+operators in expressions. See section 8.51: $text directive
 
-	the quote character
-
-	the sub:string character
-
-	the line continue character if you want one
-
-	user-supplied renames for the masmx-supplied directives
-
-	user-supplied renames for the masmx-supplied functional macros
-
-	interpretation of legacy functional macros
-
-	text string translation
-
-        number string notation
-
-Text string translation enables masmx to scan different operator styles
-See section 8.51: $text directive
-
-masmx assembly does not require code changes. Source never needs to be
-edited, until you want to change what it does
+masmx assembly does not require code changes. Application Source never
+needs to be edited, until you want to change what it does
 
 See section 6:1 Establishing your Syntax
 
 
-1.3:  Number String and Character String Notation
+
+1.2.2:  Number String and Character String Notation
 _________________________________________________
 
 masmx has a leading-zero hex or octal notation for numbers
@@ -574,13 +552,14 @@ and leading numeral 1..9 is decimal
 C-Language number and string syntax may instead be opted,
 or Motorola old notation
 
-Number string notation suffixes may be switched by directive
+Number string notation determined by suffix may be opted
 
-See section
+See Section 2.1: Number Items and Section 3.2: Expressions
 
 
-1.3 masmx is for Any Word Size
-______________________________
+
+1.3 masmx Any Word Size
+_______________________
 
 Integer and floating constants, and fields of instructions and other 
 constructed things like descriptors, are computed to 192-bit precision.
@@ -592,19 +571,29 @@ bits total.
 
 
 
-1.4: masmx is for Any Address Space
-___________________________________
+1.4: Any Address Space
+______________________
 
-masmx can construct absolute arrays and instruction segments to fit
-in address spaces up to 2*/192 bits.
+masmx can construct absolute arrays and instruction segments to load
+in memory spaces up to 2*/192 address quanta in size.
 
-Relocatable code for linkers and linking loaders
-only gets 32-bit or 4-gigaquanta addressing per segment.
+The memory space in programs may be larger than any known file systems.
 
-However the output from a masmx link may be in space up to 2*/192 bits.
+However the distribution of loaded code may be sparse within
+large memory, so that assembly output files need not take as much
+space as loaded programs
+
+See Section 9: Output File Formats, Relocation and Linking,
+Giant Address Spaces, Interfacing with GNU Tools, and Section 4.1.2.1:
+Describing Address Spaces. Location Counter Controls.
+
+Relocatable code for linkers and linking loaders only gets 32-bit or
+4-gigaquanta addressing per relocatable segment.
+
+However the output from a masmx link may be in space up to 2*/192 quanta.
 
 Previously assembled absolute object code in address spaces up to
-2*/ 192 bits may be incremented with new code which is either
+2*/192 quanta may be incremented with new code which is either
 relocatable or source.
 
 A masmx link is an assembly which uses masmx linker features.
@@ -627,18 +616,9 @@ can also be mapped on to base-displacement segments.
 masmx can construct label structures and prepare code for
 loading and accessing at astronomic addresses.
 
-The giant-address ability can be used combined with the assembly-time
-repeat compute abilities in masmx.
+Giant-address ability can be used combined with the assembly-time
+repeat compute abilities in masmx
 
-The memory space in the program may be larger than any fixed file systems.
-
-However the distribution of loaded code may be sparse within
-the large memory, so that the assembly output file does not take as much
-space as the running program.
-
-See Section 9: Output File Formats, Relocation and Linking,
-Giant Address Spaces, Interfacing with GNU Tools, and Section 4.1.2.1:
-Describing Address Spaces. Location Counter Controls.
 
 
 1.5 masmx is for Any Floating Point Format
@@ -658,6 +638,8 @@ Negative polarity is represented with the entire value in 1s complement
 
 The values are transformed to the constants of target
 size and format
+
+Macro code can generate IEEE754 floating constants
 
 IEEE754 floating formats have an unrepresented integral bit. A sign flag alone 
 represents polarity.
@@ -963,21 +945,21 @@ Directives are commands to the assembler. They are listed in Section 8: Directiv
 
 Some directives control assembly settings, for example
 
-	$word
-	$quantum
-	$list
+	$word		BITS
+	$quantum	BITS
+	$list		INCLUDE_DEPTH
 
-Others govern declare labels
+Others declare labels
 
-	$set
-	$equf
-	$equ
-	$name
+label1	$set	VALUE
+label2	$equf	VALUE1, VALUE2...
+label	$equ	VALUE
+label2	$name	VALUE
 
 Others govern conditional assembly
 
-	$if
-	$elseif
+	$if		CONDITION
+	$elseif		CONDITION
 	$endif
 
 And other directives frame macros
@@ -990,7 +972,7 @@ and frequently are, for example
 .macend $equ,"$directive"       "$end"
 
 Quotes are used in these PowerPC examples in case flag -m
-(Motorola old number notation) is required. The quotes force the
+(Motorola old number notation) is opted. The quotes force the
 "$xxxxxx" tokens to be seen as labels and not as hex strings.
 
 A small number of directives, $WORD, $BYTE and others,
@@ -1012,18 +994,31 @@ These lines make .equ .macro and .macend to be labels of directives also.
 4.1.2.2 Data Constants
 ______________________
 
-
 For complex data constants see section 4.2: Iterated Code and Structured Data
-
 
 Data constants may be integers, microstructures of bit fields, 
 floating point items or text strings.
 
-4.1.2.3 Number and Text String Syntax
-_____________________________________
 
-4.1.2.3.1:  masmx Default Number Strings and Character Strings
-______________________________________________________________
+4.1.2.2.1 Number Items
+______________________
+
+Number item constants are assembled from an expression in the command
+field or a unary sign in the command field and an expression in the
+operand field
+
+	+	INSTANCES*FACTOR
+	15
+	-8.5
+
+Number items starting with a digit need no unary token
+
+Expressions and allowable tokens and operators are detailed in
+Section 4.3.2: Expressions
+
+
+4.1.2.2.1.1:  masmx Default Number and Character String Notation
+________________________________________________________________
 
 Native masmx interprets number strings with leading zero as hex or
 octal, depending $octal or default $hex directives. Leading digit
@@ -1035,9 +1030,11 @@ character strings are space filled to containing word in absence
 of -z Flag. Escaped values are typed as integers between quoted
 substrings as "substring":INTEGER:"substring"
 
+A digit string starting \ is bit-pattern
 
-4.1.2.3.2:  C Language Syntax Number Strings and Character Strings
-______________________________________________________________
+
+4.1.2.2.1.2:  C Language Number and Character String Notation
+_____________________________________________________________
 
 With Assembly Flag -c 1000 and 0x3e8 both mean one thousand and
 leading zero is otherwise octal
@@ -1048,8 +1045,8 @@ leading zero is otherwise octal
 -c Flag interprets character string \escaped values
 
 
-4.1.2.3.3:  Motorola Old Number Notation
-____________________________________
+4.1.2.2.1.3:  Motorola Old Number Notation
+__________________________________________
 
 Flag -m interprets
 
@@ -1058,8 +1055,8 @@ Flag -m interprets
 	%bit_image
 
  
-4.1.2.3.4:  Suffix-Determined Number Notation
-_________________________________________
+4.1.2.2.1.4:  Suffix-Determined Number Notation
+_______________________________________________
 
 Directive $suffix 2 interprets upper or lowercase
 
@@ -1067,8 +1064,6 @@ Directive $suffix 2 interprets upper or lowercase
 	trailing O or Q as octal
 	trailing B as bit image
 	trailing D as decimal default
-
-All number strings must start with a numeral
 
 If the last token in a constant expression is numeral masmx interprets
 a trailing flag S D L T Q P H O upper or lower as a size in words. A notation
@@ -1082,19 +1077,6 @@ A size flag may be dissociated from the numeral token by parenthesis or colon
 	234hd		; hex notation, double word
 	234:o		; octaword, no notation suffix = decimal
 
-
-
-4.1.2.4 Number Items
-____________________
-
-Number constants have either 
-
-	a command field which starts with a digit 0..9
-
-or
-
-	a command field which starts a unary sign + - ^ 
-	Unary ^ is "not" or 1s complement
 
 A number constant item has the same expression rules and
 operators as an operand expression. See Section 4.1.3.2: Expressions 
@@ -1179,169 +1161,6 @@ downscale	$equ	2
                               +11  + 1.000000006768:pe+1200000
   :                            12  $end
 :$(00):00000000:00000016 
-
-Digit strings are by default scanned as hex if the first numeral is zero
-Leading numeral 1..9 is decimal
-
-1000 and 03e8 both mean one thousand
-
-An example is on lines 30..32 of the assembly listed below.
-
-If $OCTAL directive is issued leading zero means octal, until
-$HEX directive is issued.
-
-masmx has many variations on number string notation:
-
-	C language integer syntax
-
-	Motorola hex/bit syntax
-
-	Intel-style notation suffixes
-
-	$OCTAL/$HEX switch
-
-These are discussed under Section 4.1.3.2: Expressions.
-
-
-The default and starting point is:
-
-	leading 1..9 is decimal
-
-	leading 0 is hex
-
-	leading \ is bit pattern
-
-	character values bounded by 'apostrophes' produce
-	their absolute value in an +'expression'
-
-
-$ masmx ctest -lnk
-MASMX 7r3
-3/ctest.msm
-*EOF*
-  :                            1         $word   16
-00:0000 00010000              +2         4096*16
-00:0002 00100000              +3         4096*256
-00:0004 01000000              +4         4096*4096
-  :                            5 
-  :                            6 likely  $equ    15        
-  :                            7 what    $equ    3
-  :                            8 how     $equ    -256
-  :                            9 
-00:0006 FFF0                  +10         ^       likely
-00:0007 FFF3                  +11         ^likely++what
-00:0008 FF03                  +12         ^likely**how++what
-  :                            13 
-00:0009 0060                  +14         100-4
-00:000A 0005                  +15         100/20
-00:000B 0005                  +16         +       99//20
-00:000C 0004                  +17         80//20
-00:000D 0005                  +18         81//20
-00:000E 0013                  +19         99///20
-00:000F 004162636465666768696A6B6C6D6E6F
-                              +20         'abcdefghijklmno'-(32*/(('o'-'a')*8))
-00:0017 FFFF0000              +21         -       4096*16
-00:0019 FFF00000              +22         -       4096*256
-00:001B FF000000              +23         -       4096*4096
-00:001D FFA0                  +24         -       100-4
-00:001E FFFB                  +25         -       100/20
-00:001F FFFB                  +26         -       99//20
-00:0020 FFED                  +27         -       99///20
-00:0021 0001                  +28         2>1
-00:0022 0000                  +29         +       1>2
-00:0023 00380000              +30         0700000/*1
-00:0025 700000000000000000000000000000000000000000000000
-                              +31         0700000*/168
-00:0031 380000000000000000000000000000000000000000000000
-                              +32         +(0700000*/168)/*1
-00:003D 700000000000000000000000000000000000000000000000
-                              +33         7*/188
-00:0049 0001                  +34         +       1<(7*/188)
-00:004A 0000                  +35         +       1>(7*/188)
-  :                            36 
-00:004B 0063                  +37         99
-00:004C 00000063              +38         +       99d
-00:004E 000000000063          +39         +       99t
-00:0051 0000000000000063      +40         99q
-00:0055 00000000000000000063  +41         99p
-00:005A 000000000000000000000063
-                              +42         +       99h
-00:0060 00000000000000000000000000000063
-                              +43         99o
-00:0068 FF88                  +44         +  (-8)*likely
-00:0069 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF88
-                              +45         +  (-8)*likely:o
-00:0071 000F4240              +46         1000000
-00:0073 01000000              +47         01000000
-00:0075 000F4240              +48         1000000:l
-00:0077 4240                  +49         1000000:s
-  :                            50 
-*EOF*
-:$(00):0000:0078 
-
-
-Integer line items are in canonical byte order, and the only way to
-change that is by implementing pseudo-directives (often implemented
-with names like DW and DD) as macros.
-
-All expressions used to generate integer line items are 
-evaluated to 192 bits of precision. Then in the absence
-of a length override, an integer item is output in
-the number of words (of size set by $WORD) required to represent it.
-
-In addition to labels, there is one number string
-situation where : must be used before a length suffix. 
-That situation is in cases like 0123:D, which is different 
-in meaning from 0123D. This only concerns hex and the :D
-symbol specifically. Developers may prefer
-always to use colon in this position. There is also the :L
-or L suffix, identical in meaning to :D
-
-
-
-4.2.2.2.2 Split Integers
-________________________
-
-A split integer item is a small list of equal size fields. The default
-size of the total is one word. The suffixes :d etc can change the size.
-
-The source syntax of split integers has commas between the fields:
-
-
-MASMX 7r2
-3/commas.msm
-*EOF*
-  :                            1         $word   48
-00:000000000000 666677778888  +2         +       06666, 07777, 08888
-00:000000000001 0A0B0C0D0E0F  +3         +       10, 11, 12, 13, 14, 15
-00:000000000002 FFF00AFFF00B  +4         +       -1, +10, -1, +11
-00:000000000003 123456789ABC  +5         +       1,2,3,4,5,6,7,8,9,10,11,12
-  :                            6 left    $equ    0aaaaaaaaaaaaaaaaaaaaa
-  :                            7 centre  $equ    0bbbbbbbbbbbbbbbbbbbbb
-  :                            8 right   $equ    0ccccccccccccccccccccc
-  :                            9 
-00:000000000004 AAAACCCCBBBB  +10         +       left, right, centre
-00:000000000005 AAAAAAAACCCCCCCCBBBBBBBB
-                              +11         +       left, right, centre:d   
-00:000000000007 AAAAAAAAAAAAAAAACCCCCCCCCCCCCCCCBBBBBBBBBBBBBBBB
-                              +12         +       left, right, centre:q   
-*EOF*
-:$(00):000000000000:00000000000B 
-commas.msm: object code 200 bytes: 0 errors: 0 undefined labels
-
-If the number of fields does not divide into the total size,
-zero-filled slack bits are generated at the top.
-
-
-
-4.2.2.2.4 Floating Point Numbers
-________________________________
-
-A number constant, integer or floating, is recognised by command which is
-unary symbol + - ^
-
-	+	99	. integer
-	-	1.3276	. floating item
 
 Floating numbers contain a digit string with decimal point 
 or the decimal scale operator, *+ *- or both
@@ -1487,10 +1306,6 @@ floatalong $set 1.375h*+1200000
 -INPUT>>: object code 339 bytes: 0 errors: 0 undefined labels
 
 
-
-4.2.2.2.5: The Decimal Scale Operator *+ *-
-____________________________________________
-
 The decimal scale operator not only adds scale to a fraction string, but may also
 join two integer expressions to construct a floating number, with the mantissa taken
 from the left and the exponent from the right. Any length override is typed after the
@@ -1561,8 +1376,160 @@ floating.msm: object code 336 bytes: 0 errors: 0 undefined labels
 The scale operator *+ *- is actioned after arithmetic operators / // /// * + -
 and before boolean and shift operators ** */- */ /* ++ --
 
+Number constants in apostrophe are in the current data code juxtaposed
+at the current $byte size
 
-4.2.2.2.6 Text Strings
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$word	16
+	$quantum 8     
+$(12:65536)
+	'abc'
+	$data_code	97:65	. generate A for a
+	'abc'
+	$byte	12
+	'abc'
+	$ascii			. switch back to plain ASCII
+	'abc'
+	$byte	8
+	'abc'++1*/28
+	$end
+  :                            1  $word 16
+  :                            2  $quantum 8     
+  :                            3 $(12:65536)
+0C:10000 00616263              +4  'abc'
+  :                            5  $data_code 97:65 . generate A for a
+0C:10004 00416263              +6  'abc'
+  :                            7  $byte 12
+0C:10008 41062063              +8  'abc'
+  :                            9  $ascii   . switch back to plain ASCII
+0C:1000C 61062063              +10  'abc'
+  :                            11  $byte 8
+0C:10010 10616263              +12  'abc'++1*/28
+  :                            13  $end
+:$(0C):10000:10014 
+
+Number line items are in canonical byte order, and the only way to
+change that is by implementing pseudo-directives (often implemented
+with names like DW and DD) as macros.
+
+All expressions used to generate integer line items are 
+evaluated to 192 bits of precision. Then in the absence
+of a length override, an integer item is output in
+the number of words (of size set by $WORD) required to represent it.
+
+In addition to labels, there is one number string
+situation where : or ) or " must be used before a length suffix. 
+That situation is in cases like 0123:D, which is different 
+in meaning from 0123D. This only concerns hex and the :D
+symbol specifically. Developers may prefer
+always to use colon in this position. There is also the :L
+or L suffix, identical in meaning to :D
+
+$ masmx ctest -lnk
+MASMX 7r3
+3/ctest.msm
+*EOF*
+  :                            1         $word   16
+00:0000 00010000              +2         4096*16
+00:0002 00100000              +3         4096*256
+00:0004 01000000              +4         4096*4096
+  :                            5 
+  :                            6 likely  $equ    15        
+  :                            7 what    $equ    3
+  :                            8 how     $equ    -256
+  :                            9 
+00:0006 FFF0                  +10         ^       likely
+00:0007 FFF3                  +11         ^likely++what
+00:0008 FF03                  +12         ^likely**how++what
+  :                            13 
+00:0009 0060                  +14         100-4
+00:000A 0005                  +15         100/20
+00:000B 0005                  +16         +       99//20
+00:000C 0004                  +17         80//20
+00:000D 0005                  +18         81//20
+00:000E 0013                  +19         99///20
+00:000F 004162636465666768696A6B6C6D6E6F
+                              +20         'abcdefghijklmno'-(32*/(('o'-'a')*8))
+00:0017 FFFF0000              +21         -       4096*16
+00:0019 FFF00000              +22         -       4096*256
+00:001B FF000000              +23         -       4096*4096
+00:001D FFA0                  +24         -       100-4
+00:001E FFFB                  +25         -       100/20
+00:001F FFFB                  +26         -       99//20
+00:0020 FFED                  +27         -       99///20
+00:0021 0001                  +28         2>1
+00:0022 0000                  +29         +       1>2
+00:0023 00380000              +30         0700000/*1
+00:0025 700000000000000000000000000000000000000000000000
+                              +31         0700000*/168
+00:0031 380000000000000000000000000000000000000000000000
+                              +32         +(0700000*/168)/*1
+00:003D 700000000000000000000000000000000000000000000000
+                              +33         7*/188
+00:0049 0001                  +34         +       1<(7*/188)
+00:004A 0000                  +35         +       1>(7*/188)
+  :                            36 
+00:004B 0063                  +37         99
+00:004C 00000063              +38         +       99d
+00:004E 000000000063          +39         +       99t
+00:0051 0000000000000063      +40         99q
+00:0055 00000000000000000063  +41         99p
+00:005A 000000000000000000000063
+                              +42         +       99h
+00:0060 00000000000000000000000000000063
+                              +43         99o
+00:0068 FF88                  +44         +  (-8)*likely
+00:0069 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF88
+                              +45         +  (-8)*likely:o
+00:0071 000F4240              +46         1000000
+00:0073 01000000              +47         01000000
+00:0075 000F4240              +48         1000000:l
+00:0077 4240                  +49         1000000:s
+  :                            50 
+*EOF*
+:$(00):0000:0078 
+
+
+
+
+4.1.2.2.2 Split Integers
+________________________
+
+A split integer item is a small list of equal size fields. The default
+size of the total is one word. The suffixes :d etc can change the size.
+
+The source syntax of split integers has commas between the fields:
+
+
+MASMX 7r2
+3/commas.msm
+*EOF*
+  :                            1         $word   48
+00:000000000000 666677778888  +2         +       06666, 07777, 08888
+00:000000000001 0A0B0C0D0E0F  +3         +       10, 11, 12, 13, 14, 15
+00:000000000002 FFF00AFFF00B  +4         +       -1, +10, -1, +11
+00:000000000003 123456789ABC  +5         +       1,2,3,4,5,6,7,8,9,10,11,12
+  :                            6 left    $equ    0aaaaaaaaaaaaaaaaaaaaa
+  :                            7 centre  $equ    0bbbbbbbbbbbbbbbbbbbbb
+  :                            8 right   $equ    0ccccccccccccccccccccc
+  :                            9 
+00:000000000004 AAAACCCCBBBB  +10         +       left, right, centre
+00:000000000005 AAAAAAAACCCCCCCCBBBBBBBB
+                              +11         +       left, right, centre:d   
+00:000000000007 AAAAAAAAAAAAAAAACCCCCCCCCCCCCCCCBBBBBBBBBBBBBBBB
+                              +12         +       left, right, centre:q   
+*EOF*
+:$(00):000000000000:00000000000B 
+commas.msm: object code 200 bytes: 0 errors: 0 undefined labels
+
+If the number of fields does not divide into the total size,
+zero-filled slack bits are generated at the top.
+
+
+
+4.2.2.2.3 Text Strings
 ______________________
 
 Text strings are a row of bytes composed from
@@ -1587,15 +1554,46 @@ could be keyed as
 
 	"string of text":10:"another line of text and more of that line"
 
-The byte size, the quote symbol and the substring symbol are all
-symbols which can be selected at a different value from
-their defaults of 8, " and : with the use of directives
-$BYTE $QUOTE $STERM
+byte size, quote symbol and substring symbol may each be set to a different
+value from their defaults of 8, " and : with directives $BYTE $QUOTE $STERM
 
-Data code generated may be changed from ASCII to a sequence
-compiled and switched using the $DATA_CODE directive.
+Generated string data values may be altered from ASCII to a to a data code
+assembled and switched with the $DATA_CODE directive
 
-Text string contents are read from source code in ASCII.
+Text string contents are read from source code as Latin-1, Roman-8 or UTF-8
+according to text-editor
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$word	16
+	$quantum 8     
+$(12:65536)
+	"abc"
+	$data_code	97:65	. generate A for a
+	"abc"
+	$byte   12
+	"abc"
+	$ascii			. switch back to plain ASCII
+	"abc"
+	$byte	8
+	"abc"
+	$end
+  :                            1  $word 16
+  :                            2  $quantum 8     
+  :                            3 $(12:65536)
+0C:10000 61626320              +4  "abc"
+  :                            5  $data_code 97:65 . generate A for a
+0C:10004 41626320              +6  "abc"
+  :                            7  $byte 12
+0C:10008 041062063020          +8  "abc"
+  :                            9  $ascii   . switch back to plain ASCII
+0C:1000E 061062063020          +10  "abc"
+  :                            11  $byte 8
+0C:10014 61626320              +12  "abc"
+  :                            13  $end
+:$(0C):10000:10018 
+
 
 See also 3.2 Command Line Options -zc for space or zero pad
 
@@ -1632,10 +1630,10 @@ See also Section 10: Byte-Addressing Machines with 32- and 64-bit
 Bus, Managing Alignments
 
 
-4.2.2.2.3: $FORM Items
+4.1.2.2.4: $FORM Items
 ______________________
 
-$FORM declares a bit structure from one word to 192 bits in size.
+$FORM declares a bit layout twmplate from one word to 192 bits in size.
 The command field when using a form is the label of the $FORM:
 
 MASMX 7r2
@@ -1660,8 +1658,8 @@ jump*		$proc
 
 
 
-4.1.3: Macro Calls: Instructions and Structures
-_________________________________________________
+4.1.2.3: $proc Macro Calls: Instructions and Structures
+_______________________________________________________
 
 Most code lines have macro calls in the command position.
 That's how instructions are in masmx.
@@ -2006,14 +2004,6 @@ p       $proc
 	p(expression1, #expression2) returns 1 if subfield 
 	"expression2" of field "expression1" has the prefix # 
 	otherwise 0
-
-	p(expression1, expression2:*expression3) returns 1 
-	if substring "expression3" of subfield "expression2"
-	of field "expression1" has the prefix * otherwise 0
-     
-	p(expression1, expression2:#expression3) returns 1 
-	if substring "expression3" of subfield "expression2"
-	of field "expression1" has the prefix # otherwise 0
           
  
 p(0, 1) and p(0, 0) are both like the internal function $n
@@ -3273,11 +3263,11 @@ generate* $name
 	call    f(ROUTINE)
 
 
-5.2: Literals
-_____________
+4.1.3.3: Literals
+_________________
 
-5.2.1: A Literal Is
-___________________
+4.1.3.3.1: A Literal Is
+_______________________
 
 Literals are a kind of function. A constant is generated by reference,
 and the result of that is the address of the constant.
@@ -3288,8 +3278,8 @@ R24 gets loaded with a word containing 0FFFC0000. That word is generated
 at the end  of the segment that "literal_pool_name" was declared in.
 
 
-5.2.2: The Literal Pools
-________________________
+4.1.3.3.2: The Literal Pools
+____________________________
 
 Each of the 72 location counters may have one literal pool.
 
@@ -3306,8 +3296,8 @@ allowed literals in the first 64 parts. Literal pools are not appropriate
 for each element of a giant array.
 
 
-5.2.3: Literal Pool Tags
-________________________
+4.1.3.3.3: Literal Pool Tags
+____________________________
 
 Literal Pool Tags are labels of literal pools, and referencing them
 acts functionally to generate a literal and return its address
@@ -3325,8 +3315,8 @@ $(5:DATA_SEGMENT/literal_pool_5)
 lits7  $LIT    7
 
 
-5.2.4: The $LIT Directive
-_________________________
+4.1.3.3.4: The $LIT Directive
+_____________________________
 
 $LIT may have a label and may have an argument.
 If $LIT has an argument it must be the identity
@@ -3349,8 +3339,8 @@ tag for the literal pool.
 
 
 
-5.2.5: Automatic Literals
-_________________________
+4.1.3.3.5: Automatic Literals
+_____________________________
 
 Automatic literals are literals which are generated
 in the current default literal pool without referencing 
@@ -3507,7 +3497,7 @@ STERM=.
 ll6abs.msm: object code 537 bytes: 0 errors: 0 undefined labels
 
 
-If -A is selected to allow automatic literals, code and macro language
+If -a is opted to allow automatic literals, code and macro language
 should not include expressions that begin with left-parenthesis,
 if the expression is not meant as a literal.
 
@@ -3597,11 +3587,11 @@ MASMX 7r2
 -INPUT>>: object code 77 bytes: 0 errors: 0 undefined labels
 
 
-4.3: Iterated Code and Structured Data
+4.2: Iterated Code and Structured Data
 ______________________________________
 
-7.1: $DO
-________
+4.2.1: $DO and $proc Macros
+___________________________
 
 
 	$DO	count,repeated_source_line
@@ -3652,183 +3642,14 @@ A label (Thousands, Hundreds etc) on the $DO
 line is a relative-1 counter tag.
 
 
-7.2 Subscripted Labels
-______________________
-
-Labels may be generated with subscripts on the end.
-
-Macro language can produce the subscripted new labels, and so
-can developers manually.
-
-In the following example:
-
-Line 3 references a label which does not exist
-
-Line 4 is a count of labels one(x) with one subscript.
-
-Line 5 is a count of labels one(8,x) with two subscripts.
-
-Line 6 references a subscripted label which does
-exist, "one(1)", and gets its value, the address 00000F.
-
-There is no label "one(2)". Therefore line 7 counts all the labels
-"one(2,x)", and there are none. The resulting value is 0.
-
-There is no label "one(3)". Therefore line 8 counts all the labels
-"one(3,x)", and there are none. The resulting value is 0.
-
-Line 9 gets a count of all the one(x) labels with one subscript, as line 4. 
-
-Line 11 would change the number of one(x) labels to 3 if flag -k were set,
-and line 7 would then get the value 00000F as line 6.
-
-Line 16 references a label which does not exist.
-
-Assembly is with -u option to highlight whether any labels are undefined.
-
-Only two labels are marked as undefined: unsubscripted "one" at line 3,
-and  "two" at line 16.
-
-MASMX 7r2
-3/simple.msm
-*EOF*
-  :                            1         $res    4
-  :                            2 one(9)  $res    4
-undefined name in simple.msm on Line 3: ONE
-00:000008 000000              +3        +       one
-00:000009 000002              +4         +       one()
-00:00000A 000004              +5        +       one(8)
-00:00000B 00000F              +6         +       one(1)
-00:00000C 000000              +7         +       one(2)
-00:00000D 000000              +8         +       one(3)
-00:00000E 000002              +9         +       one()
-  :                            10 one(1)
-  :                            11       $do     $o('k'),one(2)
-  :                            12 one(8,1)
-  :                            13 one(8,2)
-  :                            14 one(8,3)
-  :                            15 one(8,4)
-undefined name in simple.msm on Line 16: TWO
-00:00000F 000000              +16         +       two(7)
-*EOF*
-:$(00):000000:000010 
-simple.msm: object code 135 bytes: 0 errors: 2 undefined labels
-
-
-It's possible to have several subscripts and to generate
-the subscripts from $DO tags:
-
-MASMX 7r2
-3/similar.msm
-*EOF*
-  :                            1 $(0:64)
-  :                            2 label(1)
-  :                            3 times   $do     8,label(1,times)       $res    1
-  :                            4 times $do 5,label(2,1,times) $res 1
-  :                            5 label(1,1,1)
-00:00004D 000040              +6         +       label(1,1)
-00:00004E 000042              +7         +       label(1,3)
-00:00004F 000044              +8         +       label(1,5)
-00:000050 000040              +9         +       label(1)
-00:000051 000045              +10         +       label(1,6)
-00:000052 000000              +11         +       label(2)
-00:000053 000005              +12         +       label(2,1)
-00:000054 000048              +13         +       label(2,1,1)
-00:000055 000000              +14         +       label(99)
-00:000056 000001              +15         +       label()
-  :                            16 
-*EOF*
-:$(00):000040:000057 
-similar.msm: object code 107 bytes: 0 errors: 0 undefined labels
-
-
-It's possible to reference subscripted labels functionally and
-retrieve a count of how many there are. Line 15 of the example above
-is a request for a count of any "label(" with one subscript.
-
-Where labels have two subscripts, "label(1)" means a count of how many
-begin "Label(1,", and so on, unless label(1) specifically exists.
-
-However "label" exists in examples with one, two  and three subscripts in
-this example, and that's unwise because, although the assembler's resulting
-behaviour is determinate, user confusion could be promoted.
-
-Line 6 gets the value of label(1,1) because that exists on line 3.
-However this known value masks the functional ability to count
-the number of labels like the label(1,1,1) on line 5.
-
-Line 9 gets the value of label(1), because that exists on line 2.
-The functional ability to count the number of labels generated
-on line 3 is masked.
-
-All of "label(2.." are label(2,x,y) with three subscripts.
-Therefore line 12 is a count of label(2,1,x) and line 13 is
-the value of label(2,1,1)
-
-Line 11 resolves to zero because there is no label(2), and the
-number of label(2,x) is none.
-
-Line 14 resolves to zero because there is no label(99), and the
-number of label(99,x) is none.
-
-Line 15 counts the one label in label(x) with one subscript.
-
-
-
-7.2.1: Subscripted Labels alongside Base-Register-in-Parenthesis
-________________________________________________________________
-
-These syntax examples shows a subscripted label followed by a base
-register tag in parentheses, and then a subscripted label without
-any base register:
-
-index	$do	240,name_of(index)	+	GENERATOR_FORMULA(index)
-
-...
-
-	lwz     r3, name_of(99)(r2)
-	lwz	r4, name_of(1)
-
-The example shows PowerPC code, but the action for safe
-assembler interpretation is general in principle.
-
-The first of the two load instructions does not present a problem.
-The last parenthesed token on the line (r2) is interpreted as a
-base-register tag, and that is intended.
-
-The label name_of(99) is also evaluated as intended.
-
-On the second load instruction, (1) could be evaluated as a
-base-register tag, and that is not intended. name_of(1) is a label.
-
-Interpretation is made definitive by interpreting only typed values
-like r1 or r2 as a base register in macro language, if subscripted
-labels are in use.
-
-The supplied definition "ppc_603.def", for example, takes the default
-action that a simple integer expression in parentheses is accepted as
-a base-register tag.
-
-This is the correct default for assembly code generated by gcc.
-
-Subscripted labels will never be generated from c code, and gcc for
-PowerPC encodes into assembler with plain numbers for base registers
-for the load/store instructions.
-
-The code fragment above is knowingly written for masmx and for masmx
-data structuring, and is a different matter from gcc compilation.
-The supplied definition "ppc_603.def", can be switched in advance to
-require tagged base register names like r1 and r3:
-
-__registers_by_name	$set		1
-			$include	"ppc_603.def"
-
-
-7.3: Structured Data and Structured Code Name Spaces
+4.2.2: Structured Data and Structured Code Name Spaces
 ____________________________________________________
 
-7.3.1: simple structures $TREE..$ROOT
-_____________________________________
+4.2.2.1: Word-Aligned Structures $tree / $branch .. $root
+_________________________________________________________
+
+4.2.2.1.1: Simple Structures $TREE .. $ROOT
+___________________________________________
 
 It's possible to generate and to reference subscripted
 labels in an automatic way. 
@@ -4014,8 +3835,8 @@ More complex examples can be found in Section
 8.54: $TREE Directive.
 
 
-7.3.2: branched structures $BRANCH..$ROOT
-_________________________________________
+4.2.2.1.2: Overlaid Structures $BRANCH .. $ROOT
+_______________________________________________
 
 Structures declared with $BRANCH instead of $TREE start from
 the same storage address. Values may freely be declared. The later
@@ -4153,8 +3974,8 @@ transport.msm=0<00000003
 transport.msm: object code 32 bytes: 0 errors: 0 undefined labels
 
 
-7.3.3: Complex Structures
-_________________________
+4.2.2.1.3: Complex Structures
+_____________________________
 
 Simple and branch structures can be combined hierarchically.
 
@@ -4622,12 +4443,23 @@ complex.msm=0<00000003
 complex.msm: object code 2976 bytes: 0 errors: 0 undefined labels
 
 
+4.2.2.2: Bit-Aligned Structures $record .. $root
+________________________________________________
 
 
-4.4: Constructing Program Sections
+4.2.2.2.1: Simple Structures $record .. $root
+_____________________________________________
+
+
+4.2.2.2.2: Overlaid Structures $record .. $root
+_______________________________________________
+
+
+
+4.3: Constructing Program Sections
 __________________________________
 
-4.4.1: Absolute Location Counters
+4.3.1: Absolute Location Counters
 _________________________________
 
 The plainest use of location counter controls has the syntax
@@ -4719,7 +4551,7 @@ If the base register is specified, labels of locations in the
 segment have a tuple base+displacement attribute.
 
 
-4.4.1.1: The Breakpointed Location Counter: Hardware Segmentation
+4.3.1.1: The Breakpointed Location Counter: Hardware Segmentation
 _________________________________________________________________
 
 The breakpointed location counter may be used to describe the absolute
@@ -4809,7 +4641,7 @@ Listings show the program-logical addresses. To see the absolute
 addresses instead, use the -d flag as well as the -l flag
 
 
-4.4.1.2: The Breakpointed Location Counter: -v Option
+4.3.1.2: The Breakpointed Location Counter: -v Option
 _____________________________________________________
 
 If -v option is applied, the treatment of breakpoint values is different.
@@ -4828,7 +4660,7 @@ and offsets instead, use the -d flag as well as the -lv flags
 
 
 
-4.4.1.3: Simple Location Counter without Breakpoint:
+4.3.1.3: Simple Location Counter without Breakpoint:
 	 Base+Displacement in Flat Address Spaces
 _____________________________________________________
 
@@ -4883,7 +4715,7 @@ STERM=.
 qplain.msm: object code 214 bytes: 0 errors: 0 undefined labels
 
 
-4.4.1.4: The Breakpointed Location Counter:
+4.3.1.4: The Breakpointed Location Counter:
              Base+Displacement in Translated Address Spaces
 ___________________________________________________________
 
@@ -4944,19 +4776,29 @@ STERM=.
 rplain.msm: object code 214 bytes: 0 errors: 0 undefined labels
 
 
-4.4.1.5: Void Segments
+4.3.1.5: Void Segments
 ______________________
 
 If the base address (VSEGMENT in the next example) is zero,
-and the segment is not relocatable, and there is no breakpoint address,
-and there is a base register:
+and the segment is not relocatable, and there is no breakpoint address
+or a zero breakpoint address, and there is a base register:
 
-$(id:0,rX)
+$root$(id:0,rX)
 
-then this is a Void Segment, and references resolve as displacements
-within it, but code is not generated.
+Then this is void segment which does not generate the data described
+within it, but maps it to displacements on the base or pointer register
 
-This addresses two cases, where 
+One location counter can be used for many different void segments if a
+zero breakpoint value is specified
+
+$(66::,rX)
+name1	descriptor_type_A
+
+$(66::,rY)
+name2	descriptor_type_B
+
+
+Void Segment addresses two cases, where 
 
 	The data is supplied by a calling
 	routine which hands "this" routine
@@ -5062,10 +4904,10 @@ STERM=.
 pusingv.msm: object code 18447 bytes: 0 errors: 0 undefined labels
 
 
-4.4.1.6: The Breakpointed Location Counter: Giant Address Spaces
+4.3.1.6: The Breakpointed Location Counter: Giant Address Spaces
 ________________________________________________________________
 
-4.4.1.6.1: Very Large Direct Addressed Segments
+4.3.1.6.1: Very Large Direct Addressed Segments
 _______________________________________________
 
 If breakpoint is prefixed with an asterisk, it is a
@@ -5168,11 +5010,11 @@ See also option flag -i, sign extended addressing (Section 3.2: Command
 Line Options).
 
 
-4.4.1.6.2: Very Large Load Address Base-Displacement Examples
+4.3.1.6.2: Very Large Load Address Base-Displacement Examples
 _____________________________________________________________
 
 
-4.4.1.6.2.1: Giant Absolute Address Base-Displacement Example
+4.3.1.6.2.1: Giant Absolute Address Base-Displacement Example
 _____________________________________________________________
 
 With Static Base-Displacement Referencing
@@ -5232,7 +5074,7 @@ modest.msm: object code 217 bytes: 0 errors: 0 undefined labels
 
 
 
-4.4.1.6.2.2.: Giant Absolute Address Data Example
+4.3.1.6.2.2.: Giant Absolute Address Data Example
 _________________________________________________
 
 with Dynamic Base-Displacement Referencing
@@ -5320,7 +5162,7 @@ See also Section 8.2: $AWIDTH directive
 See also Section 9: Output File Formats, Relocation and Linking,
 Giant Address Spaces, Interfacing with GNU Tools.
 
-4.4.1.7: Literal Pool Tag
+4.3.1.7: Literal Pool Tag
 __________________________
 
 Literals may be generated in any sort of segment where code is
@@ -5376,7 +5218,7 @@ $(.array::BASE+OFFSET/$literals_tag)
 
 
 
-4.4.2: Relocatable Location Counters
+4.3.2: Relocatable Location Counters
 ____________________________________
 
 $(id:*alignment[:initial_offset][,base_reg][/literal_pool_tag])
@@ -5446,9 +5288,6 @@ Perhaps "target.def" allows "$include" to be called
 6.1: Establishing your Syntax
 _____________________________
 
-All directives are explained in full in alphabetical order
-in Section 8: Directives
-
 When masmx starts running,
 
 	semicolon is line continuation
@@ -5478,6 +5317,29 @@ When masmx starts running,
 	leading zero on a number is hex
 	numbers beginning 1..9 are decimal
 	numbers beginning \ are bit-pattern binary
+
+
+Programmable syntax particles include
+
+	the comment character
+
+	the quote character
+
+	the sub:string character
+
+	the line continue character if you want one
+
+	user-supplied renames for the masmx-supplied directives
+
+	user-supplied renames for the masmx-supplied functional macros
+
+	interpretation of legacy functional macros
+
+	text string translation
+
+        number string notation
+
+	the spelling of the operators used in expressions
 
 If you don't want semicolon to mean line continuation
 that's the first thing you change. If you don't want
@@ -5517,8 +5379,72 @@ or maybe
 
 	$QUOTE  ''''
 
-However macro language does not recognise parameterised label
-references inside single quotes-see Section 8.42: $QUOTE directive.
+Label reference in quotes is not recognised if quote is apostrophe,
+because apostrophe also delimits a right-justified number value +'abc"
+
+Labels can be declared in quotes when quote is apostrophe
+
+'macroname(1, 1)'
+'$myname'
+
+In this example a label of the macro first actual parameter 'left'
+is successfully declared, but a label of the macro second actual
+parameter 'right' isn't referenced. An integer constant from
+the letters in the name 'right' is generated instead
+
+
+$ masmx -lnkx
+MASMX 7r3
+0/-INPUT>>
+p	$proc
+bazouki* $name
+'p(1, 1)'* + 'p(2, 1)'
+	$end
+	$quote	''''
+QDELIM='
+	bazouki	left right
+	$end
+QDELIM='
+  :                            1 p $proc
+  :                            2 bazouki* $name
+  :                            3 'p(1, 1)'* + 'p(2, 1)'
+  :                            4  $end
+  :                            5  $quote ''''
+  :                            6 QDELIM='
+00:000000 007269676874        +7  bazouki left right
+  :                            8  $end
+bazouki=:N129:P:0:000000
+QDELIM=$00:000000
+left=$00:000000
+-INPUT>>=0<000000
+:$(00):000000:000002 
+
+This does not happen when $quote is at its default " because
+" does not also have the meaning of a number delimiter. An
+external reference to label "right" is generated
+
+$ masmx -lnkx
+MASMX 7r3
+0/-INPUT>>
+p	$proc
+bazouki* $name
+"p(1, 1)"* + "p(2, 1)"
+	$end
+	bazouki	left right
+	$end
+  :                            1 p $proc
+  :                            2 bazouki* $name
+  :                            3 "p(1, 1)"* + "p(2, 1)"
+  :                            4  $end
+[+0000]18
+00:000000 000000              +5  bazouki left right
+  :                            6  $end
+bazouki=:N129:P:0:000000
+left=$00:000000
+right
+-INPUT>>=0<000000
+:$(00):000000:000001 
+
 
 If you want substring delimiter to be period
 
@@ -5542,11 +5468,14 @@ If you want leading 0... to be octal and leading 0x... to be hex
 
 	$SET_OPTION     "c"
 
-If you want leading $... to be hex
+If you want leading $... to be hex, flag -m opts Motorola old number
+notation. Leading @ will also be octal and leading % bit-pattern.
+-m masks labels beginning $ or @, unless "$labels" and "@labels"
+are referenced in quotes 
 
 	$SET_OPTION     "m"
 
-If you want both
+If you want Motorola and C notation
 
 	$SET_OPTION     "mc"
 
