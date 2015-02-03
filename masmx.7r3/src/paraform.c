@@ -219,7 +219,7 @@ static paraform_code encode_paraform(char *p, char **s)
    }
 
    #ifdef SLIPSHO
-   printf("[encode %d %8.8x]", z.level, z);
+   printf("[encode %2.2x:%2.2x:%2.2x:%2.2x]", z.level, z.field, z.subfield, z.sustring);
    #endif
 
    if (s) *s = p;
@@ -598,6 +598,21 @@ static char *substitute(char *search, char *param)
                   }
                }
                #endif
+
+               vv = getop(vv);
+
+               if (vv == NULL) break;
+               vv = edge(vv, ", ");
+               if (*vv == 0) break;
+
+               if (*vv++ == ',')
+               {
+                  while (*vv == 32) vv++;
+                  vv = edge(vv, " ");
+                  if (*vv == 0) break;
+                  vv = getop(vv);
+                  if (vv == NULL) break;
+               }
 
                while (symbol = *vv++) *v++ = symbol;
 

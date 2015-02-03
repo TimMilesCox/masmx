@@ -4626,6 +4626,7 @@ static int encode(char *x, char *f, char *n)
    char symbol = 0, sentinel = *n, prior;
    char *c, *w, *t = x;
 
+
    for (;;)
    {
       prior = symbol;
@@ -4653,7 +4654,11 @@ static int encode(char *x, char *f, char *n)
                for (;;)
                {
                   symbol = *f++;
+
+                  #if 0
                   if (!symbol) break;
+                  #endif
+
                   if ((symbol == '(') && (*c == 0))
                   {
                      t = w;
@@ -4696,7 +4701,11 @@ static int encode(char *x, char *f, char *n)
          {
             prior = symbol;
             symbol = *f++;
+
+            #if 0
             if (!symbol) break;
+            #endif
+
             *t++ = symbol;
 
             if ((selector['k'-'a'] == 0)
@@ -4719,10 +4728,17 @@ static int encode(char *x, char *f, char *n)
                   *t++ = ESC;
                   *t++ = symbol;
                }
+               #if 0
+               putchar('.');
+               #endif
+
                break;
             }
             if (symbol != *c++) break;
          }
+         #if 0
+         printf("[%c%c %2.2x]\n", sentinel, symbol, *(t-2));
+         #endif
       }
       if (!symbol) break;
    }

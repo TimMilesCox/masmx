@@ -652,4 +652,5 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz o ..\test.zo3\o -lo > ..\text.zo3\o.txt
 ..\masmz questit ..\test.zo3\questit -lok > ..\text.zo3\questit.txt
 ..\masmz nuficsee ..\test.zo3\nuficsee -lok > ..\text.zo3\nuficsee.txt
+..\masmz paving ..\test.zo3\paving -lok > ..\text.zo3\paving.txt
 

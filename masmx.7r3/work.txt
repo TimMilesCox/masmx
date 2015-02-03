@@ -119,13 +119,12 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     4.	Any Address Space						1.4
     5.	Any Floating Point Format					1.5
     6.  Structured Data and Repeat Data					1.6
-	1.  Structured Data						1.6
-	2.  Bit-Aligned Structured Data					1.6.1
-    	3.  Accessing Bit-Aligned Structured Data			1.6.2
-	4.  Repeat Data							1.6.2
-    7.	Run-Time Algorithm Plotting					1.6.4
-	1.  Run-Time Integer Algorithms					1.7.1
-	2.  Run-Time Floating Algorithms				1.7.2
+	1.  Structured Data						1.6.1
+	2.  Bit-Aligned Structured Data					1.6.2
+    	3.  Accessing Bit-Aligned Structured Data			1.6.3
+	4.  Repeat Data							1.6.4
+	5.  Functionally Compartmented Name Spaces			1.6.5
+    7.	Run-Time Algorithm Plotting					1.7
 
 2.  Developer Environment						2
 
@@ -140,13 +139,17 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	2.  The Command Field						4.1.2
 
 	    1.  Directives						4.1.2.1
+	    2.  Data Constants						4.1.2.2
+		1.  Notation
+		    1.	masmx Default Number and String Notation	4.1.2.2.1.1
+		    2.	C Language Number and String Notation		4.1.2.2.1.2
+		    3.	Motorola Old Number Notation			4.1.2.2.1.3
+		    4.	Suffix-Determined Number Notation		4.1.2.2.1.4
 
-	    2.  -Data Constants						4.1.2.2
-
-		1.  Number Items					4.1.2.2.1
-		2.  Split Number Items					4.1.2.2.2
-		3.  Text Strings					4.1.2.2.3
-		4.  $form Items						4.1.2.2.4
+		2.  Number Items					4.1.2.2.2
+		3.  Split Number Items					4.1.2.2.3
+		4.  Text Strings					4.1.2.2.4
+		5.  $form Items						4.1.2.2.5
 
 	    3.  $proc macro calls: instructions and structures		4.1.2.3
 
@@ -235,7 +238,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     2.  Iterated Code and Structured Data				4.2
 
-	    1.	$DO and macros						4.2.1
+	    1.	$do and macros						4.2.1
 
 	    2.	Structured Data and Structured Code Name Spaces		4.2.2
 
@@ -243,10 +246,13 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 		    1.  Simple Structures $TREE..$ROOT			4.2.2.1.1
 		    2.  Overlaid Structures $BRANCH..$ROOT		4.2.2.1.2
 		    3.  Complex Structures				4.2.2.1.3
+		    4.  Structured Code Name Spaces			4.2.2.1.4
+		    
 
 		2.  Bit-Aligned Structures $RECORD..$ROOT		4.2.2.2
 		    1.	Simple Structures $RECORD..$ROOT		4.2.2.2.1
 		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.2.2.2.2
+		    3.  Macro Code Access to Bit-Aligned Structures	4.2.2.2.3
 
     3.  Constructing Program Sections					4.3
 
@@ -313,9 +319,9 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 7.  Target Descriptions							7
 
-    1.	-8051								7.1
+    1.	8051								7.1
 
-    2.	-PowerPC							7.2
+    2.	PowerPC								7.2
 
     3.	Fragment Samples - ColdFire/68000, MIPS, ARM			7.3
 

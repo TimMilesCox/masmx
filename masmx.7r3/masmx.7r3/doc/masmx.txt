@@ -90,7 +90,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     1.	Any Target Architecture						1.1
     2.	Any Input Syntax
 	1  Legacy Source Code Unchanged					1.2.1
-    	2  Number String Notations					1.2.2
+    	2  Number and Character String Notation				1.2.2
     3.	Any Word Size							1.3
     4.	Any Address Space						1.4
     5.	Any Floating Point Format					1.5
@@ -99,9 +99,8 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	2.  Bit-Aligned Structured Data					1.6.2
     	3.  Accessing Bit-Aligned Structured Data			1.6.3
 	4.  Repeat Data							1.6.4
+	5.  Functionally Compartmented Name Spaces			1.6.5
     7.	Run-Time Algorithm Plotting					1.7
-	1.  Run-Time Integer Algorithms					1.7.1
-	2.  Run-Time Floating Algorithms				1.7.2
 
 2.  Developer Environment						2
 
@@ -122,9 +121,9 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 		1.  -Number Items					4.1.2.2.1
 		2.  -Split Number Items					4.1.2.2.2
 		3.  -Text Strings					4.1.2.2.3
-		4.  -$FORM Items					4.1.2.2.4
+		4.  -$form Items					4.1.2.2.4
 
-	    3.  $proc macro calls -instructions and structures		4.1.2.3
+	    3.  $proc macro calls: instructions and structures		4.1.2.3
 
 	3.  The Operand Field						4.1.3
 
@@ -191,13 +190,13 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 
 		    5.	Function Macros					4.1.3.2.2.5
-			1.  -a user function is				4.1.3.2.2.5.1.
-			2.  -directives for constructing functions	4.1.3.2.2.5.2
+			1.  a user function is				4.1.3.2.2.5.1.
+			2.  directives for constructing functions	4.1.3.2.2.5.2
 			    1.  $FUNC -head of function			4.1.3.2.2.5.2.1
         		    2.	$NAME -entry point and invocation tag	4.1.3.2.2.5.2.2
 			    3.	$RETURN -value of result		4.1.3.2.2.5.2.3
 			    4.	$END -foot of function			4.1.3.2.2.5.2.4
-			3.  -code generated during function evaluation	4.1.3.2.2.5.3
+			3.  code generated during function evaluation	4.1.3.2.2.5.3
 			    1.  idempotent functions			4.1.3.2.2.5.3.1
 			    2.  last-pass-only functions		4.1.3.2.2.5.3.2
 
@@ -211,7 +210,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     2.  Iterated Code and Structured Data				4.2
 
-	    1.	$DO and macros						4.2.1
+	    1.	$do and macros						4.2.1
 
 	    2.	Structured Data and Structured Code Name Spaces		4.2.2
 
@@ -219,10 +218,13 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 		    1.  Simple Structures $TREE..$ROOT			4.2.2.1.1
 		    2.  Overlaid Structures $BRANCH..$ROOT		4.2.2.1.2
 		    3.  Complex Structures				4.2.2.1.3
+		    4.  Structured Code Name Spaces			4.2.2.1.4
+		    
 
 		2.  Bit-Aligned Structures $RECORD..$ROOT		4.2.2.2
 		    1.	Simple Structures $RECORD..$ROOT		4.2.2.2.1
 		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.2.2.2.2
+		    3.  Macro Code Access to Bit-Aligned Structures	4.2.2.2.3
 
     3.  Constructing Program Sections					4.3
 
@@ -289,9 +291,9 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 7.  Target Descriptions							7
 
-    1.	-8051								7.1
+    1.	8051								7.1
 
-    2.	-PowerPC							7.2
+    2.	PowerPC								7.2
 
     3.	Fragment Samples - ColdFire/68000, MIPS, ARM			7.3
 
@@ -552,7 +554,8 @@ and leading numeral 1..9 is decimal
 C-Language number and string syntax may instead be opted,
 or Motorola old notation
 
-Number string notation determined by suffix may be opted
+Number string notation determined by suffix may be asserted
+by directive
 
 See Section 2.1: Number Items and Section 3.2: Expressions
 
@@ -561,13 +564,13 @@ See Section 2.1: Number Items and Section 3.2: Expressions
 1.3 masmx Any Word Size
 _______________________
 
+A word is any size from 1 bit to 192 bits, specified with directive $word
+
+Assembled code is in multiples of words, and integer constants occupy by
+default their containing number of words up to 192 bits
+
 Integer and floating constants, and fields of instructions and other 
-constructed things like descriptors, are computed to 192-bit precision.
-
-The target computer word can be any size up to 192 bits.
-
-Integers, floating items and instructions can be multiple words up to 192
-bits total.
+bit-field structures, are computed to 192-bit precision.
 
 
 
@@ -597,27 +600,14 @@ Previously assembled absolute object code in address spaces up to
 relocatable or source.
 
 A masmx link is an assembly which uses masmx linker features.
-Text-encoded-binary <b>.txo</b> files and macro language to
-organise and modify the binary code are included.
+Text-encoded-binary <b>.txo</b> files are included plus macro
+language to which processes text-encoded-binary.
 See section 9.2.2: masmx Linking in Principle
 
-Base-displacement addressing modes are supported for
-accessing data constructed beyond the direct-address
-space of instruction sets. Even for 32-bit PowerPC, 
-that's a normal way of addressing static or .BSS
-
-Many architectures rely entirely on the base-displacement principle
-to address anything at all.
-
-Data constructed at locations in 64-bit or 128-bit or 192-bit memory
-or any other address space size up to 192 bits
-can also be mapped on to base-displacement segments.
-
-masmx can construct label structures and prepare code for
-loading and accessing at astronomic addresses.
-
-Giant-address ability can be used combined with the assembly-time
-repeat compute abilities in masmx
+Base-displacement addressing modes are supported for accessing
+data or code at high effective adresses beyond the direct-address
+range of instruction sets. Data segments in 32-bit and 64-bit
+PowerPC are an example 
 
 
 
@@ -658,6 +648,7 @@ $ masmx -ln
 MASMX 7r3
 0/-INPUT>>
 	$word	32
+	$quantum 8
 	1.875	. masmx format positive value
 	-1.875	. masmx format negative value
 	$list	0
@@ -667,15 +658,16 @@ MASMX 7r3
 	ieee754_64	-1.875	. ieee754 format negative value
 	$end
   :                            1  $word 32
+  :                            2  $quantum 8
 00:00000000 400001F00000000000000000
-                              +2  1.875 . masmx format positive value
-00:00000003 BFFFFE0FFFFFFFFFFFFFFFFF
-                              +3  -1.875 . masmx format negative value
-  :                            89  $list
-00:00000006 3FFE000000000000  +90  ieee754_64 1.875 . ieee754 format positive value
-00:00000008 BFFE000000000000  +91  ieee754_64 -1.875 . ieee754 format negative value
-  :                            92  $end
-:$(00):00000000:0000000A 
+                              +3  1.875 . masmx format positive value
+00:0000000C BFFFFE0FFFFFFFFFFFFFFFFF
+                              +4  -1.875 . masmx format negative value
+  :                            90  $list
+00:00000018 3FFE000000000000  +91  ieee754_64 1.875 . ieee754 format positive value
+00:00000020 BFFE000000000000  +92  ieee754_64 -1.875 . ieee754 format negative value
+  :                            93  $end
+:$(00):00000000:00000028 
  
 The included macro package for generating IEEE754 constants is explained
 in section 12: masmx Floating Format and Alternative Formats and section
@@ -685,32 +677,65 @@ in section 12: masmx Floating Format and Alternative Formats and section
 1.6: Structured Data and Repeat Data
 ____________________________________
 
-
 1.6.1:  Structured Data
 _______________________
+
+mamsx can construct complex hierarchical data. See section 4.2 Iterated Coded and
+Structured Data
 
 
 1.6.2: Bit-Aligned Structured Data
 __________________________________
 
+masmx can construct and label complex hierarchical data which does not map to
+the target architecture and can only be described as bit-fields of arbitrarily
+large size. See Section 4.2.2.2: Bit-Aligned Structures
+
+
 1.6.3: Accessing Bit-Aligned Structured Data
 ____________________________________________
+
+masmx naming techniques allow a single set of macros for a given target
+architecture to enable any application to access complex bit-aligned data.
+See Section 4.2.2.2.3: Macro Code Access to Bit-Aligned Structures
+
 
 1.6.4: Repeat Data
 __________________
 
+masmx generates repeating data and data structures with the $do directive and
+subscripted labels. See Section 4.2.1: $do and macros
+
+
+1.6.5: Functionally Compartmented Name Spaces
+_____________________________________________
+
+Hierarchic label structures can be used to compartment name spaces as with
+languages structured by function. See Section 4.2.2.1.4: Structured Code
+Name Spaces
+
+
 1.7: Run-Time Algorithm Plotting
 ________________________________
 
-1.7.1: Run-Time Integer Algorithms
-__________________________________
-
-1.7.2: Run-Time Floating Algorithms
-___________________________________
+Directives $xqt_i and $xqt_fp combine with target-specific macro language
+to translate algorithmic expressions with run-time variable tokens into
+an instruction plan. See Section 5.1: Run-Time Integer Algorithm Plotter
+and Section 5.2: Run-Time Floating Algorithm Plotter
 
 
 2: Developer Environment
 ________________________
+
+masmx developer environment is a shell
+
+The many assembly examples in this document are captures from the Unix
+bash shell
+
+masmx on Microsoft platforms does not need any shell more sophisticated
+than the original DOS command line screen
+
+The command line is documented at Appendix A: masmx Command Line 
 
 
 3: Getting started
@@ -722,8 +747,8 @@ The developer begins the initial source file with a line like:
 	$include        target.def
 
 Initially masmx knows directives ($include is a directive) 
-and some special names representing internal functions (like $, 
-meaning "location counter").
+and some special names representing internal functions, like $ 
+which means "location counter"
 
 Because file includes can be nested extensively, you don't need
 to edit your existing source even to get the header include line in.
@@ -782,11 +807,15 @@ Lines may be continued. The default continuation symbol ; can be changed with di
 			[argumentN[,argumentN_subfield2,...]] 
 
 4.1.1: Labels
-A label starts in column 1 and ends in whitespace. A label may contain letters, digits, $_?!@: and
-starts with a letter or _?!@
+A label starts in column 1 and ends in whitespace. A label may contain letters,
+digits, $_?!@: and starts with a letter or _?!@
 
 <p>
-A reference containing substring character : may reference a simple label or a structured location
+: in this list of legal characters represents the substring separator which is
+default colon : but may be set to another value, often period . 
+
+<p>
+A reference containing substring separator may reference a simple label or a structured location
 
 <p>
 A label may be in "" and then it starts with anything and contains anything
@@ -821,11 +850,12 @@ A label <i>label_stem(4,1,20)</i> is the count of
 
 </pre>
 
-A subscripted label reference which does not exist has the value of zero because it
+A subscripted label reference which does not exist and which
+has no labels in its set has the value of zero because it
 counts an empty set
 
-Subscripted labels don't have to be in ascending order or any order, but can be
-generated by loop control
+Subscripted labels don't have to be in ascending order or any order,
+but can be generated by loop control
 
 MANY	$set	65536
 
@@ -848,8 +878,8 @@ a_name(1)	+	99*65536
 
 <p>
 Macros generate and use labels which are discarded at the end of the macro expansion.
-Labels only remain available to the calling level of assembly if they are promoted with trailing
-asterisk
+Labels only remain available to the calling level of assembly if they are promoted
+with trailing asterisk
 <pre>
 
 $ masmx -lnxk visible visible
@@ -934,7 +964,7 @@ _______________________
 
 The command field (the first field which is preceded by any
 whitespace) can contain a directive, a constant, a name
-from a $PROC macro, or the name of a $FORM template.
+of a $proc macro, or the name of a $form template.
 
 [label] COMMAND [arguments]
 
@@ -954,7 +984,7 @@ Others declare labels
 label1	$set	VALUE
 label2	$equf	VALUE1, VALUE2...
 label	$equ	VALUE
-label2	$name	VALUE
+label3	$name	VALUE
 
 Others govern conditional assembly
 
@@ -980,13 +1010,13 @@ work functionally outside the command field if they are not in quotes
 or if flag -Q is opted and flag -m is not opted
 
 BYTE	$equ	$byte		   . $byte returns the actual byte size
-setbyte	$equ,"$directive"  "$byte" . setbyte is the same directive as $byte
+setbyte	$equ,"$directive"  "$byte" . setbyte is the same directive (and function) as $byte
 
 A quote at the start of the command field produces a text string constant
 
-The command field is never viewed as an expression. So $equ in the
-command position will always be viewed as the name of some sort of
-command, and directive $EQU will be recognised.
+There may be constant expressions in the command field, but they
+start with a digit, a unary sign a quote or a single-quote. So $equ
+and other directives in the commans field are always recognised.
 
 These lines make .equ .macro and .macend to be labels of directives also.
 
@@ -994,31 +1024,19 @@ These lines make .equ .macro and .macend to be labels of directives also.
 4.1.2.2 Data Constants
 ______________________
 
+
 For complex data constants see section 4.2: Iterated Code and Structured Data
 
-Data constants may be integers, microstructures of bit fields, 
+Simple data constants may be integers, microstructures of bit fields, 
 floating point items or text strings.
 
 
-4.1.2.2.1 Number Items
-______________________
-
-Number item constants are assembled from an expression in the command
-field or a unary sign in the command field and an expression in the
-operand field
-
-	+	INSTANCES*FACTOR
-	15
-	-8.5
-
-Number items starting with a digit need no unary token
-
-Expressions and allowable tokens and operators are detailed in
-Section 4.3.2: Expressions
+4.1.2.2.1 Notation
+__________________
 
 
-4.1.2.2.1.1:  masmx Default Number and Character String Notation
-________________________________________________________________
+4.1.2.2.1.1:  masmx Default Number and String Notation
+_______________________________________________________
 
 Native masmx interprets number strings with leading zero as hex or
 octal, depending $octal or default $hex directives. Leading digit
@@ -1032,6 +1050,10 @@ substrings as "substring":INTEGER:"substring"
 
 A digit string starting \ is bit-pattern
 
+A string in single quotes 'abc' is a right-justified number unless
+' is selected the $quote symbol
+
+
 
 4.1.2.2.1.2:  C Language Number and Character String Notation
 _____________________________________________________________
@@ -1043,6 +1065,7 @@ leading zero is otherwise octal
 -z Flag is also asserted
 
 -c Flag interprets character string \escaped values
+
 
 
 4.1.2.2.1.3:  Motorola Old Number Notation
@@ -1076,6 +1099,25 @@ A size flag may be dissociated from the numeral token by parenthesis or colon
 	123dh		; decimal notation, hexaword
 	234hd		; hex notation, double word
 	234:o		; octaword, no notation suffix = decimal
+
+
+
+
+4.1.2.2.2 Number Items
+______________________
+
+Number item constants are assembled from an expression in the command
+field or a unary sign in the command field and an expression in the
+operand field
+
+	+	INSTANCES*FACTOR
+	15
+	-8.5
+
+Number items starting with a digit need no unary token
+
+Expressions and allowable tokens and operators are detailed in
+Section 4.3.2: Expressions
 
 
 A number constant item has the same expression rules and
@@ -1494,11 +1536,12 @@ MASMX 7r3
 
 
 
-4.1.2.2.2 Split Integers
+4.1.2.2.3 Split Integers
 ________________________
 
-A split integer item is a small list of equal size fields. The default
-size of the total is one word. The suffixes :d etc can change the size.
+A split integer item is a small list of equal size fields. The
+size of the total is one word. The suffixes [d t q p h o] can
+make the size  two, three, four, five, six or eight words.
 
 The source syntax of split integers has commas between the fields:
 
@@ -1529,7 +1572,7 @@ zero-filled slack bits are generated at the top.
 
 
 
-4.2.2.2.3 Text Strings
+4.2.2.2.4 Text Strings
 ______________________
 
 Text strings are a row of bytes composed from
@@ -1630,7 +1673,7 @@ See also Section 10: Byte-Addressing Machines with 32- and 64-bit
 Bus, Managing Alignments
 
 
-4.1.2.2.4: $FORM Items
+4.1.2.2.5: $FORM Items
 ______________________
 
 $FORM declares a bit layout twmplate from one word to 192 bits in size.
@@ -1932,11 +1975,49 @@ And they mostly return their values. Some labels work in a
 functional way and return something computed.
 
 Labels may be bounded with quotes in most places that expressions
-appear in masmx, but if $QUOTE has been changed to ' apostrophe,
-labels bounded with that will not be recognised in expressions,
-but instead the ASCII characters between apostrophes will be read
-as their data value in the current character set and size, by default
-8-bit ASCII, see 8.8 $DATA_CODE directive and 8.5 $BYTE directive.
+appear in masmx
+
+$ masmx -lnkz
+MASMX 7r3
+0/-INPUT>>
+ab	$equ	40
+	+"ab"		. an expression with a label
+	"ab"		. a string
+	'ab'		. a number
+	$end
+  :                            1 ab $equ 40
+00:000000 000028              +2  +"ab"  . an expression with a label
+00:000001 616200              +3  "ab"   . a string
+00:000002 006162              +4  'ab'   . a number
+  :                            5  $end
+:$(00):000000:000003 
+
+If the command field starts with $quote, there is
+no expression but a string
+
+If $quote has been changed to ' apostrophe, labels in ' will not
+be recognised in expressions. The character values between ' are
+right justified as value juxtaposed at current $byte size and
+translated from input to current $data_code, default 8-bit ASCII. 
+See also 8.8 $DATA_CODE directive and 8.5 $BYTE directive
+
+$ masmx -lnkz
+MASMX 7r3
+0/-INPUT>>
+ab	$equ	40
+	$quote	''''
+QDELIM='
+	+'ab'		. a number
+	'ab'		. a string
+	$end
+QDELIM='
+  :                            1 ab $equ 40
+  :                            2  $quote ''''
+  :                            3 QDELIM='
+00:000000 006162              +4  +'ab'	 . a number
+00:000001 616200              +5  'ab'   . a string
+  :                            6  $end
+:$(00):000000:000002 
 
 
 4.1.3.2.2.3 Macro Parameters
@@ -1959,7 +2040,7 @@ The hierarchy of arguments on the macro call line is
 OP is the command name or directive or instruction name. It
 is the first word after any whitespace. It is both subfield zero and
 subfield one of the first field, macro_name(0, 0) and macro_name(0, 1),
-or if the macro has a much-used non-unique name, for example P,
+or if the macro has a widely-used non-unique name, for example p,
 then OP may be referenced with p(0, 0) or with p(0, 1).
 
 After the command field, which is number zero, the whole fields are
@@ -1972,7 +2053,7 @@ separated by a comma and spaces can follow the comma.
 There can also be substrings in subfields, separated by the 
 substring character, default :
 
-The referencing rules are, if for example the $PROC name is P,
+The referencing rules are, if for example the $PROC name is p,
 (it may be any name), 
 
 p       $proc
