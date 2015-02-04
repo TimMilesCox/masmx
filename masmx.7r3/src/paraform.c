@@ -599,6 +599,12 @@ static char *substitute(char *search, char *param)
                }
                #endif
 
+
+               /************************************************
+		skip label and command,subcommand fields
+		translate and present only argument fields
+               ************************************************/
+
                vv = getop(vv);
 
                if (vv == NULL) break;
@@ -608,11 +614,12 @@ static char *substitute(char *search, char *param)
                if (*vv++ == ',')
                {
                   while (*vv == 32) vv++;
-                  vv = edge(vv, " ");
                   if (*vv == 0) break;
                   vv = getop(vv);
                   if (vv == NULL) break;
                }
+
+               while (*vv == ' ') vv++;
 
                while (symbol = *vv++) *v++ = symbol;
 
