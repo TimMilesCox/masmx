@@ -401,6 +401,45 @@ static long rfunction(int v,
    switch(v)
    {
       case LOCTR:
+
+	q = actual;
+        i = loc;
+        x = counter_of_reference;
+
+        if (*s++ == '(')
+        {
+           limit = edge(s, ")");
+           x = expression(s, limit, NULL);
+
+           if ((x < 0) || (x > 71))
+           {
+              flag("locator not in 0..71");
+              return 0;
+           }
+
+           q = &locator[x];
+
+           if (x ^ counter_of_reference) i = q->loc;
+        }
+
+        #ifdef RELOCATION
+        if (q->relocatable) mapx->m.l.y |= 1;
+        mapx->m.l.rel = x | 128;
+        #endif
+
+        if (q->flags & 1)
+        {
+           breakpoint_base = &((value *) q->runbank)->value;
+           item = xpression(STACK_TOP_CLEAR, STACK_TOP_CLEAR, NULL);
+           mapx->m.l.rel = x | 128;
+           quadinsert(i, item);
+           operand_add(item, breakpoint_base);
+           return quadextract(item);
+        }
+
+        return i;
+
+        #if 0
          if (*s++ == '(')
          {
    	    limit = edge(s, ")");
@@ -442,10 +481,11 @@ static long rfunction(int v,
          {
             note("GIANT SPACE: $ returns "
                  "intrasegment part of counter only");
-            note("for absolute current location use $A");
+            note("for absolute current location use $a");
          }
 
          return loc;
+         #endif
 
          #ifdef ZENITH
 
@@ -483,6 +523,15 @@ static long rfunction(int v,
          mapx->m.l.rel = counter_of_reference | 128;
          if (actual->relocatable) mapx->m.l.y = 1;
          #endif
+
+         if (actual->flags & 1)
+         {
+            breakpoint_base = &((value *) actual->runbank)->value;
+            item = xpression(STACK_TOP_CLEAR, STACK_TOP_CLEAR, NULL);
+            quadinsert(actual->base, item);
+            operand_add(item, breakpoint_base);
+            return quadextract(item);
+         }
 
          return actual->base;
          #endif
@@ -794,6 +843,10 @@ static long rfunction(int v,
 
             l = findlabel(d, limit);
 
+            #if 1
+            if ((l) && (x = l->l.r.l.rel)) q = &locator[x & 127];
+            else return j;
+            #else
             if ((l) && ((l->l.valued == LOCATION)
                     ||  (l->l.valued ==      EQU)
                     ||  (l->l.valued ==      SET)
@@ -806,6 +859,7 @@ static long rfunction(int v,
             {
                return j;
             }
+            #endif
          }
 
          #ifdef RELOCATION
@@ -3192,8 +3246,13 @@ static line_item *xpression(char *s, char *e, char *param)
             to the other internal functions
             **************************************************/
 
+            #ifdef ABSOLUTE
             if ((ires < 0)
-            &&  (i ^ LOCTR) && (i ^ ABSOLUTE) && (i ^ NET)) *sp = minus_o;
+            &&  (i ^ LOCTR) && (i ^ ABSOLUTE) && (i ^ NET) && (i ^ SIMPLE_BASE)) *sp = minus_o;
+            #else
+            if ((ires < 0)
+            &&  (i ^ LOCTR) && (i ^ NET) && (i ^ SIMPLE_BASE)) *sp = minus_o;
+            #endif
 
             quadinsert(ires, sp);
 	    return sp;

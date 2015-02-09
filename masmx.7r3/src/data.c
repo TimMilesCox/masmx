@@ -127,7 +127,7 @@
 #define CHILD_SYNONYMS 14
 #define TOP_CHILD_SYNONYMS 15
 #define	SIMPLE_BASE 16
-#define ABSOLUTE 17
+#define	ABSOLUTE 17
 #define	BANK_INDEX 18
 #define	ZENITH	4040
 
