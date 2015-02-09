@@ -439,53 +439,6 @@ static long rfunction(int v,
 
         return i;
 
-        #if 0
-         if (*s++ == '(')
-         {
-   	    limit = edge(s, ")");
-	    j = expression(s, limit, NULL);
-
-            if ((j < 0) || (j > 71))
-            {
-               flag("locator not in 0..71");
-               return 0;
-            }
-
-            q = &locator[j];
-
-            #ifdef RELOCATION
-            if (q->relocatable) mapx->m.l.y |= 1;
-   	    mapx->m.l.rel = j | 128;
-            #endif
-
-            if ((q->flags & 1) && (uselector['W'-'A'] == 0))
-            {
-               note("GIANT SPACE: $(counter) returns "
-                    "intrasegment part of counter only");
-               if (q->flags & 128)
-               note("for absolute address use $A(WITH_A_LABEL_ARGUMENT)");
-               else
-               note("reference a label directly in the target segment");
-            }
-
-            if (j == counter_of_reference) return loc;
-            return q->loc;
-         }
-
-         #ifdef RELOCATION
-         if (actual->relocatable) mapx->m.l.y |= 1;
-         mapx->m.l.rel = counter_of_reference | 128;
-         #endif
-
-         if ((actual->flags & 1) && (uselector['W'-'A'] == 0))
-         {
-            note("GIANT SPACE: $ returns "
-                 "intrasegment part of counter only");
-            note("for absolute current location use $a");
-         }
-
-         return loc;
-         #endif
 
          #ifdef ZENITH
 
@@ -773,53 +726,6 @@ static long rfunction(int v,
          #endif
          #endif
 
-         #ifdef MANTISSA
-
-      case MANTISSA:
-         s = substitute(s + 1, param);
-
-         i = quartets(s);
-         return i;
-         #endif
-
-         #ifdef SCALE
-
-      case SCALE:
-         i = 0;
-         s = substitute(s + 1, param);
-
-         while (symbol = *s++)
-         {
-             if (((symbol > 0x2F) && (symbol < 0x3A))
-             ||  ((symbol > 0x40) && (symbol < 0x5B))
-             ||  ((symbol > 0x60) && (symbol < 0x7B)))
-             {
-             }
-             else break;
-         }
-         if (symbol == '*')
-         {
-            symbol = *s++;
-            {
-               if (symbol == '/') i = quartets(s);
-            }
-         }
-         else
-         {
-            if (symbol == '/')
-            {
-               symbol = *s++;
-               if (symbol == '*')
-               {
-                  i = quartets(s);
-                  i = -i;
-               }
-            }
-         }
-
-         return i;
-
-         #endif
 
          #ifdef ABSOLUTE
       case ABSOLUTE:

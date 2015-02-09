@@ -36,10 +36,12 @@ two	$set	0ffffffffffffffffff**0ffffffff
 three	$set	(00000000aaaaaaaa00000000bbbbbbbb/*0)**0ffffffffffffffff
 four	$set	(00000000aaaaaaaa00000000bbbbbbbb/*64)**0ffffffffffffffff
 
+
 	+	$a(one)
 	+	$a(two)
 	+	$a(three)
 	+	$a(four)
+
 
         +       $a(0FFFFFFFFFFFFFFFFFF)
         +       $a(0ffffffffffffffffff**0ffffffff)
@@ -116,4 +118,10 @@ $(0)
         +       $a(after_fourth)
         +       $a(after_fifth)
         +       $a(after_sixth)
+
+weel	$equ	after_prime
+kent	$equ	$(0)
+
+	+	$a(weel)
+	+	$a(kent)
 

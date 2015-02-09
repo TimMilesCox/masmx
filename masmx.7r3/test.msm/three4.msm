@@ -25,7 +25,7 @@ showtime*
         $res    32
 partytime*
 
-$(.text:128:*BASIS, r29)
+$(.text:128:*BASIS)
 $(.literal:256:*BASIS,30/__literal)
 __base36 $equ	BASIS
 

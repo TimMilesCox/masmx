@@ -27,7 +27,7 @@ SEGMENT $equ    55*1024+768
 GALACTASEGMENT $set 0x00FFCC007FFC0000
 
 $(55:SEGMENT:*GALACTASEGMENT,r12/GALACTAPOD)
-this_segment $equ .+GALACTASEGMENT
+this_segment $equ .	#	+GALACTASEGMENT
 times   $do     2,raddle1(times) tree    18
 raddle2 tree    30
         +       GALACTAPOD(1*/120)
@@ -55,7 +55,7 @@ zibl
 oibl
 $(55, 11)
 voibl
-new_segment $equ .+GALACTASEGMENT
+new_segment $equ .	#	+GALACTASEGMENT
 jessalabel tree 6
 jumbly  tree    4
 $(0:.(0))

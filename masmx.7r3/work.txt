@@ -136,6 +136,14 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	1.  Labels							4.1.1
 
+	2.  Command and Argument Fields					4.1.2
+	    1.  Notation
+		1.  masmx Default Number and String Notation		4.1.2.1.1
+		2.  C Language Number and String Notation		4.1.2.1.2
+		3.  Motorola Old Number Notation			4.1.2.1.3
+		4.  Suffix-Determined Number Notation			4.1.2.1.4
+	    2.  Expressions						4.1.2.2
+
 	2.  The Command Field						4.1.2
 
 	    1.  Directives						4.1.2.1
@@ -155,88 +163,29 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	3.  The Operand Field						4.1.3
 
-	    1.	-Fields, Subfields and Substrings			4.1.3.1
-	    2.	-Expressions						4.1.3.2
-		1.  -operators						4.1.3.2.1
-		    1.	Operators Used on Relocatable Tokens		4.1.3.2.1.1
+	    1.	Fields, Subfields and Substrings			4.1.3.1
+	    2.	Expressions						4.1.3.2
+	    3.	Literals						4.1.3.3
 
-		2.  -tokens in expressions				4.1.3.2.2
-		    1.  -number strings					4.1.3.2.2.1
-			1.  masmx default number strings		4.1.3.2.1.1.1
-			2.  C language syntax number strings		4.1.3.2.1.1.2
-			3.  Motorola old number notation		4.1.3.2.1.1.3
-			4.  Suffix-determined number notation		4.1.3.2.1.1.4
-		    2.  -label references				4.1.3.2.2.2
-		    3.  -macro parameters				4.1.3.2.2.3
+    2.  Literals						4.1.3.3
+	1.  A literal is					4.1.3.3.1
+	2.  The Literal Pools					4.1.3.3.2
+	3.  Literal Pool Tags					4.1.3.3.3
+	4.  Re-use of Literals					4.1.3.3.4
+	5.  Automatic Literals					4.1.3.3.5
+    
+    3.	Function Macros					4.1.3.2.2.5
+	1.  a user function is				4.1.3.2.2.5.1.
+	2.  directives for constructing functions	4.1.3.2.2.5.2
+	    1.  $FUNC -head of function			4.1.3.2.2.5.2.1
+            2.	$NAME -entry point and invocation tag	4.1.3.2.2.5.2.2
+	    3.	$RETURN -value of result		4.1.3.2.2.5.2.3
+	    4.	$END -foot of function			4.1.3.2.2.5.2.4
+	3.  code generated during function evaluation	4.1.3.2.2.5.3
+	    1.  idempotent functions			4.1.3.2.2.5.3.1
+	    2.  last-pass-only functions		4.1.3.2.2.5.3.2
 
-		    4.  -assembler-supplied functions		 	4.1.3.2.2.4
-	
-                        1.  $ -this location counter			4.1.3.2.2.4.1
-
-                        2.  $(..) -a location counter			4.1.3.2.2.4.2
-
-			3.  $a -absolute address			4.1.3.2.2.4.3
-                    	  
-			4.  $b -section base address			4.1.3.2.2.4.4
-                    	  
-			5.  $bank_index -memory block identifier	4.1.3.2.2.4.5
-
-			6.  $n -short token for macro reference name	4.1.3.2.2.4.6
-
-			7.  $net(..) -unrelocated value of expression	4.1.3.2.2.4.7
-
-			8.  $o(..) -value of an option flag		4.1.3.2.2.4.8
-
-			9.  $r -region:
-
-                     	  1.  -identity of current location counter	4.1.3.2.2.4.9.1
-
-			  2.   $r(..) identity of implied locator	4.1.3.2.2.4.9.2
-
-			10. $rel(..) 
-                            -is locator relocatable?			4.1.3.2.2.4.10
-
-			11. $t(..) -type of a label			4.1.3.2.2.4.11
-
-			    1.   -undefined				4.1.3.2.2.4.11.1
-                            2.   -location				4.1.3.2.2.4.11.2
-                            3.   $EQU					4.1.3.2.2.4.11.3
-                            4.   $SET					4.1.3.2.2.4.11.4
-                            5.   $EQUF					4.1.3.2.2.4.11.5
-                            6.   $DIRECTIVE				4.1.3.2.2.4.11.6
-                            7.   $FUNCTION (of masmx)			4.1.3.2.2.4.11.7
-                            8.   $PROC (macro)				4.1.3.2.2.4.11.8
-                            9.   $NAME					4.1.3.2.2.4.11.9
-                           10.   $FUNC (macro)				4.1.3.2.2.4.11.10
-                           11.   $FORM					4.1.3.2.2.4.11.11
-                           12.   -user assigned label types		4.1.3.2.2.4.11.12
-
-			12. $zenith -high adress of section + literals	4.1.3.2.2.4.12
-
-			    1.  $zenith	  -this section			4.1.3.2.2.4.12.1
-			    2.  $zenith(..) -named section		4.1.3.2.2.4.12.2
-
-
-		    5.	Function Macros					4.1.3.2.2.5
-			1.  a user function is				4.1.3.2.2.5.1.
-			2.  directives for constructing functions	4.1.3.2.2.5.2
-			    1.  $FUNC -head of function			4.1.3.2.2.5.2.1
-        		    2.	$NAME -entry point and invocation tag	4.1.3.2.2.5.2.2
-			    3.	$RETURN -value of result		4.1.3.2.2.5.2.3
-			    4.	$END -foot of function			4.1.3.2.2.5.2.4
-			3.  code generated during function evaluation	4.1.3.2.2.5.3
-			    1.  idempotent functions			4.1.3.2.2.5.3.1
-			    2.  last-pass-only functions		4.1.3.2.2.5.3.2
-
-	    3.  Literals						4.1.3.3
-		1.  A literal is					4.1.3.3.1
-		2.  The Literal Pools					4.1.3.3.2
-		3.  Literal Pool Tags					4.1.3.3.3
-		4.  Re-use of Literals					4.1.3.3.4
-		5.  Automatic Literals					4.1.3.3.5
-
-
-    2.  Iterated Code and Structured Data				4.2
+    4.  Iterated Code and Structured Data				4.2
 
 	    1.	$do and macros						4.2.1
 
@@ -254,7 +203,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.2.2.2.2
 		    3.  Macro Code Access to Bit-Aligned Structures	4.2.2.2.3
 
-    3.  Constructing Program Sections					4.3
+    5.  Constructing Program Sections					4.3
 
 	    1.  Absolute Location Counters				4.3.1
 
@@ -289,6 +238,192 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 		7.   Literal Pool Tag					4.3.1.7
 
 	    2.  Relocatable Location Counters				4.3.2
+
+    6.  masmx Directives							8
+
+	1.	$ascii		set character code to ASCII			8.1
+	2.	$awidth		set address width				8.2
+	3.	$blank		set the globality of a future label		8.3
+	4.	$branch		branch of a structured name space		8.4
+	5.	$byte		set the width of a text byte			8.5
+
+	6.	$characteristic	-set exponent field size
+			per floating point number size			8.6
+
+	7.	$cont_char	change line continue character			8.7
+	8.	$data_code	define/select alternate character set		8.8
+	9.	$do		generate repeated code				8.9
+	10.	$else		conditional assembly				8.10
+	11.	$endif		conditional assembly				8.11
+	12.	$end		foot of macro or assembly			8.12
+	13.	$endif		conditional assembly				8.13
+	14.	$equ		assign a value to label				8.14
+	15.	$equf		assign a list of values to label		8.15
+	16.	$exit		abandon assembly with a message			8.16
+	17.	$flag		diagnostic, mark assembly in error		8.17
+
+	18.	$flagf		first pass diagnostic, mark assembly in error	8.18
+
+	19.	$floating_point set default floating number size		8.19
+
+	20.	$form		bit fields layout template
+				typically an instruction layout		8.20
+
+	21.	$func		user macro to produce an operand value		8.21
+	22.	$hex		set binary notation to hex			8.23
+
+	23.	$if		conditional assembly				8.23
+
+	24.	$include	include a source file or a binary file		8.24
+
+	    1.  $include		read a nested source file		8.24.1
+
+	    2.  $include,$binary 	linking directive:
+				read a text-encoded binary file
+				process its relocation information
+				output the linked code			8.24.2
+
+	    3.  $include,$void	linking directive:
+				include addresses from a text-encoded
+				binary file, but no code from it	8.24.3
+
+	25.	$info			linking directive:			8.25
+
+	    1.  $info,$offset	update a tuple of relocation information
+				rewrite it to output binary		8.25.1
+
+	    2.  $info,$range_check		
+		$info,$range_check1	
+
+			request linker Automatic range-checking
+			of an updated field of output binary		8.25.2
+
+	26.	$linewidth	control layout in text encoded binary		8.26
+
+	27.	$list		set inclusion nest level for listing		8.27
+			$list 0, masking names from list/export
+
+	28.	$lit		select default location counter for literals
+			-optionally declare literal tag			8.28
+
+	29.	$load		linking directive:
+			write revised binary information in
+			output text-encoded binary file			8.30
+
+	30.	$lterm		change comment character			8.30
+	31.	$name		macro call name and value			8.31
+	32.	$nop		do nothing [+ comment]				8.32
+	33.	$note		informative diagnostic, not error		8.33
+	34.	$notef		first pass informative diagnostic		8.34
+	35.	$octal		set binary notation to octal			8.35
+	36.	$path		alter include path				8.36
+	37.	$plist		nest depth for listing macro expansion		8.37
+	38.	$proc		head of procedural macro			8.38
+
+	39.	$pushrel	linking directive:
+
+				scan a relocation tuples applied to a
+				word group in the text-encoded binary.
+
+				Stack an unresolved relocation tuple
+				for replay to the $MAP linking macro		8.39
+
+	40.	$quantum	set address quantum				8.40
+
+	41.	$quote		change quote mark				8.41
+
+
+	42.	$record								8.42
+
+	    1.	$record		bit-aligned data structures		8.42.1
+	    2.	$record,$branch	bit-aligned structure overlay		8.42.2
+
+	43.	$res		declare a storage buffer			8.43
+
+	44.	$return								8.44
+
+	    1.	return a value from within $FUNC..$END		8.44.1
+	    2.	return from within $PROC..$END			8.44.2
+
+	45.	$root		end of a structured name space which was	
+			begun with $TREE or $BRANCH			8.45
+
+	46.	$set		assign value to a reassignable label		8.46
+
+	47.	$set_option							8.47
+
+	    1.	set option flags				8.47.1
+
+	    2.	Interaction of Run Options
+		and List Directives				8.47.2
+
+	48.	$snap		list the label table				8.48
+
+	49.	$sterm		set the substring sentinel symbol		8.49
+	50.	$store		set the default output file name		8.50
+
+	51.	$suffix		interpret number string notation
+			by suffix					8.51
+
+	52.	$text		translate input text patterns			8.52
+	53.	$trace		display value of expression			8.53
+	54.	$tree		simple structured name space			8.54
+
+	55.	$twos_complement
+			change negative integer representation		8.55
+			-default is twos-complement
+
+	56.	$word		declare size of target computer word		8.56
+	57.	$xqt_i		run-time integer algorithm plotter		8.57
+	58.	$xqt_fp		run-time floating algorith plotter		8.58
+	59.	$zero_code_point  escaped zero character string value		8.59
+
+
+    7.  masmx-supplied functions		 	4.1.3.2.2.4
+	
+	1.  $ -this location counter			4.1.3.2.2.4.1
+
+	2.  $(..) -a location counter			4.1.3.2.2.4.2
+
+	3.  $a -absolute address			4.1.3.2.2.4.3
+                    	  
+	4.  $b -section base address			4.1.3.2.2.4.4
+                    	  
+	5.  $bank_index -memory block identifier	4.1.3.2.2.4.5
+
+	6.  $n -short token for macro reference name	4.1.3.2.2.4.6
+
+	7.  $net(..) -unrelocated value of expression	4.1.3.2.2.4.7
+
+	8.  $o(..) -value of an option flag		4.1.3.2.2.4.8
+
+	9.  $r -region:
+
+             1.  -identity of current location counter	4.1.3.2.2.4.9.1
+
+	     2.   $r(..) identity of implied locator	4.1.3.2.2.4.9.2
+
+	10. $rel(..)  is locator relocatable?			4.1.3.2.2.4.10
+
+	11. $t(..) -type of a label			4.1.3.2.2.4.11
+
+	    1.   undefined				4.1.3.2.2.4.11.1
+	    2.   location				4.1.3.2.2.4.11.2
+	    3.   $EQU					4.1.3.2.2.4.11.3
+	    4.   $SET					4.1.3.2.2.4.11.4
+	    5.   $EQUF					4.1.3.2.2.4.11.5
+	    6.   $DIRECTIVE				4.1.3.2.2.4.11.6
+	    7.   $FUNCTION (of masmx)			4.1.3.2.2.4.11.7
+	    8.   $PROC (macro)				4.1.3.2.2.4.11.8
+	    9.   $NAME					4.1.3.2.2.4.11.9
+	    10.	 $FUNC (macro)				4.1.3.2.2.4.11.10
+	    11.  $FORM					4.1.3.2.2.4.11.11
+	    12.  user assigned label types		4.1.3.2.2.4.11.12
+
+	12. $zenith -high adress of section + literals	4.1.3.2.2.4.12
+
+	    1.  $zenith	  -this section			4.1.3.2.2.4.12.1
+	    2.  $zenith(..) -named section		4.1.3.2.2.4.12.2
 
 
 
@@ -329,146 +464,6 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	2.  MIPS							7.3.2
 	3.  ARM								7.3.3
 
-8.  masmx Directives							8
-
-    1.	$ascii		set character code to ASCII			8.1
-    2.	$awidth		set address width				8.2
-    3.  $blank		set the globality of a future label		8.3
-    4.	$branch		branch of a structured name space		8.4
-    5.	$byte		set the width of a text byte			8.5
-
-    6.	$characteristic	-set exponent field size
-			per floating point number size			8.6
-
-    7.	$cont_char	change line continue character			8.7
-    8.	$data_code	define/select alternate character set		8.8
-    9.	$do		generate repeated code				8.9
-    10.	$else		conditional assembly				8.10
-    11.	$endif		conditional assembly				8.11
-    12.	$end		foot of macro or assembly			8.12
-    13.	$endif		conditional assembly				8.13
-    14.	$equ		assign a value to label				8.14
-    15.	$equf		assign a list of values to label		8.15
-    16.	$exit		abandon assembly with a message			8.16
-    17.	$flag		diagnostic, mark assembly in error		8.17
-
-    18.	$flagf		first pass diagnostic, mark assembly in error	8.18
-
-    19.	$floating_point set default floating number size		8.19
-
-    20.	$form		bit fields layout template
-				typically an instruction layout		8.20
-
-    21.	$func		user macro to produce an operand value		8.21
-    22.	$hex		set binary notation to hex			8.23
-
-    23.	$if		conditional assembly				8.23
-
-    24. $include	include a source file or a binary file		8.24
-
-	1.  $include		read a nested source file		8.24.1
-
-	2.  $include,$binary 	linking directive:
-				read a text-encoded binary file
-				process its relocation information
-				output the linked code			8.24.2
-
-	3.  $include,$void	linking directive:
-				include addresses from a text-encoded
-				binary file, but no code from it	8.24.3
-
-    25.	$info			linking directive:			8.25
-
-	1.  $info,$offset	update a tuple of relocation information
-				rewrite it to output binary		8.25.1
-
-	2.  $info,$range_check		
-	    $info,$range_check1	
-
-			request linker Automatic range-checking
-			of an updated field of output binary		8.25.2
-
-    26.	$linewidth	control layout in text encoded binary		8.26
-
-    27.	$list		set inclusion nest level for listing		8.27
-			$list 0, masking names from list/export
-
-    28.	$lit		select default location counter for literals
-			-optionally declare literal tag			8.28
-
-    29. $load		linking directive:
-			write revised binary information in
-			output text-encoded binary file			8.30
-
-    30.	$lterm		change comment character			8.30
-    31.	$name		macro call name and value			8.31
-    32.	$nop		do nothing [+ comment]				8.32
-    33.	$note		informative diagnostic, not error		8.33
-    34.	$notef		first pass informative diagnostic		8.34
-    35.	$octal		set binary notation to octal			8.35
-    36.	$path		alter include path				8.36
-    37.	$plist		nest depth for listing macro expansion		8.37
-    38.	$proc		head of procedural macro			8.38
-
-    39. $pushrel	linking directive:
-
-			scan a relocation tuples applied to a
-			word group in the text-encoded binary.
-
-			Stack an unresolved relocation tuple
-			for replay to the $MAP linking macro		8.39
-
-    40.	$quantum	set address quantum				8.40
-
-    41.	$quote		change quote mark				8.41
-
-        1.  		quoted strings and labels
-			within macro expansions				8.41.1
-
-    42.	$record								8.42
-
-	1. $record		bit-aligned data structures		8.42.1
-	2. $record,$branch	bit-aligned structure overlay		8.42.2
-
-    43.	$res		declare a storage buffer			8.43
-
-    44.	$return								8.44
-
-	1.		return a value from within $FUNC..$END		8.44.1
-	2.		return from within $PROC..$END			8.44.2
-
-    45.	$root		end of a structured name space which was	
-			begun with $TREE or $BRANCH			8.45
-
-    46.	$set		assign value to a reassignable label		8.46
-
-    47.	$set_option							8.47
-
-	1.		set option flags				8.47.1
-
-	2.		Interaction of Run Options
-			and List Directives				8.47.2
-
-    48.	$snap		list the label table				8.48
-
-    49.	$sterm		set the substring sentinel symbol		8.49
-    50.	$store		set the default output file name		8.50
-
-    51.	$suffix		interpret number string notation
-			by suffix					8.51
-
-    52.	$text		translate input text patterns			8.52
-    53.	$trace		display value of expression			8.53
-    54.	$tree		simple structured name space			8.54
-
-    55.	$twos_complement
-			change negative integer representation		8.55
-			-default is twos-complement
-
-    56.	$word		declare size of target computer word		8.56
-    57.	$xqt_i		run-time integer algorithm plotter		8.57
-    58. $xqt_fp		run-time floating algorith plotter		8.58
-    59. $zero_code_point  escaped zero character string value		8.59
 
 
 9.  Output File Formats, Relocation and Linking
