@@ -2335,6 +2335,7 @@ static line_item *xpression(char *s, char *e, char *param)
 	 on the signed flag without shifting
          ****************************************/
 
+
          if (*(d + 2) == '-') left_side.l.y |= 4;
 
          if (x < 0)
@@ -2345,6 +2346,7 @@ static line_item *xpression(char *s, char *e, char *param)
             part + the shift indication are output
             ****************************************/
 
+            left_side.l.y |= 4;
             map_offset(x, left);
             o_range(left_side.l.y, left);
          }

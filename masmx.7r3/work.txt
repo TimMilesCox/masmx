@@ -136,32 +136,26 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	1.  Labels							4.1.1
 
-	2.  Command and Argument Fields					4.1.2
-	    1.  Notation
-		1.  masmx Default Number and String Notation		4.1.2.1.1
-		2.  C Language Number and String Notation		4.1.2.1.2
-		3.  Motorola Old Number Notation			4.1.2.1.3
-		4.  Suffix-Determined Number Notation			4.1.2.1.4
-	    2.  Expressions						4.1.2.2
-
 	2.  The Command Field						4.1.2
 
 	    1.  Directives						4.1.2.1
+
 	    2.  Data Constants						4.1.2.2
-		1.  Notation
-		    1.	masmx Default Number and String Notation	4.1.2.2.1.1
-		    2.	C Language Number and String Notation		4.1.2.2.1.2
-		    3.	Motorola Old Number Notation			4.1.2.2.1.3
-		    4.	Suffix-Determined Number Notation		4.1.2.2.1.4
+		1.  Notation						4.2.2.2.1
+		    1.  masmx Default Number and String Notation	4.1.2.1.1
+		    2.  C Language Number and String Notation		4.1.2.1.2
+		    3.  Motorola Old Number Notation			4.1.2.1.3
+		    4.  Suffix-Determined Number Notation		4.1.2.1.4
 
-		2.  Number Items					4.1.2.2.2
-		3.  Split Number Items					4.1.2.2.3
-		4.  Text Strings					4.1.2.2.4
-		5.  $form Items						4.1.2.2.5
+		2.  Expressions	and Number Constants			4.1.2.2.2
+		    1.  Operators					4.1.2.2.2.1
+	    	3.  Split Number Items					4.1.3.2.3
+	    	4.  Text Strings					4.1.3.2.4
+	    	5.  $form Items						4.1.3.2.5
 
-	    3.  $proc macro calls: instructions and structures		4.1.2.3
+	    3.  $proc macro calls: instructions and structures		4.1.3.3
 
-	3.  The Operand Field						4.1.3
+	3.  The Operand Field						4.1.4
 
 	    1.	Fields, Subfields and Substrings			4.1.3.1
 	    2.	Expressions						4.1.3.2
@@ -203,43 +197,52 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.2.2.2.2
 		    3.  Macro Code Access to Bit-Aligned Structures	4.2.2.2.3
 
-    5.  Constructing Program Sections					4.3
+    5.	Run-Time Algorithm Plotter					4.5
 
-	    1.  Absolute Location Counters				4.3.1
+	1.  Run-Time Integer Algorithm Plotter				4.5.1
+
+	2.  Run-Time Floating Algorith Plotter				4.5.2
+
+
+    6.  Constructing Program Sections					4.6
+
+	    1.  Absolute Location Counters				4.6.1
 
 		1.  The Breakpointed Location Counter
-		    and Hardware Segmentation				4.3.1.1
+		    and Hardware Segmentation				4.6.1.1
 
-		2.  The Breakpointed Location Counter: -v Option	4.3.1.2
+		2.  The Breakpointed Location Counter: -v Option	4.6.1.2
 
 		3.  Simple Location Counter without Breakpoint:
-		    Base+Displacement in Flat Address Spaces		4.3.1.3
+		    Base+Displacement in Flat Address Spaces		4.6.1.3
 
 		4.  The Breakpointed Location Counter:
-             	    Base+Displacement in Translated Address Spaces	4.3.1.4
+             	    Base+Displacement in Translated Address Spaces	4.6.1.4
 
-		5.  Void Segments					4.3.1.5
+		5.  Void Segments					4.6.1.5
 
 		6.  The Breakpointed Location Counter:
-		    Giant Address Spaces				4.3.1.6
+		    Giant Address Spaces				4.6.1.6
 
 		    1.  Very Large
-			Direct Addressed Segments			4.3.1.6.1
+			Direct Addressed Segments			4.6.1.6.1
 
 		    2.  Very Large Load Address
-			Base-Displacement Examples			4.3.1.6.2
+			Base-Displacement Examples			4.6.1.6.2
 
 		        1.  Giant Absolute Address Base-Displacement
-			    Example (static referencing)		4.3.1.6.2.1
+			    Example (static referencing)		4.6.1.6.2.1
 
 			2.  Giant Absolute Address Base-Displacement
-			    Example (dynamic referencing)		4.3.1.6.2.2
+			    Example (dynamic referencing)		4.6.1.6.2.2
 
-		7.   Literal Pool Tag					4.3.1.7
+		7.   Literal Pool Tag					4.6.1.7
 
-	    2.  Relocatable Location Counters				4.3.2
+	    2.  Relocatable Location Counters				4.6.2
 
-    6.  masmx Directives							8
+
+
+6.  masmx Directives							8
 
 	1.	$ascii		set character code to ASCII			8.1
 	2.	$awidth		set address width				8.2
@@ -425,47 +428,6 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    1.  $zenith	  -this section			4.1.3.2.2.4.12.1
 	    2.  $zenith(..) -named section		4.1.3.2.2.4.12.2
 
-
-
-5.  Run-Time Algorithm Plotter						5
-
-    1.  Run-Time Integer Algorithm Plotter				5.1
-
-    2.  Run-Time Floating Algorith Plotter				5.2
-
-
-6.  Describing Target Architecture in Text				6
-
-    1.  Establishing Your Syntax					6.1
-    2.	Describing the Target Architecture				6.2
-	1.  $WORD, $BYTE, $QUANTUM, $AWIDTH				6.2.1
-	2.  $FORM, $PROC, $NAME, $END					6.2.2
-	    1.	The $FORM Template					6.2.2.1
-	    2.	The $PROC Header					6.2.2.2
-	    3.	The $NAME Entry Point					6.2.2.3
-	    4.	The $END Macro Footer					6.2.2.4
-	    5.  Minimal Instruction Macro Example			6.2.2.5
-	    6.	The Two-pass $PROC					6.2.2.6
-	    7.	The Out of Line $PROC					6.2.2.7
-	    8.	Nested Macro Descriptions				6.2.2.8
-    3.  Synthesising Legacy Automatic Macros				6.3
-	1.  Synthesising Legacy Functional Macros			6.3.1
-	2.  Synthesising Legacy Command Macros				6.3.2
-
-7.  Target Descriptions							7
-
-    1.	8051								7.1
-
-    2.	PowerPC								7.2
-
-    3.	Fragment Samples - ColdFire/68000, MIPS, ARM			7.3
-
-	1.  68000 and ColdFire						7.3.1
-	2.  MIPS							7.3.2
-	3.  ARM								7.3.3
-
-
-
 9.  Output File Formats, Relocation and Linking
     Giant Address Spaces, Interfacing with GNU Tools			9
 
@@ -503,18 +465,6 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    10.	Linking with void Inclusion
 		in Giant Address Space					9.2.3.10
 
-10. Byte-Addressing Machines with 32 and 64 Bit Bus
-    Managing Alignments							10
-
-11. Tuning Macro Language and Fixing Problems				11
-
-    1	Fixing a Macro Parameter Reference				11.1
-    2	Label Cannot Be Referenced					11.2
-    3	Changed Label Value Disappears					11.3
-    4	Tracing Macro Expansion						11.4
-    5	Aliasing masmx Internal Functions				11.5
-    6	Diagnostic about a Label Address				11.6
-    7	Label fails to be Exported					11.7
 
 12. masmx Abstract Floating Format and Alternative Floating Formats	12
     1.  masmx Floating Format						12.1
@@ -523,11 +473,57 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 									12.2.1
 	2. Macro Language Generation of IEEE754 Floating Constants	12.2.2
 
+
+6.  Describing Target Architecture in Text				6
+
+    1.  Establishing Your Syntax					6.1
+    2.	Describing the Target Architecture				6.2
+	1.  $WORD, $BYTE, $QUANTUM, $AWIDTH				6.2.1
+	2.  $FORM, $PROC, $NAME, $END					6.2.2
+	    1.	The $FORM Template					6.2.2.1
+	    2.	The $PROC Header					6.2.2.2
+	    3.	The $NAME Entry Point					6.2.2.3
+	    4.	The $END Macro Footer					6.2.2.4
+	    5.  Minimal Instruction Macro Example			6.2.2.5
+	    6.	The Two-pass $PROC					6.2.2.6
+	    7.	The Out of Line $PROC					6.2.2.7
+	    8.	Nested Macro Descriptions				6.2.2.8
+    3.  Synthesising Legacy Automatic Macros				6.3
+	1.  Synthesising Legacy Functional Macros			6.3.1
+	2.  Synthesising Legacy Command Macros				6.3.2
+
+7.  Target Descriptions							7
+
+    1.	8051								7.1
+
+    2.	PowerPC								7.2
+
+    3.	Fragment Samples - ColdFire/68000, MIPS, ARM			7.3
+
+	1.  68000 and ColdFire						7.3.1
+	2.  MIPS							7.3.2
+	3.  ARM								7.3.3
+
+
+10. Byte-Addressing Machines with 32 and 64 Bit Bus
+    Managing Alignments							10
+
+
 Appendix A: masmx Command Line
 Appendix B: What's new in 7r3?
 Appendix C: The masmx Product Road Map
 Appendix D: masmx's Potential for High Level Languages
-Appendix E: Disclaimer and Contact
+
+Appendix E: Tuning Macro Language and Fixing Problems
+	 E.1:	Fixing a Macro Parameter Reference
+	 E.2:	Label Cannot Be Referenced
+	 E.3:	Changed Label Value Disappears
+	 E.4:	Tracing Macro Expansion
+	 E.5:	Aliasing masmx Internal Functions
+	 E.6:	Diagnostic about a Label Address
+	 E.7:	Label fails to be Exported
+
+Appendix F: Disclaimer and Contact
 
 </pre>
 

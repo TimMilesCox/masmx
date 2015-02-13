@@ -548,14 +548,9 @@ See section 6:1 Establishing your Syntax
 1.2.2:  Number String and Character String Notation
 _________________________________________________
 
-masmx has a leading-zero hex or octal notation for numbers
-and leading numeral 1..9 is decimal
-
-C-Language number and string syntax may instead be opted,
-or Motorola old notation
-
-Number string notation determined by suffix may be asserted
-by directive
+Number and character strings are assembled in masmx native
+notation, C-Language notation, Motorola Old Notation or
+suffix-determined notation
 
 See Section 2.1: Number Items and Section 3.2: Expressions
 
@@ -956,17 +951,84 @@ attestor.msm: object code 0 bytes: 0 errors: 0 undefined labels
 $ cat temp.txo
 $
 
-4.1.2: Command and Argument Fields
-__________________________________
 
-Command and argument fields each may contain expressions
+4.1.2 The Command Field
+_______________________
 
-4.1.2.1 Notation
+The command field (the first field which is preceded by any
+whitespace) can contain a directive, a constant, a name
+of a $proc macro, or the name of a $form template.
+
+[label] COMMAND [arguments]
+
+4.1.2.1 Directives
 __________________
 
+Directives are commands to the assembler. They are listed in Section 8: Directives
 
-4.1.2.1.1:  masmx Default Number and String Notation
-_______________________________________________________
+Some directives control assembly settings, for example
+
+	$word		BITS
+	$quantum	BITS
+	$list		INCLUDE_DEPTH
+
+Others declare labels
+
+label1	$set	VALUE
+label2	$equf	VALUE1, VALUE2...
+label	$equ	VALUE
+label3	$name	VALUE
+
+Others govern conditional assembly
+
+	$if		CONDITION
+	$elseif		CONDITION
+	$endif
+
+And other directives frame macros
+
+All directives may  be aliased to other names using the $EQU directive,
+and frequently are, for example
+
+.equ    $equ,"$directive"       "$equ"
+.macro  $equ,"$directive"       "$proc"
+.macend $equ,"$directive"       "$end"
+
+Quotes are used in these PowerPC examples in case flag -m
+(Motorola old number notation) is opted. The quotes force the
+"$xxxxxx" tokens to be seen as labels and not as hex strings.
+
+A small number of directives, $WORD, $BYTE and others,
+work functionally outside the command field if they are not in quotes
+or if flag -Q is opted and flag -m is not opted
+
+BYTE	$equ	$byte		   . $byte returns the actual byte size
+setbyte	$equ,"$directive"  "$byte" . setbyte is the same directive (and function) as $byte
+
+A quote at the start of the command field produces a text string constant
+
+There may be constant expressions in the command field, but they
+start with a digit, a unary sign a quote or a single-quote. So $equ
+and other directives in the commans field are always recognised.
+
+These lines make .equ .macro and .macend to be labels of directives also.
+
+
+4.1.2.2 Data Constants
+______________________
+
+
+For complex data constants see section 4.2: Iterated Code and Structured Data
+
+Simple data constants may be integers, microstructures of bit fields, 
+floating point items or text strings.
+
+
+4.1.2.2.1 Notation
+__________________
+
+4.1.2.2.1.1:  masmx Default Number and String Notation
+____________________________________________________
 
 Native masmx interprets number strings with leading zero as hex or
 octal, depending $octal or default $hex directives. Leading digit
@@ -985,7 +1047,7 @@ A string in single quotes 'abc' is a right-justified number unless
 
 
 
-4.1.2.1.2:  C Language Number and Character String Notation
+4.1.2.2.1.2:  C-Language Number and Character String Notation
 _____________________________________________________________
 
 With Assembly Flag -c 1000 and 0x3e8 both mean one thousand and
@@ -998,7 +1060,7 @@ leading zero is otherwise octal
 
 
 
-4.1.2.1.3:  Motorola Old Number Notation
+4.1.2.2.1.3:  Motorola Old Number Notation
 __________________________________________
 
 Flag -m interprets
@@ -1008,7 +1070,7 @@ Flag -m interprets
 	%bit_image
 
  
-4.1.2.1.4:  Suffix-Determined Number Notation
+4.1.2.2.1.4:  Suffix-Determined Number Notation
 _______________________________________________
 
 Directive $suffix 2 interprets upper or lowercase
@@ -1030,27 +1092,23 @@ A size flag may be dissociated from the numeral token by parenthesis or colon
 	234hd		; hex notation, double word
 	234:o		; octaword, no notation suffix = decimal
 
-4.1.2.2: Expressions
-____________________
 
-Expressions are labels, numbers and macro argument references computed
-together by operators. Labels may represent 
+4.1.2.2.2: Expressions and Number Constants
+_________________________________________
 
-	addresses of storage locations
-	
-	values given names with $EQU or $SET
+Number item constants are assembled from an expression in the command
+field or a unary sign in the command field and an expression in the
+operand field
 
-	the current iteration count of a $DO loop
-	
-	functions internally supplied from the assembler, 
-	such as location counter values
-	
-	macrofunctions written by the developer, 
-	which assemble when referenced and return 
-	a value to which can be used in the expression
+	+	INSTANCES*FACTOR
+	15
+	-8.5
+	'hello World'
+
+Positive number items starting with a digit need no unary operator
 
 
-4.1.3.2.1 Operators
+4.1.2.2.2.1 Operators
 ___________________
 	
 Operators by rank are
@@ -1104,8 +1162,8 @@ The operators are
 	|_______________|_______________________|
 	|	*/-	| right	shift algebraic	|
 	|_______________|_______________________|
-	|	**	|	AND		|
-	|_______________|_______________________|
+	|	**	|	AND		|			
+	|_______________|_______________________|		
 	|	*+	|      +decimal exponent|
 	|_______________|_______________________|
 	|	*-	|      -decimal exponent|
@@ -1124,78 +1182,74 @@ The operators are
 	|_______________|_______________________|
 
 
+Only	+	PLUS
+	-	MINUS
+	**	AND
+	/*	SHIFT RIGHT
+	*/-	SHIFT RIGHT ALGEBRAIC may be applied to relocatable tokens
 
 
+	+ PLUS - MINUS may operate without restriction on mixed relocatable
+	and absolute tokens	
 
-4.1.3.2.1.1: Operators Used on Relocatable Tokens
-_________________________________________________
+	The token left of ** AND may be relocatable, not the mask. AND applied
+	to a relocatable token suppresses range checking at the link step
 
-Not all operators may be used on relocatable arguments.
+	SHIFT RIGHT and SHIFT RIGHT ALGEBRAIC may be applied to a relocatable
+	token and cause the link step to shift the value after relocation.
+	A shift count may not be relocatable
 
-These notes apply only to relocatable tokens in expressions.
+	/* SHIFT RIGHT requests a logical shift right and unsigned range check
+	after relocation
 
-Operations other than these are not allowed on relocatable tokens.
+	shift left operator */ with negative shift count is SHIFT RIGHT ALGEBRAIC.
+	The link step shifts a relocatable value algebraically after relocation
 
-Relocation information in the text encoded binary is supplemented
-according to the following operations.
 
-+ and - may be used without limit on mixed relocatable and unrelocatable
-arguments. Relocation information is appended for addition once per + of
-a relocatable argument, and for subtraction once per -
+$ masmx relarith -lnk
+MASMX 7r3
+3/relarith.msm
+*EOF*
+  :                            1 	$word		32
+  :                            2 	$quantum	8
+  :                            3 
+  :                            4 ABSOLUTE	$equ	-4096
+  :                            5 MINUS8		$equ	-8
+  :                            6 $(5:*1)
+  :                            7 relocatable	$res	1
+  :                            8 $(6:06000)
+  :                            9 
+(+05:00000000/*10)20+
+06:00006000 00000000          +10 	+	relocatable*/-16	. shift right algebraic 16 positions after relocation
+  :                            11 					. signed range check after reloction and shift
+  :                            12 
+(+05)20+
+06:00006004 00000000          +13 	+	relocatable*/-0		. shift no positions
+  :                            14 					. signed range check after relocation
+  :                            15 
+(+05:00000000/*10)20+
+06:00006008 00000000          +16 	+	relocatable*/(-16)	. shift right algebraic 16 positions after relocation
+  :                            17 					. signed range check after relocation and shift
+  :                            18 
+06:0000600C FFFFFFF0          +19 	+	ABSOLUTE*/MINUS8	. shift right algebraic 8 positions at assembly time
+06:00006010 FFFFFFF0          +20 	+	ABSOLUTE*/-8		. shift right algebraic 8 positions at assembly time
+06:00006014 00FFFFFF          +21 	+	0FFFFFFFF/*8		. shift right logical 8 positions at assembly time	
+  :                            22 
+(+05:00000000/*08)20
+06:00006018 00000000          +23 	+	relocatable/*8		. shift right logical 8 positions after relocation
+  :                            24 					. unsigned range check after relocation and shift
+  :                            25 
+(+05:00000000/*0c)20+
+[+0000:00000000/*0c]20+
+06:0000601C 00000000          +26 	+	relocatable+EXTERNAL*/-12 . shift right algebraic 12 positions after relocation
+  :                            27 					. signed range check after relocation and shift
+  :                            28 
+(+05:00000000/*08)20+
+06:00006020 00000000          +29 	+	relocatable*/MINUS8	. shift right algebraic 8 positions after relocation
+  :                            30 					. signed range check after relocation and shift
+*EOF*
+:$(05):00000000:00000001 :$(06):00006000:00006024 
 
-AND ** instructs the linker that truncation is expected and range is
-not to be checked after relocation.
-
-Only the token left of ** may be relocatable, not the AND mask.
-
-/* SHIFT RIGHT and */- SHIFT RIGHT ALGEBRAIC cause the entire unrelocated
-value to be placed in output unshifted, with instructions to the linker
-to shift after relocation.
-
-Only the token left of the shift operator may be relocatable, not the
-shift count
-
-At assembly time, shift right algebraic */- is chosen instead of shift
-left */ if the left shift count is FACTUALLY negative.
-
-The shift count is factually negative in
-
-	NUMBER*/-16
-	NUMBER*/(-16)
-
-The shift count is not factually negative in
-
-	NUMBER*/-(-16)
-
-The linker is instructed that the value for shifting after relocation
-is to be treated as signed for range-checking if the left shift count
-is APPARENTLY negative.
-
-The shift count is apparently negative if minus follows shift-left
-immediately, as */-
-
-The shift count is apparently negative in
-
-	NUMBER*/-16
-
-The shift count is apparently negative in
-
-	NUMBER*/-0
-
-and then linker range-checking is for signed although no shift takes place.
-
-The shift count is not apparently negative in
-
-	NUMBER*/(-16)
-
-SLEIGHT	$equ	-16
-	NUMBER*/SLEIGHT
-
-In both cases the shift count is ACTUALLY NEGATIVE but not APPARENTLY
-NEGATIVE, so shift right would take place; unrelocated NUMBER would
-be forwarded entire and unshifted to the linker with instructions to
-shift right 16 bits after relocation; range-check as unsigned.
-	
 
 
 4.1.3.2.2: Tokens in Expressions
@@ -1204,10 +1258,8 @@ ________________________________
 4.1.3.2.2.1: Number Strings
 ___________________________
 
-Number string notation is described at Section 4.1.2.1.1: Notation
-
-All notation variants support decimal, hexadecimal, octal and bit-pattern
-By default leading zero is hexadecimal and bit-pattern starts with \
+This expression is in masmx native number notation. Leading zero is
+hexadecimal and bit-pattern starts with \
 
 $ masmx -ln
 MASMX 7r3
@@ -1302,8 +1354,6 @@ add*    $name   1
 
 Actual arguments map to these reference paraforms when the $proc name is p 
 
-Command Line Field
-__________________
 
 	command[,subcommand]	[argument[,argument,..]]	[argument[,..
 
@@ -1313,8 +1363,9 @@ Reference Paraform
 __________________
 
 The command is the first call-line word after any whitespace.
-It is both subfield zero and subfield one of the first field,
-macro_name(0, 0) and macro_name(0, 1),
+It is subfield zero of field 0, macro_name(0, 0)
+
+A subcommand on the command is macro_name(0, 2)
 
 Argument field numbers and their subfield numbers ascend from 1
 
@@ -1326,11 +1377,12 @@ separated by a comma [and spaces]
 There may also be substrings of subfields, separated by the 
 substring character, default :
 
-Here substrings have been counted and assembled into network socket addresses
+Here substrings have been counted and assembled as constants
+containing network socket addresses
 
 The $proc callname $net_socket is in the command field in order to generate a
 constant. $net_socket obtains the value of the network part of the address
-by referencing $func macro $set_ipv4
+by referencing $func macro $net_ipv4
 
 The default $sterm value : is temporarily changed to . for scanning dotted decimal
 
@@ -1405,9 +1457,15 @@ Assembler-supplied functions are summarised as
 
 	$(..)		named location counter value
 
-	$a		absolute value of current location counter
-			used instead of $ to get an absolute
-			location in executable space
+	$a		absolute value of current location counter.
+
+			$a is similar to $ except
+
+				$a can generate absolute constants of
+				locations in base-displacement sections
+
+				an argument to $a(..) is an expression
+ 				not a location counter identity
 
 	$a(..)		absolute value of expression
                     	  
@@ -1454,87 +1512,6 @@ Assembler-supplied functions are summarised as
 
 
 
-
-
-
-
-4.1.3 The Command Field
-_______________________
-
-The command field (the first field which is preceded by any
-whitespace) can contain a directive, a constant, a name
-of a $proc macro, or the name of a $form template.
-
-[label] COMMAND [arguments]
-
-4.1.2.1 Directives
-__________________
-
-Directives are commands to the assembler. They are listed in Section 8: Directives
-
-Some directives control assembly settings, for example
-
-	$word		BITS
-	$quantum	BITS
-	$list		INCLUDE_DEPTH
-
-Others declare labels
-
-label1	$set	VALUE
-label2	$equf	VALUE1, VALUE2...
-label	$equ	VALUE
-label3	$name	VALUE
-
-Others govern conditional assembly
-
-	$if		CONDITION
-	$elseif		CONDITION
-	$endif
-
-And other directives frame macros
-
-All directives may  be aliased to other names using the $EQU directive,
-and frequently are, for example
-
-.equ    $equ,"$directive"       "$equ"
-.macro  $equ,"$directive"       "$proc"
-.macend $equ,"$directive"       "$end"
-
-Quotes are used in these PowerPC examples in case flag -m
-(Motorola old number notation) is opted. The quotes force the
-"$xxxxxx" tokens to be seen as labels and not as hex strings.
-
-A small number of directives, $WORD, $BYTE and others,
-work functionally outside the command field if they are not in quotes
-or if flag -Q is opted and flag -m is not opted
-
-BYTE	$equ	$byte		   . $byte returns the actual byte size
-setbyte	$equ,"$directive"  "$byte" . setbyte is the same directive (and function) as $byte
-
-A quote at the start of the command field produces a text string constant
-
-There may be constant expressions in the command field, but they
-start with a digit, a unary sign a quote or a single-quote. So $equ
-and other directives in the commans field are always recognised.
-
-These lines make .equ .macro and .macend to be labels of directives also.
-
-
-4.1.2.2 Data Constants
-______________________
-
-
-For complex data constants see section 4.2: Iterated Code and Structured Data
-
-Simple data constants may be integers, microstructures of bit fields, 
-floating point items or text strings.
-
-
-4.1.2.2.1 Notation
-__________________
-
-
-
 4.1.2.2.2 Number Items
 ______________________
 
@@ -1555,7 +1532,7 @@ Section 4.3.2: Expressions
 A number constant item has the same expression rules and
 operators as an operand expression. See Section 4.1.3.2: Expressions 
 
-The operators = ^= > < -- ++ /* */ ** + - * / // /// *+ *-
+The operators are = ^= > < -- ++ /* */ */- ** + - * / // /// *+ *-
 
 Unary + - ^ prepended to the first token of the constant expression
 exerts polarity only on the first token
@@ -14721,6 +14698,8 @@ location_after*
 	$store			new_rel
 
 See also 8.28: $LIST 0, masking names from list and export
+
+
 
 12:  masmx Abstract Floating Format and Alternative Floating Formats
 ____________________________________________________________________

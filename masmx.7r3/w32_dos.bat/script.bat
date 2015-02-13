@@ -658,6 +658,7 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx stamp ..\test.o3\stamp -lyok > ..\text.o3\stamp.txt
 ..\masmx nuficsee ..\test.o3\nuficsee -lyok > ..\text.o3\nuficsee.txt
 ..\masmx paving ..\test.o3\paving -lyok > ..\text.o3\paving.txt
+..\masmx relarith ..\test.o3\relarith -lyok > ..\text.o3\relarith.txt
 
 call ..\linkpart
 call ..\coldfire
