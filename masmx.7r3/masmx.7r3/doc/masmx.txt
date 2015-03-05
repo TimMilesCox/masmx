@@ -1107,6 +1107,33 @@ operand field
 
 Positive number items starting with a digit need no unary operator
 
+Unary + - ^ prepended to the first token of the constant expression
+exerts polarity only on the first token
+
+Unary + - ^ separated from the constant expression by whitespace
+exerts polarity over the whole expression
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$word		16
+	$quantum	8
+
+	1.875
+	-2-2
+	-	2-2
+	$end
+  :                            1  $word  16
+  :                            2  $quantum 8
+  :                            3 
+00:0000 400001F00000000000000000
+                              +4  1.875
+00:000C FFFC                  +5  -2-2
+00:000E 0000                  +6  - 2-2
+  :                            7  $end
+:$(00):0000:0010
+
+	
 
 4.1.2.2.2.1 Operators
 ___________________
@@ -1206,7 +1233,7 @@ Only	+	PLUS
 	The link step shifts a relocatable value algebraically after relocation
 
 
-$ masmx relarith -lnk
+$ ../masmx relarith -lnk
 MASMX 7r3
 3/relarith.msm
 *EOF*
@@ -1233,7 +1260,7 @@ MASMX 7r3
   :                            18 
 06:0000600C FFFFFFF0          +19 	+	ABSOLUTE*/MINUS8	. shift right algebraic 8 positions at assembly time
 06:00006010 FFFFFFF0          +20 	+	ABSOLUTE*/-8		. shift right algebraic 8 positions at assembly time
-06:00006014 00FFFFFF          +21 	+	0FFFFFFFF/*8		. shift right logical 8 positions at assembly time	
+06:00006014 00FFFFF0          +21 	+	0FFFFF000/*8		. shift right logical 8 positions at assembly time	
   :                            22 
 (+05:00000000/*08)20
 06:00006018 00000000          +23 	+	relocatable/*8		. shift right logical 8 positions after relocation
@@ -1282,286 +1309,7 @@ MASMX 7r3
 :$(00):00000000:00000002 
 immediat.msm: object code 62 bytes: 0 errors: 0 undefined labels
 
-
-
-4.1.3.2.2.2 Label References
-_____________________________
-
-Labels of any type (storage location line labels, equates, function
-macro names, $DO loop tags) may be referenced in expressions
-
-	+       this*that+the_other
-
-And they mostly return their values. Some labels work in a 
-functional way and return something computed.
-
-Labels may be bounded with quotes on reference
-$ masmx -lnkz
-MASMX 7r3
-0/-INPUT>>
-ab	$equ	40
-	+"ab"		. a label expression
-	"ab"		. a string
-	'ab'		. a number expression
-	$end
-  :                            1 ab $equ 40
-00:000000 000028              +2  +"ab"  . a label expression
-00:000001 616200              +3  "ab"   . a string
-00:000002 006162              +4  'ab'   . a number expression
-  :                            5  $end
-:$(00):000000:000003 
-
-If the command field starts with $quote, there is
-no expression but a string
-
-If $quote has been changed to ' apostrophe, labels in ' will not
-be detected in expressions. The character values between ' are
-right justified as value juxtaposed at current $byte size and
-translated from input to current $data_code, default 8-bit ASCII. 
-See also 8.8 $DATA_CODE directive and 8.5 $BYTE directive
-
-$ masmx -lnkz
-MASMX 7r3
-0/-INPUT>>
-ab	$equ	40
-	$quote	''''
-QDELIM='
-	+'ab'		. a number
-	'ab'		. a string
-	$end
-QDELIM='
-  :                            1 ab $equ 40
-  :                            2  $quote ''''
-  :                            3 QDELIM='
-00:000000 006162              +4  +'ab'	 . a number
-00:000001 616200              +5  'ab'   . a string
-  :                            6  $end
-:$(00):000000:000002 
-
-
-4.1.3.2.2.3 Macro Parameters
-______________________________
-
-Macro actual arguments are accessed by using the label of 
-the macro in a functional way
-
-p       $proc
-add*    $name   1
-	iform   p(0, 1), p(1, 1), p(1, 2)
-	$end
-
-
-
-Actual arguments map to these reference paraforms when the $proc name is p 
-
-
-	command[,subcommand]	[argument[,argument,..]]	[argument[,..
-
-	p(0,0)[, p(0, 2)]	[p(1, 1)[,p(1, 2),..]]		[p(2, 1)[,..
-
-Reference Paraform
-__________________
-
-The command is the first call-line word after any whitespace.
-It is subfield zero of field 0, macro_name(0, 0)
-
-A subcommand on the command is macro_name(0, 2)
-
-Argument field numbers and their subfield numbers ascend from 1
-
-The first subfield of the second argument field is referenced macro_name(2, 1)
-
-Fields are separated by spaces. Subfields in a field are 
-separated by a comma [and spaces]
-
-There may also be substrings of subfields, separated by the 
-substring character, default :
-
-Here substrings have been counted and assembled as constants
-containing network socket addresses
-
-The $proc callname $net_socket is in the command field in order to generate a
-constant. $net_socket obtains the value of the network part of the address
-by referencing $func macro $net_ipv4
-
-The default $sterm value : is temporarily changed to . for scanning dotted decimal
-
-$ masmx -lnk
-MASMX 7r3
-0/-INPUT>>
-        $word	16
-	$quantum 8
-
-f       $func
-"$net_ipv4"* $name
-
-net     $set    0
-        $sterm  '.'
-
-?       $do     f(1, 1:),;
-net     $set    net*/8++f(1, 1:?)
-
-        $sterm  ':'
-
-        $return net
-        $end
-
-
-"$netp" $form   32, 16
-
-p       $proc
-"$net_socket"* $name
-        $netp   $net_ipv4(p(1, 1:1)), p(1, 1:2)
-        $end
-
-address_A	$net_socket	172.29.7.9:8080
-address_B	$net_socket	172.29.6.8:23
-	$end
-  :                            1  $word 16
-  :                            2  $quantum 8
-  :                            3 
-  :                            4 f       $func
-  :                            5 "$net_ipv4"* $name
-  :                            6 
-  :                            7 net     $set    0
-  :                            8         $sterm  '.'
-  :                            9 
-  :                            10 ?       $do     f(1, 1:),net     $set    net*/8++f(1, 1:?)
-  :                            11 
-  :                            12         $sterm  ':'
-  :                            13 
-  :                            14         $return net
-  :                            15         $end
-  :                            16 
-  :                            17 
-  :                            18 "$netp" $form   32, 16
-  :                            19 
-  :                            20 p       $proc
-  :                            21 "$net_socket"* $name
-  :                            22         $netp   $net_ipv4(p(1, 1:1)), p(1, 1:2)
-  :                            23         $end
-  :                            24 
-00:0000 AC1D07091F90          +25 address_A $net_socket 172.29.7.9:8080
-00:0006 AC1D06080017          +26 address_B $net_socket 172.29.6.8:23
-  :                            27  $end
-:$(00):0000:000C 
-
-
-
-4.1.3.2.2.4 Assembler-supplied functions
-________________________________________
-
-Assembler-supplied functions are summarised as
-
-	$		current location counter value
-
-	$(..)		named location counter value
-
-	$a		absolute value of current location counter.
-
-			$a is similar to $ except
-
-				$a can generate absolute constants of
-				locations in base-displacement sections
-
-				an argument to $a(..) is an expression
- 				not a location counter identity
-
-	$a(..)		absolute value of expression
-                    	  
-	$b		start address of current program section
-                    	  
-	$bank_index	current memory block identifier
-			where breakpoint addresses are used
-
-	$n		macro call name
-			retrieves low-order 32 bits of
-			macro_name(0, 0) value
-
-	$net(..)	unrelocated value of expression
-
-	$o(..)		value of an option flag
-
-	$r		current location counter identity
-
-	$r(..)		location counter identity of named address
-
-	$rel		relocation aligment of current program section
-			returns zero for absolute sections and nozero
-			for relocatable sections
-
-	$rel(..)	relocation alignment of named program section
-			returns zero for absolute sections and nozero
-			for relocatable sections
-
-	$t(..)		label type
-
-	$zenith		high address of current section + literals
-
-	$zenith(..)	high address of named section + literals
-
-
-	Examples of masmx Internal Functions in expressions
-	___________________________________________________
-
-	jump	$+2
-
-	$do	$<VISIBLE_REGION,$(64:VISIBLE_REGION)
-
-	$do	$zenith>SECTION_LIMIT,	$flag	section too long
-
-
-
-4.1.2.2.2 Number Items
-______________________
-
-Number item constants are assembled from an expression in the command
-field or a unary sign in the command field and an expression in the
-operand field
-
-	+	INSTANCES*FACTOR
-	15
-	-8.5
-
-Number items starting with a digit need no unary operator
-
-Expressions and allowable tokens and operators are detailed in
-Section 4.3.2: Expressions
-
-
-A number constant item has the same expression rules and
-operators as an operand expression. See Section 4.1.3.2: Expressions 
-
-The operators are = ^= > < -- ++ /* */ */- ** + - * / // /// *+ *-
-
-Unary + - ^ prepended to the first token of the constant expression
-exerts polarity only on the first token
-
-Unary + - ^ separated from the constant expression by whitespace
-exerts polarity over the whole expression
-
-$ masmx -lnk
-MASMX 7r3
-0/-INPUT>>
-	$word		16
-	$quantum	8
-
-	1.875
-	-2-2
-	-	2-2
-	$end
-  :                            1  $word  16
-  :                            2  $quantum 8
-  :                            3 
-00:0000 400001F00000000000000000
-                              +4  1.875
-00:000C FFFC                  +5  -2-2
-00:000E 0000                  +6  - 2-2
-  :                            7  $end
-:$(00):0000:0010 
-
-The following assembly shows at lines 38..49 that
-integer items may have trailing length overrides. Their meanings are
+Integer items may have trailing length overrides. Their meanings are
 
 :s or S = 1 * word size 
 :d or D = 2 * word size
@@ -1822,6 +1570,284 @@ MASMX 7r2
   :                            48 	$end
 :$(00):000000000000:000000000016 
 floating.msm: object code 336 bytes: 0 errors: 0 undefined labels
+
+
+4.1.3.2.2.2 Label References
+_____________________________
+
+Labels of any type (storage location line labels, equates, function
+macro names, $DO loop tags) may be referenced in expressions
+
+	+       this*that+the_other
+
+And they mostly return their values. Some labels work in a 
+functional way and return something computed.
+
+Labels may be bounded with quotes on reference
+$ masmx -lnkz
+MASMX 7r3
+0/-INPUT>>
+ab	$equ	40
+	+"ab"		. a number expression with label reference
+	"ab"		. a string
+	'ab'		. a number expression
+	$end
+  :                            1 ab $equ 40
+00:000000 000028              +2  +"ab"  . a number expression with label reference
+00:000001 616200              +3  "ab"   . a string
+00:000002 006162              +4  'ab'   . a number expression
+  :                            5  $end
+:$(00):000000:000003 
+
+If the command field starts with $quote, there is
+no expression but a string
+
+If $quote has been changed to ' apostrophe, labels in ' will not
+be detected in expressions. The character values between ' are
+right justified as value juxtaposed at current $byte size and
+translated from input to current $data_code, default 8-bit ASCII. 
+See also 8.8 $DATA_CODE directive and 8.5 $BYTE directive
+
+$ masmx -lnkz
+MASMX 7r3
+0/-INPUT>>
+ab	$equ	40
+	$quote	''''
+QDELIM='
+	+'ab'		. a number
+	'ab'		. a string
+	$end
+QDELIM='
+  :                            1 ab $equ 40
+  :                            2  $quote ''''
+  :                            3 QDELIM='
+00:000000 006162              +4  +'ab'	 . a number
+00:000001 616200              +5  'ab'   . a string
+  :                            6  $end
+:$(00):000000:000002 
+
+
+4.1.3.2.2.3 Macro Parameters
+______________________________
+
+Macro actual arguments are accessed by using the label of 
+the macro in a functional way
+
+p       $proc
+add*    $name   1
+	iform   p(0, 1), p(1, 1), p(1, 2)
+	$end
+
+
+
+Actual arguments map to these reference paraforms when the $proc name is p 
+
+
+	command[,subcommand]	[argument[,argument,..]]	[argument[,..
+
+	p(0,0)[, p(0, 2)]	[p(1, 1)[,p(1, 2),..]]		[p(2, 1)[,..
+
+Reference Paraform
+__________________
+
+The command is the first call-line word after any whitespace.
+It is subfield zero of field 0, macro_name(0, 0)
+
+A subcommand on the command is macro_name(0, 2)
+
+Argument field numbers and their subfield numbers ascend from 1
+
+The first subfield of the second argument field is referenced macro_name(2, 1)
+
+Fields are separated by spaces. Subfields in a field are 
+separated by a comma [and spaces]
+
+There may also be substrings of subfields, separated by the 
+substring character, default :
+
+Here substrings have been counted and assembled as constants
+containing network socket addresses
+
+The $proc callname $net_socket is in the command field in order to generate a
+constant. $net_socket obtains the value of the network part of the address
+by referencing $func macro $net_ipv4
+
+The default $sterm value : is temporarily changed to . for scanning dotted decimal
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+        $word	16
+	$quantum 8
+
+f       $func
+"$net_ipv4"* $name
+
+net     $set    0
+        $sterm  '.'
+
+?       $do     f(1, 1:),;
+net     $set    net*/8++f(1, 1:?)
+
+        $sterm  ':'
+
+        $return net
+        $end
+
+
+"$netp" $form   32, 16
+
+p       $proc
+"$net_socket"* $name
+        $netp   $net_ipv4(p(1, 1:1)), p(1, 1:2)
+        $end
+
+address_A	$net_socket	172.29.7.9:8080
+address_B	$net_socket	172.29.6.8:23
+	$end
+  :                            1  $word 16
+  :                            2  $quantum 8
+  :                            3 
+  :                            4 f       $func
+  :                            5 "$net_ipv4"* $name
+  :                            6 
+  :                            7 net     $set    0
+  :                            8         $sterm  '.'
+  :                            9 
+  :                            10 ?       $do     f(1, 1:),net     $set    net*/8++f(1, 1:?)
+  :                            11 
+  :                            12         $sterm  ':'
+  :                            13 
+  :                            14         $return net
+  :                            15         $end
+  :                            16 
+  :                            17 
+  :                            18 "$netp" $form   32, 16
+  :                            19 
+  :                            20 p       $proc
+  :                            21 "$net_socket"* $name
+  :                            22         $netp   $net_ipv4(p(1, 1:1)), p(1, 1:2)
+  :                            23         $end
+  :                            24 
+00:0000 AC1D07091F90          +25 address_A $net_socket 172.29.7.9:8080
+00:0006 AC1D06080017          +26 address_B $net_socket 172.29.6.8:23
+  :                            27  $end
+:$(00):0000:000C 
+
+
+
+4.1.3.2.2.4 Assembler-supplied functions
+________________________________________
+
+Assembler-supplied functions are summarised as
+
+	$		current location counter value
+
+	$(..)		named location counter value
+
+	$a		absolute value of current location counter.
+
+			$a is similar to $ except
+
+				$a can generate absolute constants of
+				locations in base-displacement sections
+
+				an argument to $a(..) is an expression
+ 				not a location counter identity
+
+	$a(..)		absolute value of expression
+                    	  
+	$b		start address of current program section
+                    	  
+	$bank_index	current memory block identifier
+			where breakpoint addresses are used
+
+	$n		macro call name
+			retrieves low-order 32 bits of
+			macro_name(0, 0) value
+
+	$net(..)	unrelocated value of expression
+
+	$o(..)		value of an option flag
+
+	$r		current location counter identity
+
+	$r(..)		location counter identity of named address
+
+	$rel		relocation aligment of current program section
+			returns zero for absolute sections and nozero
+			for relocatable sections
+
+	$rel(..)	relocation alignment of named program section
+			returns zero for absolute sections and nozero
+			for relocatable sections
+
+	$t(..)		label type
+
+	$zenith		high address of current section + literals
+
+	$zenith(..)	high address of named section + literals
+
+
+	Examples of masmx Internal Functions in expressions
+	___________________________________________________
+
+	jump	$+2
+
+	$do	$<VISIBLE_REGION,$(64:VISIBLE_REGION)
+
+	$do	$zenith>SECTION_LIMIT,	$flag	section too long
+
+
+
+4.1.2.2.2 Number Items
+______________________
+
+Number item constants are assembled from an expression in the command
+field or a unary sign in the command field and an expression in the
+operand field
+
+	+	INSTANCES*FACTOR
+	15
+	-8.5
+
+Number items starting with a digit need no unary operator
+
+Expressions and allowable tokens and operators are detailed in
+Section 4.3.2: Expressions
+
+
+A number constant item has the same expression rules and
+operators as an operand expression. See Section 4.1.3.2: Expressions 
+
+The operators are = ^= > < -- ++ /* */ */- ** + - * / // /// *+ *-
+
+Unary + - ^ prepended to the first token of the constant expression
+exerts polarity only on the first token
+
+Unary + - ^ separated from the constant expression by whitespace
+exerts polarity over the whole expression
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$word		16
+	$quantum	8
+
+	1.875
+	-2-2
+	-	2-2
+	$end
+  :                            1  $word  16
+  :                            2  $quantum 8
+  :                            3 
+00:0000 400001F00000000000000000
+                              +4  1.875
+00:000C FFFC                  +5  -2-2
+00:000E 0000                  +6  - 2-2
+  :                            7  $end
+:$(00):0000:0010 
+
 
 
 The scale operator *+ *- is actioned after arithmetic operators / // /// * + -

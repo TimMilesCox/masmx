@@ -5,7 +5,7 @@ retrieves* $name	2	. signed override
 retrieveu* $name	0	. unsigned override 
 
 SIGNED	$set	p(1, *5)+p(0, 0)/*1
-BITS	$set	p(1, 5)
+BITS	$set	p(1, 5)**0x7FFFFFFF	. -c option is in coldfire.def
 OFFSET	$set	p(1, 4)
 D_REG	$set,"$d_reg"	d0+p(2, 1)
 

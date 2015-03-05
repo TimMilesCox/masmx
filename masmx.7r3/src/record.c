@@ -520,8 +520,9 @@ static int record(object *l, char *data, int subfunction)
 
       if (y < 0)
       {
-         if (selector['p'-'a']) printf("eof stop\n");
-         break;
+         printf("eof in $record stop\n");
+	 printf("%s\n", active_instance[active_x - 1]->l.name);
+         exit(0);
       }
 
       if (selector['p'-'a']) printf("%s>\n", p);

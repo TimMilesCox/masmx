@@ -1,0 +1,21 @@
+	$path		../smaragd.68k
+	$include	coldfire.def
+	$include	record_x.def
+	$path
+
+$(5:050000)
+
+layer4  $record,$branch         10 11 12 13 14 15
+?       $do     60,quartet(?)   4
+        $root
+layer5  $record,$branch
+?       $do     80,quintet(?)   5s
+        $root
+layer6  $record,$branch
+?       $do     40,sextet(?)    6
+	$root
+
+$(64:65536)
+
+	retrieve	layer5.quintet(2)	; substring is .
+	retrieve	layer6.sextet(40)	d2

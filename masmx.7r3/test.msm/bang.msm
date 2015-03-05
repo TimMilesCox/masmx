@@ -1,4 +1,6 @@
+	$path		../smaragd.68k
 	$include	coldfire.def
+	$path
 
 $(6:060000)
 Bang	$branch

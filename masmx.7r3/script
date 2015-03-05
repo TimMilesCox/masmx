@@ -658,6 +658,8 @@ lstring -b ../test.o3/straling.txo ../test.o3/straling
 ../masmx nuficsee ../test.o3/nuficsee -lyok > ../text.o3/nuficsee.txt
 ../masmx paving ../test.o3/paving -lyok > ../text.o3/paving.txt
 ../masmx relarith ../test.o3/relarith -lyok > ../text.o3/relarith.txt
+../masmx brachat ../test.o3/brachat -lyok > ../text.o3/brachat.txt
+../masmx mfeuille ../test.o3/mfeuille -lyok > ../text.o3/mfeuille.txt
 
 ../linkpart
 ../coldfire
