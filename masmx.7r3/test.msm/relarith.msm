@@ -7,24 +7,24 @@ $(5:*1)
 relocatable	$res	1
 $(6:06000)
 
-	+	relocatable*/-16	. shift right algebraic 16 positions after relocation
-					. signed range check after reloction and shift
+	+	relocatable*/-16	. signed range check after relocation
+					. shift right algebraic 16 positions
 
-	+	relocatable*/-0		. shift no positions
-					. signed range check after relocation
+	+	relocatable*/-0		. signed range check after relocation
+					. shift no positions
 
-	+	relocatable*/(-16)	. shift right algebraic 16 positions after relocation
-					. signed range check after relocation and shift
+	+	relocatable*/(-16)	. signed range check after relocation
+					. shift right algebraic 16 positions
 
 	+	ABSOLUTE*/MINUS8	. shift right algebraic 8 positions at assembly time
 	+	ABSOLUTE*/-8		. shift right algebraic 8 positions at assembly time
 	+	0FFFFF000/*8		. shift right logical 8 positions at assembly time	
 
-	+	relocatable/*8		. shift right logical 8 positions after relocation
-					. unsigned range check after relocation and shift
+	+	relocatable/*8		. unsigned range check after relocation
+					. shift right logical 8 positions
 
-	+	relocatable+EXTERNAL*/-12 . shift right algebraic 12 positions after relocation
-					. signed range check after relocation and shift
+	+	relocatable+EXTERNAL*/-12 . signed range check after relocation
+					. shift right algebraic 12 positions
 
-	+	relocatable*/MINUS8	. shift right algebraic 8 positions after relocation
-					. signed range check after relocation and shift
+	+	relocatable*/MINUS8	. signed range check after relocation
+					. shift right algebraic 8 positions

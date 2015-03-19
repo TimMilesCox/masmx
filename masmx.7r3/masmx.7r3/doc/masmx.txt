@@ -116,201 +116,179 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	    1.  Directives						4.1.2.1
 
-	    2.  -Data Constants						4.1.2.2
+	    2.  Data Constants						4.1.2.2
+		1.  Notation						4.1.2.2.1
+		    1.  masmx Default Number and String Notation	4.1.2.1.1
+		    2.  C Language Number and String Notation		4.1.2.1.2
+		    3.  Motorola Old Number Notation			4.1.2.1.3
+		    4.  Suffix-Determined Number Notation		4.1.2.1.4
 
-		1.  -Number Items					4.1.2.2.1
-		2.  -Split Number Items					4.1.2.2.2
-		3.  -Text Strings					4.1.2.2.3
-		4.  -$form Items					4.1.2.2.4
+		2.  Expressions	and Number Constants			4.1.2.2.2
+		    1.  Operators					4.1.2.2.2.1
+		    2.	Expression Tokens				4.1.2.2.2.2
+			1.  Number Strings				4.1.2.2.2.2.1
+			2.  Label References				4.1.2.2.2.2.2
+			3.  Assembler-Supplied Functions		4.1.2.2.2.2.3
+			4.  Function Macro Reference			4.1.2.2.2.2.4
+			5.  Macro Parameter Reference			4.1.2.2.2.2.5
+		3.  Number Constants					4.1.2.2.3
+	   	4.  Split Number Items					4.1.2.2.4
+	    	5.  Text Strings					4.1.2.2.5
+	    	6.  $form Items						4.1.2.2.6
 
 	    3.  $proc macro calls: instructions and structures		4.1.2.3
 
-	3.  The Operand Field						4.1.3
+	3.  The Argument Field						4.1.3
 
-	    1.	-Fields, Subfields and Substrings			4.1.3.1
-	    2.	-Expressions						4.1.3.2
-		1.  -operators						4.1.3.2.1
-		    1.	Operators Used on Relocatable Tokens		4.1.3.2.1.1
+	    1.  Instruction Operands					4.1.3.1
+		1.  Operand Expressions					4.1.3.1.1
+		2.  Literal Operands					4.1.3.1.2
 
-		2.  -tokens in expressions				4.1.3.2.2
-		    1.  -number strings					4.1.3.2.2.1
-			1.  masmx default number strings		4.1.3.2.1.1.1
-			2.  C language syntax number strings		4.1.3.2.1.1.2
-			3.  Motorola old number notation		4.1.3.2.1.1.3
-			4.  Suffix-determined number notation		4.1.3.2.1.1.4
-		    2.  -label references				4.1.3.2.2.2
-		    3.  -macro parameters				4.1.3.2.2.3
+	    2.	Arguments of Constant Lines				4.1.3.2
+		1.  Expressions						4.1.3.2.1
+		2.  Literals						4.1.3.2.2
 
-		    4.  -assembler-supplied functions		 	4.1.3.2.2.4
-	
-                        1.  $ -this location counter			4.1.3.2.2.4.1
+    2.  Literals							4.2
+	1.  A literal is						4.2.1
+	2.  The Literal Pools						4.2.2
+	3.  Literal Pool Tags						4.2.3
+	4.  Re-use of Literals						4.2.4
+	5.  Automatic Literals						4.2.5
+    
+    3.	Function Macros							4.3
+	1.  a user function is						4.3.1
+	2.  directives for constructing functions			4.3.2
+	    1.  $FUNC	head of function				4.3.2.1
+            2.	$NAME	entry point and invocation tag			4.3.2.2
+	    3.	$RETURN	value of result					4.3.2.3
+	    4.	$END	foot of function				4.3.2.4
+	3.  code generated during function evaluation			4.3.3
+	    1.  idempotent functions					4.3.3.1
+	    2.  last-pass-only functions				4.3.3.2
 
-                        2.  $(..) -a location counter			4.1.3.2.2.4.2
 
-			3.  $a -absolute address			4.1.3.2.2.4.3
+    4.  masmx-supplied functions				 	4.4
+
+	1.  $ 		this location counter				4.4.1
+
+	2.  $(..)	named location counter				4.4.2
+
+	3.  $a		absolute address				4.4.3
                     	  
-			4.  $b -section base address			4.1.3.2.2.4.4
+	4.  $b		section base address				4.4.4
                     	  
-			5.  $bank_index -memory block identifier	4.1.3.2.2.4.5
+	5.  $bank_index	memory block identifier				4.4.5
 
-			6.  $n -short token for macro reference name	4.1.3.2.2.4.6
+	6.  $n		short token for macro reference name		4.4.6
 
-			7.  $net(..) -unrelocated value of expression	4.1.3.2.2.4.7
+	7.  $net(..)	unrelocated value of expression			4.4.7
 
-			8.  $o(..) -value of an option flag		4.1.3.2.2.4.8
+	8.  $o(..)	value of an option flag				4.4.8
 
-			9.  $r -region:
+	9.  $r		region						4.4.9
 
-                     	  1.  -identity of current location counter	4.1.3.2.2.4.9.1
+	    1.		identity of current location counter		4.4.9.1
 
-			  2.   $r(..) identity of implied locator	4.1.3.2.2.4.9.2
+	    2.		$r(expression) identity of implied locator	4.4.9.2
 
-			10. $rel(..) 
-                            -is locator relocatable?			4.1.3.2.2.4.10
+	10. $rel(..)	is locator relocatable?				4.4.10
 
-			11. $t(..) -type of a label			4.1.3.2.2.4.11
+	11. $t(..)	type of a label					4.4.11
 
-			    1.   -undefined				4.1.3.2.2.4.11.1
-                            2.   -location				4.1.3.2.2.4.11.2
-                            3.   $EQU					4.1.3.2.2.4.11.3
-                            4.   $SET					4.1.3.2.2.4.11.4
-                            5.   $EQUF					4.1.3.2.2.4.11.5
-                            6.   $DIRECTIVE				4.1.3.2.2.4.11.6
-                            7.   $FUNCTION (of masmx)			4.1.3.2.2.4.11.7
-                            8.   $PROC (macro)				4.1.3.2.2.4.11.8
-                            9.   $NAME					4.1.3.2.2.4.11.9
-                           10.   $FUNC (macro)				4.1.3.2.2.4.11.10
-                           11.   $FORM					4.1.3.2.2.4.11.11
-                           12.   -user assigned label types		4.1.3.2.2.4.11.12
+	    1.   undefined						4.4.11.1
+	    2.   location						4.4.11.2
+	    3.   $EQU							4.4.11.3
+	    4.   $SET							4.4.11.4
+	    5.   $EQUF							4.4.11.5
+	    6.   $DIRECTIVE						4.4.11.6
+	    7.   $FUNCTION (of masmx)					4.4.11.7
+	    8.   $PROC (macro)						4.4.11.8
+	    9.   $NAME							4.4.11.9
+	    10.	 $FUNC (macro)						4.4.11.10
+	    11.  $FORM							4.4.11.11
+	    12.  user assigned label types				4.4.11.12
 
-			12. $zenith -high adress of section + literals	4.1.3.2.2.4.12
+	12. $zenith	high address of section + literals		4.4.12
 
-			    1.  $zenith	  -this section			4.1.3.2.2.4.12.1
-			    2.  $zenith(..) -named section		4.1.3.2.2.4.12.2
-
-
-		    5.	Function Macros					4.1.3.2.2.5
-			1.  a user function is				4.1.3.2.2.5.1.
-			2.  directives for constructing functions	4.1.3.2.2.5.2
-			    1.  $FUNC -head of function			4.1.3.2.2.5.2.1
-        		    2.	$NAME -entry point and invocation tag	4.1.3.2.2.5.2.2
-			    3.	$RETURN -value of result		4.1.3.2.2.5.2.3
-			    4.	$END -foot of function			4.1.3.2.2.5.2.4
-			3.  code generated during function evaluation	4.1.3.2.2.5.3
-			    1.  idempotent functions			4.1.3.2.2.5.3.1
-			    2.  last-pass-only functions		4.1.3.2.2.5.3.2
-
-	    3.  Literals						4.1.3.3
-		1.  A literal is					4.1.3.3.1
-		2.  The Literal Pools					4.1.3.3.2
-		3.  Literal Pool Tags					4.1.3.3.3
-		4.  Re-use of Literals					4.1.3.3.4
-		5.  Automatic Literals					4.1.3.3.5
+	    1.	$zenith		this section				4.4.12.1
+	    2.	$zenith(..)	named section				4.4.12.2
 
 
-    2.  Iterated Code and Structured Data				4.2
 
-	    1.	$do and macros						4.2.1
 
-	    2.	Structured Data and Structured Code Name Spaces		4.2.2
 
-		1.  Word-Aligned Structures $TREE / $BRANCH..$ROOT	4.2.2.1
-		    1.  Simple Structures $TREE..$ROOT			4.2.2.1.1
-		    2.  Overlaid Structures $BRANCH..$ROOT		4.2.2.1.2
-		    3.  Complex Structures				4.2.2.1.3
-		    4.  Structured Code Name Spaces			4.2.2.1.4
+
+5.  Iterated Code and Structured Data					5
+
+    1.	$do and macros							5.1
+
+    2.	Structured Data and Structured Code Name Spaces			5.2
+
+	1.  Word-Aligned Structures $TREE / $BRANCH..$ROOT		5.2.1
+	    1.  Simple Structures $TREE..$ROOT				5.2.1.1
+	    2.  Overlaid Structures $BRANCH..$ROOT			5.2.1.2
+	    3.  Complex Structures					5.2.1.3
+	    4.  Structured Code Name Spaces				5.2.1.4
 		    
 
-		2.  Bit-Aligned Structures $RECORD..$ROOT		4.2.2.2
-		    1.	Simple Structures $RECORD..$ROOT		4.2.2.2.1
-		    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT	4.2.2.2.2
-		    3.  Macro Code Access to Bit-Aligned Structures	4.2.2.2.3
-
-    3.  Constructing Program Sections					4.3
-
-	    1.  Absolute Location Counters				4.3.1
-
-		1.  The Breakpointed Location Counter
-		    and Hardware Segmentation				4.3.1.1
-
-		2.  The Breakpointed Location Counter: -v Option	4.3.1.2
-
-		3.  Simple Location Counter without Breakpoint:
-		    Base+Displacement in Flat Address Spaces		4.3.1.3
-
-		4.  The Breakpointed Location Counter:
-             	    Base+Displacement in Translated Address Spaces	4.3.1.4
-
-		5.  Void Segments					4.3.1.5
-
-		6.  The Breakpointed Location Counter:
-		    Giant Address Spaces				4.3.1.6
-
-		    1.  Very Large
-			Direct Addressed Segments			4.3.1.6.1
-
-		    2.  Very Large Load Address
-			Base-Displacement Examples			4.3.1.6.2
-
-		        1.  Giant Absolute Address Base-Displacement
-			    Example (static referencing)		4.3.1.6.2.1
-
-			2.  Giant Absolute Address Base-Displacement
-			    Example (dynamic referencing)		4.3.1.6.2.2
-
-		7.   Literal Pool Tag					4.3.1.7
-
-	    2.  Relocatable Location Counters				4.3.2
+	2.  Bit-Aligned Structures $RECORD..$ROOT			5.2.2
+	    1.	Simple Structures $RECORD..$ROOT			5.2.2.1
+	    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT		5.2.2.2
+	    3.  Macro Code Access to Bit-Aligned Structures		5.2.2.3
 
 
 
-5.  Run-Time Algorithm Plotter
 
-    1.  Run-Time Integer Algorithm Plotter				5.1
+6.  Run-Time Algorithm Plotter						6
 
-    2.  Run-Time Floating Algorith Plotter				5.2
+    1.	Run-Time Integer Algorithm Plotter				6.1
+
+    2.	Run-Time Floating Algorithm Plotter				6.2
 
 
-6.  Describing Target Architecture in Text				6
+7.  Constructing Program Sections					7
 
-    1.  Establishing Your Syntax					6.1
-    2.	Describing the Target Architecture				6.2
-	1.  $WORD, $BYTE, $QUANTUM, $AWIDTH				6.2.1
-	2.  $FORM, $PROC, $NAME, $END					6.2.2
-	    1.	The $FORM Template					6.2.2.1
-	    2.	The $PROC Header					6.2.2.2
-	    3.	The $NAME Entry Point					6.2.2.3
-	    4.	The $END Macro Footer					6.2.2.4
-	    5.  Minimal Instruction Macro Example			6.2.2.5
-	    6.	The Two-pass $PROC					6.2.2.6
-	    7.	The Out of Line $PROC					6.2.2.7
-	    8.	Nested Macro Descriptions				6.2.2.8
-    3.  Synthesising Legacy Automatic Macros				6.3
-	1.  Synthesising Legacy Functional Macros			6.3.1
-	2.  Synthesising Legacy Command Macros				6.3.2
+    1.  Absolute Location Counters					7.1
 
-7.  Target Descriptions							7
+	1.  Breakpointed Location Counters and Hardware Segmentation	7.1.1
 
-    1.	8051								7.1
+	2.  Breakpointed Location Counters: -v Option			7.1.2
 
-    2.	PowerPC								7.2
+	3.  Simple Location Counter without Breakpoint:
+	    Base+Displacement in Flat Address Spaces			7.1.3
 
-    3.	Fragment Samples - ColdFire/68000, MIPS, ARM			7.3
+	4.  Breakpointed Location Counters:
+             	    Base+Displacement in Translated Address Spaces	7.1.4
 
-	1.  68000 and ColdFire						7.3.1
-	2.  MIPS							7.3.2
-	3.  ARM								7.3.3
+	5.  Void Segments						7.1.5
+
+	6.  Breakpointed Location Counters: Giant Address Spaces	7.1.6
+
+	    1.  Very Large Direct Addressed Segments			7.1.6.1
+
+	    2.  Very Large Load Address Base-Displacement Examples	7.1.6.2
+
+		1.  Giant Absolute Address Base-Displacement
+		    Example (static referencing)			7.1.6.2.1
+
+		2.  Giant Absolute Address Base-Displacement
+		    Example (dynamic referencing)			7.1.6.2.2
+
+	7.   Literal Pool Tag						7.1.7
+
+    2.  Relocatable Location Counters					7.2
+
+
 
 8.  masmx Directives							8
 
     1.	$ascii		set character code to ASCII			8.1
     2.	$awidth		set address width				8.2
-    3.  $blank		set the globality of a future label		8.3
+    3.	$blank		set the globality of a future label		8.3
     4.	$branch		branch of a structured name space		8.4
     5.	$byte		set the width of a text byte			8.5
 
-    6.	$characteristic	-set exponent field size
-			per floating point number size			8.6
+    6.	$characteristic		set floating exponent field size	8.6
 
     7.	$cont_char	change line continue character			8.7
     8.	$data_code	define/select alternate character set		8.8
@@ -328,15 +306,14 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     19.	$floating_point set default floating number size		8.19
 
-    20.	$form		bit fields layout template
-				typically an instruction layout		8.20
+    20.	$form		bit fields layout template			8.20
 
     21.	$func		user macro to produce an operand value		8.21
     22.	$hex		set binary notation to hex			8.23
 
     23.	$if		conditional assembly				8.23
 
-    24. $include	include a source file or a binary file		8.24
+    24.	$include	include a source file or a binary file		8.24
 
 	1.  $include		read a nested source file		8.24.1
 
@@ -351,8 +328,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     25.	$info			linking directive:			8.25
 
-	1.  $info,$offset	update a tuple of relocation information
-				rewrite it to output binary		8.25.1
+	1.  $info,$offset	update tuple of relocation information	8.25.1
 
 	2.  $info,$range_check		
 	    $info,$range_check1	
@@ -362,13 +338,14 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     26.	$linewidth	control layout in text encoded binary		8.26
 
-    27.	$list		set inclusion nest level for listing		8.27
-			$list 0, masking names from list/export
+    27.	$list								8.27
+	1.  $list	set inclusion nest level for listing		8.27.1
+	2.  $list 0	suppress list and labels export			8.27.2
 
     28.	$lit		select default location counter for literals
-			-optionally declare literal tag			8.28
+			optionally declare literal tag			8.28
 
-    29. $load		linking directive:
+    29.	$load		linking directive:
 			write revised binary information in
 			output text-encoded binary file			8.30
 
@@ -382,9 +359,9 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     37.	$plist		nest depth for listing macro expansion		8.37
     38.	$proc		head of procedural macro			8.38
 
-    39. $pushrel	linking directive:
+    39.	$pushrel	linking directive:
 
-			scan a relocation tuples applied to a
+			scan a relocation tuple applied to a
 			word group in the text-encoded binary.
 
 			Stack an unresolved relocation tuple
@@ -394,13 +371,11 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     41.	$quote		change quote mark				8.41
 
-        1.  		quoted strings and labels
-			within macro expansions				8.41.1
 
-    42.	$record								8.42
+   42.	$record								8.42
 
-	1. $record		bit-aligned data structures		8.42.1
-	2. $record,$branch	bit-aligned structure overlay		8.42.2
+	1.  $record		bit-aligned data structures		8.42.1
+	2.  $record,$branch	bit-aligned structure overlay		8.42.2
 
     43.	$res		declare a storage buffer			8.43
 
@@ -423,42 +398,50 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     48.	$snap		list the label table				8.48
 
+	1.  $snap		2nd pass				8.48.1
+	2.  $snap, 1		1st pass				8.48.2
+	3.  $snap[,1]	2	dynamic label table			8.48.3
+
     49.	$sterm		set the substring sentinel symbol		8.49
     50.	$store		set the default output file name		8.50
 
-    51.	$suffix		interpret number string notation
-			by suffix					8.51
+    51.	$suffix		suffix-determined  number string notation	8.51
 
     52.	$text		translate input text patterns			8.52
+
     53.	$trace		display value of expression			8.53
+	1.  $trace	2nd pass display				8.53.1
+	2.  $trace, 1	display both passes				8.53.2
+
     54.	$tree		simple structured name space			8.54
 
-    55.	$twos_complement
-			change negative integer representation		8.55
-			-default is twos-complement
+    55.	$twos_complement						8.55
+	1.  $twos_complement	1	2s complement, default		8.55.1
+	2.  $twos_complement	0	1s complement			8.55.2
+
 
     56.	$word		declare size of target computer word		8.56
     57.	$xqt_i		run-time integer algorithm plotter		8.57
-    58. $xqt_fp		run-time floating algorith plotter		8.58
-    59. $zero_code_point  escaped zero character string value		8.59
+    58.	$xqt_fp		run-time floating algorithm plotter		8.58
+    59.	$zero_code_point  character string escaped zero value		8.59
+
 
 
 9.  Output File Formats, Relocation and Linking
     Giant Address Spaces, Interfacing with GNU Tools			9
 
-    1.	Text Encoded Binary Format, S-Records
-	and Intel Hex Records						8.1
+    1.	Text Encoded Binary Format, S-Records and Intel Hex Records	9.1
 
     2.	Relocation, Linking, Giant Address Space
-	and Interfacing with GNU Tools					8.2
+	and Interfacing with GNU Tools					9.2
 
-	1.  Relocation Information in Text Encoded Binary		8.2.1
+	1.  Relocation Information in Text Encoded Binary		9.2.1
 
-	2.  masmx Linking in Principle					8.2.2
+	2.  masmx Linking in Principle					9.2.2
 
-	3.  Demonstration Links						8.2.3
+	3.  Demonstration Links						9.2.3
 
-	    1.	The Simplest Link					8.2.3.1
+	    1.	The Simplest Link					9.2.3.1
 
 	    2.	Link Collected by Sections				9.2.3.2
 
@@ -480,31 +463,62 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    10.	Linking with void Inclusion
 		in Giant Address Space					9.2.3.10
 
-10. Byte-Addressing Machines with 32 and 64 Bit Bus
-    Managing Alignments							10
 
-11. Tuning Macro Language and Fixing Problems				11
-
-    1	Fixing a Macro Parameter Reference				11.1
-    2	Label Cannot Be Referenced					11.2
-    3	Changed Label Value Disappears					11.3
-    4	Tracing Macro Expansion						11.4
-    5	Aliasing masmx Internal Functions				11.5
-    6	Diagnostic about a Label Address				11.6
-    7	Label fails to be Exported					11.7
-
-12. masmx Abstract Floating Format and Alternative Floating Formats	12
-    1.  masmx Floating Format						12.1
-    2.  IEEE754 Floating Values						12.2
+10. masmx Abstract Floating Format and Alternative Floating Formats	10
+    1.  masmx Floating Format						10.1
+    2.  IEEE754 Floating Values						10.2
 	1. Differences between masmx FLoating Format and IEEE754 Floating Formats
-									12.2.1
-	2. Macro Language Generation of IEEE754 Floating Constants	12.2.2
+									10.2.1
+	2. Macro Language Generation of IEEE754 Floating Constants	10.2.2
+
+
+11. Describing Target Architecture in Text				11
+
+    1.  Establishing Your Syntax					11.1
+    2.	Describing the Target Architecture				11.2
+	1.  $WORD, $BYTE, $QUANTUM, $AWIDTH				11.2.1
+	2.  $FORM, $PROC, $NAME, $END					11.2.2
+	    1.	The $FORM Template					11.2.2.1
+	    2.	The $PROC Header					11.2.2.2
+	    3.	The $NAME Entry Point					11.2.2.3
+	    4.	The $END Macro Footer					11.2.2.4
+	    5.  Minimal Instruction Macro Example			11.2.2.5
+	    6.	The Two-pass $PROC					11.2.2.6
+	    7.	The Out of Line $PROC					11.2.2.7
+	    8.	Nested Macro Descriptions				11.2.2.8
+    3.  Synthesising Legacy Automatic Macros				11.3
+	1.  Synthesising Legacy Functional Macros			11.3.1
+	2.  Synthesising Legacy Command Macros				11.3.2
+
+12. Target Descriptions							12
+
+    1.	8051								12.1
+
+    2.	PowerPC								12.2
+
+    3.	Fragment Samples - ColdFire/68000, MIPS, ARM			12.3
+
+	1.  68000 and ColdFire						12.3.1
+	2.  MIPS							12.3.2
+	3.  ARM								12.3.3
+
 
 Appendix A: masmx Command Line
 Appendix B: What's new in 7r3?
 Appendix C: The masmx Product Road Map
 Appendix D: masmx's Potential for High Level Languages
-Appendix E: Disclaimer and Contact
+
+Appendix E: Tuning Macro Language and Fixing Problems
+	 E.1:	Fixing a Macro Parameter Reference
+	 E.2:	Label Cannot Be Referenced
+	 E.3:	Changed Label Value Disappears
+	 E.4:	Tracing Macro Expansion
+	 E.5:	Aliasing masmx Internal Functions
+	 E.6:	Diagnostic about a Label Address
+	 E.7:	Label fails to be Exported
+
+Appendix F: Byte-Addressing Machines with 32 and 64 Bit Bus, Managing Alignments
+Appendix G: Disclaimer and Contact
 
 
 _______________________________________________________________________
@@ -854,7 +868,7 @@ but can be generated by loop control
 
 MANY	$set	65536
 
-index	$do	MANY,a_name(MANY+1-index)	+	99*index
+index	$do	MANY,a_name(MANY+1-index)	99*index
 
 The subscript is an expression like any other and need not be written
 as a normalised integer. On storage and reference, the assembler encodes
@@ -862,14 +876,14 @@ each expression in the subscript list as a strictly normalised integer.
 
 For example, the first two repeats of the $DO above generate
 
-a_name(65536)	+	99*1
-a_name(65535)	+	99*2
+a_name(65536)	99*1
+a_name(65535)	99*2
 
 and the last three generate
 
-a_name(3)	+	99*65534
-a_name(2)	+	99*65535
-a_name(1)	+	99*65536
+a_name(3)	99*65534
+a_name(2)	99*65535
+a_name(1)	99*65536
 
 <p>
 Macros generate and use labels which are discarded at the end of the macro expansion.
@@ -1009,9 +1023,8 @@ A quote at the start of the command field produces a text string constant
 
 There may be constant expressions in the command field, but they
 start with a digit, a unary sign a quote or a single-quote. So $equ
-and other directives in the commans field are always recognised.
+and other directives in the command field are always recognised.
 
-These lines make .equ .macro and .macend to be labels of directives also.
 
 
 4.1.2.2 Data Constants
@@ -1021,7 +1034,7 @@ ______________________
 For complex data constants see section 4.2: Iterated Code and Structured Data
 
 Simple data constants may be integers, microstructures of bit fields, 
-floating point items or text strings.
+floating numbers or text strings.
 
 
 4.1.2.2.1 Notation
@@ -1038,12 +1051,15 @@ octal, depending $octal or default $hex directives. Leading digit
 
 character strings are space filled to containing word in absence
 of -z Flag. Escaped values are typed as integers between quoted
-substrings as "substring":INTEGER:"substring"
+substrings as "substring":INTEGER_EXPRESSION:"substring"
+
+If the substring delimiter is changed with for example $sterm '.'
+then escape sequence is "substring".INTEGER_EXPRESSION."substring"
 
 A digit string starting \ is bit-pattern
 
 A string in single quotes 'abc' is a right-justified number unless
-' is selected the $quote symbol
+directive $quote '''' designates apostrophe to be the quote symbol
 
 
 
@@ -1080,21 +1096,23 @@ Directive $suffix 2 interprets upper or lowercase
 	trailing B as bit image
 	trailing D as decimal default
 
-If the last token in a constant expression is numeral masmx interprets
-a trailing flag S D L T Q P H O upper or lower as a size in words. A notation
-suffix may append to the number string and precede the optional size flag
-
-A size flag may be dissociated from the numeral token by parenthesis or colon
+masmx interprets a trailing flag [s d l t q p h o] on a constant expression
+as a size in words (See 4.1.2.2.3 Number constants). A suffix declaring number
+notation is typed before a size flag
 
 	+123		; decimal notation, self-sizing
 	+(123d)h	; decimal notation, hexaword
 	123dh		; decimal notation, hexaword
 	234hd		; hex notation, double word
-	234:o		; octaword, no notation suffix = decimal
+	234o		; octaword, no notation suffix = decimal
+	234os		; single word octal
+	01dh:d		; hex double word
+
+Directive $suffix 1 defaults leading zero to hex
 
 
 4.1.2.2.2: Expressions and Number Constants
-_________________________________________
+___________________________________________
 
 Number item constants are assembled from an expression in the command
 field or a unary sign in the command field and an expression in the
@@ -1164,7 +1182,8 @@ encountered in the expression
 
 
 Operators of higher rank are evaluated first and operated last. An expression
-generates an integer until a decimal exponent operator *+ *- is actioned
+generates an integer until a decimal exponent operator *+ *- is actioned or a
+decimal point is encountered
 
 
 The operators are 
@@ -1222,15 +1241,14 @@ Only	+	PLUS
 	The token left of ** AND may be relocatable, not the mask. AND applied
 	to a relocatable token suppresses range checking at the link step
 
-	SHIFT RIGHT and SHIFT RIGHT ALGEBRAIC may be applied to a relocatable
-	token and cause the link step to shift the value after relocation.
+	SHIFT RIGHT and SHIFT RIGHT ALGEBRAIC shift the final relocated value
 	A shift count may not be relocatable
 
-	/* SHIFT RIGHT requests a logical shift right and unsigned range check
-	after relocation
+	/* SHIFT RIGHT shifts the relocated value logically right and range-checks unsigned
 
 	shift left operator */ with negative shift count is SHIFT RIGHT ALGEBRAIC.
-	The link step shifts a relocatable value algebraically after relocation
+	Range check at link is signed. The target field contains at least one sign bit.
+	The relocated value is shifted right algebraically
 
 
 $ ../masmx relarith -lnk
@@ -1247,43 +1265,43 @@ MASMX 7r3
   :                            8 $(6:06000)
   :                            9 
 (+05:00000000/*10)20+
-06:00006000 00000000          +10 	+	relocatable*/-16	. shift right algebraic 16 positions after relocation
-  :                            11 					. signed range check after reloction and shift
+06:00006000 00000000          +10 	+	relocatable*/-16	. signed range check after relocation
+  :                            11 					. shift right algebraic 16 positions
   :                            12 
 (+05)20+
-06:00006004 00000000          +13 	+	relocatable*/-0		. shift no positions
-  :                            14 					. signed range check after relocation
+06:00006004 00000000          +13 	+	relocatable*/-0		. signed range check after relocation
+  :                            14 					. shift no positions
   :                            15 
 (+05:00000000/*10)20+
-06:00006008 00000000          +16 	+	relocatable*/(-16)	. shift right algebraic 16 positions after relocation
-  :                            17 					. signed range check after relocation and shift
+06:00006008 00000000          +16 	+	relocatable*/(-16)	. signed range check after relocation
+  :                            17 					. shift right algebraic 16 positions
   :                            18 
 06:0000600C FFFFFFF0          +19 	+	ABSOLUTE*/MINUS8	. shift right algebraic 8 positions at assembly time
 06:00006010 FFFFFFF0          +20 	+	ABSOLUTE*/-8		. shift right algebraic 8 positions at assembly time
 06:00006014 00FFFFF0          +21 	+	0FFFFF000/*8		. shift right logical 8 positions at assembly time	
   :                            22 
 (+05:00000000/*08)20
-06:00006018 00000000          +23 	+	relocatable/*8		. shift right logical 8 positions after relocation
-  :                            24 					. unsigned range check after relocation and shift
+06:00006018 00000000          +23 	+	relocatable/*8		. unsigned range check after relocation
+  :                            24 					. shift right logical 8 positions
   :                            25 
 (+05:00000000/*0c)20+
 [+0000:00000000/*0c]20+
-06:0000601C 00000000          +26 	+	relocatable+EXTERNAL*/-12 . shift right algebraic 12 positions after relocation
-  :                            27 					. signed range check after relocation and shift
+06:0000601C 00000000          +26 	+	relocatable+EXTERNAL*/-12 . signed range check after relocation
+  :                            27 					. shift right algebraic 12 positions
   :                            28 
 (+05:00000000/*08)20+
-06:00006020 00000000          +29 	+	relocatable*/MINUS8	. shift right algebraic 8 positions after relocation
-  :                            30 					. signed range check after relocation and shift
+06:00006020 00000000          +29 	+	relocatable*/MINUS8	. signed range check after relocation
+  :                            30 					. shift right algebraic 8 positions
 *EOF*
 :$(05):00000000:00000001 :$(06):00006000:00006024 
 
 
 
-4.1.3.2.2: Tokens in Expressions
-________________________________
+4.1.2.2.2.2: Expression Tokens
+_______________________________
 
-4.1.3.2.2.1: Number Strings
-___________________________
+4.1.2.2.2.2.1: Number Strings
+_____________________________
 
 This expression is in masmx native number notation. Leading zero is
 hexadecimal and bit-pattern starts with \
@@ -1298,7 +1316,7 @@ MASMX 7r3
  
 Expression tokens of ASCII bytes between apostrophes produce their
 absolute value in the current $data_code juxtaposed by $byte, by
-default 8-bit ASCII.  See 8.8: $DATA_CODE directive and 8.5: $BYTE directive):
+default 8-bit ASCII.  See 8.8: $DATA_CODE directive and 8.5: $BYTE directive
 
 MASMX 7r3
 3/immediat.msm
@@ -1309,7 +1327,324 @@ MASMX 7r3
 :$(00):00000000:00000002 
 immediat.msm: object code 62 bytes: 0 errors: 0 undefined labels
 
-Integer items may have trailing length overrides. Their meanings are
+
+
+4.1.2.2.2.2.2 Label References
+_______________________________
+
+Labels of any type (storage location line labels, equates, function
+macro names, $DO loop tags) may be referenced in expressions
+
+	+       this*that+the_other
+
+And they mostly return their values. Some labels work in a 
+functional way and return something computed. See 4.1.2.2.2.2.3:
+Assembler-Supplied Functions and 4.1.2.2.2.2.4 Function Macro Reference
+
+Labels may be bounded with quotes on reference
+$ masmx -lnkz
+MASMX 7r3
+0/-INPUT>>
+ab	$equ	40
+	+"ab"		. a number expression with label reference
+	"ab"		. a string
+	'ab'		. a number expression
+	$end
+  :                            1 ab $equ 40
+00:000000 000028              +2  +"ab"  . a number expression with label reference
+00:000001 616200              +3  "ab"   . a string
+00:000002 006162              +4  'ab'   . a number expression
+  :                            5  $end
+:$(00):000000:000003 
+
+If the command field starts with $quote, there is
+no expression but a string
+
+If $quote has been changed to ' apostrophe, labels in ' will not
+be detected in expressions. The character values between ' are
+right justified as value juxtaposed at current $byte size and
+translated from input to current $data_code, default 8-bit ASCII. 
+See also 8.8 $DATA_CODE directive and 8.5 $BYTE directive
+
+$ masmx -lnkz
+MASMX 7r3
+0/-INPUT>>
+ab	$equ	40
+	$quote	''''
+QDELIM='
+	+'ab'		. a number
+	'ab'		. a string
+	$end
+QDELIM='
+  :                            1 ab $equ 40
+  :                            2  $quote ''''
+  :                            3 QDELIM='
+00:000000 006162              +4  +'ab'	 . a number
+00:000001 616200              +5  'ab'   . a string
+  :                            6  $end
+:$(00):000000:000002 
+
+
+4.1.2.2.2.2.3: masmx-Supplied Functions
+_______________________________________
+
+See section 4.4 masmx-Supplied Functions for full description.
+In summary:
+
+	$		current location counter value
+
+	$(..)		named location counter value
+
+	$a		absolute value of current location counter.
+
+			$a is similar to $ except
+
+				$a can generate absolute constants of
+				locations in base-displacement sections
+
+				an argument to $a(..) is an expression
+ 				not a location counter identity
+
+				the expression may reference a location
+				counter: + $a($(5))
+
+	$a(..)		absolute value of expression
+                    	  
+	$b		start address of current program section
+                    	  
+	$bank_index	current memory block identifier
+			where breakpoint addresses are used
+
+	$n		macro call name
+			retrieves low-order 32 bits of
+			macro_name(0, 0) value
+
+	$net(..)	unrelocated value of expression
+
+	$o(..)		value of an option flag
+
+	$r		current location counter identity
+
+	$r(..)		location counter identity of named address
+
+	$rel		relocation aligment of current program section
+			returns zero for absolute sections and nozero
+			for relocatable sections
+
+	$rel(..)	relocation alignment of named program section
+			returns zero for absolute sections and nozero
+			for relocatable sections
+
+	$t(..)		label type
+
+	$zenith		high address of current section + literals
+
+	$zenith(..)	high address of named section + literals
+
+
+	Examples of masmx Internal Functions in expressions
+	___________________________________________________
+
+	jump	$+2
+
+	$do	$<VISIBLE_REGION,$(64:VISIBLE_REGION)
+
+	$do	$zenith>SECTION_LIMIT,	$flag	section too long
+
+
+4.1.2.2.2.2.4: Function Macro Reference
+_______________________________________
+
+
+
+
+4.1.2.2.2.2.5: Macro Parameters
+______________________________
+
+Macro actual arguments are accessed by using the label of 
+the macro in a functional way
+
+p       $proc
+add*    $name   1
+	iform   p(0, 1), p(1, 1), p(1, 2)
+	$end
+
+Actual arguments map to these reference paraforms when the $proc name is p 
+
+
+	command[,subcommand]	[argument[,argument,..]]	[argument[,..
+
+	p(0,0)[, p(0, 2)]	[p(1, 1)[,p(1, 2),..]]		[p(2, 1)[,..
+
+
+
+The command is the first call-line word after any whitespace.
+It is subfield zero of field 0, macro_name(0, 0)
+
+A subcommand on the command is macro_name(0, 2)
+
+Argument field numbers and their subfield numbers ascend from 1
+
+The first subfield of the second argument field is referenced macro_name(2, 1)
+
+Fields are separated by spaces. Subfields in a field are 
+separated by a comma [and spaces]
+
+There may also be substrings of subfields, separated by the 
+substring character, default :
+
+Here substrings have been counted and assembled as constants
+containing network socket addresses
+
+The $proc callname $net_socket is in the command field in order to generate a
+constant. $net_socket obtains the value of the network part of the address
+by referencing $func macro $net_ipv4
+
+The default $sterm value : is temporarily changed to . for scanning dotted decimal
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+        $word	16
+	$quantum 8
+
+f       $func
+"$net_ipv4"* $name
+
+net     $set    0
+        $sterm  '.'
+
+?       $do     f(1, 1:),;
+net     $set    net*/8++f(1, 1:?)
+
+        $sterm  ':'
+
+        $return net
+        $end
+
+
+"$netp" $form   32, 16
+
+p       $proc
+"$net_socket"* $name
+        $netp   $net_ipv4(p(1, 1:1)), p(1, 1:2)
+        $end
+
+address_A	$net_socket	172.29.7.9:8080
+address_B	$net_socket	172.29.6.8:23
+	$end
+  :                            1  $word 16
+  :                            2  $quantum 8
+  :                            3 
+  :                            4 f       $func
+  :                            5 "$net_ipv4"* $name
+  :                            6 
+  :                            7 net     $set    0
+  :                            8         $sterm  '.'
+  :                            9 
+  :                            10 ?       $do     f(1, 1:),net     $set    net*/8++f(1, 1:?)
+  :                            11 
+  :                            12         $sterm  ':'
+  :                            13 
+  :                            14         $return net
+  :                            15         $end
+  :                            16 
+  :                            17 
+  :                            18 "$netp" $form   32, 16
+  :                            19 
+  :                            20 p       $proc
+  :                            21 "$net_socket"* $name
+  :                            22         $netp   $net_ipv4(p(1, 1:1)), p(1, 1:2)
+  :                            23         $end
+  :                            24 
+00:0000 AC1D07091F90          +25 address_A $net_socket 172.29.7.9:8080
+00:0006 AC1D06080017          +26 address_B $net_socket 172.29.6.8:23
+  :                            27  $end
+:$(00):0000:000C 
+
+
+
+
+4.1.2.2.3 Number Constants
+_____________________________
+
+Number item constants are assembled from an expression in the command
+field or a unary sign in the command field and an expression in the
+operand field
+
+	+	INSTANCES*FACTOR
+	15
+	-8.5
+
+Number items starting with a digit need no unary operator
+
+Unary + - ^ prepended to the first token of the constant expression
+exerts polarity only on the first token
+
+Unary + - ^ separated from the constant expression by whitespace
+exerts polarity over the whole expression
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$word		16
+	$quantum	8
+
+	1.875
+	-2-2
+	-	2-2
+	$end
+  :                            1  $word  16
+  :                            2  $quantum 8
+  :                            3 
+00:0000 400001F00000000000000000
+                              +4  1.875
+00:000C FFFC                  +5  -2-2
+00:000E 0000                  +6  - 2-2
+  :                            7  $end
+:$(00):0000:0010 
+
+
+Number constants in apostrophe are in the current data code juxtaposed
+at the current $byte size
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$word	16
+	$quantum 8     
+$(12:65536)
+	'abc'
+	$data_code	97:65	. generate A for a
+	'abc'
+	$byte	12
+	'abc'
+	$ascii			. switch back to plain ASCII
+	'abc'
+	$byte	8
+	'abc'++1*/28
+	$end
+  :                            1  $word 16
+  :                            2  $quantum 8     
+  :                            3 $(12:65536)
+0C:10000 00616263              +4  'abc'
+  :                            5  $data_code 97:65 . generate A for a
+0C:10004 00416263              +6  'abc'
+  :                            7  $byte 12
+0C:10008 41062063              +8  'abc'
+  :                            9  $ascii   . switch back to plain ASCII
+0C:1000C 61062063              +10  'abc'
+  :                            11  $byte 8
+0C:10010 10616263              +12  'abc'++1*/28
+  :                            13  $end
+:$(0C):10000:10014 
+
+Number line items are in canonical byte order, and the only way to
+change that is by implementing pseudo-directives (often implemented
+with names like DW and DD) as macros.
+
+
+Number constants may have trailing length overrides. Their meanings are
 
 :s or S = 1 * word size 
 :d or D = 2 * word size
@@ -1320,16 +1655,102 @@ Integer items may have trailing length overrides. Their meanings are
 :h or H = 6 * word size
 :o or O = 8 * word size
 
+
+Integers occupy their containing number of words in the absence of a length suffix
+
+
+$ masmx ctest -lnk
+MASMX 7r3
+3/ctest.msm
+*EOF*
+  :                            1         $word   16
+00:0000 00010000              +2         4096*16
+00:0002 00100000              +3         4096*256
+00:0004 01000000              +4         4096*4096
+  :                            5 
+  :                            6 likely  $equ    15        
+  :                            7 what    $equ    3
+  :                            8 how     $equ    -256
+  :                            9 
+00:0006 FFF0                  +10         ^       likely
+00:0007 FFF3                  +11         ^likely++what
+00:0008 FF03                  +12         ^likely**how++what
+  :                            13 
+00:0009 0060                  +14         100-4
+00:000A 0005                  +15         100/20
+00:000B 0005                  +16         +       99//20
+00:000C 0004                  +17         80//20
+00:000D 0005                  +18         81//20
+00:000E 0013                  +19         99///20
+00:000F 004162636465666768696A6B6C6D6E6F
+                              +20         'abcdefghijklmno'-(32*/(('o'-'a')*8))
+00:0017 FFFF0000              +21         -       4096*16
+00:0019 FFF00000              +22         -       4096*256
+00:001B FF000000              +23         -       4096*4096
+00:001D FFA0                  +24         -       100-4
+00:001E FFFB                  +25         -       100/20
+00:001F FFFB                  +26         -       99//20
+00:0020 FFED                  +27         -       99///20
+00:0021 0001                  +28         2>1
+00:0022 0000                  +29         +       1>2
+00:0023 00380000              +30         0700000/*1
+00:0025 700000000000000000000000000000000000000000000000
+                              +31         0700000*/168
+00:0031 380000000000000000000000000000000000000000000000
+                              +32         +(0700000*/168)/*1
+00:003D 700000000000000000000000000000000000000000000000
+                              +33         7*/188
+00:0049 0001                  +34         +       1<(7*/188)
+00:004A 0000                  +35         +       1>(7*/188)
+  :                            36 
+00:004B 0063                  +37         99
+00:004C 00000063              +38         +       99d
+00:004E 000000000063          +39         +       99t
+00:0051 0000000000000063      +40         99q
+00:0055 00000000000000000063  +41         99p
+00:005A 000000000000000000000063
+                              +42         +       99h
+00:0060 00000000000000000000000000000063
+                              +43         99o
+00:0068 FF88                  +44         +  (-8)*likely
+00:0069 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF88
+                              +45         +  (-8)*likely:o
+00:0071 000F4240              +46         1000000
+00:0073 01000000              +47         01000000
+00:0075 000F4240              +48         1000000:l
+00:0077 4240                  +49         1000000:s
+  :                            50 
+*EOF*
+:$(00):0000:0078 
+
+
+
 If the last token in the expression is a label instead of a number string
-(as line 45 of the next assembly sample), then any length override must
-be preceded by colon, parenthesis or quote
+then any length override must be preceded by colon, parenthesis or quote
 
 	+       expression:D
 	+(expression)q
 	+	"expression"h
-	
-When the number constant is floating point, any length override follows
-the fraction, not the exponent
+
+Words flag D after a hex string also needs separation
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$word	16
+	01d
+	01:d  
+	$end
+  :                            1  $word 16
+00:0000 001D                  +2  01d
+00:0001 00000001              +3  01:d  
+  :                            4  $end
+:$(00):0000:0003 
+
+Floating numbers to not self size. Their default size determined with
+directive $floating_point
+
+A floating number length override follows the fraction, not the exponent
 
 $ masmx -lnk
 MASMX 7r3
@@ -1416,18 +1837,18 @@ MASMX 7r2
 fs32.msm: object code 145 bytes: 0 errors: 0 undefined labels
 
 
-The directive $FLOATING POINT changes the default 96-bit total size of the
+The directive $floating_point changes the default 96-bit total size of the
 stored floating-point constant.
 
-The $CHARACTERISTIC directive sets the characteristic size for a given
-number size.
+The $characteristic directive sets the characteristic size for a given
+number size
 
 	$characteristic,number_size	characteristic_width
 
 Without number_size, characteristic_width is for the current default
 floating number size
 
-characteristic_width is the characteristic field + sign, or
+characteristic width is the characteristic field + sign, or
 everything except the mantissa. So for example a target which supports
 the 80-bit coprocessor format with 15-bit exponent might have
 
@@ -1462,12 +1883,10 @@ Macros supplied in this package generate IEEE754 floating constants.
 See Section 1.5: Any Floating Point Format.
 
 
-This example generates
+This example generates the value 1.375e+1200000 with various typing.
+A size override h for hexaword follows the fraction in each number,
+so they are all 192 bits
 
-	1.375e+1200000
-
-according to different syntaxes. A size override h for hexaword
-follows the fraction in each number, so they are all 192 bits
 
 
 $ masmx -ln
@@ -1572,410 +1991,13 @@ MASMX 7r2
 floating.msm: object code 336 bytes: 0 errors: 0 undefined labels
 
 
-4.1.3.2.2.2 Label References
-_____________________________
 
-Labels of any type (storage location line labels, equates, function
-macro names, $DO loop tags) may be referenced in expressions
 
-	+       this*that+the_other
-
-And they mostly return their values. Some labels work in a 
-functional way and return something computed.
-
-Labels may be bounded with quotes on reference
-$ masmx -lnkz
-MASMX 7r3
-0/-INPUT>>
-ab	$equ	40
-	+"ab"		. a number expression with label reference
-	"ab"		. a string
-	'ab'		. a number expression
-	$end
-  :                            1 ab $equ 40
-00:000000 000028              +2  +"ab"  . a number expression with label reference
-00:000001 616200              +3  "ab"   . a string
-00:000002 006162              +4  'ab'   . a number expression
-  :                            5  $end
-:$(00):000000:000003 
-
-If the command field starts with $quote, there is
-no expression but a string
-
-If $quote has been changed to ' apostrophe, labels in ' will not
-be detected in expressions. The character values between ' are
-right justified as value juxtaposed at current $byte size and
-translated from input to current $data_code, default 8-bit ASCII. 
-See also 8.8 $DATA_CODE directive and 8.5 $BYTE directive
-
-$ masmx -lnkz
-MASMX 7r3
-0/-INPUT>>
-ab	$equ	40
-	$quote	''''
-QDELIM='
-	+'ab'		. a number
-	'ab'		. a string
-	$end
-QDELIM='
-  :                            1 ab $equ 40
-  :                            2  $quote ''''
-  :                            3 QDELIM='
-00:000000 006162              +4  +'ab'	 . a number
-00:000001 616200              +5  'ab'   . a string
-  :                            6  $end
-:$(00):000000:000002 
-
-
-4.1.3.2.2.3 Macro Parameters
-______________________________
-
-Macro actual arguments are accessed by using the label of 
-the macro in a functional way
-
-p       $proc
-add*    $name   1
-	iform   p(0, 1), p(1, 1), p(1, 2)
-	$end
-
-
-
-Actual arguments map to these reference paraforms when the $proc name is p 
-
-
-	command[,subcommand]	[argument[,argument,..]]	[argument[,..
-
-	p(0,0)[, p(0, 2)]	[p(1, 1)[,p(1, 2),..]]		[p(2, 1)[,..
-
-Reference Paraform
-__________________
-
-The command is the first call-line word after any whitespace.
-It is subfield zero of field 0, macro_name(0, 0)
-
-A subcommand on the command is macro_name(0, 2)
-
-Argument field numbers and their subfield numbers ascend from 1
-
-The first subfield of the second argument field is referenced macro_name(2, 1)
-
-Fields are separated by spaces. Subfields in a field are 
-separated by a comma [and spaces]
-
-There may also be substrings of subfields, separated by the 
-substring character, default :
-
-Here substrings have been counted and assembled as constants
-containing network socket addresses
-
-The $proc callname $net_socket is in the command field in order to generate a
-constant. $net_socket obtains the value of the network part of the address
-by referencing $func macro $net_ipv4
-
-The default $sterm value : is temporarily changed to . for scanning dotted decimal
-
-$ masmx -lnk
-MASMX 7r3
-0/-INPUT>>
-        $word	16
-	$quantum 8
-
-f       $func
-"$net_ipv4"* $name
-
-net     $set    0
-        $sterm  '.'
-
-?       $do     f(1, 1:),;
-net     $set    net*/8++f(1, 1:?)
-
-        $sterm  ':'
-
-        $return net
-        $end
-
-
-"$netp" $form   32, 16
-
-p       $proc
-"$net_socket"* $name
-        $netp   $net_ipv4(p(1, 1:1)), p(1, 1:2)
-        $end
-
-address_A	$net_socket	172.29.7.9:8080
-address_B	$net_socket	172.29.6.8:23
-	$end
-  :                            1  $word 16
-  :                            2  $quantum 8
-  :                            3 
-  :                            4 f       $func
-  :                            5 "$net_ipv4"* $name
-  :                            6 
-  :                            7 net     $set    0
-  :                            8         $sterm  '.'
-  :                            9 
-  :                            10 ?       $do     f(1, 1:),net     $set    net*/8++f(1, 1:?)
-  :                            11 
-  :                            12         $sterm  ':'
-  :                            13 
-  :                            14         $return net
-  :                            15         $end
-  :                            16 
-  :                            17 
-  :                            18 "$netp" $form   32, 16
-  :                            19 
-  :                            20 p       $proc
-  :                            21 "$net_socket"* $name
-  :                            22         $netp   $net_ipv4(p(1, 1:1)), p(1, 1:2)
-  :                            23         $end
-  :                            24 
-00:0000 AC1D07091F90          +25 address_A $net_socket 172.29.7.9:8080
-00:0006 AC1D06080017          +26 address_B $net_socket 172.29.6.8:23
-  :                            27  $end
-:$(00):0000:000C 
-
-
-
-4.1.3.2.2.4 Assembler-supplied functions
-________________________________________
-
-Assembler-supplied functions are summarised as
-
-	$		current location counter value
-
-	$(..)		named location counter value
-
-	$a		absolute value of current location counter.
-
-			$a is similar to $ except
-
-				$a can generate absolute constants of
-				locations in base-displacement sections
-
-				an argument to $a(..) is an expression
- 				not a location counter identity
-
-	$a(..)		absolute value of expression
-                    	  
-	$b		start address of current program section
-                    	  
-	$bank_index	current memory block identifier
-			where breakpoint addresses are used
-
-	$n		macro call name
-			retrieves low-order 32 bits of
-			macro_name(0, 0) value
-
-	$net(..)	unrelocated value of expression
-
-	$o(..)		value of an option flag
-
-	$r		current location counter identity
-
-	$r(..)		location counter identity of named address
-
-	$rel		relocation aligment of current program section
-			returns zero for absolute sections and nozero
-			for relocatable sections
-
-	$rel(..)	relocation alignment of named program section
-			returns zero for absolute sections and nozero
-			for relocatable sections
-
-	$t(..)		label type
-
-	$zenith		high address of current section + literals
-
-	$zenith(..)	high address of named section + literals
-
-
-	Examples of masmx Internal Functions in expressions
-	___________________________________________________
-
-	jump	$+2
-
-	$do	$<VISIBLE_REGION,$(64:VISIBLE_REGION)
-
-	$do	$zenith>SECTION_LIMIT,	$flag	section too long
-
-
-
-4.1.2.2.2 Number Items
-______________________
-
-Number item constants are assembled from an expression in the command
-field or a unary sign in the command field and an expression in the
-operand field
-
-	+	INSTANCES*FACTOR
-	15
-	-8.5
-
-Number items starting with a digit need no unary operator
-
-Expressions and allowable tokens and operators are detailed in
-Section 4.3.2: Expressions
-
-
-A number constant item has the same expression rules and
-operators as an operand expression. See Section 4.1.3.2: Expressions 
-
-The operators are = ^= > < -- ++ /* */ */- ** + - * / // /// *+ *-
-
-Unary + - ^ prepended to the first token of the constant expression
-exerts polarity only on the first token
-
-Unary + - ^ separated from the constant expression by whitespace
-exerts polarity over the whole expression
-
-$ masmx -lnk
-MASMX 7r3
-0/-INPUT>>
-	$word		16
-	$quantum	8
-
-	1.875
-	-2-2
-	-	2-2
-	$end
-  :                            1  $word  16
-  :                            2  $quantum 8
-  :                            3 
-00:0000 400001F00000000000000000
-                              +4  1.875
-00:000C FFFC                  +5  -2-2
-00:000E 0000                  +6  - 2-2
-  :                            7  $end
-:$(00):0000:0010 
-
-
-
-The scale operator *+ *- is actioned after arithmetic operators / // /// * + -
-and before boolean and shift operators ** */- */ /* ++ --
-
-Number constants in apostrophe are in the current data code juxtaposed
-at the current $byte size
-
-$ masmx -lnk
-MASMX 7r3
-0/-INPUT>>
-	$word	16
-	$quantum 8     
-$(12:65536)
-	'abc'
-	$data_code	97:65	. generate A for a
-	'abc'
-	$byte	12
-	'abc'
-	$ascii			. switch back to plain ASCII
-	'abc'
-	$byte	8
-	'abc'++1*/28
-	$end
-  :                            1  $word 16
-  :                            2  $quantum 8     
-  :                            3 $(12:65536)
-0C:10000 00616263              +4  'abc'
-  :                            5  $data_code 97:65 . generate A for a
-0C:10004 00416263              +6  'abc'
-  :                            7  $byte 12
-0C:10008 41062063              +8  'abc'
-  :                            9  $ascii   . switch back to plain ASCII
-0C:1000C 61062063              +10  'abc'
-  :                            11  $byte 8
-0C:10010 10616263              +12  'abc'++1*/28
-  :                            13  $end
-:$(0C):10000:10014 
-
-Number line items are in canonical byte order, and the only way to
-change that is by implementing pseudo-directives (often implemented
-with names like DW and DD) as macros.
-
-All expressions used to generate integer line items are 
-evaluated to 192 bits of precision. Then in the absence
-of a length override, an integer item is output in
-the number of words (of size set by $WORD) required to represent it.
-
-In addition to labels, there is one number string
-situation where : or ) or " must be used before a length suffix. 
-That situation is in cases like 0123:D, which is different 
-in meaning from 0123D. This only concerns hex and the :D
-symbol specifically. Developers may prefer
-always to use colon in this position. There is also the :L
-or L suffix, identical in meaning to :D
-
-$ masmx ctest -lnk
-MASMX 7r3
-3/ctest.msm
-*EOF*
-  :                            1         $word   16
-00:0000 00010000              +2         4096*16
-00:0002 00100000              +3         4096*256
-00:0004 01000000              +4         4096*4096
-  :                            5 
-  :                            6 likely  $equ    15        
-  :                            7 what    $equ    3
-  :                            8 how     $equ    -256
-  :                            9 
-00:0006 FFF0                  +10         ^       likely
-00:0007 FFF3                  +11         ^likely++what
-00:0008 FF03                  +12         ^likely**how++what
-  :                            13 
-00:0009 0060                  +14         100-4
-00:000A 0005                  +15         100/20
-00:000B 0005                  +16         +       99//20
-00:000C 0004                  +17         80//20
-00:000D 0005                  +18         81//20
-00:000E 0013                  +19         99///20
-00:000F 004162636465666768696A6B6C6D6E6F
-                              +20         'abcdefghijklmno'-(32*/(('o'-'a')*8))
-00:0017 FFFF0000              +21         -       4096*16
-00:0019 FFF00000              +22         -       4096*256
-00:001B FF000000              +23         -       4096*4096
-00:001D FFA0                  +24         -       100-4
-00:001E FFFB                  +25         -       100/20
-00:001F FFFB                  +26         -       99//20
-00:0020 FFED                  +27         -       99///20
-00:0021 0001                  +28         2>1
-00:0022 0000                  +29         +       1>2
-00:0023 00380000              +30         0700000/*1
-00:0025 700000000000000000000000000000000000000000000000
-                              +31         0700000*/168
-00:0031 380000000000000000000000000000000000000000000000
-                              +32         +(0700000*/168)/*1
-00:003D 700000000000000000000000000000000000000000000000
-                              +33         7*/188
-00:0049 0001                  +34         +       1<(7*/188)
-00:004A 0000                  +35         +       1>(7*/188)
-  :                            36 
-00:004B 0063                  +37         99
-00:004C 00000063              +38         +       99d
-00:004E 000000000063          +39         +       99t
-00:0051 0000000000000063      +40         99q
-00:0055 00000000000000000063  +41         99p
-00:005A 000000000000000000000063
-                              +42         +       99h
-00:0060 00000000000000000000000000000063
-                              +43         99o
-00:0068 FF88                  +44         +  (-8)*likely
-00:0069 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF88
-                              +45         +  (-8)*likely:o
-00:0071 000F4240              +46         1000000
-00:0073 01000000              +47         01000000
-00:0075 000F4240              +48         1000000:l
-00:0077 4240                  +49         1000000:s
-  :                            50 
-*EOF*
-:$(00):0000:0078 
-
-
-
-
-4.1.2.2.3 Split Integers
+4.1.2.2.4 Split Integers
 ________________________
 
 A split integer item is a small list of equal size fields. The
-size of the total is one word. The suffixes [d t q p h o] can
+size of the total is one word. The suffixes [d l t q p h o] can
 make the size  two, three, four, five, six or eight words.
 
 The source syntax of split integers has commas between the fields:
@@ -2007,7 +2029,7 @@ zero-filled slack bits are generated at the top.
 
 
 
-4.2.2.2.4 Text Strings
+4.2.2.2.5 Text Strings
 ______________________
 
 Text strings are a row of bytes composed from
@@ -2108,7 +2130,7 @@ See also Section 10: Byte-Addressing Machines with 32- and 64-bit
 Bus, Managing Alignments
 
 
-4.1.2.2.5: $FORM Items
+4.1.2.2.6: $FORM Items
 ______________________
 
 $FORM declares a bit layout twmplate from one word to 192 bits in size.
@@ -2281,115 +2303,103 @@ code definition in Section 6.2: Describing Target Architecture in Text
 4.1.3: The Argument Field
 _________________________
 
-An argument is an expression, a string or a literal reference
+
+4.1.3.1: Instruction Operands
+_____________________________
 
 An argument which is an instruction operand is an expression
 or a literal reference
 
 
+4.1.3.1.1 Operand Expressions
+_____________________________
 
-4.1.3.2 Operand Expressions
+An operand expression generates a value which fits in the operand
+field of an instruction
+
+Expressions are the same as expressions which generate storage constants
+(4.1.2.2.2: Expressions and Number Constants)
+
+Expressions contain operators and tokens. The tokens may be
+
+	numbers
+
+	macro parameter references
+
+	simple names of values or of storage locations
+
+	assembler-automatic function names
+
+	$do counter names
+
+	function macro names
+
+Instruction lines with an operand expression might appear as
+
+	load_address	r27, base+INDEX*SIZE
+	call		handler
+
+
+
+4.1.3.1.2: Literal Operands
 ___________________________
 
-Expressions are labels or numbers or macro parameters computed
-together by operators. Labels may represent 
 
-	addresses of storage locations
-	
-	values given names with $EQU or $SET
-
-	the current iteration count of a $DO loop
-	
-	functions internally supplied from the assembler, 
-	such as location counter values
-	
-	macrofunctions written by the developer, 
-	which assemble when referenced and return 
-	a value to which can be used in the expression
-
-
-
-
-4.1.3.3: Literals
-_________________
-
-
-
-
-4.1.3.3.1: A Literal Is
-_______________________
-
-Literals are constants is generated by reference,
-and the result of that is the address of the constant.
+Literals are constants generated by reference,
+The address of the literal goes in the address field of the instruction
 
 	Load    r24, .literal_pool_name(0FFFC0000)
 
 R24 gets loaded with a word containing 0FFFC0000. That word is generated
 at the end  of the segment that "literal_pool_name" was declared in.
 
+With assembly flag -a an operand entirely in parentheses is an 
+automatic literal
 
-4.1.3.3.2: The Literal Pools
-____________________________
+	add	r21, (LARGE_VALUE)
+
+See 4.2: Literals
+
+
+4.1.3.2 Arguments of Constant Lines
+___________________________________
+
+Lines generating constants may have arguments which are expressions or
+literals. See 4.1.2.2: Data Constants, 4.2: Literals and 5: Iterated
+Code and Structured Data
+
+
+4.2: Literals
+_____________
+
+4.2.1: A Literal is
+___________________
+
+A literal is a constant generated by reference. It is assembled at the
+foot of its containing program section, which may be any section regardless
+of where the literal is referenced. Its address goes into the instruction
+or structure which references it
+
+Literals identical by value are not duplicated within one program section.
+All references share one literal.
+
+
+
+4.2.2: The Literal Pools
+_________________________
 
 Each of the 72 location counters may have one literal pool.
 
-Within one literal pool, identical literals are not duplicated. All
-references get the same one.
+If a location counter is breakpointed (many sections declared
+with the same location counter), each section has a literal table.
 
-If a location counter is breakpointed (many segments declared
-with the same location counter), each part gets a literal table,
-and identical literals may occur in each part, but not more than
-once in each part.
 
 Location counters which are breakpointed more than 64 times are only
-allowed literals in the first 64 parts. Literal pools are not appropriate
-for each element of a giant array.
-
-
-4.1.3.3.3: Literal Pool Tags
-____________________________
-
-Literal Pool Tags are labels of literal pools, and referencing them
-acts functionally to generate a literal and return its address
-
-Each literal pool may have any number of tags.
-
-Literal Pool Tags may be generated: 
-
-	on the location counter control line:
-
-$(5:DATA_SEGMENT/literal_pool_5)
-
-	as the label of a $LIT directive:
-
-lits7  $LIT    7
-
-
-4.1.3.3.4: The $LIT Directive
-_____________________________
-
-$LIT may have a label and may have an argument.
-If $LIT has an argument it must be the identity
-of a location counter 0..71.
-
-If $LIT has no argument its effective argument
-is the identity of the current location counter.
-
-$LIT always sets the default location counter
-for literals to the value in its argument or
-to the current location counter.
-
-The default location counter for literals is
-only used by automatic literals (literals which
-are generated without referencing a literal
-pool tag).
-
-If $LIT has a label, the label becomes a literal
-tag for the literal pool.
+allowed literals in the first 64 parts
 
 
 
-4.1.3.3.5: Automatic Literals
+4.2.3: Automatic Literals
 _____________________________
 
 Automatic literals are literals which are generated
@@ -2416,8 +2426,59 @@ In that example, 0FFFC0000 is generated at the end of the assembly or
 location counter breakpoint. The address of the literal goes in the
 load instruction.
 
-masmx also generates automatic literals where an integer line item has all
-its expression part in parentheses and separate from the operative unary:
+
+
+4.2.4: Literal Pool Tags
+____________________________
+
+Literal Pool Tags are labels of literal pools, and referencing them
+acts functionally to generate a literal and return its address
+
+Each literal pool may have any number of tags.
+
+Literal Pool Tags may be generated: 
+
+	on the location counter control line:
+
+$(5:DATA_SEGMENT/literal_pool_5)
+
+	as the label of a $LIT directive:
+
+lits7  $LIT    7
+
+	floating_multiply	literal_pool_5(7.2e-1200000)
+	quad_store		*lits7(HIGH_ADDRESS)
+
+
+4.2.5: The $LIT Directive
+_____________________________
+
+$LIT may have a label and may have an argument.
+If $LIT has an argument it must be the identity
+of a location counter 0..71.
+
+If $LIT has no argument its effective argument
+is the identity of the current location counter.
+
+$LIT always sets the default location counter
+for literals to the value in its argument or
+to the current location counter.
+
+The default location counter for literals is
+only used by automatic literals (literals which
+are generated without referencing a literal
+pool tag).
+
+If $LIT has a label, the label becomes a literal
+tag for the literal pool.
+
+
+
+4.2.5 Constant Pointer to Literal
+
+masmx also generates literals referenced from integer line items
+
+	$set_option	"a"
 
 	+       (1.75)  . 
 	+       (BIG), (ADDRESSES) .
@@ -2637,13 +2698,13 @@ MASMX 7r2
 -INPUT>>: object code 77 bytes: 0 errors: 0 undefined labels
 
 
-4.1.3.2.2.5: Function Macros
-____________________________
+4.3 Function Macros
+____________________
 
 Operand expressions may include user function macros,
 
-4.1.3.2.2.5.1: A User Function Is
-_________________________________
+4.3.1: A User Function Is
+_________________________
 
 Functions are not code subroutines (as they are in C-Language).
 
@@ -2665,11 +2726,11 @@ simplog*	$func
 		shift_left	r6, simplog(BUCKET_SIZE)
 
 
-4.1.3.2.2.5.2: Directives for Constructing Functions
-____________________________________________________
+4.3.2: Directives for Constructing Functions
+____________________________________________
 
-4.1.3.2.2.5.1: $FUNC -head of function
-______________________________________
+4.3.2.1: $FUNC -head of function
+________________________________
 
 function_name  $FUNC
 	.
@@ -2729,8 +2790,8 @@ a second-pass-only function
 
 
 
-4.1.3.2.2.5.2: $NAME -entry point and invocation tag
-____________________________________________________
+4.3.2.2.2: $NAME -entry point and invocation tag
+________________________________________________
 
 It's easier to code functions (like $PROCs) if
 they all have the same name. But it's easier to
@@ -2771,8 +2832,8 @@ Labels or anything else in quotes inside a macro body can be
 constructed to include macro parameters.
 
 
-4.1.3.2.2.5.3: $RETURN -value of result
-_______________________________________
+4.3.2.3: $RETURN -value of result
+_________________________________
 
 The argument of $RETURN is an expression.
 192 bits of it are returned:
@@ -2784,8 +2845,8 @@ macros as well as $FUNC macros, although $PROC macros do not have
 a result value.
 
 
-4.1.3.2.2.5.4: $END -foot of function
-_____________________________________
+4.3.2.4: $END -foot of function
+_______________________________
 
 $END is the last command on any subassembly.
 A $FUNC is a subassembly (a macro):
@@ -2797,8 +2858,8 @@ f       $func
 	$end
 
 
-4.1.3.2.2.5: Code Generated During Function Evaluation 
-______________________________________________________
+4.3.3: Code Generated During Function Evaluation 
+________________________________________________
 
 Code can't be generated inline to the current
 location counter during a $FUNC. That's treated
@@ -2829,9 +2890,987 @@ generate* $name
 
 
 
+4.4: masmx-Supplied Functions
+_____________________________
 
-4.2: Iterated Code and Structured Data
+
+4.4.1: $
+________
+
+4.4.1.1: $	this location counter
+_____________________________________
+
+The expression $ returns the value of the current location counter. 
+For example the sequence
+
+$(7:256)
+	$res    4
+bampot  $equ    $+1
+
+will have the result that the label bampot has the value 261
+
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$word	32
+
+ASTRONOMIC	$set	07FFFF8000380000000040000
+	    
+$(43:1024:*ASTRONOMIC)
+	
+	$res	512
+here
+tube	$equ	$+1
+
+	+	tube
+	+	here
+	$end
+  :                            1  $word 32
+  :                            2 
+  :                            3 ASTRONOMIC $set 07FFFF8000380000000040000
+  :                            4      
+  :                            5 $(43:1024:*ASTRONOMIC)
+  :                            6  
+  :                            7  $res 512
+  :                            8 here
+  :                            9 tube $equ $+1
+  :                            10 
+2B:000000040600:7FFFF8000380000000040601
+                              +11  + tube
+2B:000000040603:7FFFF8000380000000040600
+                              +12  + here
+  :                            13  $end
+:$(2B):00000400:00000606 
+
+
+
+
+4.4.1.2: $(..)	named location counter
 ______________________________________
+
+The expression $(..) returns the value of the location 
+counter identified in the brackets. For example the sequence
+
+text    $equ    0
+var     $equ    1
+$(var:4096)
+	$res    4
+$(text:256)
+CONSTANT        +       $(1)+3
+
+causes the data word at location CONSTANT to contain 
+the value 4103
+
+4.1.3.2.2.4.3: $a -absolute address
+___________________________________
+
+$a is the absolute address relative to the program space. In base-displacement
+sections $a adds the base if that is known from an absolute location counter,
+and in relocatable sections $a instructs the link step to add the relocation.
+
+	$(15:*8, r9)
+	here	+	$a(here)
+
+In this example the segment is relocatable (it has an *alignment word),
+and the effect of $A is that relocation information is attached to the
+generated constant.
+
+$A is functional whether the target address is both relocatable and
+base+displacement as already shown; where the target address is relocatable
+
+	$(4:*4)
+	there
+
+		+	$a(there)
+
+
+and where the target address has a known absolute base
+
+	$(4:QUITE_LARGE_START_ADDRESS, r9)
+
+		$res	intervening_displacement
+
+	name
+
+		+	$a(name)
+
+In this configuration, name has the base+diplacement value 
+
+	intervening_displacement, r9
+
+and $a(name) has the absolute value
+
+	QUITE_LARGE_ADDRESS+intervening_displacement
+
+$a has no function for addresses in void segments, where the base
+register value is runtime dynamic
+
+A breakpoint value in the locator declaration can indicate a hardware
+translation or index known in advance for addresses which are already
+absolute in linked program terms
+
+	$(17:ADDRESS_IN_PROGRAM:ADDRESS_IN_HARDWARE)
+
+$a retrieves ADDRESS_IN_PROGRAM and not ADDRESS_IN_HARDWARE. A separate
+function $bank_index retrieves that
+
+$A function is also used in segments which are giant at assembly time.
+
+	$($14::*00FFC800003F0000, r19)
+	basev	+	$a:d	; double length:d
+
+Giant means address spaces larger than four gigaquanta.
+
+The $A function works for relocatable segments which are for later
+link-inclusion in giant spaces. But the constant must be large enough
+to contain the linked address:
+
+	$(15:*8, r9)
+	here	+	$a(here):d	; double length:d
+
+
+
+If the constant overflows, the link step fails with an error message.
+
+
+
+4.1.3.2.2.4.4: $b -base address of current section
+               or -base address of current segment
+__________________________________________________
+
+$B function in an absolute section retrieves the initial start address
+of the section
+
+$(2:02000)
+
+	$include	source1
+	$include	source2
+
+$(2:05000)
+
+constant +		$b
+
+The value stored in location constant is 02000
+
+$B function in a relocatable section retrieves the link root of the
+input segment within the link collection
+
+%masmx
+
+$(2:*8)
+
+	.
+	.
+
+constant +		$b
+
+	$store		rel_file
+	$end
+
+%masmx
+
+	$include	linkmacro.def
+
+$(2:02000)
+buffer	$res		03000
+	$include,$binary rel_file.txo
+
+
+The value in location constant is 05000.
+
+
+$B does not concern the breakpoint address retrieved with $bank_index
+
+
+4.1.3.2.2.4.5: $bank_index -absolute or virtual memory space identity
+_____________________________________________________________________
+
+For targets with hardware relocation, $bank_index retrieves the absolute
+or virtual load pointer named in the breakpoint field of the location
+counter switch statement
+
+$(locator_number:relative_base_address:BREAKPOINT_VALUE)
+
+This value is naturally known if it has been named, but $bank_index
+allows portable macro code to retrieve it
+
+If assembly flag -v is not set, this breakpoint value is the absolute load
+address of the section assembling. A section defined by locator number
+may be breakpointed many times in one or many assemblies, making many
+absolute banks. The value is an absolute word or byte address, and is
+added to program-relative addresses to construct load string addresses
+
+If assembly flag -v is set, this value is an abstraction like a handler
+or descriptor index, and the binary output appends it to load string
+addresses without interpreting it. A section defined by location counter
+may breakpointed many times, constructing many banks at virtual (i.e.
+assembly-time-independent) addresses
+
+$bank_index retrieves the current section breakpoint whether
+virtual or absolute
+
+There are no parameters. Only the current breakpoint value of the
+current section can be retrieved in this way.
+
+An application of $bank_index is the export of long absolute or virtual names
+
+	public_name*	$equ	$bank_index*/address_size++$
+
+
+4.1.3.2.2.4.6: $n -value of instruction $NAME, macro entry tag
+______________________________________________________________
+
+When exported from a macro,
+$n is a token for the low-order 32 bits of the macro $name value.
+The whole 192-bit value is macro_name(0, 0)
+
+
+$n may be used both 
+
+	inside $PROC..$END (instruction or structure macro) 
+	
+and 
+
+	inside $FUNC..$END (value-generating macro).
+
+$n references the call name of the macro, which must be the label 
+of a $NAME directive within the macro declaration.
+
+For example where
+
+	$word   48
+"$instruction" $form 8, 40
+	.
+	.
+p       $proc
+load*   $name   1
+store*  $name   2
+add*    $name   3
+subtract* $name  4
+
+	$instruction   $n, p(1,1)
+
+	$end
+
+the call line
+
+	add     8193
+
+generates, shown as hex,
+
+	030000002001
+
+because the macro was called with the name add, 
+which is worth 3, 3 is in the upper eight bits 
+of the output instruction, and the 
+operand address in the lower 40.
+
+$n can also be retrieved as parameter p(0, 1) or p(0, 0)
+
+parameter [macro_name](0, 0) is the same as [macro_name](0,1) because
+subfield 0 is the same as subfield 1 for all parameter fields.
+
+The result width of [macro_name](0, 0) and of all parameters is 192 bits.
+
+The result width of $n is 32 bits.
+
+Function macros written with $FUNC can also access $n or
+[macro_name](0, 0) or [macro_name](0,1)
+
+This user-written function uses its $n value to compute
+an address relative to the trailing edge of 
+either a two- or a three-byte relative-jump instruction:
+
+"$REL"  $func
+"$REL2"* $name   2
+"$REL3"* $name   3
+target  $set    $REL(1,1)-($+$n)
+	$if     target<-128)
+	$flag   You may only jump from instr. trailing edge - 128
+	$endif
+	$if     target>127
+	$flag   You may only jump from instr. trailing edge + 127
+	$endif
+	$return target
+	$end
+
+Here are $PROC instruction macros which call 
+$REL function.
+
+"cjne" wants an 8-bit relative displacement from its own 
+trailing edge, which is three bytes later than the location 
+counter. $REL3 is called
+
+"jc" and "jnc" want an 8-bit relative displacement from 
+their trailing edge, which is two bytes later than the 
+location counter. $REL2 is called.
+
+
+i$cjne_a        $form   8,8,8
+i$cjne_r        $form   5,3,8,8
+i$cjne_indirect $form   7,1,8,8
+
+"$jumpcc"	$form 8, 8
+
+p	$proc
+cjne*	$name
+
+        $if     ($t(p(1,1))=REGISTERS$)**(p(1,1)=A)
+          $if   p(1,#2)
+            i$cjne_a            0b4, p(1,2), $REL3(p(1,3))
+          $else
+            i$cjne_a            0b5, p(1,2), $REL3(p(1,3))
+          $endif
+        $elseif $t(p(1,1))=POINTER$
+          $if   p(1,#2)
+            i$cjne_indirect     05bh, p(1,1), p(1,2), $REL3(p(1,3))
+          $else
+            $flag Second Operand Must Be Immediate
+          $endif
+        $elseif $t(p(1,1))=RREGISTERS$
+          $if  p(1,#2)
+            i$cjne_r            017, p(1,1), p(1,2), $REL3(p(1,3))
+          $else
+            $flag Second Operand Must Be Immediate
+          $endif
+        $else
+          $flag First Operand Must be A/Rn/@Rn
+        $endif
+        $end
+
+p       $proc
+jc*     $name   JC_CODE
+jnc*    $name   JNC_CODE
+	$jumpcc $n, $REL2(p(1,1))
+	$end
+
+$n may also be accessed as parameter (0, 1) of the macro name.
+In function $REL, $n could instead be retrieved as $rel(0, 1)
+$rel(0,0) can be referenced with the same result, because subfield
+0 is the same as subfield 1.
+
+
+4.1.3.2.2.4.6: $net(..) -the unrelocated value of an expression
+_______________________________________________________________
+
+If an expression attempts algebra on a relocatable address,
+very few operations are allowed. See 4.2.3.2.2.1: Operators Used
+on Relocatable Tokens.
+
+There may be reasons why algebra is needed on the unrelocated part of a 
+relocatable address. For example, field range checks should be carried
+out at assembly time on both absolute and relocatable code.
+
+Relocatable code is also checked later at link, but it should be checked
+that no part of the unrelocated value has outflowed.
+
+Range checking at link is geometrically driven from within the linker.
+But at assembly time only macro language can carry out checks.
+
+It is also desirable that the same macro language is used for both
+absolute and relocatable code generation.
+
+No comparison operators are allowed on a relocatable address. The sequence
+
+p	$proc
+jump*	$name	
+target	$set	p(1, 1)
+
+	$do	target>16777261,	$flag	you can't jump there
+
+would always error where p(1, 1) is relocatable, because comparison
+operator > is not allowed on a relocatable.
+
+The following is allowed
+
+	$do	$net(target)>16777261,	$flag	you can't jump there
+
+Labels which are not present are treated as external and therefore
+relocatable.
+
+Shift right /* algebraic shift right */- AND ** are always allowed on
+relocatable values, to allow relocation of split and shifted fields.
+
+Addition and subtraction are always allowed on relocatable fields.
+
+See Sections 9.2: masmx Linking in Principle, 9.2.3: Demonstration Links
+(PowerPC).
+
+Information is encoded in the relocatable binary output which causes
+the whole value to be relocated before any shifts or truncations.
+See Sections 9.2: masmx Linking in Principle, 9.2.3: Demonstration Links
+(PowerPC).
+
+When using $NET for address range checks in instruction macros,
+or carrying out a range comparison any other way,
+the address parameter should be cached in a label first.
+In these examples that label is called "target":
+
+p	$proc
+
+jump*	$name	JUMP_OPCODE
+jump_maybe* $name JIF_OPCODE
+
+target	$set	p(1, 1)
+
+	$do	$net(target)>(1*/ADDRESS_FIELD_SIZE)-1,	;
+	$flag	jump address out of range
+
+	jump_form	p(0, 0), target
+	$end
+
+
+It may be inefficient to fetch the parameter tagged p(1, 1) more
+than once, especially if the actual parameter calls function macros.
+
+
+
+4.1.3.2.2.4.7: $o(.) -is this option set?
+_________________________________________
+
+An expression whose value is 'A'..'Z' or 'a'..'z' is allowed in the
+parentheses, and 1 is returned if the equivalent flag is on, for example:
+
+	$do	$o('k'),	$note flag -k is set
+
+	$if	$o(65)=0
+	$flag	flag -A should be set
+	$endif 
+
+The flag is set by any of -abcdefghijklmnopqrsuvwxyzEFGQZ+ anywhere 
+on the command line, or with the  $SET_OPTIONS directive.
+
+
+
+4.1.3.2.2.4.9: $r -region
+_________________________
+
+
+4.1.3.2.2.4.9.1: $r
+___________________
+
+Returns the identity, not the value, of the current 
+location counter 0..71. 
+
+
+4.1.3.2.2.4.9.2: $r(..)
+_______________________
+
+returns the identity of named address expression's location counter
+
+
+There should be a label in parentheses and "$R(label)" 
+will return be the identity 0..71, of the location 
+counter under which the label is generated.
+				  
+				  
+4.1.3.2.2.4.10: $rel(..) -is this a relocatable location counter?
+_________________________________________________________________
+
+An expression identifying a location counter 0..71 is in the parentheses,
+and $REL(x) tells you if it's a relocatable segment. No parentheses,
+and $REL tells you if the current segment is relocatable. The
+result isn't always 0 or 1. It's the load alignment factor of
+the segment which is 0 for absolute and 1 or something higher
+for relocatable.
+
+This function can be cascaded with the previous one to
+detect whether a label is relocatable
+
+	$if     $rel($r(label))
+	.
+	.
+
+
+4.1.3.2.2.4.11: $t(..) -what type of label
+__________________________________________
+
+The return value from the $t(..) function is a type 
+associated with a label. The type will either be 
+assigned by the assembler or by the developer.
+
+In this example, the developer has designated a type value, 
+128, to mean registers. The imaginary architecture
+here does not place registers in the memory address 
+space, and the register tags must be detected in 
+order to generate the correct instruction variant.
+
+The contents of the parentheses must resolve to a label, 
+typically an actual parameter to a macro.
+
+There may be unary + - * # on the front of the argument. This is
+not predictable for macro language examining actual parameters.
+
+$t function steps over one unary symbol + - * # if present before
+examining the label.
+
+A macro parameter is examined here to decide 
+whether it is the tag of a register or some other kind 
+of address before the correct variant of the instruction 
+can be chosen:
+
+"$instruction" $form    6, 6, 36
+"$register_instruction" $form 6, 6, 6, 30
+"$REGISTERS" $equ       128
+R0      $equ,$registers 0
+R1      $equ,$registers 1
+	.
+	.
+R63     $equ,$registers 63
+
+
+p       $proc
+store*  $name   12
+	$if     $t(p(1,2))=$REGISTERS
+	$register_instruction $n+32, p(1, 1), p(1, 2), 0
+	$else
+	$instruction    $n, p(1,1), p(1,2)
+	$endif
+	$end
+
+
+
+4.1.3.2.2.4.11.1: Label Type Undefined
+______________________________________
+
+Labels which have not been defined before the start
+of the second assembly pass may be tested for type, 
+which will be 0. Any other reference to an undefined
+label during the second assembly pass generates an
+external reference, or if -u flag is set, an error.
+
+
+4.1.3.2.2.4.11.2: Label Type Location        
+_____________________________________
+
+A label has the type of a storage address if it
+has been encountered on column 1 of a source line, and
+is not the label of a $EQU, $SET, $EQUF, $PROC, 
+$FUNC, a $NAME in a $PROC or $FUNC, or the counter tag 
+of a $DO, or the tag of a $LIT directive. 
+	
+The type and value of address labels cannot be changed.
+However the same label name can be used independently
+in different subassemblies (macro depths).
+	
+An address label has an associated location counter and 
+is either absolute or relocatable.
+
+
+4.1.3.2.2.4.11.3: Label Type $EQU            
+_________________________________
+
+The label of a $EQU line has an absolute or a relocatable 
+value according to the the argument to which it's equated.
+
+$EQU labels are not intended to be equated more than once
+per subassembly. A warning is output if they are.
+
+Any label name may be defined independently in different
+subassemblies.
+
+
+4.1.3.2.2.4.11.4: Label Type $SET            
+_________________________________
+
+The label of a $SET line has an absolute or a relocatable 
+value according to the argument to which it's set.
+
+$SET labels are intended to be reassigned at will.
+$SET is actioned on both assembly passes.
+
+Any label name may be defined independently in different
+subassemblies.
+
+The label of a $DO, which accumulates in value as
+a relative-1 counter, has a type of $SET.
+	
+
+4.1.3.2.2.4.11.5: Label Type $EQUF      
+__________________________________
+
+$EQUF equates a label to a list of values and the label has
+the type $EQUF. This enables macro processing to assign to
+subassemblies a transparent number of subparameters.
+
+When parameter reference is resolved, the preassembled values
+in the $EQUF label are individually accessed, thus
+
+load    $proc
+	lwz     load(1, 1), load(1, 2)(load(1, 3))
+
+
+table_reference $equf   lookup, r31
+
+	load    r3, table_reference
+
+resolves to
+
+	lwz r3,lookup(r31)
+
+If the $EQUF name is a component of an expression, 
+it's its first value, "lookup" in this example, which is
+considered a principal value and is returned.
+
+MASMX 7r2
+3/lodation.msm
+LTERM=#
+CONT_CHAR=
+STERM=.
+*EOF*
+  :                            1:         $include "ppc1.def"
+  :                            2 load*   $proc
+  :                            3      lwz   load(1,1),load(1, 2)(load(1,3))
+  :                            4         $end
+  :                            5 
+  :                            6 lookup  $equ    101
+  :                            7 table_reference $equf   lookup, r31
+  :                            8 
+00:00000000 807F0065          +9         load    r3, table_reference
+  :                            10 
+*EOF*
+:$(00):00000000:00000004 
+lodation.msm: object code 54 bytes: 0 errors: 0 undefined labels
+
+
+
+Any of the values in the $EQUF may be retrieved with label\X
+
+In that assembly. table_reference\1 would retrieve the value
+"lookup", equal to 101.
+
+table_reference\2 would be the tag value identifying r31
+
+Any $EQUF attributes retrieved via \selector are net of relocation.
+
+Any \selection outside the set which has been declared (here 1 and 2)
+gives a result of 0.
+
+
+
+4.1.3.2.2.4.11.6: Label Type $DIRECTIVE      
+_______________________________________
+
+The labels of directives available when the assembler begins 
+to execute have the type $DIRECTIVE. The developer may also
+alias those directives by giving equates the type of 
+$DIRECTIVE, thus
+
+MACRO   $equ,$directive $proc
+MACEND  $equ,$directive $end
+
+
+4.1.3.2.2.4.11.7: Label Type $FUNCTION       
+______________________________________
+
+The internal functions available when the assembler begins
+to execute have the type $FUNCTION. The developer may also
+alias those functions by giving equates the subtype of $FUNCTION,
+thus
+
+	$cont_char	'|'
+. semicolon is no longer the line continue
+
+	$lterm		';'
+; period is no longer the comment character
+
+	$sterm		'.'
+; period can now be used within a label
+
+.       $equ,$function  "$"   ; $ is now also named .
+
+This only equates "." to location counter function "$" if "$"
+is in quotes as shown. This retrieves the functional identity
+of "$" for "."
+
+"." now means the location counter function.
+
+Without the quotes $ is evaluated functionally and "." receives
+the current location value. That would render "." an unusable function
+
+
+4.1.3.2.2.4.11.8: Label Type $PROC
+__________________________________
+
+The label on column 1 of the $PROC card is the name of the
+macro. Its meaning is all the images from $PROC to $END, and
+it has the label type of $PROC.
+
+If a $PROC name is encountered on the command field of a
+line, the macro is expanded, if the label is made visible*
+outside the $PROC with a trailing asterisk.
+
+If the name of the macro currently being expanded
+is encountered when evaluating an operand expression, 
+then a parameter reference is resolved:
+
+this_macro*      $proc
+	jump    this_macro(1, 4)
+	$end
+
+	this_macro 1, 2, 3, away
+
+has the effect "jump away"
+
+this_macro* has to be unique to the subassembly calling it.
+$PROC labels often aren't unique, and aren't exported with
+the trailing asterisk* Then the macro must contain an exported
+$NAME which has a asterisked_label*
+
+$PROC macros also have a unique numeric identity attached
+to their name, if their name is unique*
+
+That identity is returned if the $PROC name is referenced
+functionally
+
+$ masmx -ln
+MASMX 7r2
+0/-INPUT>>
+
+	$word	16
+
+var*    $proc   $(1)
+*       $res    var(1,1)
+        $end
+
+	.
+	.
+
+align*	$proc
+	$if	($t(align(1,1))=$proc)**(align(1,1)=var)
+granule	$set	align(1, 2)
+	var	granule-($(1)**granule-1)
+	$else
+granule	$set	align(1, 1)
+	$do	granule-($**granule-1),	-	1
+	$endif
+	$end
+
+$(1:1024)	.	variables
+$(0:256)	.	invariables
+	
+	$do	5,      -	4
+
+firstly	var	21
+	align	var, 8
+secondly var	4
+
+	align	8
+	+	99
+	+	firstly
+	+	secondly
+
+
+	$end
+
+  :                            1 
+  :                            2  $word 16
+  :                            3 
+  :                            4 var*    $proc   $(1)
+  :                            5 *       $res    var(1,1)
+  :                            6         $end
+  :                            7 
+  :                            8  .
+  :                            9  .
+  :                            10 
+  :                            11 align* $proc
+  :                            12  $if ($t(align(1,1))=$proc)**(align(1,1)=var)
+  :                            13 granule $set align(1, 2)
+  :                            14  var granule-($(1)**granule-1)
+  :                            15  $else
+  :                            16 granule $set align(1, 1)
+  :                            17  $do granule-($**granule-1), - 1
+  :                            18  $endif
+  :                            19  $end
+  :                            20 
+  :                            21 $(1:1024) .	variables
+  :                            22 $(0:256) .	invariables
+  :                            23  
+00:0100 FFFC                  +24  $do 5,      - 4
+00:0101 FFFC                  +24 
+00:0102 FFFC                  +24 
+00:0103 FFFC                  +24 
+00:0104 FFFC                  +24 
+  :                            25 
+  :                            26 firstly var 21
+  :                            27  align var, 8
+  :                            28 secondly var 4
+  :                            29 
+00:0105 FFFF                  +30  align 8
+00:0106 FFFF                  +30 
+00:0107 FFFF                  +30 
+00:0108 0063                  +31  + 99
+00:0109 0400                  +32  + firstly
+00:010A 0418                  +33  + secondly
+  :                            34 
+  :                            35 
+  :                            36  $end
+:$(00):0100:010B :$(01):0400:041C 
+-INPUT>>: object code 113 bytes: 0 errors: 0 undefined labels
+
+
+4.1.3.2.2.4.11.9: Label Type $NAME
+__________________________________
+
+$NAME is used within macro text $PROC..$END or $FUNC..$END
+to give alternative call names associated with a call value
+to the macro. $NAME labels return a type of $NAME.
+
+Macro labels do not need to be unique, so long as they have
+unique $NAME entry points.
+	
+Therefore it's possible to have similar or identical cryptic
+labels for all $PROC declarations. For example:
+
+instruction_form $form 8, 8, 16
+
+p       $proc
+grabit* $name   1
+dropit* $name   2
+	instruction_form   $n, p(1, 1), p(1, 2)
+	$end
+
+If the developer has called many procedural macros P, then
+P is not used as a call name, but the $NAME names are:
+
+	grabit  r12, input_port
+	dropit  r12, output_port
+
+Whatever macro you're writing, if it's called "p",
+its argument paraforms are then p(1,1) p(1,2) etc, 
+which makes it easy to write the macros. $NAME then 
+makes it easier to call the macros.
+
+If the macro is instead called "pqrpqr" then its parameters are
+referenced by macro code within pqrpqr as pqrpqr(1, 1), pqrpqr(1, 2) etc.
+
+Whether you want to call a macro by its $PROC label or a $NAME label,
+that label must be exported by having a trailing asterisk* Any label
+so exported from a $PROC must be unique to the next subassembly level
+upwards.
+
+
+4.1.3.2.2.4.11.10: Label Type $FUNC 
+___________________________________
+
+Developer-written function labels return a type of $FUNC.
+Developer-written functions are all functions which are 
+not internal to masmx, including functions in header files 
+supplied with this package. They are macros which return
+values which may be referenced in expressions.
+
+A $FUNC type label is the label on column 1 of a $FUNC 
+line. This is a user written value-generating macro and 
+its meaning is the expression on the first $RETURN line 
+actioned in the macro text $FUNC..$END
+
+$FUNC macros are expanded when encountered during evaluation
+of an operand expression, for example
+
+@*      $func
+	$return $(1)
+	$end
+
+length_of_variables     $set    @-START_OF_VARIABLES
+	
+This example is from the mapping of external RAM in a
+microcontroller-based system. The developer uses location counter $(1)
+to map external RAM and wishes $(1) to be known as @. 
+	
+@ returns the next available address in variable space.
+
+
+4.1.3.2.2.4.11.11: Label Type $FORM
+___________________________________
+
+A label declared as $FORM returns the type $FORM and
+describes the layout of an instruction or similar
+bit-structure.
+
+When a $FORM label is encountered in the command position
+the corresponding storage structure is generated inline.
+
+powerpc_load_store_instruction  $form   6, 5, 5, 16
+
+p       $proc
+lwz*    $name   LWZ
+stw*    $name   STW
+lbz*    $name   LBZ
+stb*    $name   STB
+	.
+	.
+	powerpc_load_store_instruction $n,p(1, 1),.index\p(1, 2),p(1, 2)
+	$end
+
+
+
+4.1.3.2.2.4.11.12: Label Types Assigned by the Developer
+________________________________________________________
+
+Label type values 128..255 are available to the developer
+who may designate them to associate special attributes with
+certain names. For example, a definition file for M68K might
+contain
+
+data_register   $equ    128
+address_register $equ   129
+pointer_register $equ   130
+special_register $equ   131
+
+d0      $equ,data_register      0
+d1      $equ,data_register      1
+	.
+	.
+d7      $equ,data_register      7
+
+a0      $equ,address_register   0
+a1      $equ,address_register   1
+	.
+	.
+a7      $equ,address_register   7
+	.
+	.
+a0@     $equ,pointer_register   0
+a1@     $equ,pointer_register   1
+	.
+	.
+a7@     $equ,pointer_register   7
+	.
+	.
+ssp     $equ,special_register   $0407
+usp     $equ,special_register   $0007
+cr      $equ,special_register   1
+
+Because the 68K target (and nearly all CISC targets)
+use the same mnemonics, ADD, MOV etc, for functional
+groups of instructions which have different opcodes
+depending on the class of operands (memory, various
+register classes), names may be typed and the type
+may be retrieved with $T(..)
+
+p       $proc
+mov.b*  $name   MOV_B
+mov.w*  $name   MOV_W
+mov.l*  $name   MOV_L
+	$if     $t(p(1,1))=data_register     
+	.
+	.
+
+4.1.3.2.2.4.12: $zenith -High Address of Section + Literals
+___________________________________________________________
+
+4.1.3.2.2.4.12.1: $zenith -this Section
+_______________________________________
+
+
+4.4.12.2: $zenith -named Section
+________________________________________
+
+
+
+5: Iterated Code and Structured Data
+____________________________________
 
 4.2.1: $DO and $proc Macros
 ___________________________
@@ -3698,8 +4737,19 @@ _____________________________________________
 _______________________________________________
 
 
+6: Run-Time Algorithm Plotter
+_____________________________
 
-4.3: Constructing Program Sections
+6.1 Run-Time Integer Algorithm Plotter
+______________________________________
+
+6.2 Run-Time Floating Algorithm Plotter
+_______________________________________
+
+  
+
+
+7: Constructing Program Sections
 __________________________________
 
 4.3.1: Absolute Location Counters
@@ -8759,1012 +9809,15 @@ A suitable parameter set for 8-bit microcontrollers is
 	$awidth 16
 
 
-4.1.3.2.2.4.1: $ -this location counter
-_______________________________________
+8.59: $zero_code_point
+______________________
 
-The expression $ returns the value of the current location counter. 
-For example the sequence
 
-$(7:256)
-	$res    4
-bampot  $equ    $+1
 
-will have the result that the label bampot has the value 261
 
-In giant segments, the giant value is obtained by adding the
-giant base to $, or by calling the $A function, see Section 4.2.3.2.2.4.3
 
-$ masmx -ln
-MASMX 7r2
-0/-INPUT>>
-	$word	32
 
-ASTRONOMIC	$set	07FFFF8000380000000040000
-	    
-$(43:1024:*ASTRONOMIC)
-	
-	$res	512
-here
-tube	$equ	$+ASTRONOMIC+1
-
-	+	tube
-	+	here
-
-	$end
-  :                            1  $word 32
-  :                            2 
-  :                            3 ASTRONOMIC $set 07FFFF8000380000000040000
-  :                            4      
-  :                            5 $(43:1024:*ASTRONOMIC)
-  :                            6  
-  :                            7  $res 512
-  :                            8 here
-Note: -INPUT>> Line 9: GIANT SPACE: $ returns intrasegment part of counter only
-Note: -INPUT>> Line 9: for absolute current location use $A
-  :                            9 tube $equ $+ASTRONOMIC+1
-  :                            10 
-2B:000000040600:7FFFF8000380000000040601
-                              +11  + tube
-2B:000000040603:7FFFF8000380000000040600
-                              +12  + here
-  :                            13 
-  :                            14  $end
-:$(2B):00000400:00000606 
--INPUT>>: object code 113 bytes: 0 errors: 0 undefined labels
-
-
-The value of "tube" is ASTRONOMIC+1537, equal to 07FFFF8000380000000040601
-hexadecimal.
-
-$ alone at the point where "tube" is declared only has the net value 1536.
-
-"here" is not an equate but a location, and has the value ASTRONOMIC+1536,
-equal to 07FFFF8000380000000040600 hexadecimal
-
-Note, $WORD directive sets the address quantum to $WORD size.
-
-If the target machine address quantum is an 8-bit byte,
-$WORD must be followed with the $QUANTUM directive
-
-	$word		32
-	$quantum	8
-
-
-
-4.1.3.2.2.4.2: $(..) -a location counter
-________________________________________
-
-The expression $(..) returns the value of the location 
-counter identified in the brackets. For example the sequence
-
-text    $equ    0
-var     $equ    1
-$(var:4096)
-	$res    4
-$(text:256)
-CONSTANT        +       $(1)+3
-
-causes the data word at location CONSTANT to contain 
-the value 4103
-
-4.1.3.2.2.4.3: $a -absolute address
-___________________________________
-
-$a is the absolute address relative to the program space. In base-displacement
-sections $a adds the base if that is known from an absolute location counter,
-and in relocatable sections $a instructs the link step to add the relocation.
-
-	$(15:*8, r9)
-	here	+	$a(here)
-
-In this example the segment is relocatable (it has an *alignment word),
-and the effect of $A is that relocation information is attached to the
-generated constant.
-
-$A is functional whether the target address is both relocatable and
-base+displacement as already shown; where the target address is relocatable
-
-	$(4:*4)
-	there
-
-		+	$a(there)
-
-
-and where the target address has a known absolute base
-
-	$(4:QUITE_LARGE_START_ADDRESS, r9)
-
-		$res	intervening_displacement
-
-	name
-
-		+	$a(name)
-
-In this configuration, name has the base+diplacement value 
-
-	intervening_displacement, r9
-
-and $a(name) has the absolute value
-
-	QUITE_LARGE_ADDRESS+intervening_displacement
-
-$a has no function for addresses in void segments, where the base
-register value is runtime dynamic
-
-A breakpoint value in the locator declaration can indicate a hardware
-translation or index known in advance for addresses which are already
-absolute in linked program terms
-
-	$(17:ADDRESS_IN_PROGRAM:ADDRESS_IN_HARDWARE)
-
-$a retrieves ADDRESS_IN_PROGRAM and not ADDRESS_IN_HARDWARE. A separate
-function $bank_index retrieves that
-
-$A function is also used in segments which are giant at assembly time.
-
-	$($14::*00FFC800003F0000, r19)
-	basev	+	$a:d	; double length:d
-
-Giant means address spaces larger than four gigaquanta.
-
-The $A function works for relocatable segments which are for later
-link-inclusion in giant spaces. But the constant must be large enough
-to contain the linked address:
-
-	$(15:*8, r9)
-	here	+	$a(here):d	; double length:d
-
-
-
-If the constant overflows, the link step fails with an error message.
-
-
-
-4.1.3.2.2.4.4: $b -base address of current section
-               or -base address of current segment
-__________________________________________________
-
-$B function in an absolute section retrieves the initial start address
-of the section
-
-$(2:02000)
-
-	$include	source1
-	$include	source2
-
-$(2:05000)
-
-constant +		$b
-
-The value stored in location constant is 02000
-
-$B function in a relocatable section retrieves the link root of the
-input segment within the link collection
-
-%masmx
-
-$(2:*8)
-
-	.
-	.
-
-constant +		$b
-
-	$store		rel_file
-	$end
-
-%masmx
-
-	$include	linkmacro.def
-
-$(2:02000)
-buffer	$res		03000
-	$include,$binary rel_file.txo
-
-
-The value in location constant is 05000.
-
-
-$B does not concern the breakpoint address retrieved with $bank_index
-
-
-4.1.3.2.2.4.5: $bank_index -absolute or virtual memory space identity
-_____________________________________________________________________
-
-For targets with hardware relocation, $bank_index retrieves the absolute
-or virtual load pointer named in the breakpoint field of the location
-counter switch statement
-
-$(locator_number:relative_base_address:BREAKPOINT_VALUE)
-
-This value is naturally known if it has been named, but $bank_index
-allows portable macro code to retrieve it
-
-If assembly flag -v is not set, this breakpoint value is the absolute load
-address of the section assembling. A section defined by locator number
-may be breakpointed many times in one or many assemblies, making many
-absolute banks. The value is an absolute word or byte address, and is
-added to program-relative addresses to construct load string addresses
-
-If assembly flag -v is set, this value is an abstraction like a handler
-or descriptor index, and the binary output appends it to load string
-addresses without interpreting it. A section defined by location counter
-may breakpointed many times, constructing many banks at virtual (i.e.
-assembly-time-independent) addresses
-
-$bank_index retrieves the current section breakpoint whether
-virtual or absolute
-
-There are no parameters. Only the current breakpoint value of the
-current section can be retrieved in this way.
-
-An application of $bank_index is the export of long absolute or virtual names
-
-	public_name*	$equ	$bank_index*/address_size++$
-
-
-4.1.3.2.2.4.6: $n -value of instruction $NAME, macro entry tag
-______________________________________________________________
-
-When exported from a macro,
-$n is a token for the low-order 32 bits of the macro $name value.
-The whole 192-bit value is macro_name(0, 0)
-
-
-$n may be used both 
-
-	inside $PROC..$END (instruction or structure macro) 
-	
-and 
-
-	inside $FUNC..$END (value-generating macro).
-
-$n references the call name of the macro, which must be the label 
-of a $NAME directive within the macro declaration.
-
-For example where
-
-	$word   48
-"$instruction" $form 8, 40
-	.
-	.
-p       $proc
-load*   $name   1
-store*  $name   2
-add*    $name   3
-subtract* $name  4
-
-	$instruction   $n, p(1,1)
-
-	$end
-
-the call line
-
-	add     8193
-
-generates, shown as hex,
-
-	030000002001
-
-because the macro was called with the name add, 
-which is worth 3, 3 is in the upper eight bits 
-of the output instruction, and the 
-operand address in the lower 40.
-
-$n can also be retrieved as parameter p(0, 1) or p(0, 0)
-
-parameter [macro_name](0, 0) is the same as [macro_name](0,1) because
-subfield 0 is the same as subfield 1 for all parameter fields.
-
-The result width of [macro_name](0, 0) and of all parameters is 192 bits.
-
-The result width of $n is 32 bits.
-
-Function macros written with $FUNC can also access $n or
-[macro_name](0, 0) or [macro_name](0,1)
-
-This user-written function uses its $n value to compute
-an address relative to the trailing edge of 
-either a two- or a three-byte relative-jump instruction:
-
-"$REL"  $func
-"$REL2"* $name   2
-"$REL3"* $name   3
-target  $set    $REL(1,1)-($+$n)
-	$if     target<-128)
-	$flag   You may only jump from instr. trailing edge - 128
-	$endif
-	$if     target>127
-	$flag   You may only jump from instr. trailing edge + 127
-	$endif
-	$return target
-	$end
-
-Here are $PROC instruction macros which call 
-$REL function.
-
-"cjne" wants an 8-bit relative displacement from its own 
-trailing edge, which is three bytes later than the location 
-counter. $REL3 is called
-
-"jc" and "jnc" want an 8-bit relative displacement from 
-their trailing edge, which is two bytes later than the 
-location counter. $REL2 is called.
-
-
-i$cjne_a        $form   8,8,8
-i$cjne_r        $form   5,3,8,8
-i$cjne_indirect $form   7,1,8,8
-
-"$jumpcc"	$form 8, 8
-
-p	$proc
-cjne*	$name
-
-        $if     ($t(p(1,1))=REGISTERS$)**(p(1,1)=A)
-          $if   p(1,#2)
-            i$cjne_a            0b4, p(1,2), $REL3(p(1,3))
-          $else
-            i$cjne_a            0b5, p(1,2), $REL3(p(1,3))
-          $endif
-        $elseif $t(p(1,1))=POINTER$
-          $if   p(1,#2)
-            i$cjne_indirect     05bh, p(1,1), p(1,2), $REL3(p(1,3))
-          $else
-            $flag Second Operand Must Be Immediate
-          $endif
-        $elseif $t(p(1,1))=RREGISTERS$
-          $if  p(1,#2)
-            i$cjne_r            017, p(1,1), p(1,2), $REL3(p(1,3))
-          $else
-            $flag Second Operand Must Be Immediate
-          $endif
-        $else
-          $flag First Operand Must be A/Rn/@Rn
-        $endif
-        $end
-
-p       $proc
-jc*     $name   JC_CODE
-jnc*    $name   JNC_CODE
-	$jumpcc $n, $REL2(p(1,1))
-	$end
-
-$n may also be accessed as parameter (0, 1) of the macro name.
-In function $REL, $n could instead be retrieved as $rel(0, 1)
-$rel(0,0) can be referenced with the same result, because subfield
-0 is the same as subfield 1.
-
-
-4.1.3.2.2.4.6: $net(..) -the unrelocated value of an expression
-_______________________________________________________________
-
-If an expression attempts algebra on a relocatable address,
-very few operations are allowed. See 4.2.3.2.2.1: Operators Used
-on Relocatable Tokens.
-
-There may be reasons why algebra is needed on the unrelocated part of a 
-relocatable address. For example, field range checks should be carried
-out at assembly time on both absolute and relocatable code.
-
-Relocatable code is also checked later at link, but it should be checked
-that no part of the unrelocated value has outflowed.
-
-Range checking at link is geometrically driven from within the linker.
-But at assembly time only macro language can carry out checks.
-
-It is also desirable that the same macro language is used for both
-absolute and relocatable code generation.
-
-No comparison operators are allowed on a relocatable address. The sequence
-
-p	$proc
-jump*	$name	
-target	$set	p(1, 1)
-
-	$do	target>16777261,	$flag	you can't jump there
-
-would always error where p(1, 1) is relocatable, because comparison
-operator > is not allowed on a relocatable.
-
-The following is allowed
-
-	$do	$net(target)>16777261,	$flag	you can't jump there
-
-Labels which are not present are treated as external and therefore
-relocatable.
-
-Shift right /* algebraic shift right */- AND ** are always allowed on
-relocatable values, to allow relocation of split and shifted fields.
-
-Addition and subtraction are always allowed on relocatable fields.
-
-See Sections 9.2: masmx Linking in Principle, 9.2.3: Demonstration Links
-(PowerPC).
-
-Information is encoded in the relocatable binary output which causes
-the whole value to be relocated before any shifts or truncations.
-See Sections 9.2: masmx Linking in Principle, 9.2.3: Demonstration Links
-(PowerPC).
-
-When using $NET for address range checks in instruction macros,
-or carrying out a range comparison any other way,
-the address parameter should be cached in a label first.
-In these examples that label is called "target":
-
-p	$proc
-
-jump*	$name	JUMP_OPCODE
-jump_maybe* $name JIF_OPCODE
-
-target	$set	p(1, 1)
-
-	$do	$net(target)>(1*/ADDRESS_FIELD_SIZE)-1,	;
-	$flag	jump address out of range
-
-	jump_form	p(0, 0), target
-	$end
-
-
-It may be inefficient to fetch the parameter tagged p(1, 1) more
-than once, especially if the actual parameter calls function macros.
-
-
-
-4.1.3.2.2.4.7: $o(.) -is this option set?
-_________________________________________
-
-An expression whose value is 'A'..'Z' or 'a'..'z' is allowed in the
-parentheses, and 1 is returned if the equivalent flag is on, for example:
-
-	$do	$o('k'),	$note flag -k is set
-
-	$if	$o(65)=0
-	$flag	flag -A should be set
-	$endif 
-
-The flag is set by any of -abcdefghijklmnopqrsuvwxyzEFGQZ+ anywhere 
-on the command line, or with the  $SET_OPTIONS directive.
-
-
-
-4.1.3.2.2.4.9: $r -region
-_________________________
-
-
-4.1.3.2.2.4.9.1: $r
-___________________
-
-Returns the identity, not the value, of the current 
-location counter 0..71. 
-
-
-4.1.3.2.2.4.9.2: $r(..)
-_______________________
-
-returns the identity of named address expression's location counter
-
-
-There should be a label in parentheses and "$R(label)" 
-will return be the identity 0..71, of the location 
-counter under which the label is generated.
-				  
-				  
-4.1.3.2.2.4.10: $rel(..) -is this a relocatable location counter?
-_________________________________________________________________
-
-An expression identifying a location counter 0..71 is in the parentheses,
-and $REL(x) tells you if it's a relocatable segment. No parentheses,
-and $REL tells you if the current segment is relocatable. The
-result isn't always 0 or 1. It's the load alignment factor of
-the segment which is 0 for absolute and 1 or something higher
-for relocatable.
-
-This function can be cascaded with the previous one to
-detect whether a label is relocatable
-
-	$if     $rel($r(label))
-	.
-	.
-
-
-4.1.3.2.2.4.11: $t(..) -what type of label
-__________________________________________
-
-The return value from the $t(..) function is a type 
-associated with a label. The type will either be 
-assigned by the assembler or by the developer.
-
-In this example, the developer has designated a type value, 
-128, to mean registers. The imaginary architecture
-here does not place registers in the memory address 
-space, and the register tags must be detected in 
-order to generate the correct instruction variant.
-
-The contents of the parentheses must resolve to a label, 
-typically an actual parameter to a macro.
-
-There may be unary + - * # on the front of the argument. This is
-not predictable for macro language examining actual parameters.
-
-$t function steps over one unary symbol + - * # if present before
-examining the label.
-
-A macro parameter is examined here to decide 
-whether it is the tag of a register or some other kind 
-of address before the correct variant of the instruction 
-can be chosen:
-
-"$instruction" $form    6, 6, 36
-"$register_instruction" $form 6, 6, 6, 30
-"$REGISTERS" $equ       128
-R0      $equ,$registers 0
-R1      $equ,$registers 1
-	.
-	.
-R63     $equ,$registers 63
-
-
-p       $proc
-store*  $name   12
-	$if     $t(p(1,2))=$REGISTERS
-	$register_instruction $n+32, p(1, 1), p(1, 2), 0
-	$else
-	$instruction    $n, p(1,1), p(1,2)
-	$endif
-	$end
-
-
-
-4.1.3.2.2.4.11.1: Label Type Undefined
-______________________________________
-
-Labels which have not been defined before the start
-of the second assembly pass may be tested for type, 
-which will be 0. Any other reference to an undefined
-label during the second assembly pass generates an
-external reference, or if -u flag is set, an error.
-
-
-4.1.3.2.2.4.11.2: Label Type Location        
-_____________________________________
-
-A label has the type of a storage address if it
-has been encountered on column 1 of a source line, and
-is not the label of a $EQU, $SET, $EQUF, $PROC, 
-$FUNC, a $NAME in a $PROC or $FUNC, or the counter tag 
-of a $DO, or the tag of a $LIT directive. 
-	
-The type and value of address labels cannot be changed.
-However the same label name can be used independently
-in different subassemblies (macro depths).
-	
-An address label has an associated location counter and 
-is either absolute or relocatable.
-
-
-4.1.3.2.2.4.11.3: Label Type $EQU            
-_________________________________
-
-The label of a $EQU line has an absolute or a relocatable 
-value according to the the argument to which it's equated.
-
-$EQU labels are not intended to be equated more than once
-per subassembly. A warning is output if they are.
-
-Any label name may be defined independently in different
-subassemblies.
-
-
-4.1.3.2.2.4.11.4: Label Type $SET            
-_________________________________
-
-The label of a $SET line has an absolute or a relocatable 
-value according to the argument to which it's set.
-
-$SET labels are intended to be reassigned at will.
-$SET is actioned on both assembly passes.
-
-Any label name may be defined independently in different
-subassemblies.
-
-The label of a $DO, which accumulates in value as
-a relative-1 counter, has a type of $SET.
-	
-
-4.1.3.2.2.4.11.5: Label Type $EQUF      
-__________________________________
-
-$EQUF equates a label to a list of values and the label has
-the type $EQUF. This enables macro processing to assign to
-subassemblies a transparent number of subparameters.
-
-When parameter reference is resolved, the preassembled values
-in the $EQUF label are individually accessed, thus
-
-load    $proc
-	lwz     load(1, 1), load(1, 2)(load(1, 3))
-
-
-table_reference $equf   lookup, r31
-
-	load    r3, table_reference
-
-resolves to
-
-	lwz r3,lookup(r31)
-
-If the $EQUF name is a component of an expression, 
-it's its first value, "lookup" in this example, which is
-considered a principal value and is returned.
-
-MASMX 7r2
-3/lodation.msm
-LTERM=#
-CONT_CHAR=
-STERM=.
-*EOF*
-  :                            1:         $include "ppc1.def"
-  :                            2 load*   $proc
-  :                            3      lwz   load(1,1),load(1, 2)(load(1,3))
-  :                            4         $end
-  :                            5 
-  :                            6 lookup  $equ    101
-  :                            7 table_reference $equf   lookup, r31
-  :                            8 
-00:00000000 807F0065          +9         load    r3, table_reference
-  :                            10 
-*EOF*
-:$(00):00000000:00000004 
-lodation.msm: object code 54 bytes: 0 errors: 0 undefined labels
-
-
-
-Any of the values in the $EQUF may be retrieved with label\X
-
-In that assembly. table_reference\1 would retrieve the value
-"lookup", equal to 101.
-
-table_reference\2 would be the tag value identifying r31
-
-Any $EQUF attributes retrieved via \selector are net of relocation.
-
-Any \selection outside the set which has been declared (here 1 and 2)
-gives a result of 0.
-
-
-
-4.1.3.2.2.4.11.6: Label Type $DIRECTIVE      
-_______________________________________
-
-The labels of directives available when the assembler begins 
-to execute have the type $DIRECTIVE. The developer may also
-alias those directives by giving equates the type of 
-$DIRECTIVE, thus
-
-MACRO   $equ,$directive $proc
-MACEND  $equ,$directive $end
-
-
-4.1.3.2.2.4.11.7: Label Type $FUNCTION       
-______________________________________
-
-The internal functions available when the assembler begins
-to execute have the type $FUNCTION. The developer may also
-alias those functions by giving equates the subtype of $FUNCTION,
-thus
-
-	$cont_char	'|'
-. semicolon is no longer the line continue
-
-	$lterm		';'
-; period is no longer the comment character
-
-	$sterm		'.'
-; period can now be used within a label
-
-.       $equ,$function  "$"   ; $ is now also named .
-
-This only equates "." to location counter function "$" if "$"
-is in quotes as shown. This retrieves the functional identity
-of "$" for "."
-
-"." now means the location counter function.
-
-Without the quotes $ is evaluated functionally and "." receives
-the current location value. That would render "." an unusable function
-
-
-4.1.3.2.2.4.11.8: Label Type $PROC
-__________________________________
-
-The label on column 1 of the $PROC card is the name of the
-macro. Its meaning is all the images from $PROC to $END, and
-it has the label type of $PROC.
-
-If a $PROC name is encountered on the command field of a
-line, the macro is expanded, if the label is made visible*
-outside the $PROC with a trailing asterisk.
-
-If the name of the macro currently being expanded
-is encountered when evaluating an operand expression, 
-then a parameter reference is resolved:
-
-this_macro*      $proc
-	jump    this_macro(1, 4)
-	$end
-
-	this_macro 1, 2, 3, away
-
-has the effect "jump away"
-
-this_macro* has to be unique to the subassembly calling it.
-$PROC labels often aren't unique, and aren't exported with
-the trailing asterisk* Then the macro must contain an exported
-$NAME which has a asterisked_label*
-
-$PROC macros also have a unique numeric identity attached
-to their name, if their name is unique*
-
-That identity is returned if the $PROC name is referenced
-functionally
-
-$ masmx -ln
-MASMX 7r2
-0/-INPUT>>
-
-	$word	16
-
-var*    $proc   $(1)
-*       $res    var(1,1)
-        $end
-
-	.
-	.
-
-align*	$proc
-	$if	($t(align(1,1))=$proc)**(align(1,1)=var)
-granule	$set	align(1, 2)
-	var	granule-($(1)**granule-1)
-	$else
-granule	$set	align(1, 1)
-	$do	granule-($**granule-1),	-	1
-	$endif
-	$end
-
-$(1:1024)	.	variables
-$(0:256)	.	invariables
-	
-	$do	5,      -	4
-
-firstly	var	21
-	align	var, 8
-secondly var	4
-
-	align	8
-	+	99
-	+	firstly
-	+	secondly
-
-
-	$end
-
-  :                            1 
-  :                            2  $word 16
-  :                            3 
-  :                            4 var*    $proc   $(1)
-  :                            5 *       $res    var(1,1)
-  :                            6         $end
-  :                            7 
-  :                            8  .
-  :                            9  .
-  :                            10 
-  :                            11 align* $proc
-  :                            12  $if ($t(align(1,1))=$proc)**(align(1,1)=var)
-  :                            13 granule $set align(1, 2)
-  :                            14  var granule-($(1)**granule-1)
-  :                            15  $else
-  :                            16 granule $set align(1, 1)
-  :                            17  $do granule-($**granule-1), - 1
-  :                            18  $endif
-  :                            19  $end
-  :                            20 
-  :                            21 $(1:1024) .	variables
-  :                            22 $(0:256) .	invariables
-  :                            23  
-00:0100 FFFC                  +24  $do 5,      - 4
-00:0101 FFFC                  +24 
-00:0102 FFFC                  +24 
-00:0103 FFFC                  +24 
-00:0104 FFFC                  +24 
-  :                            25 
-  :                            26 firstly var 21
-  :                            27  align var, 8
-  :                            28 secondly var 4
-  :                            29 
-00:0105 FFFF                  +30  align 8
-00:0106 FFFF                  +30 
-00:0107 FFFF                  +30 
-00:0108 0063                  +31  + 99
-00:0109 0400                  +32  + firstly
-00:010A 0418                  +33  + secondly
-  :                            34 
-  :                            35 
-  :                            36  $end
-:$(00):0100:010B :$(01):0400:041C 
--INPUT>>: object code 113 bytes: 0 errors: 0 undefined labels
-
-
-4.1.3.2.2.4.11.9: Label Type $NAME
-__________________________________
-
-$NAME is used within macro text $PROC..$END or $FUNC..$END
-to give alternative call names associated with a call value
-to the macro. $NAME labels return a type of $NAME.
-
-Macro labels do not need to be unique, so long as they have
-unique $NAME entry points.
-	
-Therefore it's possible to have similar or identical cryptic
-labels for all $PROC declarations. For example:
-
-instruction_form $form 8, 8, 16
-
-p       $proc
-grabit* $name   1
-dropit* $name   2
-	instruction_form   $n, p(1, 1), p(1, 2)
-	$end
-
-If the developer has called many procedural macros P, then
-P is not used as a call name, but the $NAME names are:
-
-	grabit  r12, input_port
-	dropit  r12, output_port
-
-Whatever macro you're writing, if it's called "p",
-its argument paraforms are then p(1,1) p(1,2) etc, 
-which makes it easy to write the macros. $NAME then 
-makes it easier to call the macros.
-
-If the macro is instead called "pqrpqr" then its parameters are
-referenced by macro code within pqrpqr as pqrpqr(1, 1), pqrpqr(1, 2) etc.
-
-Whether you want to call a macro by its $PROC label or a $NAME label,
-that label must be exported by having a trailing asterisk* Any label
-so exported from a $PROC must be unique to the next subassembly level
-upwards.
-
-
-4.1.3.2.2.4.11.10: Label Type $FUNC 
-___________________________________
-
-Developer-written function labels return a type of $FUNC.
-Developer-written functions are all functions which are 
-not internal to masmx, including functions in header files 
-supplied with this package. They are macros which return
-values which may be referenced in expressions.
-
-A $FUNC type label is the label on column 1 of a $FUNC 
-line. This is a user written value-generating macro and 
-its meaning is the expression on the first $RETURN line 
-actioned in the macro text $FUNC..$END
-
-$FUNC macros are expanded when encountered during evaluation
-of an operand expression, for example
-
-@*      $func
-	$return $(1)
-	$end
-
-length_of_variables     $set    @-START_OF_VARIABLES
-	
-This example is from the mapping of external RAM in a
-microcontroller-based system. The developer uses location counter $(1)
-to map external RAM and wishes $(1) to be known as @. 
-	
-@ returns the next available address in variable space.
-
-
-4.1.3.2.2.4.11.11: Label Type $FORM
-___________________________________
-
-A label declared as $FORM returns the type $FORM and
-describes the layout of an instruction or similar
-bit-structure.
-
-When a $FORM label is encountered in the command position
-the corresponding storage structure is generated inline.
-
-powerpc_load_store_instruction  $form   6, 5, 5, 16
-
-p       $proc
-lwz*    $name   LWZ
-stw*    $name   STW
-lbz*    $name   LBZ
-stb*    $name   STB
-	.
-	.
-	powerpc_load_store_instruction $n,p(1, 1),.index\p(1, 2),p(1, 2)
-	$end
-
-
-
-4.1.3.2.2.4.11.12: Label Types Assigned by the Developer
-________________________________________________________
-
-Label type values 128..255 are available to the developer
-who may designate them to associate special attributes with
-certain names. For example, a definition file for M68K might
-contain
-
-data_register   $equ    128
-address_register $equ   129
-pointer_register $equ   130
-special_register $equ   131
-
-d0      $equ,data_register      0
-d1      $equ,data_register      1
-	.
-	.
-d7      $equ,data_register      7
-
-a0      $equ,address_register   0
-a1      $equ,address_register   1
-	.
-	.
-a7      $equ,address_register   7
-	.
-	.
-a0@     $equ,pointer_register   0
-a1@     $equ,pointer_register   1
-	.
-	.
-a7@     $equ,pointer_register   7
-	.
-	.
-ssp     $equ,special_register   $0407
-usp     $equ,special_register   $0007
-cr      $equ,special_register   1
-
-Because the 68K target (and nearly all CISC targets)
-use the same mnemonics, ADD, MOV etc, for functional
-groups of instructions which have different opcodes
-depending on the class of operands (memory, various
-register classes), names may be typed and the type
-may be retrieved with $T(..)
-
-p       $proc
-mov.b*  $name   MOV_B
-mov.w*  $name   MOV_W
-mov.l*  $name   MOV_L
-	$if     $t(p(1,1))=data_register     
-	.
-	.
-
-4.1.3.2.2.4.12: $zenith -High Address of Section + Literals
-___________________________________________________________
-
-4.1.3.2.2.4.12.1: $zenith -this Section
-_______________________________________
-
-
-4.1.3.2.2.4.12.2: $zenith -named Section
-________________________________________
-
-
-
-5: Run-Time Algorithm Plotter
-_____________________________
-
-5.1: Run-Time Integer Algorithm Plotter
-_______________________________________
-
-5.2: Run-Time Floating Algorithm Plotter
-________________________________________
-
-
-6: Describing the Target Architecture in Text 
+11: Describing the Target Architecture in Text 
 _____________________________________________
 
 If you're not using a ready made header file, you need
