@@ -106,116 +106,111 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 3.  Getting started							3
 
-4.  The Core of masmx							4
 
-    1.	The Assembly Language Source Line				4.1
+4.  The Assembly Language Source Line					4
 
-	1.  Labels							4.1.1
+    1.  Labels								4.1
 
-	2.  The Command Field						4.1.2
+    2.  The Command Field						4.2
 
-	    1.  Directives						4.1.2.1
+	1.  Directives							4.2.1
 
-	    2.  Data Constants						4.1.2.2
-		1.  Notation						4.1.2.2.1
-		    1.  masmx Default Number and String Notation	4.1.2.1.1
-		    2.  C Language Number and String Notation		4.1.2.1.2
-		    3.  Motorola Old Number Notation			4.1.2.1.3
-		    4.  Suffix-Determined Number Notation		4.1.2.1.4
+	2.  Data Constants						4.2.2
+	    1.	Notation						4.2.2.1
+		1.  masmx Default Number and String Notation		4.2.1.1
+		2.  C Language Number and String Notation		4.2.1.2
+		3.  Motorola Old Number Notation			4.2.1.3
+		4.  Suffix-Determined Number Notation			4.2.1.4
 
-		2.  Expressions	and Number Constants			4.1.2.2.2
-		    1.  Operators					4.1.2.2.2.1
-		    2.	Expression Tokens				4.1.2.2.2.2
-			1.  Number Strings				4.1.2.2.2.2.1
-			2.  Label References				4.1.2.2.2.2.2
-			3.  Assembler-Supplied Functions		4.1.2.2.2.2.3
-			4.  Function Macro Reference			4.1.2.2.2.2.4
-			5.  Macro Parameter Reference			4.1.2.2.2.2.5
-		3.  Number Constants					4.1.2.2.3
-	   	4.  Split Number Items					4.1.2.2.4
-	    	5.  Text Strings					4.1.2.2.5
-	    	6.  $form Items						4.1.2.2.6
+	    2.	Expressions and Number Constants			4.2.2.2
+		1.  Operators						4.2.2.2.1
+		2.  Expression Tokens					4.2.2.2.2
+		    1.	Number Strings					4.2.2.2.2.1
+		    2.	Label References				4.2.2.2.2.2
+		    3	masmx-Supplied Functions			4.2.2.2.2.3
+		    4.	Function Macro Reference			4.2.2.2.2.4
+		    5.	Macro Parameter Reference			4.2.2.2.2.5
+	    3.	Number Constants					4.2.2.3
+	    4.	Split Number Items					4.2.2.4
+	    5.	Text Strings						4.2.2.5
+	    6.	$form Items						4.2.2.6
 
-	    3.  $proc macro calls: instructions and structures		4.1.2.3
+	3.  $proc macro calls: instructions and structures		4.2.3
 
-	3.  The Argument Field						4.1.3
+    3.	The Argument Field						4.3
 
-	    1.  Instruction Operands					4.1.3.1
-		1.  Operand Expressions					4.1.3.1.1
-		2.  Literal Operands					4.1.3.1.2
+	1.  Instruction Operands					4.3.1
+	    1.	Operand Expressions					4.3.1.1
+	    2.	Literal Operands					4.3.1.2
 
-	    2.	Arguments of Constant Lines				4.1.3.2
-		1.  Expressions						4.1.3.2.1
-		2.  Literals						4.1.3.2.2
+	2.  Arguments of Constant Lines					4.3.2
+	    1.  Expressions						4.3.2.1
+	    2.  Literals						4.3.2.2
 
-    2.  Literals							4.2
-	1.  A literal is						4.2.1
-	2.  The Literal Pools						4.2.2
-	3.  Literal Pool Tags						4.2.3
-	4.  Re-use of Literals						4.2.4
-	5.  Automatic Literals						4.2.5
+    4.  Literals							4.4.2
+	1.  A literal is						4.4.2.1
+	2.  Literal Pools						4.4.2.2
+	3.  Automatic Literals						4.4.2.3
+	4.  Literal Pool Tags						4.4.2.4
+	5.  Constant Pointer to Literal					4.4.2.5
     
-    3.	Function Macros							4.3
-	1.  a user function is						4.3.1
-	2.  directives for constructing functions			4.3.2
-	    1.  $FUNC	head of function				4.3.2.1
-            2.	$NAME	entry point and invocation tag			4.3.2.2
-	    3.	$RETURN	value of result					4.3.2.3
-	    4.	$END	foot of function				4.3.2.4
-	3.  code generated during function evaluation			4.3.3
-	    1.  idempotent functions					4.3.3.1
-	    2.  last-pass-only functions				4.3.3.2
+    5.	Function Macros							4.5
+	1.  a user function is						4.5.1
+	2.  directives for constructing functions			4.5.2
+	    1.  $FUNC	head of function				4.5.2.1
+            2.	$NAME	entry point and invocation tag			4.5.2.2
+	    3.	$RETURN	value of result					4.5.2.3
+	    4.	$END	foot of function				4.5.2.4
+	3.  code generated during function evaluation			4.5.3
+	    1.  idempotent functions					4.5.3.1
+	    2.  last-pass-only functions				4.5.3.2
 
 
-    4.  masmx-supplied functions				 	4.4
+    6.  masmx-supplied functions				 	4.6
 
-	1.  $ 		this location counter				4.4.1
+	1.  $		location counter				4.6.1
 
-	2.  $(..)	named location counter				4.4.2
+	2.  $(..)	named location counter				4.6.2
 
-	3.  $a		absolute address				4.4.3
+	3.  $a		absolute address				4.6.3
                     	  
-	4.  $b		section base address				4.4.4
+	4.  $b		section base address				4.6.4
                     	  
-	5.  $bank_index	memory block identifier				4.4.5
+	5.  $bank_index	memory block identifier				4.6.5
 
-	6.  $n		short token for macro reference name		4.4.6
+	6.  $n		short token for macro reference name		4.6.6
 
-	7.  $net(..)	unrelocated value of expression			4.4.7
+	7.  $net(..)	unrelocated value of expression			4.6.7
 
-	8.  $o(..)	value of an option flag				4.4.8
+	8.  $o(..)	value of an option flag				4.6.8
 
-	9.  $r		region						4.4.9
+	9.  $r		region						4.6.9
 
-	    1.		identity of current location counter		4.4.9.1
+	    1.		identity of current location counter		4.6.9.1
 
-	    2.		$r(expression) identity of implied locator	4.4.9.2
+	    2.		$r(expression) identity of implied locator	4.6.9.2
 
-	10. $rel(..)	is locator relocatable?				4.4.10
+	10. $rel(..)	is locator relocatable?				4.6.10
 
-	11. $t(..)	type of a label					4.4.11
+	11. $t(..)	type of a label					4.6.11
 
-	    1.   undefined						4.4.11.1
-	    2.   location						4.4.11.2
-	    3.   $EQU							4.4.11.3
-	    4.   $SET							4.4.11.4
-	    5.   $EQUF							4.4.11.5
-	    6.   $DIRECTIVE						4.4.11.6
-	    7.   $FUNCTION (of masmx)					4.4.11.7
-	    8.   $PROC (macro)						4.4.11.8
-	    9.   $NAME							4.4.11.9
-	    10.	 $FUNC (macro)						4.4.11.10
-	    11.  $FORM							4.4.11.11
-	    12.  user assigned label types				4.4.11.12
+	    1.   undefined						4.6.11.1
+	    2.   location						4.6.11.2
+	    3.   $EQU							4.6.11.3
+	    4.   $SET							4.6.11.4
+	    5.   $EQUF							4.6.11.5
+	    6.   $DIRECTIVE						4.6.11.6
+	    7.   $FUNCTION (of masmx)					4.6.11.7
+	    8.   $PROC (macro)						4.6.11.8
+	    9.   $NAME							4.6.11.9
+	    10.	 $FUNC (macro)						4.6.11.10
+	    11.  $FORM							4.6.11.11
+	    12.  user assigned label types				4.6.11.12
 
-	12. $zenith	high address of section + literals		4.4.12
+	12. $zenith	high address of section + literals		4.6.12
 
-	    1.	$zenith		this section				4.4.12.1
-	    2.	$zenith(..)	named section				4.4.12.2
-
-
-
-
+	    1.	$zenith		this section				4.6.12.1
+	    2.	$zenith(..)	named section				4.6.12.2
 
 
 5.  Iterated Code and Structured Data					5
@@ -235,8 +230,6 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    1.	Simple Structures $RECORD..$ROOT			5.2.2.1
 	    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT		5.2.2.2
 	    3.  Macro Code Access to Bit-Aligned Structures		5.2.2.3
-
-
 
 
 6.  Run-Time Algorithm Plotter						6
@@ -372,7 +365,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     41.	$quote		change quote mark				8.41
 
 
-   42.	$record								8.42
+    42.	$record								8.42
 
 	1.  $record		bit-aligned data structures		8.42.1
 	2.  $record,$branch	bit-aligned structure overlay		8.42.2
@@ -545,15 +538,12 @@ _______________
 1.2.1: Legacy Source Code Unchanged
 ____________________________________
 
-masmx has a slender native syntax described in Section 4: The Core of
-masmx. There is no need to convert  existing source code before masmx
-can assemble it, because include files define imported syntax to masmx.
 
-Text string translation enables masmx to scan differently written
-operators in expressions. See section 8.51: $text directive
+Include files define imported syntax to masmx.
+Existing source code assembles unchanged
 
-masmx assembly does not require code changes. Application Source never
-needs to be edited, until you want to change what it does
+masmx interprets imported notation for code, data and even
+arithmetic and manipulation operators 
 
 See section 6:1 Establishing your Syntax
 
@@ -566,20 +556,20 @@ Number and character strings are assembled in masmx native
 notation, C-Language notation, Motorola Old Notation or
 suffix-determined notation
 
-See Section 2.1: Number Items and Section 3.2: Expressions
+See Section 4.2.2.1: Notation and Section 4.2.2.2: Expressions
+Number Constants
 
 
 
 1.3 masmx Any Word Size
 _______________________
 
-A word is any size from 1 bit to 192 bits, specified with directive $word
+Code and data are assembled in multiples of words. Directive $word
+defines the size of a word from 1 to 192 bits
+ 
+Integer and floating values are computed to 192-bit precision
 
-Assembled code is in multiples of words, and integer constants occupy by
-default their containing number of words up to 192 bits
-
-Integer and floating constants, and fields of instructions and other 
-bit-field structures, are computed to 192-bit precision.
+Integer constants occupy by default their containing number of words
 
 
 
@@ -614,10 +604,10 @@ PowerPC are an example of base-displacement addressing
 1.5 masmx is for Any Floating Point Format
 __________________________________________
 
-masmx default floating constant size is 96 bits
+masmx default floating constant size is 96 bits rounded from 192 bits
 
-masmx evaluates floating numbers as 192-bit values
-with 23-bit exponent and 168-bit fractional mantissa
+Internally generated 192-bit floating values have 23-bit exponent and
+168-bit fractional mantissa
 
 
 	__________________________________________________________________
@@ -626,10 +616,12 @@ with 23-bit exponent and 168-bit fractional mantissa
 
 Negative polarity is represented with the entire value in 1s complement
 
-The values are transformed to the constants of target
-size and format
+Size, layout and representation of floating constants are programmable and
+derived from masmx 192-bit internal representation. There is no restriction
+target representations. Macro code can achieve any representation
 
-Macro code can generate IEEE754 floating constants
+Supplied macros generate IEEE754 floating constants in 32-bit, 64-bit and
+128-bit formats, and in the popular non-IEEE654 80-bit representation
 
 IEEE754 floating formats have an unrepresented integral bit. A sign flag alone 
 represents polarity.
@@ -680,7 +672,7 @@ ____________________________________
 1.6.1:  Structured Data
 _______________________
 
-mamsx can construct complex hierarchical data. See section 4.2 Iterated Coded and
+mamsx can construct complex hierarchical data. See section 5 Iterated Coded and
 Structured Data
 
 
@@ -689,7 +681,7 @@ __________________________________
 
 masmx can construct and label complex hierarchical data which does not map to
 the target architecture and can only be described as bit-fields of arbitrarily
-large size. See Section 4.2.2.2: Bit-Aligned Structures
+large size. See Section 5.2.2: Bit-Aligned Structures
 
 
 1.6.3: Accessing Bit-Aligned Structured Data
@@ -697,21 +689,21 @@ ____________________________________________
 
 masmx naming techniques allow a single set of macros for a given target
 architecture to enable any application to access complex bit-aligned data.
-See Section 4.2.2.2.3: Macro Code Access to Bit-Aligned Structures
+See Section 5.2.2.3: Macro Code Access to Bit-Aligned Structures
 
 
 1.6.4: Repeat Data
 __________________
 
 masmx generates repeating data and data structures with the $do directive and
-subscripted labels. See Section 4.2.1: $do and macros
+subscripted labels. See Section 5.1: $do and macros
 
 
 1.6.5: Functionally Compartmented Name Spaces
 _____________________________________________
 
 Hierarchic label structures can be used to compartment name spaces as with
-languages structured by function. See Section 4.2.2.1.4: Structured Code
+languages structured by function. See Section 5.2.1.4: Structured Code
 Name Spaces
 
 
@@ -720,8 +712,8 @@ ________________________________
 
 Directives $xqt_i and $xqt_fp combine with target-specific macro language
 to translate algorithmic expressions with run-time variable tokens into
-an instruction plan. See Section 5.1: Run-Time Integer Algorithm Plotter
-and Section 5.2: Run-Time Floating Algorithm Plotter
+an instruction plan. See Section 6.1: Run-Time Integer Algorithm Plotter
+and Section 6.2: Run-Time Floating Algorithm Plotter
 
 
 2: Developer Environment
@@ -729,7 +721,7 @@ ________________________
 
 masmx developer environment is a shell
 
-The many assembly examples in this document are captures from the Unix
+Assembly examples in this document are captures from the Unix
 bash shell
 
 masmx on Microsoft platforms does not need any shell more sophisticated
@@ -750,17 +742,16 @@ Initially masmx knows directives ($include is a directive)
 and some special names representing internal functions, like $ 
 which means "location counter"
 
-Because file includes can be nested extensively, you don't need
-to edit your existing source even to get the header include line in.
-You can construct wrappers like:
+Wrappers may be constructed to include headers without altering
+existing source. File includes may be extensively nested
 
 	$list	0
 	$include	target.def
 	$list	2
 	$include	existing_application.msm
 
-You can alias the built-in directives and functions to suit your existing
-code. You can also implement the directives of other assemblers as macros.
+masmx internal directives and functions can be aliased to suit existing code.
+Directives of other assemblers can also be constructed as macros
 
 A definition file included at the head of the assembly defines: 
 
@@ -787,12 +778,10 @@ A definition file included at the head of the assembly defines:
 	integer encoding and floating point formats
 
 
-4: The Core of masmx
-____________________
 
 
-4.1: The Assembly Language Source Line
-_____________________________________
+4: The Assembly Language Source Line
+____________________________________
 
 
 The line of assembly language code has an arbitrary number of fields
@@ -810,60 +799,56 @@ Lines may be continued. The default continuation symbol ; can be changed with di
 A label starts in column 1 and ends in whitespace. A label may contain letters,
 digits, $_?!@: and starts with a letter or _?!@
 
-<p>
-: in this list of legal characters represents the substring separator which is
-default colon : but may be set to another value, often period . 
 
-<p>
+: in this list of legal characters represents the substring separator which is
+default colon : but may be another value, often period . 
+
 A reference containing substring separator may reference a simple label or a structured location
 
-<p>
 A label may be in "" and then it starts with anything and contains anything
 
-<p>
 Without case-sensitive option -k all labels and references are translated to uppercase
 
-<p>
 $ in column one is a program section control called a location counter with syntax
-<b>$(number[:attributes])</b> See section <b>4.3: Constructing Program Sections/b>
+$(number[:attributes])   See section 7: Constructing Program Sections
 
-<p>
+
 A label starting with $ is declared in quotes but usually referenced without quotes
 
-<p>
+
 A label may have an arbitrary number of subscripts
-<pre>
 
-<i>label(5,7,600)</i>
 
-</pre>
+label(5,7,600)
+
+
 Each subscripted instance is a different label
 
-<p>
-A label <i>label_stem(4,1,20)</i> is the count of
+Reference to a subscripted label which does not exist
+counts instances of labels identical except for one more
+subscript
 
-<pre>
-	<i>
-	label_stem(4,1,20,5)<br>
-	label_stem(4,1,20,20)<br>
-	...</i>
+A label label_stem(4,1,20) is the count of labels label_stem(4,1,20,?)
 
-</pre>
+	label_stem(4,1,20,5)
+	label_stem(4,1,20,20)
+	...
 
-A subscripted label reference which does not exist and which
-has no labels in its set has the value of zero because it
+If no instances exist either the reference has the value of zero because it
 counts an empty set
 
-Subscripted labels don't have to be in ascending order or any order,
-but can be generated by loop control
+There is no requirement for label subscripts to fill a number space
+continuously or evenly
+
+Subscripted labels need not be in ascending order or any order,
+but may be generated by loop control
 
 MANY	$set	65536
 
 index	$do	MANY,a_name(MANY+1-index)	99*index
 
-The subscript is an expression like any other and need not be written
-as a normalised integer. On storage and reference, the assembler encodes
-each expression in the subscript list as a strictly normalised integer.
+The assembler normalises subscript integer expressions to a decimal
+digit string when inserting or referencing subscripted labels.
 
 For example, the first two repeats of the $DO above generate
 
@@ -876,11 +861,9 @@ a_name(3)	99*65534
 a_name(2)	99*65535
 a_name(1)	99*65536
 
-<p>
 Macros generate and use labels which are discarded at the end of the macro expansion.
 Labels only remain available to the calling level of assembly if they are promoted
 with trailing asterisk
-<pre>
 
 $ masmx -lnxk visible visible
 MASMX 7r3
@@ -918,22 +901,17 @@ $ cat visible.txo
 :$0E*000000:00E000:00E000
 $
 
-</pre>
-<p>
 One asterisk is added to promote a label one  macro level. An asterisk at the main
 assembly level externalises the label
 
-<p>
-A label declared at the main assembly with <b>$set</b> directive cannot accidentally
-be exported from the assembly by subsequent sets. <b>$set</b> labels may be changed
+A label declared at the main assembly with $set directive cannot accidentally
+be exported from the assembly by subsequent sets. $set labels may be changed
 in value but a label global to the assembly cannot be changed to an exported label
 
-<p>
 Macros can therefore use many asterisks to make sure they are updating a
 global (and not a nested macro-local) <b>$set</b> label without risking a
 clash with other assemblies. In this sample assembly the output file does
 not contain an exported label, or in this case anything at all
-<pre>
 
 $ masmx attestor -lnx
 MASMX 7r3
@@ -957,8 +935,8 @@ $ cat temp.txo
 $
 
 
-4.1.2 The Command Field
-_______________________
+4.2 The Command Field
+_____________________
 
 The command field (the first field which is preceded by any
 whitespace) can contain a directive, a constant, a name
@@ -966,8 +944,8 @@ of a $proc macro, or the name of a $form template.
 
 [label] COMMAND [arguments]
 
-4.1.2.1 Directives
-__________________
+4.2.1 Directives
+________________
 
 Directives are commands to the assembler. They are listed in Section 8: Directives
 
@@ -1018,8 +996,8 @@ and other directives in the command field are always recognised.
 
 
 
-4.1.2.2 Data Constants
-______________________
+4.2.2: Data Constants
+_____________________
 
 
 For complex data constants see section 4.2: Iterated Code and Structured Data
@@ -1028,10 +1006,10 @@ Simple data constants may be integers, microstructures of bit fields,
 floating numbers or text strings.
 
 
-4.1.2.2.1 Notation
-__________________
+4.2.2.1: Notation
+_________________
 
-4.1.2.2.1.1:  masmx Default Number and String Notation
+4.2.2.1.1:  masmx Default Number and String Notation
 ____________________________________________________
 
 Native masmx interprets number strings with leading zero as hex or
@@ -1054,7 +1032,7 @@ directive $quote '''' designates apostrophe to be the quote symbol
 
 
 
-4.1.2.2.1.2:  C-Language Number and Character String Notation
+4.2.2.1.2:  C-Language Number and Character String Notation
 _____________________________________________________________
 
 With Assembly Flag -c 1000 and 0x3e8 both mean one thousand and
@@ -1067,7 +1045,7 @@ leading zero is otherwise octal
 
 
 
-4.1.2.2.1.3:  Motorola Old Number Notation
+4.2.2.1.3:  Motorola Old Number Notation
 __________________________________________
 
 Flag -m interprets
@@ -1077,7 +1055,7 @@ Flag -m interprets
 	%bit_image
 
  
-4.1.2.2.1.4:  Suffix-Determined Number Notation
+4.2.2.1.4:  Suffix-Determined Number Notation
 _______________________________________________
 
 Directive $suffix 2 interprets upper or lowercase
@@ -1102,8 +1080,8 @@ notation is typed before a size flag
 Directive $suffix 1 defaults leading zero to hex
 
 
-4.1.2.2.2: Expressions and Number Constants
-___________________________________________
+4.2.2.2: Expressions and Number Constants
+_________________________________________
 
 Number item constants are assembled from an expression in the command
 field or a unary sign in the command field and an expression in the
@@ -1144,28 +1122,26 @@ MASMX 7r3
 
 	
 
-4.1.2.2.2.1 Operators
+4.2.2.2.1 Operators
 ___________________
 	
 Operators by rank are
 
-	<blockquote>
-	()<br>
-	=<br>
-	^=<br>
-	><br>
-	<<br>
-	--<br>
-	++<br>
-	/*<br>
-	*/<br>
-	*/-<br>
-	**<br>
-	*+ *-<br>
-	+ -<br>
-	* / // ///<br>
-	&plusmn; ^unary<br>
-	</blockquote>
+	()
+	=
+	^=
+	>
+	<
+	--
+	++
+	/*
+	*/
+	*/-
+	**
+	*+ *-
+	+ -
+	* / // ///
+	+ - ^unary
 
 
 Operators in the same rank have left-to-right precedence as they are
@@ -1288,11 +1264,11 @@ MASMX 7r3
 
 
 
-4.1.2.2.2.2: Expression Tokens
-_______________________________
-
-4.1.2.2.2.2.1: Number Strings
+4.2.2.2.2: Expression Tokens
 _____________________________
+
+4.2.2.2.2.1: Number Strings
+___________________________
 
 This expression is in masmx native number notation. Leading zero is
 hexadecimal and bit-pattern starts with \
@@ -1320,8 +1296,8 @@ immediat.msm: object code 62 bytes: 0 errors: 0 undefined labels
 
 
 
-4.1.2.2.2.2.2 Label References
-_______________________________
+4.2.2.2.2.2: Label References
+_____________________________
 
 Labels of any type (storage location line labels, equates, function
 macro names, $DO loop tags) may be referenced in expressions
@@ -1376,10 +1352,10 @@ QDELIM='
 :$(00):000000:000002 
 
 
-4.1.2.2.2.2.3: masmx-Supplied Functions
-_______________________________________
+4.2.2.2.2.3: masmx-Supplied Functions
+_____________________________________
 
-See section 4.4 masmx-Supplied Functions for full description.
+See section 4.6 masmx-Supplied Functions for full description.
 In summary:
 
 	$		current location counter value
@@ -1443,13 +1419,13 @@ In summary:
 	$do	$zenith>SECTION_LIMIT,	$flag	section too long
 
 
-4.1.2.2.2.2.4: Function Macro Reference
-_______________________________________
+4.2.2.2.2.4: Function Macro Reference
+_____________________________________
 
 
 
 
-4.1.2.2.2.2.5: Macro Parameters
+4.2.2.2.2.5: Macro Parameters
 ______________________________
 
 Macro actual arguments are accessed by using the label of 
@@ -1556,8 +1532,8 @@ address_B	$net_socket	172.29.6.8:23
 
 
 
-4.1.2.2.3 Number Constants
-_____________________________
+4.2.2.3 Number Constants
+________________________
 
 Number item constants are assembled from an expression in the command
 field or a unary sign in the command field and an expression in the
@@ -1738,7 +1714,7 @@ MASMX 7r3
   :                            4  $end
 :$(00):0000:0003 
 
-Floating numbers to not self size. Their default size determined with
+Floating numbers do not self size. Their default size determined with
 directive $floating_point
 
 A floating number length override follows the fraction, not the exponent
@@ -1776,10 +1752,10 @@ downscale	$equ	2
 Floating numbers contain a digit string with decimal point 
 or the decimal scale operator, *+ *- or both
 
-	+	1.75
-	+	175*-2
+	1.75
+	175*-2
 
-	+	298.5e1262611
+	298.5e1262611
 
 The scale punctuation e+ e- is also recognised after a fraction string
 
@@ -1808,7 +1784,8 @@ with the characteristic still 23 bits midpointed, and the fraction 72 bits
 	|_|________________|____________________________	________|
 
 
-Numbers in the default 96-bit format are shown here
+Numbers in the default 96-bit format are assembled here. Negative numbers
+are represented in 1s complement
 
 MASMX 7r2
 3/fs32.msm
@@ -1816,13 +1793,13 @@ MASMX 7r2
   :                            1 	$word	32
   :                            2 
 00:00000000 400001C00000000000000000
-                              +3         +       1.5
+                              +3         1.5
 00:00000003 BFFFFE3FFFFFFFFFFFFFFFFF
                               +4         -       1.5
 00:00000006 72B049CD0D73CF08E04D576E
-                              +5         + 1.5*+1000000
+                              +5         1.5*+1000000
 00:00000009 0D4FB9B3C73F219697B1274F
-                              +6         + 1.5*-1000000
+                              +6         1.5*-1000000
 *EOF*
 :$(00):00000000:0000000C 
 fs32.msm: object code 145 bytes: 0 errors: 0 undefined labels
@@ -1871,7 +1848,7 @@ can be escaped with macro language
 
 Macros supplied in this package generate IEEE754 floating constants. 
 
-See Section 1.5: Any Floating Point Format.
+See Section 10: masmx Abstract Floating Format and Alternative Floating Formats
 
 
 This example generates the value 1.375e+1200000 with various typing.
@@ -1881,12 +1858,12 @@ so they are all 192 bits
 
 
 $ masmx -ln
-MASMX 7r2
+MASMX 7r3
 0/-INPUT>>
         $word   32
-        +       1.375h*+1200000
-        +       1.375he+1200000
-        +       1375h*+1199997
+                1.375h*+1200000
+                1.375he+1200000
+                1375h*+1199997
 floatup $set	137.5he1199998
 floataway $set	1.375he1200000
 floatalong $set 1.375h*+1200000
@@ -1896,11 +1873,11 @@ floatalong $set 1.375h*+1200000
         $end
   :                            1         $word   32
 00:00000000 7CD38B90563FA97362D8D4F8DAAE3CB167FAE1BBCD7D99BB
-                              +2         +       1.375h*+1200000
+                              +2                 1.375h*+1200000
 00:00000006 7CD38B90563FA97362D8D4F8DAAE3CB167FAE1BBCD7D99BB
-                              +3         +       1.375he+1200000
+                              +3                 1.375he+1200000
 00:0000000C 7CD38B90563FA97362D8D4F8DAAE3CB167FAE1BBCD7D99BB
-                              +4         +       1375h*+1199997
+                              +4                 1375h*+1199997
   :                            5 floatup $set 137.5he1199998
   :                            6 floataway $set 1.375he1200000
   :                            7 floatalong $set 1.375h*+1200000
@@ -1912,7 +1889,6 @@ floatalong $set 1.375h*+1200000
                               +10         +       floatalong
   :                            11         $end
 :$(00):00000000:00000024 
--INPUT>>: object code 339 bytes: 0 errors: 0 undefined labels
 
 
 The decimal scale operator not only adds scale to a fraction string, but may also
@@ -1920,8 +1896,9 @@ join two integer expressions to construct a floating number, with the mantissa t
 from the left and the exponent from the right. Any length override is typed after the
 fraction and before the *+ *- operator
 
-$ masmx -ln floating
-MASMX 7r2
+
+$ masmx floating -lnky
+MASMX 7r3
 3/floating.msm
   :                            1 
   :                            2 	$word	48		. the word size of the target
@@ -1940,37 +1917,37 @@ MASMX 7r2
   :                            15 one     $equ    1
   :                            16 
 00:000000000000 3FFFFDCCCCCCCCCCCCCCCCCD
-                              +17 	+	1*-1		. floating recognised from operator
+                              +17 		1*-1		. floating recognised from operator
   :                            18 				. current default floating size
   :                            19 
-00:000000000002 3FDCCCCCCCCD  +20 	+	1s*-one		. floating recognised from operator
+00:000000000002 3FDCCCCCCCCD  +20 		1s*-one		. floating recognised from operator
   :                            21 				. single-word override
   :                            22 
   :                            23 
 00:000000000003 3FFFFDCCCCCCCCCCCCCCCCCD
-                              +24 	+	0.1		. floating recognised from fraction string
-00:000000000005 3FDCCCCCCCCD  +25 	+	0.1s		. floating recognised from fraction string
+                              +24 		0.1		. floating recognised from fraction string
+00:000000000005 3FDCCCCCCCCD  +25 		0.1s		. floating recognised from fraction string
   :                            26 				. single word override, 12-bit characteristic
   :                            27 
 00:000000000006 3FFFFDCCCCCCCCCCCCCCCCCD
-                              +28 	+	1.0e-1		. fraction string followed by e+ e- punctuation
+                              +28 		1.0e-1		. fraction string followed by e+ e- punctuation
   :                            29 
 00:000000000008 3FFFFDCCCCCCCCCCCCCCCCCD
                               +30 	+	one*-one	. floating recognised from operator
   :                            31 				. mantissa / exponent expressions
   :                            32 				. contain any integer tokens
   :                            33 
-00:00000000000A 3FDCCCCCCCCD  +34 	+	1s*-1		. expression sizes and rounds at
+00:00000000000A 3FDCCCCCCCCD  +34 		1s*-1		. expression sizes and rounds at
   :                            35 				. one-word override
   :                            36 
   :                            37 
 00:00000000000B 3FFFFDCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCD
-                              +38         +	1q*-one		. four-word override
+                              +38         	1q*-one		. four-word override
   :                            39 
-00:00000000000F 3FDCCCCCCCCD  +40 	+	1.0s*-one  	. exponent string can be any integer tokens
+00:00000000000F 3FDCCCCCCCCD  +40 		1.0s*-one  	. exponent string can be any integer tokens
   :                            41 
 00:000000000010 401800000000404A00000000407C8000000040AFA0000000
-                              +42 	+	1s*+0, 1s*+1, 1s*+2, 1s*+3q	. four words,
+                              +42 		1s*+0, 1s*+1, 1s*+2, 1s*+3q	. four words,
   :                            43 						. four floating numbers
   :                            44 
   :                            45 tagged	$equ	163.84e+2
@@ -1979,13 +1956,12 @@ MASMX 7r2
   :                            47 
   :                            48 	$end
 :$(00):000000000000:000000000016 
-floating.msm: object code 336 bytes: 0 errors: 0 undefined labels
 
 
 
 
-4.1.2.2.4 Split Integers
-________________________
+4.2.2.4: Split Integers
+_______________________
 
 A split integer item is a small list of equal size fields. The
 size of the total is one word. The suffixes [d l t q p h o] can
@@ -1994,14 +1970,15 @@ make the size  two, three, four, five, six or eight words.
 The source syntax of split integers has commas between the fields:
 
 
-MASMX 7r2
+$ masmx commas -lny
+MASMX 7r3
 3/commas.msm
 *EOF*
   :                            1         $word   48
-00:000000000000 666677778888  +2         +       06666, 07777, 08888
-00:000000000001 0A0B0C0D0E0F  +3         +       10, 11, 12, 13, 14, 15
-00:000000000002 FFF00AFFF00B  +4         +       -1, +10, -1, +11
-00:000000000003 123456789ABC  +5         +       1,2,3,4,5,6,7,8,9,10,11,12
+00:000000000000 666677778888  +2                 06666, 07777, 08888
+00:000000000001 0A0B0C0D0E0F  +3                 10, 11, 12, 13, 14, 15
+00:000000000002 FFF00AFFF00B  +4                 -1, +10, -1, +11
+00:000000000003 123456789ABC  +5                 1,2,3,4,5,6,7,8,9,10,11,12
   :                            6 left    $equ    0aaaaaaaaaaaaaaaaaaaaa
   :                            7 centre  $equ    0bbbbbbbbbbbbbbbbbbbbb
   :                            8 right   $equ    0ccccccccccccccccccccc
@@ -2013,35 +1990,52 @@ MASMX 7r2
                               +12         +       left, right, centre:q   
 *EOF*
 :$(00):000000000000:00000000000B 
-commas.msm: object code 200 bytes: 0 errors: 0 undefined labels
 
 If the number of fields does not divide into the total size,
 zero-filled slack bits are generated at the top.
 
 
 
-4.2.2.2.5 Text Strings
-______________________
+4.2.2.5: Text Strings
+_____________________
 
 Text strings are a row of bytes composed from
 
 	"text in quotes ";	. text in quotes
 
-	:;			. the substring character default :
+	:one_byte_expression;	. the substring character before a 1-byte integer 
 
-	number_expressions	. generating one byte per expression
 
 These line-continued parts produce
 
 	"text_in quotes":number_expression
 
+Text substrings and one-byte integers may be combined without restriction
+
 These lines
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$word	16
+	$quantum 8      
 
 	"string of text":10:;
 	"another line of text ":;
 	"and more of that line"
+	$end
+  :                            1  $word 16
+  :                            2  $quantum 8      
+  :                            3 
+00:0000 737472696E67206F6620746578740A616E6F74686572206C
+                              +4  "string of text":10:"another line of text ":"and more of that line"
+00:0018 696E65206F66207465787420616E64206D6F7265206F6620
+                              +4 
+00:0030 74686174206C696E6520  +4 
+  :                            5  $end
+:$(00):0000:003A 
 
-could be keyed as
+are effectively
 
 	"string of text":10:"another line of text and more of that line"
 
@@ -2090,11 +2084,15 @@ See also 3.2 Command Line Options -zc for space or zero pad
 
 Text string constants are described further in 
 
-Section 8.5: $BYTE Directive
-Section 8.42: $QUOTE Directive 
-Section 8.49: $STERM Directive
-Section 8.8: $DATA_CODE Directive
-Section 8.1: $ASCII Directive
+	Section 8.5: $BYTE Directive
+
+	Section 8.41: $QUOTE Directive 
+
+	Section 8.49: $STERM Directive
+
+	Section 8.8: $DATA_CODE Directive
+
+	Section 8.1: $ASCII Directive
 
 Text strings generate enough words (size set by $WORD) to 
 contain a byte (size set by $BYTE) per symbol in the string.
@@ -2121,11 +2119,12 @@ See also Section 10: Byte-Addressing Machines with 32- and 64-bit
 Bus, Managing Alignments
 
 
-4.1.2.2.6: $FORM Items
-______________________
+4.2.2.6: $FORM Items
+____________________
 
-$FORM declares a bit layout twmplate from one word to 192 bits in size.
+$FORM declares a bit layout template from one word to 192 bits in size.
 The command field when using a form is the label of the $FORM:
+<pre>
 
 MASMX 7r2
 3/form.msm
@@ -2139,7 +2138,9 @@ MASMX 7r2
 :$(00):0000:0006 
 form.msm: object code 55 bytes: 0 errors: 0 undefined labels
 
-$FORM is the masmx building block for instructions:
+</pre>
+
+$FORM is the masmx building block for instruction code:
 
 jump_form	$form	6, 26
 
@@ -2149,8 +2150,8 @@ jump*		$proc
 
 
 
-4.1.2.3: $proc Macro Calls: Instructions and Structures
-_______________________________________________________
+4.2.3: $proc Macro Calls: Instructions and Structures
+_____________________________________________________
 
 Most code lines have macro calls in the command position.
 That's how instructions are in masmx.
