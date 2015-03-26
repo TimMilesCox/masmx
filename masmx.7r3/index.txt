@@ -28,7 +28,7 @@
 
 	1.  Directives							4.2.1
 
-	2.  Data Constants						4.2.2
+	2.  Storage Constants						4.2.2
 	    1.	Notation						4.2.2.1
 		1.  masmx Default Number and String Notation		4.2.2.1.1
 		2.  C Language Number and String Notation		4.2.2.1.2
@@ -80,7 +80,7 @@
 	    2.  last-pass-only functions				4.5.3.2
 
 
-    6.  masmx-supplied functions				 	4.6
+    6.  masmx Internal Functions in Detail			 	4.6
 
 	1.  $		location counter				4.6.1
 
