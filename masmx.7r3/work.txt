@@ -477,7 +477,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 		in Giant Address Space					9.2.3.10
 
 
-10. masmx Abstract Floating Format and Alternative Floating Formats	10
+10. masmx Internal Floating Format and Alternative Floating Formats	10
     1.  masmx Floating Format						10.1
     2.  IEEE754 Floating Values						10.2
 	1. Differences between masmx FLoating Format and IEEE754 Floating Formats
@@ -1752,7 +1752,7 @@ with names like DW and DD) as macros.
 
 <p>
 Number constants may have trailing length overrides. Their meanings are
-</pre>
+<pre>
 
 :s or S = 1 * word size 
 :d or D = 2 * word size
@@ -2018,9 +2018,9 @@ can be escaped with macro language
 Macros supplied in this package generate IEEE754 floating constants. 
 
 <p>
-See Section 10: masmx Abstract Floating Format and Alternative Floating Formats
+See Section 10: masmx Internal Floating Format and Alternative Floating Formats
 
-
+<p>
 This example generates the value 1.375e+1200000 with various typing.
 A size override h for hexaword follows the fraction in each number,
 so they are all 192 bits

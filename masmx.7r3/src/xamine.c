@@ -366,7 +366,7 @@ static char *first_at(char *data, char *mask)
    return data;
 }
 
-static int frightmost(char *data, char *margin)
+static char *frightmost(char *data, char *margin)
 {
    register int		 d;
    int			 bdepth = 0;
@@ -374,7 +374,7 @@ static int frightmost(char *data, char *margin)
 
    for (;;)
    {
-      if (margin == data) return *margin;
+      if (margin == data) return margin;
       margin--;
       d = *margin;
 
@@ -399,7 +399,7 @@ static int frightmost(char *data, char *margin)
       if ((!bdepth) && (!squote))
       {
 	 if ((d == '+') || (d == '-') || (d == '*') || (d == '/')
-	 ||  (d == ',') || (d == 32)) return *(margin+1);
+	 ||  (d == ',') || (d == 32)) return margin + 1;
       }
    }
 }

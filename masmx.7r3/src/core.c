@@ -36,6 +36,16 @@ static int length_mark(int symbol)
    return 0;
 }
 
+static int suffix_noclash(int symbol)
+{
+   if ((symbol == 'h') || (symbol == 'H')
+   ||  (symbol == 'o') || (symbol == 'O')
+   ||  (symbol == 'q') || (symbol == 'Q')
+   ||  (symbol == 'd') || (symbol == 'D')) return 0;
+
+   return 1;
+}
+
 static long bucket(long granule)
 {
    long power = 1;
@@ -2052,6 +2062,7 @@ static line_item *xpression(char *s, char *e, char *param)
    long				 i = 0, ires;
 
    char				*d,
+				*p,
 				*margin;
 
    unsigned short		 c;
@@ -2448,14 +2459,39 @@ static line_item *xpression(char *s, char *e, char *param)
          }
          else
          {
-            c = frightmost(s, d);
+            p = frightmost(s, d);
+            c = *p;
 
-            if (((c >  '0') && (c < '9' + 1))
-            ||  ((c == '0') && (octal))
-            ||  ((c == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
+            if ((c > '0' - 1) && (c < '9' + 1))
             {
-               margin--;
-               transient_floating_bits = x;
+               if (suffix)
+               {
+                  if (suffix_noclash(symbol))
+                  {
+                     margin--;
+                     transient_floating_bits = x;
+                  }
+               }
+               else if (selector['c'-'a'])
+               {
+                  if ((c > '0')
+                  ||  ((c == '0') && (y = *(p + 1) ^ 'x') && (y ^ 'X'))
+                  ||  ((c == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
+                  {
+                     margin--;
+                     transient_floating_bits = x;
+                  }
+               }
+               else
+               {
+                  if ((c > '0')
+                  ||  ((c == '0') && (octal))
+                  ||  ((c == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
+                  {
+                     margin--;
+                     transient_floating_bits = x;
+                  }
+               }
             }
          }
       }
@@ -5805,7 +5841,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
    char			*argument, *search = line_label,
                          unary = 0, tpp;
    
-   int			 x, j, bits = 0, spotted,
+   int			 x, y,
+			 j, bits = 0, spotted,
                          commas = 0, slice,
                          known = -1, type = -1;
                          
@@ -6213,6 +6250,9 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		looks like a label, so it  needs : or )'"
 		if you want to add a length flag
 
+		-c syntax octal and hex should use
+		'l' 'L' not 'd' 'D' for two words
+
 		Intel-style notation suffix OQDHoqhd looks
 		like a length flag but you can follow it
 		with another length flag
@@ -6224,20 +6264,51 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		be accommodated without change
                *******************************************/
 
-               x = frightmost(argument, search);
+               subtext = frightmost(argument, search);
+               x = *subtext;
 
-               if (((x  > '0') && (x < '9' + 1))
-               ||  ((x == '0') && (octal))
-               ||  ((x == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
+               if ((x  > '0' - 1) && (x < '9' + 1))
                {
-                  /****************************************
-			digit string other than
-			hex ending in D
-                        *search goes where it was
-                  ****************************************/
+                  if (suffix)
+                  {
+                     if (suffix_noclash(symbol))
+                     {
+                        /****************************************
+				digit string
+				suffix is not [OQDHoqhd]
+                                *search goes where it was
+                        ****************************************/
 
-                  bits = j;
-                  search = limit;
+                        bits = j;
+                        search = limit;
+                     }
+                  }
+                  else if (selector['c'-'a'])
+                  {
+                     if ((x > '0')
+                     ||  ((x == '0') && (y = *(subtext + 1) ^ 'x') && (y ^ 'X'))
+                     ||  ((x == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
+                     {
+                        bits = j;
+                        search = limit;
+                     }
+                  }
+                  else
+                  {
+                     if ((x > '0')
+                     ||  ((x == '0') && (octal))
+                     ||  ((x == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
+                     {
+                        /****************************************
+				digit string other than
+				hex ending in 'd' or 'D'
+				*search goes where it was
+                        ****************************************/
+
+                        bits = j;
+                        search = limit;
+                     }
+                  }
                }
             }
          }
@@ -6392,8 +6463,11 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             if (unary == '-') unary = '^';
             if (bits)
             {
-               if (bits ^ transient_floating_bits) note("field is size of floating number\n"
-	       "\t\twords given tag may follow the fraction +1234.567[[:]{sdtqpho}][*+exponent]");
+               if (bits ^ transient_floating_bits)
+               {
+                  note("floating number words given tag may follow the fraction");
+	          note("+1234.567[[:]{sdltqpho}][*+exponent]");
+               }
             }
 
             bits = transient_floating_bits;

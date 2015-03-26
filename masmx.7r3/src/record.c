@@ -240,7 +240,7 @@ static int precord(object *l, char *line, char **data, int nest)
 
       if ((symbol == 'u') || (symbol == 's'))
       {
-         y = frightmost(op, argument);
+         y = *frightmost(op, argument);
 
          if ((y < '0') || (y > '9' + 1))
          {

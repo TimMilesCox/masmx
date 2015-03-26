@@ -660,6 +660,8 @@ lstring -b ../test.o3/straling.txo ../test.o3/straling
 ../masmx relarith ../test.o3/relarith -lyok > ../text.o3/relarith.txt
 ../masmx brachat ../test.o3/brachat -lyok > ../text.o3/brachat.txt
 ../masmx mfeuille ../test.o3/mfeuille -lyok > ../text.o3/mfeuille.txt
+../masmx suffix ../test.o3/suffix -lyok > ../text.o3/suffix.txt
+../masmx celia ../test.o3/celia -lyok > ../text.o3/celia.txt
 
 ../linkpart
 ../coldfire
