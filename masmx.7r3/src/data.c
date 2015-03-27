@@ -89,8 +89,10 @@
 #define BLANK   78
 #define STORE	79
 
+#ifdef	SUPERSET
 #define	FP_XPRESS 80
 #define	ESPRESSO  81
+#endif
 
 #ifdef	STRUCTURE_DEPTH
 #define	RECORD	82
@@ -176,7 +178,7 @@ typedef struct { char  type,length, passflag,valued;
 
                                         #ifdef HASH
 		 void			  *hashlink;
-                                             #endif;
+                                             #endif
 
                                       #ifdef BINARY
 		 void			      *link;

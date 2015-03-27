@@ -2,4 +2,4 @@
 	$set_option	"b"
 somewhere*      $equ    0a00
 $(8:08000)
-	$include,$binary ../test.o3/strahl
+	$include,$binary ../result.txo/strahl

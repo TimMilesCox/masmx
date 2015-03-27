@@ -656,4 +656,5 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz relarith ..\test.zo3\relarith -lok > ..\text.zo3\relarith.txt
 ..\masmz suffix ..\test.zo3\suffix -lok > ..\text.zo3\suffix.txt
 ..\masmz celia ..\test.zo3\celia -lok > ..\text.zo3\celia.txt
+..\masmz xqt ..\test.zo3\xqt -lok > ..\text.zo3\xqt.txt
 

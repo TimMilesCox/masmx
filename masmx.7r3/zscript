@@ -345,7 +345,6 @@ rm ../text.zo3/*
 ../masmz mbank1 ../test.zo3/mbank1.txo -lo> ../text.zo3/mbank1.txt
 ../masmz ml ../test.zo3/ml.txo -lo> ../text.zo3/ml.txt
 ../masmz mlingba ../test.zo3/mlingba.txo -lo> ../text.zo3/mlingba.txt
-lstring -b ../test.zo3/mlingba.txo ../test.zo3/mlingba
 ../masmz modest ../test.zo3/modest.txo -lo> ../text.zo3/modest.txt
 ../masmz mojo ../test.zo3/mojo.txo -lo> ../text.zo3/mojo.txt
 ../masmz mouli ../test.zo3/mouli.txo -lo> ../text.zo3/mouli.txt
@@ -491,10 +490,8 @@ lstring -b ../test.zo3/mlingba.txo ../test.zo3/mlingba
 ../masmz sterm ../test.zo3/sterm.txo -lo> ../text.zo3/sterm.txt
 ../masmz strahl ../test.zo3/strahl.txo -lo> ../text.zo3/strahl.txt
 ../masmz strahler ../test.zo3/strahler.txo -lo> ../text.zo3/strahler.txt
-lstring -b ../test.zo3/strahler.txo ../test.zo3/strahler
 ../masmz strain ../test.zo3/strain.txo -lo> ../text.zo3/strain.txt
 ../masmz straling ../test.zo3/straling.txo -lo> ../text.zo3/straling.txt
-lstring -b ../test.zo3/straling.txo ../test.zo3/straling
 ../masmz strange ../test.zo3/strange.txo -lo> ../text.zo3/strange.txt
 ../masmz strial1 ../test.zo3/strial1.txo -lo> ../text.zo3/strial1.txt
 ../masmz strial2 ../test.zo3/strial2.txo -lo> ../text.zo3/strial2.txt
@@ -655,4 +652,5 @@ lstring -b ../test.zo3/straling.txo ../test.zo3/straling
 ../masmz relarith ../test.zo3/relarith -lok > ../text.zo3/relarith.txt
 ../masmz suffix ../test.zo3/suffix -lok > ../text.zo3/suffix.txt
 ../masmz celia ../test.zo3/celia -lok > ../text.zo3/celia.txt
+../masmz xqt ../test.zo3/xqt -lok > ../text.zo3/xqt.txt
 

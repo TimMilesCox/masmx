@@ -13,7 +13,7 @@
 
 	
 	0xaa*+0
-	0xaad*+0	. d becomes part of aad
+	0Xaad*+0	. d becomes part of aad
 	0xaal*+0	. l = 2 words
 	1.5d*+1		. d = 2 words in fraction string
 	1.5l*+1		. l = 2 words

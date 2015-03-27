@@ -25,7 +25,6 @@ See also the licensing notice at the foot of this document
 
 <h2>What's masmx?</h2>
 
-
 <p>
 masmx is a freeware meta-assembler for any target.
 
@@ -46,7 +45,7 @@ Address spaces are the size of any target architecture
 
 <p>
 masmx has a slender native syntax, and interprets all other assembler syntax.
-All existing source code therefore assembles unchanged
+All existing source code assembles unchanged
 
 <p>
 Intermediate binary encoding and target S-Records or I-Records are in text
@@ -59,6 +58,16 @@ are field proven in live commercial use.
 Innovations in target architecture are tracked with updates in macro language.
 Anyone who understands the target architecture can do this.
 
+<p>
+User interface is a shell or command prompt
+
+<p>
+binaries for all popular platforms are downloadable. Installation = copy the binaries now
+
+<p>
+masmx source code is in git and download zip. Build for new developer platforms is a one-line shell command
+
+ 
 
 
 <h2>Why do you want it?</h2>

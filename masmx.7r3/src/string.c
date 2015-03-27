@@ -52,7 +52,7 @@ static long simple_c_escape(int symbol)
    return symbol;
 }
 
-static inline long string_read(char *q)
+static long string_read(char *q)
 {
    static char		*p;
    static int		 out_of_band;

@@ -2474,8 +2474,9 @@ static line_item *xpression(char *s, char *e, char *param)
                }
                else if (selector['c'-'a'])
                {
+                  y = *(p + 1);
                   if ((c > '0')
-                  ||  ((c == '0') && (y = *(p + 1) ^ 'x') && (y ^ 'X'))
+                  ||  ((c == '0') && (y ^ 'x') && (y ^ 'X'))
                   ||  ((c == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
                   {
                      margin--;
@@ -6250,18 +6251,21 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		looks like a label, so it  needs : or )'"
 		if you want to add a length flag
 
-		-c syntax octal and hex should use
-		'l' 'L' not 'd' 'D' for two words
+		native syntax and -c syntax hex can use
+		'l' 'L' instead of 'd' 'D' for two words
+		or separate the length flag +(0number)d
+		or 0number:d
 
-		Intel-style notation suffix OQDHoqhd looks
-		like a length flag but you can follow it
-		with another length flag
+		Intel-style notation suffix OQDHoqhd masks
+		a length flags octaword quadword hexaword
+		doubleword unless you separate the length
+		length flag (numberD)o numberQ:q
 
-		The circumstance of encountering $hex or
 		Intel suffix is always in a macro with a
 		name like DW or DD or DB or .byte or .word
-		or .long, so application code can always
-		be accommodated without change
+		or .long, so macro code can ensure syntax
+		clarity and application code needs no
+		alteration
                *******************************************/
 
                subtext = frightmost(argument, search);
@@ -6285,8 +6289,9 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                   }
                   else if (selector['c'-'a'])
                   {
+                     y = *(subtext + 1);
                      if ((x > '0')
-                     ||  ((x == '0') && (y = *(subtext + 1) ^ 'x') && (y ^ 'X'))
+                     ||  ((x == '0') && (y  ^ 'x') && (y ^ 'X'))
                      ||  ((x == '0') && (symbol ^ 'd') && (symbol ^ 'D')))
                      {
                         bits = j;

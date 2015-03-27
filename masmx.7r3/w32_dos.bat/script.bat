@@ -663,8 +663,9 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx mfeuille ..\test.o3\mfeuille -lyok > ..\text.o3\mfeuille.txt
 ..\masmx suffix ..\test.o3\suffix -lyok > ..\text.o3\suffix.txt
 ..\masmx celia ..\test.o3\celia -lyok > ..\text.o3\celia.txt
+..\masmx xqt ..\test.o3\xqt -lyok > ..\text.o3\xqt.txt
 
-call ..\linkpart
-call ..\coldfire
-call ..\ppc_kern
+call ..\w32_dos.bat\linkpart
+call ..\w32_dos.bat\coldfire
+call ..\w32_dos.bat\ppc_kern
 
