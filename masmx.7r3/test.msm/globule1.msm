@@ -1,0 +1,6 @@
+	$word	32
+	$quantum 8
+
+$(25:*8)
+globule1*	$res	3*/30
+trip1*		90

@@ -1,7 +1,7 @@
 __giant	$set	1
 __registers_by_name $set 1 
         $include        "../aside.dem/ppc_64.def"
-	$include	../aside.dem/enter64A.def
+	$include	../aside.dem/enter64a.def
 
 __base36* $equ	__end0+7**-8
 $(.literal::*__base36, r30/.lit)

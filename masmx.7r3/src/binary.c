@@ -223,10 +223,12 @@ static int load_binary_summary(char *p)
    location_counter	*q = &locator[x];
    value		*v = (value *) q->runbank;
 
+   #if 0
    if (pass)
    {
       return x;
    }
+   #endif
 
    alignment = strict_address(p + 5);
 
@@ -242,6 +244,21 @@ static int load_binary_summary(char *p)
 
    low       = strict_address(p + 5 + apw + 1);
    high      = strict_address(p + 5 + 2 * apw + 2);
+
+   #if 1
+   if (pass)
+   {
+      if ((unsigned long) high > (unsigned long) q->loc)
+      {
+         q->loc = high;
+         if ((x == counter_of_reference) && (q->flags & 1)) loc = high;
+      }
+      /*
+      q->touch_base = 1;
+      */
+      return x;
+   }
+   #endif
 
    q->relocatable = alignment;
 
@@ -261,7 +278,6 @@ static int load_binary_summary(char *p)
    q->loc = high;
 
    if ((x == counter_of_reference) && (q->flags & 1)) loc = high;
-      
    return x;
 }
 
@@ -425,6 +441,7 @@ static void load_binary(char *p)
    touch_table	 touched = untouched;
 
    int		 prelix = lix;
+
 
    lix = DISPLAY_WIDTH + 8;
 
@@ -653,6 +670,7 @@ static void load_binary(char *p)
    if (pass)
    {
       actual->loc = loc;
+      if (actual->touch_base == 0) actual->loc = 0;
    }
    else
    {
@@ -664,8 +682,10 @@ static void load_binary(char *p)
 
          if (touched.base[x])
          {
-            actual = &locator[x];
-            alignment = actual->relocatable;
+            sample = &locator[x];
+            actual = sample;
+            counter_of_reference = x;
+            alignment = sample->relocatable;
 
             if (alignment)
             {
@@ -690,40 +710,41 @@ static void load_binary(char *p)
                {
                   v = loc;
 
-                  if (((selector['b'-'a']) && ((actual->flags & 1) == 0))
-                  ||  (actual->bias))
+                  if (((selector['b'-'a']) && ((sample->flags & 1) == 0))
+                  ||  (sample->bias))
                   {
-                     v = actual->runbank;
+                     v = sample->runbank;
                   }
 
-                  if (actual->flags & 1)
+                  if (sample->flags & 1)
                   {
-                     v = ((value *) actual->runbank)->offset;
+                     v = ((value *) sample->runbank)->offset;
                   }
 
                   v = (v + alignment - 1) & -alignment;
 
                   loc = v;
 
-                  if (!actual->touch_base) actual->base = loc;    
-                  loc += actual->loc;
-                  actual->loc = loc;
+                  if (!sample->touch_base) sample->base = loc;
+                  loc += sample->loc;
+                  sample->loc =loc;
 
-                  actual->relocatable = 0;
+                  sample->relocatable = 0;
                }
                else
                {
-                  loc = actual->lroot;
+                  loc = sample->lroot;
 
                   loc = (loc + alignment - 1) & -alignment;
+
                   v = loc;
 
-                  if (!actual->touch_base) actual->base = loc;
+                  if (!sample->touch_base) sample->base = loc;
 
-                  loc += actual->loc;
-                  actual->loc = loc;
+                  loc += sample->loc;
+                  sample->loc = loc;
 
-                  actual->lroot = loc;
+                  sample->lroot = loc;
 
                   absolute = 0;
                }
@@ -732,17 +753,17 @@ static void load_binary(char *p)
             }
             else
             {
-               loc = actual->loc;
+               loc = sample->loc;
 
-               if (actual->flags & 1)
+               if (sample->flags & 1)
                {
-                  v = ((value *) actual->runbank)->offset;
+                  v = ((value *) sample->runbank)->offset;
                }
                else
                {
-                  if (actual->loc < loc) flag("code address moved back");
-                  if (!actual->touch_base) actual->base = actual->runbank;
-                  v = actual->base;
+                  if (sample->loc < loc) flag("code address moved back");
+                  if (!sample->touch_base) sample->base = sample->runbank;
+                  v = sample->base;
                }
 
                absolute = 1;
@@ -750,41 +771,45 @@ static void load_binary(char *p)
 
             if (selector['l'-'a'])
             {
-               if (actual->flags & 1)
-               {
-                  if (selector['d'-'a'])
-                  {
-                     printf("@:");
-                     illustrate_xad(actual, 0);
-                     printf("\n");
-                  }
-               }
-
                #ifdef DOS
-               printf("%s:$(%d) %ld locations decimal ", f->l.name,
+               printf("%s:$(%d) %lu locations decimal ", f->l.name,
                                        x, loc - v);
                #else
-               printf("%s:$(%d) %ld %s decimal ", f->l.name,
+               printf("%s:$(%d) %lu %s decimal ", f->l.name,
                                         x, loc - v,
                (address_quantum == 8) ? "bytes" : "words");
                #endif
 
-               if (actual->relocatable)
+               if (sample->relocatable)
                {
-                  printf("[*%ld] ", actual->relocatable);
+                  printf("[*%ld] ", sample->relocatable);
                }
 
-               if (octal) printf("from octal %0*lo to %0*lo\n",
+               if (octal) printf("from octal %0*lo to %0*lo",
                                      apw, v, apw, loc);
-               else printf("from hexadecimal %0*lX to %0*lX\n",
+               else printf("from hexadecimal %0*lX to %0*lX",
                                      apw, v, apw, loc);
+
+               if (sample->flags & 1)
+               {
+                  if (selector['d'-'a'])
+                  {
+                     printf(" +");
+                     illustrate_xad(sample, 0);
+                  }
+               }
+
+               putchar('\n');
             }
 
-            actual->touch_base = 1;
+            sample->touch_base = 1;
          }
 
          x = order[x];
       }
+
+      if ((actual->flags & 1) | actual->bias) loc = actual->loc;
+      else                                    actual->loc = loc;
 
       o = xpo_list_head;
 

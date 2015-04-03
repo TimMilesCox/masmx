@@ -19,5 +19,6 @@ $(36::*__end3)
 	$include,$binary	"../result.txo/gfurther.txo"
 	$store			"../test.o3/iscale2.txo"
 $(3)
+	$trace	$
 __end3
 	$end			yoohoo

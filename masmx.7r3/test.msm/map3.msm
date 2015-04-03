@@ -5,6 +5,7 @@ data	$equ	3
 bss	$equ	5
 sdata	$equ	6
 
+	$list	2
 $(1:000A0000)
 	$include,$binary	../result.txo/soso	$(text)
 	$include,$binary	../result.txo/factor	$(text)

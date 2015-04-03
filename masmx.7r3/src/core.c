@@ -180,12 +180,15 @@ static void switch_locator(char *p, char *param)
             limit2 = substitute(limit+1, param);
             limit = first_at(limit2, ",/)");
          
+            if (!pass)
+            {
             if (actual->touch_base)
             {
                if (actual->breakpoint == 0)
                {
                   flag("earlier part of segment is not breakpointed");
                }
+            }
             }
 
             #ifdef LITERALS
@@ -231,7 +234,6 @@ static void switch_locator(char *p, char *param)
 
                   ((value *) actual->runbank)->value
                   = *xpression(limit2+1, limit, NULL);
-
 
                   actual->flags |= 3;
                }
@@ -412,42 +414,42 @@ static long rfunction(int v,
    {
       case LOCTR:
 
-	q = actual;
-        i = loc;
-        x = counter_of_reference;
+         q = actual;
+         i = loc;
+         x = counter_of_reference;
 
-        if (*s++ == '(')
-        {
-           limit = edge(s, ")");
-           x = expression(s, limit, NULL);
+         if (*s++ == '(')
+         {
+            limit = edge(s, ")");
+            x = expression(s, limit, NULL);
 
-           if ((x < 0) || (x > 71))
-           {
-              flag("locator not in 0..71");
-              return 0;
-           }
+            if ((x < 0) || (x > 71))
+            {
+               flag("locator not in 0..71");
+               return 0;
+            }
 
-           q = &locator[x];
+            q = &locator[x];
 
-           if (x ^ counter_of_reference) i = q->loc;
-        }
+            if (x ^ counter_of_reference) i = q->loc;
+         }
 
-        #ifdef RELOCATION
-        if (q->relocatable) mapx->m.l.y |= 1;
-        mapx->m.l.rel = x | 128;
-        #endif
+         #ifdef RELOCATION
+         if (q->relocatable) mapx->m.l.y |= 1;
+         mapx->m.l.rel = x | 128;
+         #endif
 
-        if (q->flags & 1)
-        {
-           breakpoint_base = &((value *) q->runbank)->value;
-           item = xpression(STACK_TOP_CLEAR, STACK_TOP_CLEAR, NULL);
-           mapx->m.l.rel = x | 128;
-           quadinsert(i, item);
-           operand_add(item, breakpoint_base);
-           return quadextract(item);
-        }
+         if (q->flags & 1)
+         {
+            breakpoint_base = &((value *) q->runbank)->value;
+            item = xpression(STACK_TOP_CLEAR, STACK_TOP_CLEAR, NULL);
+            mapx->m.l.rel = x | 128;
+            quadinsert(i, item);
+            operand_add(item, breakpoint_base);
+            return quadextract(item);
+         }
 
-        return i;
+         return i;
 
 
          #ifdef ZENITH
@@ -6835,8 +6837,19 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		  word = expression(argument, limit, param);
 		  address_quantum = word;
 		  address_size = word;
-		  if (octal) apw = (address_size + 2) / 3;
-		  else       apw = (address_size + 3) / 4;
+                  if (address_size > (AQUARTETS*4)) address_size = AQUARTETS*4;
+                  if (xadw < address_size) xadw = address_size;
+
+		  if (octal)
+                  {
+                     apw = (address_size + 2) / 3;
+                     apwx = (xadw + 2) / 3;
+                  }
+		  else
+                  {
+                     apw = (address_size + 3) / 4;
+                     apwx = (xadw + 3) / 4;
+                  }
 	       }
 	       break;
 	    case BYTE:
@@ -6972,16 +6985,28 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       {
 		  limit = edge(argument, " :");
 		  address_size = expression(argument, limit, param);
-		  if (octal) apw = (address_size + 2) / 3;
-		  else       apw = (address_size + 3) / 4;
-		  if (*limit != ':') break;
-		  argument = limit+1;
-		  limit = edge(argument, " ");
-		  xadw = expression(argument, limit, param);
+                  if (address_size > (AQUARTETS*4)) address_size = AQUARTETS*4;
+
+		  if (*limit == ':')
+                  {
+		     argument = limit+1;
+		     limit = edge(argument, " ");
+		     xadw = expression(argument, limit, param);
+                  }
+
+                  if (xadw < address_size) xadw = address_size;
                   if (xadw > RADIX) xadw = RADIX;
-                  if (xadw <   0) xadw = 96;
-		  if (octal) apwx = (xadw - address_size + 2) / 3;
-		  else       apwx = (xadw - address_size + 3) / 4;
+
+                  if (octal)
+                  {
+                     apw  = (address_size + 2) / 3;
+                     apwx = (xadw - address_size + 2) / 3;
+                  }
+                  else
+                  {
+                     apw  = (address_size + 3) / 4;
+                     apwx = (xadw - address_size + 3) / 4;
+                  }
 	       }
 	       break;
 
@@ -8710,7 +8735,6 @@ main(int argc, char *_argv[])
 
          #endif       
 
-
 	 actual->loc = loc;
 
          #ifdef STRUCTURE_DEPTH
@@ -8727,7 +8751,7 @@ main(int argc, char *_argv[])
          mapx = mapinfo;
          mapx->m.i = 0;
          #endif
-	 
+
          q = locator;
 
 	 for (i = 0; i < LOCATORS; i++)
@@ -8758,7 +8782,10 @@ main(int argc, char *_argv[])
 
 	    q->loc = 0;
 
+            #if 1
             q->touch_base = 0;
+            #endif
+
             q->breakpoint = 0;
             q->bias       = 0;
             q++;
@@ -9036,7 +9063,7 @@ main(int argc, char *_argv[])
       }
       #endif
 
-      if ((q->loc) || (q->flags & 1))
+      if (q->loc | (q->flags & 1))
       {
          #ifdef LONG_TRAILER
          if (q->flags & 1)
@@ -9065,14 +9092,21 @@ main(int argc, char *_argv[])
 
          #endif
 
-	 write(ohandle, "\n:$", 3);
-	 pushh2(i);
-	 write(ohandle, "*", 1);
-	 pushaddress(q->relocatable);
-	 write(ohandle, ":", 1);
-	 pushaddress(low);
-	 write(ohandle, ":", 1);
-	 pushaddress(high);
+         if ((q->flags & 128) && (q->base == 0) && (q->runbank == 0)
+         &&  (q->relocatable == 0))
+         {
+         }
+         else
+         {
+	    write(ohandle, "\n:$", 3);
+	    pushh2(i);
+	    write(ohandle, "*", 1);
+	    pushaddress(q->relocatable);
+	    write(ohandle, ":", 1);
+	    pushaddress(low);
+	    write(ohandle, ":", 1);
+	    pushaddress(high);
+         }
 
 	 if (!selector['w'-'a'])
          {

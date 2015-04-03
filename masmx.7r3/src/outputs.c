@@ -32,9 +32,9 @@ static void xpushaddress(line_item *i, int id)
 
 static void pushaddress(long i)
 {
-   int			 j = 12;
-   int			 k = 12-(address_size+3)/4;
-   char			 b[12];
+   int			 j = AQUARTETS;
+   int			 k = AQUARTETS - (address_size + 3) / 4;
+   char			 b[AQUARTETS];
 
    if (!pass) return;
    
@@ -45,14 +45,14 @@ static void pushaddress(long i)
       if (b[j] > '9') b[j] += 7;
       i >>= 4;
    }
-   write(ohandle, &b[j], 12-j);
+   write(ohandle, &b[j], AQUARTETS - j);
 }
 
 static void pushsegx(long i)
 {
-   int			 j = 12;
-   int			 k = 12-((xadw-address_size)+3)/4;
-   char			 b[12];
+   int			 j = RADIX/4;
+   int			 k = RADIX/4 - ((xadw-address_size)+3) / 4;
+   char			 b[RADIX/4];
 
    if (!pass) return;
    
@@ -63,7 +63,7 @@ static void pushsegx(long i)
       if (b[j] > '9') b[j] += 7;
       i >>= 4;
    }
-   write(ohandle, &b[j], 12-j);
+   write(ohandle, &b[j], RADIX/4-j);
 }
 
 static int pushs(char  *b)
@@ -199,7 +199,7 @@ static void produce(int bits, char dflag, line_item *item, txo *a_image)
    if (bits > RADIX) bits = RADIX;
    bits /= granule;
    bits *= granule;
-   
+
    bytes = (bits+EIGHT-1) >> 3;
    
    if ((actual->flags & 128)

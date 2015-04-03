@@ -24,107 +24,99 @@
 
     1.  Labels								4.1
 
-    2.  The Command Field						4.2
+    2.  Command and Arguments						4.2
+	1.  Expressions							4.2.1
+	    1.  Operators						4.2.1.1
+	    2.	Tokens							4.2.1.2
+		1.  Number strings					4.2.1.2.1
+		    1.	masmx Default Number and String Notation	4.2.1.2.1.1
+		    2.  Apostrophe-Bounded Strings as Integers		4.2.1.2.1.2
+		    3.	C Language Number and String Notation		4.2.1.2.1.3
+		    4.	Motorola Old Number Notation			4.2.1.2.1.4
+		    5.	Suffix-Determined Number Notation		4.2.1.2.1.5
+		2.  Label References					4.2.1.2.2
+		3.  masmx-Supplied Functions				4.2.1.2.3
+		4.  Function Macro Reference				4.2.1.2.4
+		5.  Macro Parameter Reference				4.2.1.2.5
 
-	1.  Directives							4.2.1
+	2.  The Command Field						4.2.2
 
-	2.  Storage Constants						4.2.2
-	    1.	Notation						4.2.2.1
-		1.  masmx Default Number and String Notation		4.2.2.1.1
-		2.  C Language Number and String Notation		4.2.2.1.2
-		3.  Motorola Old Number Notation			4.2.2.1.3
-		4.  Suffix-Determined Number Notation			4.2.2.1.4
-
-	    2.	Expressions and Number Constants			4.2.2.2
-		1.  Operators						4.2.2.2.1
-		2.  Expression Tokens					4.2.2.2.2
-		    1.	Number Strings					4.2.2.2.2.1
-		    2.	Label References				4.2.2.2.2.2
-		    3	masmx-Supplied Functions			4.2.2.2.2.3
-		    4.	Function Macro Reference			4.2.2.2.2.4
-		    5.	Macro Parameter Reference			4.2.2.2.2.5
+	    1.	Directives						4.2.2.1
+	    2.	Storage Constants					4.2.2.2
 	    3.	Number Constants					4.2.2.3
 	    4.	Split Number Items					4.2.2.4
 	    5.	Text Strings						4.2.2.5
 	    6.	$form Items						4.2.2.6
+	    7.	$proc macro calls: instructions and structures		4.2.2.7
 
-	3.  $proc macro calls: instructions and structures		4.2.3
 
-    3.	The Argument Field						4.3
+	3.  The Argument Field						4.2.3
+	    1.	Operand Expressions					4.2.3.1
+	    2.	Literal Operands					4.2.3.1
 
-	1.  Instruction Operands					4.3.1
-	    1.	Operand Expressions					4.3.1.1
-	    2.	Literal Operands					4.3.1.2
-
-	2.  Arguments of Constant Lines					4.3.2
-	    1.  Expressions						4.3.2.1
-	    2.  Literals						4.3.2.2
-
-    4.  Literals							4.4
-	1.  A literal is						4.4.1
-	2.  Literal Pools						4.4.2
-	3.  Automatic Literals						4.4.3
-	4.  Literal Pool Tags						4.4.4
-	5.  $lit Directive						4.4.5
-	6.  Constant Pointer to Literal					4.4.6
+	4.  Literals							4.2.4
+	    1.	A literal is						4.2.4.1
+	    2.	Literal Pools						4.2.4.2
+	    3.	Automatic Literals					4.2.4.3
+	    4.	Literal Pool Tags					4.2.4.4
+	    5.	$lit Directive						4.2.4.5
     
-    5.	Function Macros							4.5
-	1.  a user function is						4.5.1
-	2.  directives for constructing functions			4.5.2
-	    1.  $FUNC	head of function				4.5.2.1
-            2.	$NAME	entry point and invocation tag			4.5.2.2
-	    3.	$RETURN	value of result					4.5.2.3
-	    4.	$END	foot of function				4.5.2.4
-	3.  code generated during function evaluation			4.5.3
-	    1.  idempotent functions					4.5.3.1
-	    2.  last-pass-only functions				4.5.3.2
+	5.  Function Macros						4.2.5
+	    1.	a user function is					4.2.5.1
+	    2.	directives for constructing functions			4.2.5.2
+		1.  $FUNC	head of function			4.2.5.2.1
+     		2.  $NAME	entry point and invocation tag		4.2.5.2.2
+		3.  $RETURN	value of result				4.2.5.2.3
+		4.  $END	foot of function			4.2.5.2.4
+	    3.  code generated during function evaluation		4.2.5.3
+		1.  idempotent functions				4.2.5.3.1
+		2.  last-pass-only functions				4.2.5.3.2
 
+	6.  masmx Internal Functions in Detail			 	4.2.6
 
-    6.  masmx Internal Functions in Detail			 	4.6
+	    1.  $	location counter				4.2.6.1
 
-	1.  $		location counter				4.6.1
+	    2.  $(..)	named location counter				4.2.6.2
 
-	2.  $(..)	named location counter				4.6.2
-
-	3.  $a		absolute address				4.6.3
+	    3.  $a	absolute address				4.2.6.3
                     	  
-	4.  $b		section base address				4.6.4
+	    4.  $b	section base address				4.2.6.4
                     	  
-	5.  $bank_index	memory block identifier				4.6.5
+	    5.  $bank_index	memory block identifier			4.2.6.5
 
-	6.  $n		short token for macro reference name		4.6.6
+	    6.  $n	short token for macro reference name		4.2.6.6
 
-	7.  $net(..)	unrelocated value of expression			4.6.7
+	    7.  $net(..) unrelocated value of expression		4.2.6.7
 
-	8.  $o(..)	value of an option flag				4.6.8
+	    8.  $o(..)	value of an option flag				4.2.6.8
 
-	9.  $r		region						4.6.9
+	    9.  $r	region						4.2.6.9
 
-	    1.		identity of current location counter		4.6.9.1
+		1.	identity of current location counter		4.2.6.9.1
 
-	    2.		$r(expression) identity of implied locator	4.6.9.2
+		2.	$r(expression) identity of implied locator	4.2.6.9.2
 
-	10. $rel(..)	is locator relocatable?				4.6.10
+	    10. $rel(..) is locator relocatable?			4.2.6.10
 
-	11. $t(..)	type of a label					4.6.11
+	    11. $t(..)	type of a label					4.2.6.11
 
-	    1.   undefined						4.6.11.1
-	    2.   location						4.6.11.2
-	    3.   $EQU							4.6.11.3
-	    4.   $SET							4.6.11.4
-	    5.   $EQUF							4.6.11.5
-	    6.   $DIRECTIVE						4.6.11.6
-	    7.   $FUNCTION (of masmx)					4.6.11.7
-	    8.   $PROC (macro)						4.6.11.8
-	    9.   $NAME							4.6.11.9
-	    10.	 $FUNC (macro)						4.6.11.10
-	    11.  $FORM							4.6.11.11
-	    12.  user assigned label types				4.6.11.12
+		1.   undefined						4.2.6.11.1
+		2.   location						4.2.6.11.2
+		3.   $EQU						4.2.6.11.3
+		4.   $SET						4.2.6.11.4
+		5.   $EQUF						4.2.6.11.5
+		6.   $DIRECTIVE						4.2.6.11.6
+		7.   $FUNCTION (of masmx)				4.2.6.11.7
+		8.   $PROC (macro)					4.2.6.11.8
+		9.   $NAME						4.2.6.11.9
+		10.  $FUNC (macro)					4.2.6.11.10
+		11.  $FORM						4.2.6.11.11
+		12.  user assigned label types				4.2.6.11.12
 
-	12. $zenith	high address of section + literals		4.6.12
+	    12. $zenith	high address of section + literals		4.2.6.12
 
-	    1.	$zenith		this section				4.6.12.1
-	    2.	$zenith(..)	named section				4.6.12.2
+		1.	$zenith		this section			4.2.6.12.1
+		2.	$zenith(..)	named section			4.2.6.12.2
 
 
 5.  masmx Internal Floating Format and Alternative Floating Formats	5

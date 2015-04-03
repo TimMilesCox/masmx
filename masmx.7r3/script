@@ -660,6 +660,12 @@ rm ../text.o3/*
 ../masmx suffix ../test.o3/suffix -lyok > ../text.o3/suffix.txt
 ../masmx celia ../test.o3/celia -lyok > ../text.o3/celia.txt
 ../masmx xqt ../test.o3/xqt -lyok > ../text.o3/xqt.txt
+../masmx globule1 ../test.o3/globule1 -lyok > ../text.o3/globule1.txt
+../masmx globule2 ../test.o3/globule2 -lyok > ../text.o3/globule2.txt
+../masmx globule3 ../test.o3/globule3 -lyok > ../text.o3/globule3.txt
+../masmx globule4 ../test.o3/globule4 -lyok > ../text.o3/globule4.txt
+../masmx globules ../test.o3/globules -lyok > ../text.o3/globules.txt
+../masmx garbules ../test.o3/garbules -lyok > ../text.o3/garbules.txt
 
 ../linkpart
 ../coldfire

@@ -156,6 +156,7 @@
 #endif
 
 #define	DEFAULT_ZERO_CODE_POINT	0x00002700
+#define	AQUARTETS		12
 
 typedef struct {  char			   flag[26]; } flag_box;
 

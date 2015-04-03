@@ -654,3 +654,10 @@ rm ../text.zo3/*
 ../masmz celia ../test.zo3/celia -lok > ../text.zo3/celia.txt
 ../masmz xqt ../test.zo3/xqt -lok > ../text.zo3/xqt.txt
 
+../masmz globule1 ../test.zo3/globule1 -lok > ../text.zo3/globule1.txt
+../masmz globule2 ../test.zo3/globule2 -lok > ../text.zo3/globule2.txt
+../masmz globule3 ../test.zo3/globule3 -lok > ../text.zo3/globule3.txt
+../masmz globule4 ../test.zo3/globule4 -lok > ../text.zo3/globule4.txt
+../masmz globules ../test.zo3/globules -lok > ../text.zo3/globules.txt
+../masmz garbules ../test.zo3/garbules -lok > ../text.zo3/garbules.txt
+
