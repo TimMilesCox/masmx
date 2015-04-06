@@ -1,0 +1,9 @@
+	$path		../aside.dem
+	$include	ppc64map.def
+	$path
+
+$(47)
+	$list			2
+	$include,$binary	didit
+rampire	$res			8
+

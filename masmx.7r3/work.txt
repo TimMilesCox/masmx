@@ -44,7 +44,8 @@ Integers and floating numbers are any format and size up to 192 bits
 Address spaces are the size of any target architecture
 
 <p>
-masmx has a slender native syntax, and interprets all other assembler syntax.
+masmx has a slender native syntax, and interprets all other assembly
+source code syntax.
 All existing source code assembles unchanged
 
 <p>
@@ -74,11 +75,16 @@ masmx source code is in git and download zip. Build for new developer platforms 
 
 
 <p>
+masmx gives minute control of the construction and location of code and data.
+
+<p>
 Typical masmx targets are low-power targets where as few instructions
 as possible are executed.
 
 <p>
-masmx gives minute control of the construction and location of code and data.
+masmx saves on electronics and on energy. masmx may be used as the substance
+of thin-layer compilers. It makes the miniature more possible, and has the
+potential to multiply the performance of giant servers by ten- and twentyfold
 
 <p>
 Complex EPROM and Flash structures may be described in a few cryptic lines of source code.
@@ -612,17 +618,12 @@ masmx can construct absolute arrays and instruction segments to fit
 in address spaces up to 2*/192 bits.
 
 <p>
-The memory space in programs may be larger than any known file systems.
+Absolute object code may be incremented with new source or relocatable code
 
 <p>
-However the distribution of loaded code may be sparse within
-large memory, so that assembly output files need not take as much
-space as loaded programs
-
-<p>
-Previously assembled absolute object code in address spaces up to
-2*/192 bits may be incremented with new code which is either
-relocatable or source.
+The memory space in programs may be larger than any known file systems,
+if the distribution of loaded code does not saturate target application
+memory and does not therefore overload the file system
 
 <p>
 A masmx link is an assembly which uses masmx linker features.
@@ -743,7 +744,7 @@ subscripted labels. See Section 5.1: $do and macros
 <h3>1.6.5: Functionally Compartmented Name Spaces</h3>
 
 
-Hierarchic label structures can be used to compartment name spaces as with
+Hierarchic label structures can be used to compartment name spaces like
 languages structured by function. See Section 5.2.1.4: Structured Code
 Name Spaces
 
@@ -1222,16 +1223,11 @@ MASMX 7r3
 
 <p>
 
-
-<h4>4.2.1.2.1.2: Apostrophe-Bounded Strings as Integers</h4> 
-
-With all supported number notations, apostrophe used as single
-quote bounds a right-justified number unless apostrophe has also
-been chosen as the quote symbol
+Characters in apostrophe are right justified value strings
 
 <p>
-The characters in apostrophes produce their absolute value in the current
-$data_code each in $byte bits, default 8 bits
+Each character produces its value in the current $data_code and
+$byte size, default 8 bits
 <pre>
 
 
@@ -1247,11 +1243,93 @@ immediat.msm: object code 62 bytes: 0 errors: 0 undefined labels
 
 </pre>
 The default data code $ascii means more exactly characters unchanged
-from editor input and may therefore be ASCII extended to Roman-8,
-UTF-8 or UTF-16. These have the same code points 0..127 as ASCII
+from editor input and may therefore be ASCII extended to Roman-8 or
+UTF-8. These have the same code points 0..127 as ASCII
 
-<p>  
+<p>
+Character value string tokens are available to expressions whatever the
+current number string notation
+
+<p>
 See also directives 8.1 $ascii, 8.8: $data_code and 8.5: $byte
+
+<p>
+If apostrophe has been chosen as the quote character, a command
+token starting apostrophe is a left-justified byte string and not
+an integer value string, but quoted tokens in expressions are value
+strings, not labels
+<pre>
+
+$ masmx -lnkz
+MASMX 7r3
+0/-INPUT>>
+	$word		16
+	$quantum	8
+	$awidth		24
+	$quote		''''
+QDELIM='
+$(10:0A0000)
+place
+	+place		. label reference
+	+'place'	. value string
+	'place'		. byte string
+	$end
+  :                            1  $word  16
+  :                            2  $quantum 8
+  :                            3  $awidth  24
+  :                            4  $quote  ''''
+  :                            5 $(10:0A0000)
+  :                            6 place
+0A:0A0000 000A0000            +7  +place   . label reference
+0A:0A0004 00706C616365        +8  +'place' . value string
+0A:0A000A 706C61636500        +9  'place'  . byte string
+  :                            10  $end
+:$(0A):0A0000:0A0010 
+
+
+</pre>
+If quote symbol remains at default " then a value string ' is recognised
+at the start of the command field and quoted labels are recognised in
+expressions
+
+<p>
+It is not in simple cases necessary to reference labels in quotes, but macro
+text sometimes does that in order to manipulate parameter values
+
+<pre>
+
+$ masmx -lnkz
+MASMX 7r3
+0/-INPUT>>
+	$word		16
+	$quantum	8
+	$awidth		24
+$(10:0A0000)
+place
+	+place		. label reference
+	+'place'	. value string
+	'place'		. value string
+	+"place"	. label reference
+	"place"		. byte string
+	$end
+  :                            1  $word  16
+  :                            2  $quantum 8
+  :                            3  $awidth  24
+  :                            4 $(10:0A0000)
+  :                            5 place
+0A:0A0000 000A0000            +6  +place    . label reference
+0A:0A0004 00706C616365        +7  +'place'  . value string
+0A:0A000A 00706C616365        +8  'place'   . value string
+0A:0A0010 000A0000            +9  +"place"  . label reference
+0A:0A0014 706C61636500        +10  "place"  . byte string
+  :                            11  $end
+:$(0A):0A0000:0A001A 
+
+</pre>
+
+Option -m Motorola Old Number Notation (4.2.1.2.1.4) also masks labels
+beginning with $ or @ unless they are referenced in quotes
+
 
 
 <h4>4.2.1.2.1.3:  C-Language Number and Character String Notation</h4>
@@ -1265,7 +1343,7 @@ leading zero is otherwise octal
 
 <p>
 -c Flag interprets character string \escaped values in both strings
-and apostrophe-bounded string integers
+and apostrophe-bounded value-string numbers 
 <pre>
 
 $ ~/masmx -lnkc
@@ -1285,7 +1363,7 @@ MASMX 7r3
 
 </pre>
 
-<h4>4.2.2.2.1.4:  Motorola Old Number Notation</h4>
+<h4>4.2.1.2.1.4:  Motorola Old Number Notation</h4>
 
 Flag -m interprets
 <pre>
@@ -1297,7 +1375,7 @@ Flag -m interprets
 </pre> 
 <h4>4.2.1.2.1.5:  Suffix-Determined Number Notation</h4>
 
-Directive $suffix 2 interprets upper or lowercase
+Directive $suffix 2 interprets upper or lowercase last column of the number string
 <pre>
 
 	trailing H as hex
@@ -1313,400 +1391,8 @@ Storage constant numbers in all notations may also have a storage
 words suffix [s d l t q p h o]. See 4.2.2.3: Number constants
 
 
-<h3>4.2.2: The Command Field</h3>
 
-
-The command field (the first field which is preceded by any
-whitespace) can contain a directive, a constant, a name
-of a $proc macro, or the name of a $form template.
-<pre>
-
-[label] COMMAND [arguments]
-
-</pre>
-<h3>4.2.1 Directives</h3>
-
-
-Directives are commands to the assembler. They are listed in Section 8: Directives
-
-<p>
-Some directives control assembly settings, for example
-<pre>
-
-	$word		BITS
-	$quantum	BITS
-	$list		INCLUDE_DEPTH
-
-</pre>
-Others declare labels
-<pre>
-
-label1	$set	VALUE
-label2	$equf	VALUE1, VALUE2...
-label	$equ	VALUE
-label3	$name	VALUE
-
-</pre>
-Others govern conditional assembly
-<pre>
-
-	$if		CONDITION
-	$elseif		CONDITION
-	$endif
-
-</pre>
-And other directives frame macros
-
-<p>
-All directives may  be aliased to other names using the $EQU directive,
-and frequently are, for example
-<pre>
-
-.equ    $equ,"$directive"       "$equ"
-.macro  $equ,"$directive"       "$proc"
-.macend $equ,"$directive"       "$end"
-
-</pre>
-Quotes are used in these PowerPC examples in case flag -m
-(Motorola old number notation) is opted. The quotes force the
-"$xxxxxx" tokens to be seen as labels and not as hex strings.
-
-<p>
-A small number of directives, $WORD, $BYTE and others,
-work functionally outside the command field if they are not in quotes
-or if flag -Q is opted and flag -m is not opted
-<pre>
-
-BYTE	$equ	$byte		   . $byte returns the actual byte size
-setbyte	$equ,"$directive"  "$byte" . setbyte is the same directive (and function) as $byte
-
-</pre>
-A quote at the start of the command field produces a text string constant
-
-<p>
-There may be constant expressions in the command field, but they
-start with a digit, a unary sign a quote or a single-quote. So $equ
-and other directives in the command field are always recognised.
-
-
-
-<h3>4.2.2: Storage Constants</h3>
-
-For complex data constants see section 5: Iterated Code and Structured Data
-and 4.2.3: $proc Macro Calls: Instructions and Structures 
-
-<p>
-Simple data constants may be integers, microstructures of bit fields, 
-floating numbers or text strings.
-
-
-<h4>4.2.2.1: Notation</h4>
-
-
-<h4>4.2.2.1.1: masmx Default Number and String Notation</h4>
-
-Native masmx interprets number strings with leading zero as hex or
-octal, depending $octal or default $hex directives. Leading digit
-1..9 means decimal
-
-<p>
-1000 and 03e8 both mean one thousand
-
-<p>
-character strings are space filled to containing word in absence
-of -z Flag. Escaped values are typed as integers between quoted
-substrings as "substring":INTEGER_EXPRESSION:"substring"
-
-<p>
-If the substring delimiter is changed with for example $sterm '.'
-then escape sequence is "substring".INTEGER_EXPRESSION."substring"
-
-<p>
-A digit string starting \ is bit-pattern
-
-<p>
-A string in single quotes 'abc' is a right-justified number unless
-directive $quote '''' designates apostrophe to be the quote symbol
-
-
-
-<h4>4.2.2.1.2:  C-Language Number and Character String Notation</h4>
-
-With Assembly Flag -c 1000 and 0x3e8 both mean one thousand and
-leading zero is otherwise octal
-
-<p>
--c Flag also zero-fills character strings to containing word unless
--z Flag is also asserted
-
-<p>
--c Flag interprets character string \escaped values
-
-
-
-<h4>4.2.2.1.3:  Motorola Old Number Notation</h4>
-
-Flag -m interprets
-<pre>
-
-	$hex
-	@octal
-	%bit_image
-
-</pre> 
-<h4>4.2.2.1.4:  Suffix-Determined Number Notation</h4>
-
-Directive $suffix 2 interprets upper or lowercase
-<pre>
-
-	trailing H as hex
-	trailing O or Q as octal
-	trailing B as bit image
-	trailing D as decimal default
-
-</pre>
-Directive $suffix 1 defaults leading zero to hex
-
-<p>
-Storage constant numbers in all notations may also have a storage  
-words suffix [s d l t q p h o]. See 4.2.2.3: Number constants
-
-
-<h4>4.2.2.2: Expressions and Number Constants</h4>
-
-<p>
-Number storage constants are assembled from an expression in the command
-field or a unary sign in the command field and an expression in the
-operand field
-<pre>
-
-
-	+	INSTANCES*FACTOR
-	15
-	-8.5
-	'hello World'
-
-</pre>
-Positive number storage constants starting with a digit need no unary operator
-
-<p>
-Unary + - ^ prepended to the first token of the constant expression
-exerts polarity only on the first token
-
-<p>
-Unary + - ^ separated from the constant expression by whitespace
-exerts polarity over the whole expression
-<pre>
-
-
-$ masmx -lnk
-MASMX 7r3
-0/-INPUT>>
-	$word		16
-	$quantum	8
-
-	1.875
-	-2-2
-	-	2-2
-	$end
-  :                            1  $word  16
-  :                            2  $quantum 8
-  :                            3 
-00:0000 400001F00000000000000000
-                              +4  1.875
-00:000C FFFC                  +5  -2-2
-00:000E 0000                  +6  - 2-2
-  :                            7  $end
-:$(00):0000:0010
-
-	
-</pre>
-
-<h4>4.2.2.2.1: Operators</h4>
-	
-Operators by rank are
-
-	<blockquote>
-	()<br>
-	=<br>
-	^=<br>
-	><br>
-	<<br>
-	--<br>
-	++<br>
-	/*<br>
-	*/<br>
-	*/-<br>
-	**<br>
-	*+ *-<br>
-	+ -<br>
-	* / // ///<br>
-	&plusmn; ^unary<br>
-	</blockquote>
-
-
-Operators in the same rank have left-to-right precedence as they are
-encountered in the expression
-
-<p>
-Operators of higher rank are evaluated first and operated last. An expression
-generates an integer until a decimal exponent operator *+ *- is actioned or a
-decimal point is encountered
-
-<p>
-The operators are 
-<pre>
-
-
-	_________________________________________
-	|	=	|	equal		|	= 1 ^= 0
-	|_______________|_______________________|
-	|	^=	|	unequal		|	^= 1 = 0
-	|_______________|_______________________|
-	|	>	|	greater		|	> 1 = 0 < 0
-	|_______________|_______________________|
-	|	<	|	less		|	< 1 = 0 > 0
-	|_______________|_______________________|
-	|	--	|	XOR		|
-	|_______________|_______________________|
-	|	++	|	OR		|
-	|_______________|_______________________|
-	|	/*	|	shift right	|
-	|_______________|_______________________|
-	|	*/	|	shift left	|
-	|_______________|_______________________|
-	|	*/-	| right	shift algebraic	|
-	|_______________|_______________________|
-	|	**	|	AND		|			
-	|_______________|_______________________|		
-	|	*+	|      +decimal exponent|
-	|_______________|_______________________|
-	|	*-	|      -decimal exponent|
-	|_______________|_______________________|
-	|	+	|	PLUS		|
-	|_______________|_______________________|
-	|	-	|	MINUS		|
-	|_______________|_______________________|
-	|	*	|	MULTIPLY	|
-	|_______________|_______________________|
-	|	/	|	DIVIDE		|
-	|_______________|_______________________|
-	|	//	|	covered quotient|
-	|_______________|_______________________|
-	|	///	|	remainder	|
-	|_______________|_______________________|
-
-
-Only	+	PLUS
-	-	MINUS
-	**	AND
-	/*	SHIFT RIGHT
-	*/-	SHIFT RIGHT ALGEBRAIC may be applied to relocatable tokens
-
-
-	+ PLUS - MINUS may operate without restriction on mixed relocatable
-	and absolute tokens	
-
-	The token left of ** AND may be relocatable, not the mask. AND applied
-	to a relocatable token suppresses range checking at the link step
-
-	SHIFT RIGHT and SHIFT RIGHT ALGEBRAIC shift the final relocated value
-	A shift count may not be relocatable
-
-	/* SHIFT RIGHT shifts the relocated value logically right and range-checks unsigned
-
-	shift left operator */ with negative shift count is SHIFT RIGHT ALGEBRAIC.
-	Range check at link is signed. The target field contains at least one sign bit.
-	The relocated value is shifted right algebraically
-
-
-$ ../masmx relarith -lnk
-MASMX 7r3
-3/relarith.msm
-*EOF*
-  :                            1 	$word		32
-  :                            2 	$quantum	8
-  :                            3 
-  :                            4 ABSOLUTE	$equ	-4096
-  :                            5 MINUS8		$equ	-8
-  :                            6 $(5:*1)
-  :                            7 relocatable	$res	1
-  :                            8 $(6:06000)
-  :                            9 
-(+05:00000000/*10)20+
-06:00006000 00000000          +10 	+	relocatable*/-16	. signed range check after relocation
-  :                            11 					. shift right algebraic 16 positions
-  :                            12 
-(+05)20+
-06:00006004 00000000          +13 	+	relocatable*/-0		. signed range check after relocation
-  :                            14 					. shift no positions
-  :                            15 
-(+05:00000000/*10)20+
-06:00006008 00000000          +16 	+	relocatable*/(-16)	. signed range check after relocation
-  :                            17 					. shift right algebraic 16 positions
-  :                            18 
-06:0000600C FFFFFFF0          +19 	+	ABSOLUTE*/MINUS8	. shift right algebraic 8 positions at assembly time
-06:00006010 FFFFFFF0          +20 	+	ABSOLUTE*/-8		. shift right algebraic 8 positions at assembly time
-06:00006014 00FFFFF0          +21 	+	0FFFFF000/*8		. shift right logical 8 positions at assembly time	
-  :                            22 
-(+05:00000000/*08)20
-06:00006018 00000000          +23 	+	relocatable/*8		. unsigned range check after relocation
-  :                            24 					. shift right logical 8 positions
-  :                            25 
-(+05:00000000/*0c)20+
-[+0000:00000000/*0c]20+
-06:0000601C 00000000          +26 	+	relocatable+EXTERNAL*/-12 . signed range check after relocation
-  :                            27 					. shift right algebraic 12 positions
-  :                            28 
-(+05:00000000/*08)20+
-06:00006020 00000000          +29 	+	relocatable*/MINUS8	. signed range check after relocation
-  :                            30 					. shift right algebraic 8 positions
-*EOF*
-:$(05):00000000:00000001 :$(06):00006000:00006024 
-
-
-</pre>
-
-
-
-
-<h4>4.2.2.2.2: Expression Tokens</h4>
-
-<h4>4.2.2.2.2.1: Number Strings</h4>
-
-This expression is in masmx native number notation. Leading zero is
-hexadecimal and bit-pattern starts with \
-<pre>
-
-
-$ masmx -ln
-MASMX 7r3
-0/-INPUT>>
-	40960++2560++0aa0000++\10101010
-        $end
-00:000000 000000AAAAAA        +1  40960++2560++0aa0000++\10101010
-  :                            2  $end
-
-</pre> 
-Expression tokens of ASCII bytes between apostrophes produce their
-absolute value in the current $data_code juxtaposed by $byte, by
-default 8-bit ASCII.  See 8.8: $DATA_CODE directive and 8.5: $BYTE directive
-<pre>
-
-
-MASMX 7r3
-3/immediat.msm
-*EOF*
-  :                            1         $word   32
-00:00000000 0000006168657245  +2         'ahere'-32
-*EOF*
-:$(00):00000000:00000002 
-immediat.msm: object code 62 bytes: 0 errors: 0 undefined labels
-
-
-</pre>
-
-<h4>4.2.2.2.2.2: Label References</h4>
+<h4>4.2.1.2.2: Label References</h4>
 
 
 Labels of any type (storage location line labels, equates, function
@@ -1716,9 +1402,9 @@ macro names, $DO loop tags) may be referenced in expressions
 	+       this*that+the_other
 
 </pre>
-And they mostly return their values. Some labels work in a 
-functional way and return something computed. See 4.1.2.2.2.2.3:
-Assembler-Supplied Functions and 4.1.2.2.2.2.4 Function Macro Reference
+Most labels return an absolute or a relocatable value. Some labels work
+functionally and return a computed value. See 4.2.1.2.3:
+Assembler-Supplied Functions and 4.2.1.2.4 Function Macro Reference
 
 <p>
 Labels may be bounded with quotes on reference
@@ -1747,7 +1433,7 @@ containing word
 <p>
 If $quote has been changed to ' apostrophe, labels in ' will not
 be detected in expressions. The character values between ' are
-right justified as value juxtaposed at current $byte size and
+right justified as values juxtaposed at current $byte size and
 translated from input to current $data_code, default 8-bit ASCII. 
 See also 8.8 $DATA_CODE directive and 8.5 $BYTE directive
 <pre>
@@ -1774,7 +1460,7 @@ QDELIM='
 </pre>
 
 
-<h4>4.2.2.2.2.3: masmx-Supplied Functions</h4>
+<h4>4.2.1.2.3: masmx-Supplied Functions</h4>
 
 See also 4.6 masmx Internal Functions in Detail.
 Internal functions are in summary:
@@ -1832,22 +1518,68 @@ Internal functions are in summary:
 	$zenith(..)	high address of named section + literals
 
 
-	Examples of masmx Internal Functions in expressions
-	___________________________________________________
 
-	jump	$+2
+</pre>
+<h4>4.2.1.2.4: Function Macro Reference</h4>
 
-	$do	$zenith&gt;SECTION_LIMIT,	$flag	section too long
+Function macros deliver a value to assembly-time expressions
+
+<p>
+Here a function log2 returns the power 2 which covers the value of the input integer
+
+<p>
+Lines 2..8 are the function macro. The other lines invoke it
+
+<pre>
+
+$ masmx log2.msm -lnkx
+MASMX 7r3
+3/log2.msm
+*EOF*
+  :                            1 
+  :                            2 f	$func
+  :                            3 log2*	$name
+  :                            4 fulcrum	$set	f(1, 1)-1
+  :                            5 	$do	fulcrum<1,	$return	0
+  :                            6 log	$do	48,	$do	1*/log>fulcrum,	$return	log
+  :                            7 	$return	-1
+  :                            8 	$end
+  :                            9 
+  :                            10 log2:zero	$equ	log2(0)
+  :                            11 log2:1		$equ	log2(1)
+  :                            12 log2:2		$equ	log2(2)
+  :                            13 log2:3		$equ	log2(3)
+  :                            14 log2:15		$equ	log2(15)
+  :                            15 log2:16		$equ	log2(16)
+  :                            16 log2:17		$equ	log2(17)
+  :                            17 log2:16383	$equ	log2(16383)
+  :                            18 log2:16384	$equ	log2(16384)
+  :                            19 log2:16385	$equ	log2(16385)
+  :                            20 
+*EOF*
+log2=:N65:F:0:000000
+log2:zero=000000
+log2:1=000000
+log2:2=$00:000001
+log2:3=$00:000002
+log2:15=$00:000004
+log2:16=$00:000004
+log2:17=$00:000005
+log2:16383=$00:00000E
+log2:16384=$00:00000E
+log2:16385=$00:00000F
+log2.msm=0<000003
 
 
 </pre>
-<h4>4.2.2.2.2.4: Function Macro Reference</h4>
 
+The assembly at 4.2.1.2.4 shows a function macro $net_ipv4 delivering a value which represents
+a network address composed from dotted decimal text
 
+<p>
+For more information on the construction of function macros see 4.2.5: Function Macros
 
-
-
-<h4>4.2.2.2.2.5: Macro Parameters</h4>
+<h4>4.2.1.2.5: Macro Parameters</h4>
 
 
 Macro actual arguments are accessed by using the label of 
@@ -1966,6 +1698,100 @@ address_B	$net_socket	172.29.6.8:23
 
 
 </pre>
+
+
+<h3>4.2.2: The Command Field</h3>
+
+
+The command field (the first field which is preceded by any
+whitespace) can contain a directive, a constant, a name
+of a $proc macro, or the name of a $form template.
+<pre>
+
+[label] COMMAND [arguments]
+
+</pre>
+
+
+
+<h3>4.2.1 Directives</h3>
+
+
+Directives are commands to the assembler. They are listed in Section 8: Directives
+
+<p>
+Some directives control assembly settings, for example
+<pre>
+
+	$word		BITS
+	$quantum	BITS
+	$list		INCLUDE_DEPTH
+
+</pre>
+Others declare labels
+<pre>
+
+label1	$set	VALUE
+label2	$equf	VALUE1, VALUE2...
+label	$equ	VALUE
+label3	$name	VALUE
+
+</pre>
+Others govern conditional assembly
+<pre>
+
+	$if		CONDITION
+	$elseif		CONDITION
+	$endif
+
+</pre>
+And other directives frame macros
+
+<p>
+All directives may  be aliased to other names using the $EQU directive,
+and frequently are, for example
+<pre>
+
+.equ    $equ,"$directive"       "$equ"
+.macro  $equ,"$directive"       "$proc"
+.macend $equ,"$directive"       "$end"
+
+</pre>
+Quotes are used in these PowerPC examples in case flag -m
+(Motorola old number notation) is opted. The quotes force the
+"$xxxxxx" tokens to be seen as labels and not as hex strings.
+
+<p>
+A small number of directives, $WORD, $BYTE and others,
+work functionally outside the command field if they are not in quotes
+or if flag -Q is opted and flag -m is not opted
+<pre>
+
+BYTE	$equ	$byte		   . $byte returns the actual byte size
+setbyte	$equ,"$directive"  "$byte" . setbyte is the same directive (and function) as $byte
+
+</pre>
+A quote at the start of the command field produces a text string constant
+
+<p>
+There may be constant expressions in the command field, but they
+start with a digit, a unary sign a quote or a single-quote. So $equ
+and other directives in the command field are always recognised.
+
+
+
+<h3>4.2.2: Storage Constants</h3>
+
+For complex data constants see section 5: Iterated Code and Structured Data
+and 4.2.3: $proc Macro Calls: Instructions and Structures 
+
+<p>
+Simple data constants may be integers, microstructures of bit fields, 
+floating numbers or text strings.
+
+
+</pre>
+
 
 <h4>4.2.2.3 Number Constants</h4>
 
@@ -2135,6 +1961,7 @@ MASMX 7r3
 
 
 </pre>
+
 If the last token in the expression is a label instead of a number string
 then any length override must be preceded by colon, parenthesis or quote
 <pre>
@@ -2159,6 +1986,49 @@ MASMX 7r3
 00:0001 00000001              +3  01:d  
   :                            4  $end
 :$(00):0000:0003 
+
+</pre>
+$suffix-determined number notation (4.2.1.2: Number String Notation) masks
+length flags [d q h o] if the length flag is not separated. Fraction strings
+containing decimal point are decimal and a suffix is interpreted as size in
+words and not as notation
+<pre>
+
+$ masmx suffix -lnk
+MASMX 7r3
+3/suffix.msm
+CONT_CHAR=
+LTERM=;
+*EOF*
+  :                            1 	$suffix	2
+  :                            2 	$cont_char 0
+  :                            3 	$lterm ';'
+  :                            4 	$word	16
+  :                            5 	$quantum 8
+  :                            6 	$floating_point	80
+  :                            7 	$characteristic	16
+  :                            8 	$characteristic,64 12
+  :                            9 
+00:0000 007B                  +10 	123		; decimal notation, self-sizing
+00:0002 00000000000000000000007B
+                              +11 	+(123d)h	; decimal notation, hexaword
+00:000E 123D                  +12 	123dh		; hex notation, self-sized
+00:0010 00EA                  +13 	234		; decimal notation, self-sized
+00:0012 009C                  +14 	234o		; octal
+00:0014 009C                  +15 	234os		; single word octal
+00:0016 0000009C              +16 	234ol		; octal double word
+00:001A 0000001D              +17 	01dh:d		; hex double word
+  :                            18 
+00:001E 401C000000000000      +19 	1.5q		; fraction string, no notation suffix, quad
+00:0026 40259502F90000000000  +20 	010q*+0ah	; octal mantissa, hex exponent, default 80 bits
+00:0030 40259502F90000000000  +21 	8*+10		; same thing, just testing
+00:003A 400007C80000000000000000
+                              +22 	1.0h*+10b	; fraction string always decimal, hexaword
+  :                            23 			; but bit-pattern exponent, result = 100
+  :                            24 
+*EOF*
+:$(00):0000:0046 
+
 
 </pre>
 Floating numbers do not self size. Their default size is determined with
