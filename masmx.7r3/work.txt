@@ -2477,7 +2477,7 @@ If there are bits unfilled  after the last whole byte position
 in the last word in the string, they are zero filled.
 
 <p>
-See also Section 10: Byte-Addressing Machines with 32- and 64-bit
+See also Appendix F.4: Byte-Addressing Machines with 32- and 64-bit
 Bus, Managing Alignments
 
 
@@ -4264,405 +4264,6 @@ mov.l*  $name   MOV_L
 
 
 
-<h1>5: masmx Internal Floating Format and Alternative Floating Formats</h1>
-
-
-<h2>5.1: masmx Floating Format</h2>
-
-The default masmx floating number is the the 192-bit
-value rounded to 96 bits with 23-bit midpointed exponent
-and 72-bit all-fractional mantissa.
-
-<p>
-The width and exponent-width of a floating item output in masmx default
-format can be adjusted with the directives
-<pre>
-
-	$FLOATING_POINT
-
-	$CHARACTERISTIC
-
-</pre>
-but the scheme
-<pre>
-
-	mid-point-exponent.normalised-fractional-mantissa.1s-complement
-
-</pre>
-is only changed with macro language
-
-<h2>5.2: IEEE754 Floating Values</h2>
-
-
-<h3>5.2.1: Differences between masmx FLoating Format at IEEE754 Floating Formats</h3>
-
-<p>
-This package contains macros for assembling 128-bit,  64- and 32-bit
-IEEE754 floating constants.
-
-<p>
-Macros use the directive $set to cache floating numbers as label
-values for manipulation
-
-<p>
-The masmx internal format is:
-<pre>
-
-	a fraction-only 168-bit precision mantissa,
-	normalising bit is represented, immediately
-	to the right of the binary point
-
-	a mid-pointed 23-bit exponent
-
-	the entire item is 1s-complemented for negative polarity:
-	sign bit = 1 indicates that all of the bits are inverted
-
-	__________________________________________________________________
-	|s|190 exponent 168|167          mantissa                       0|
-	|_|________________|_____________________________________________|
-
-
-
-</pre>
-IEEE754 32-bit, 64-bit, and 128-bit floating formats have
-<pre>
-
-	an integral mantissa part one bit in size which is not
-	represented. The encoded mantissa field starts with the
-	first fractional bit. The normalising bit is the absent
-	integral bit which has the imputed value 1.
-
-	a biased exponent 8, 11 or 15 bits in size
-
-	a sign bit which determines the polarity of the number.
-	The remaining bits are not inverted with negative polarity.
-
-	_____________________________________
-	|s|exponent|mantissa fractional part|
-	|_|________|________________________|
-	          ^
-	         |1| <- the unrepresented normalising integral bit
-
-
-</pre>
-For a given scale the IEEE754 biased exponent is 2 less than the
-masmx abstract format mid-pointed exponent.
-
-<p>
-For the value 1.75 the masmx internal format places the true fraction
-1110000000... at the top of the mantissa field, at the
-immediate right of the binary point, and sets the exponent at one
-greater than the mid-point, indicating that the integral value is
-obtained by hauling the mantissa one bit position upwards through
-the binary point:
-<pre>
-
-	The masmx Abstract Format
-	_____________________________________________________________
-	|s| 100 0000 0000 0000 0000 0001 | 1110 0000 0000 0000 ......
-	|_|______________________________|___________________________
-
-
-</pre>
-In the IEEE754 32-bit, 64-bit and 128-bit formats, 1.75 has a biased
-exponent one less than the mid point:
-<pre>
-
-	The IEEE754 64-bit Format
-	___________________________________________________________
-	|s| 011 1111 1111 | 1100 0000 0000 0000 0000...............
-	|_|_______________|________________________________________
-	                ^
-	               |1| <- the unrepresented normalising integral bit
-
-</pre>
-These differences can be seen in the this assembly.
-The first generated value is the masmx default, the second ieee754:
-<pre>
-
-MASMX 7r2
-0/-INPUT>>
-        $list   0
-        $word   32
-        $include        "ieee754.def"
-        $list   2
-        +               1.75
-        ieee754_64      1.75
-        $end
-  :                            41         $list   2
-00:00000000 400001E00000000000000000
-                              +42         +               1.75
-00:00000003 3FFC000000000000  +43         ieee754_64      1.75
-  :                            44         $end
-:$(00):00000000:00000005 
--INPUT>>: object code 87 bytes: 0 errors: 0 undefined labels
-
-</pre>
-
-<h3>5.2.2: Macro-Language Generation of IEEE754 FLoating Constants</h3>
-
-The macro language for generating IEEE754 floating values is shown here.
-
-<p>
-These macros can be a guide for implementing any other floating
-format transformations:
-<pre>
-
-
-	$floating_point	192
-	$characteristic	24
-
-fieee754_32 $form 1, 8, 23
-fieee754_64 $form 1, 11, 52
-fieee754_128 $form 1, 15, 112
-
-p       $proc
-ieee754_32* $name 0
-
-tag     $set	 p(1,1)
-sign    $set    tag/*191
-        
-        $if     sign
-tag     $set    ^tag        
-        $endif
-
-characteristic $set (((tag/*183)**128)++((tag/*168)**127))-2
-mantissa $set   ((tag**(1*/168)-1)+(7*/141))/*144
-
-	$nop	adjust any rounding outflow
-	$nop	indicated by a 25th bit
-
-	$if	mantissa**1*/24
-mantissa $set	mantissa/*1
-characteristic $set characteristic+1
-	$endif
-
-        $nop	bits 166..144 -> bits 22..0. Normalising Bit 167 truncated
-        
-        fieee754_32 sign, characteristic, mantissa 
-        $end
-
-
-p       $proc
-ieee754_64* $name 0
-
-tag     $set	p(1,1)
-sign    $set    tag/*191
-        
-        $if     sign
-tag     $set    ^tag        
-        $endif
-
-characteristic $set (((tag/*180)**1024)++((tag/*168)**1023))-2
-mantissa $set   ((tag**(1*/168)-1)+(7*/112))/*115
-
-	$nop	adjust any rounding outflow
-	$nop	indicated by a 54th bit
-
-	$if	mantissa**(1*/53)
-mantissa $set	mantissa/*1
-characteristic $set characteristic+1
-	$endif
-
-        $nop	bits 166..115 -> bits 51..0. Normalising Bit 167 truncated
-        
-        fieee754_64 sign, characteristic, mantissa 
-        $end
-
-p	$proc
-ieee754_128* $name
-
-tag	$set	p(1, 1)
-sign	$set	tag/*191
-
-	$do	sign,tag	$set	^tag
-
-characteristic $set (((tag/*176)**16384)++((tag/*168**16383))-2
-mantissa $set	((tag**(1*/168)-1)+(7*/52))/*55
-
-	$nop	adjust any rounding outflow
-	$nop	indicated by a 114th bit
-
-	$if	mantissa**(1*/113)
-mantissa $set	mantissa/*1
-characteristic $set characteristic+1
-	$endif
-
-	$nop	bits 166..55 -> bits 111.0 Normalising bit 167 truncated
-
-	fieee754_128	sign, characteristic, mantissa
-	$end
-
-
-</pre>
-IEEE754 format floating numbers are supported on many
-architectures as well as matching XDR layout.
-
-<p>
-The $NOP directive has been used to comment the macro code.
-This is because the macros may be included in many different
-assemblies with different comment characters, # ; .
-
-<p>
-<b>$floating_point</b> and <b>$characteristic</b> directives set the maximum range
-and precision. The transient value is 192 bits in size
-
-<p>
-The directive $SET caches the value of the floating argument
-in the label "tag"
-
-<p>
-"tag" may contain a 1s-complement value. If it does, it's inverted after
-"sign" is isolated and evaluated. That's because IEEE754 formats only
-invert the sign bit for negative polarity, not the whole number.
-
-<p>
-The labels "characteristic" and "mantissa" cache manipulated
-fields from "tag"
-
-<p>
-sign, characteristic and mantissa are output under control of the
-form-template fieee754_32, fieee754_64 or fieee754_128.
-
-<p>
-These three form-templates are defined with the $FORM directive.
-
-<p>
-The $FORM directive drives instruction layouts and other small structures.
-This $form
-<pre>
-
-fieee754_32	$form	1, 8, 23
-
-</pre>
-Causes the "instruction" fieee754_32 to construct its arguments in
-this layout:
-<pre>
-
-	________________________________________________
-	| x | xxxx xxxx | xxx xxxx xxxx xxxx xxxx xxxx |
-	|___|___________|______________________________|
-         31   30     23   22                         0
-
-
-
-</pre>
-This $form
-<pre>
-
-fieee754_64	$form	1, 11, 52
-
-</pre>
-Causes the "instruction" fieee754_64 to construct its arguments in
-this layout:
-<pre>
-
-	____________________________________________________    _______
-	| x | xxx xxxx xxxx | xxxx xxxx xxxx xxxx xxxx xxxx .... xxxx |
-	|___|_______________|_______________________________    ______|
-	 63   62         52   51                                     0
-
-
-</pre>
-This $form
-<pre>
-
-fieee754_128	$form	1, 15, 112
-
-</pre>
-<p>
-causes the "instruction" <b>fieee754_128</b> to construct its arguments in
-this layout:
-<pre>
-
-	____________________________________________________    _______
-	| x | xxx xxxx xxxx xxxx | xxxx xxxx xxxx xxxx xxxx .... xxxx |
-	|___|____________________|__________________________    ______|
-	 127  126            112   111                               0
-
-
-</pre>
-The labels tag, sign, characteristic and mantissa aren't promoted with
-any trailing asterisk, so they only exist during the subassembly of
-the macro.
-
-<p>
-All the macros shown are called "p". They don't have to be.
-
-<p>
-Parameters referenced forms start with the macro name:
-<pre>
-
-	macro_name(x,y)
-
-</pre>
-for example in the macros shown
-<pre>
-
-	p(1,1)
-
-</pre>
-Giving many macros the same $PROC or $FUNC label means that blocks of
-macro language can be cut-and-pasted between different macros.
-
-<p>
-In this example the label "p" isn't available for calling. Only labels
-with asterisk* at the end can be seen outside the macro they are in.
-
-<p>
-The trailing asterisk on ieee754_32* ieee754_64* and ieee754_128* make
-those names visible as macros. They're the labels on the $name lines
-
-<p>
-An asterisk on the label of the $proc line would make that label visible:
-<pre>
-
-unique_macro_name*	$proc
-
-</pre>
-Then unique_macro_name must be unique. See Section 6.2.2.2: The $PROC 
-Header
-
-<p>
-Macros with non-unique labels are called by the labels on the $NAME lines,
-and these names are visible* and unique*.
-
-<p>
-The label on $PROC, $NAME or $FUNC is only visible for calling outside
-the macro if the LABEL* has an asterisk after it.
-
-<p>
-There is a layout directive $FORM and code-generating macros
-run from $PROC to $END. That's the essence of masmx.
-
-<p>
-Macros can all have the same label on the $PROC line to make them easy 
-to write. Then they must have unique names on the $NAME line
-to make them possible to call
-<pre>
-
-
-$ masmx ieeef -ln
-MASMX 7r2
-3/ieeef.msm
-*EOF*
-  :                            1         $word   32
-  :                            2:         $include "ieee754.def"
-  :                            3 
-00:00000000 3FE00000          +4         ieee754_32      1.75
-00:00000001 BFE00000          +5         ieee754_32      -1.75
-00:00000002 01B45BD15F9FB3FB  +6         ieee754_64      1.9e-300
-00:00000004 3FEFFFFFFFFFFFFE  +7         ieee754_64      0.9999999999999997779553950749686919152736663818359375
-  :                            8 
-00:00000006 7FFFA000000000000000000000000000
-                              +9 	ieee754_128	1.625
-00:0000000A 4530893B3F9CA1B98E9D33873CAF6153
-                              +10 	ieee754_128	1.8e400
-*EOF*
-:$(00):00000000:0000000E 
-
-
-</pre>
 
 <h1>6: Iterated Code and Structured Data</h1>
 
@@ -5762,7 +5363,940 @@ complex.msm: object code 2976 bytes: 0 errors: 0 undefined labels
 
 </pre>
 
-<h1>8:    The Directives:</h1>                                         
+
+
+<h1>6: Run-Time Algorithm Plotter</h1>
+
+<h2>6.1: Run-Time Integer Algorithm Plotter</h2>
+
+<h2>6:2: Run-Time Floating Algorithm Plotter</h2>
+
+
+
+<h1>7: Constructing Program Sections</h1>
+
+<h2>7.1: Absolute Location Counters</h2>
+<h3>7.1.1: Simple Absolute Location Counters</h3>
+
+The plainest use of location counter controls has the syntax
+<pre>
+
+$(counter_id:value)
+
+</pre>
+at the start of the assembly, and later
+<pre>
+
+$(counter_id)
+
+</pre>
+to switch between the program sections
+
+<p>
+If for example location counter zero has been chosen for code,
+and location counter one for data:
+<pre>
+
+$(0:code_start_address)
+
+	some code
+
+$(1:data_start_address)
+
+	some data
+
+$(0)
+
+	some more code
+
+$(1)
+
+	some more data
+
+</pre>
+
+Sections can be identified by name and all initialized together
+
+<pre>
+
+text	$equ	1
+data	$equ	3
+
+$(text:START_OF_TEXT)
+$(data:START_OF_DATA)
+.	end of header information
+
+.	start of application information
+$(data)
+.	data declarations
+
+$(text)
+.	instructions
+
+$(data)
+.	more data
+
+$(text)
+.	more instructions
+
+</pre>
+
+A construct
+<pre>
+
+$(0:0)
+
+</pre>
+means switch to location counter 0 and initialise it 
+to absolute unrelocatable 0. This the default environment
+beginning of main assembly
+
+<p>
+Program sections addressing is initialised
+<pre>
+
+$(1:static_base_address)
+$(2:strings_base_address/literal_pool_name)
+
+</pre>
+Code or data is added to each section
+<pre>
+
+$(1)
+structure1      structure_macro_name
+buffer20        $res    20
+$(0)
+	load_address    r6, literal_pool_name("Long Text String":10)
+	call            copy_routine
+
+</pre>
+Sections can be named to match assembly language output from compilers
+<pre>
+
+CODE    $equ    0
+STATIC  $equ    1
+$(CODE:0/STRING_LITERALS)
+$(STATIC:32768)
+$(STATIC)
+buffer...
+$(CODE)
+Start   load... ,STRING_LITERALS("Text...
+	call..
+	store  ...,buffer...
+$(STATIC)
+another_variable..
+$(CODE)
+	load_address ..,another_variable
+
+
+</pre>
+The explanation of each possible field in a location counter control
+is, for absolutely addressed segments:
+<pre>
+
+$(id:address:breakpoint,base_register/literal_pool_tag)
+
+</pre>
+or
+<pre>
+
+$(id:address:*breakpoint,base_register/literal_pool_tag)
+
+</pre>
+All fields except id (0..71) may be absent.
+
+<p>
+If addresses are absent
+<pre>
+
+$(id[,base_register][/literal_pool_tag])
+
+</pre>
+then addressing in this segment picks up where it last reached.
+
+<p>
+If the base register is specified, labels of locations in the
+segment have a tuple base+displacement attribute.
+
+
+<h3>7.1.2: The Breakpointed Location Counter</h3>
+<h4>7.1.2.1 Physical Address Offset</h4>
+
+The breakpointed location counter may be used to describe the absolute
+locations of hardware-relocated banks.
+
+<p>
+The simple absolute start address declaration has the syntax
+<pre>
+
+$(id:base_address)
+
+</pre>
+But the breakpointed value pointing to a hardware-relocated location
+has the syntax
+<pre>
+
+$(id:logical_base_address:absolute_address)
+
+</pre>
+Load addresses are computed from breakpointed segment start plus offset
+minus base.
+
+<p>
+But references are relative to the logical base only (the first address).
+<pre>
+
+$(5::SEGMENT1)
+.
+.
+$(5::SEGMENT2)
+.
+.
+
+	_________________________
+	| SEGMENT1 Location 0	|
+	|			|
+	|			|
+	|			|
+	|_______________________|
+	| SEGMENT2 Location 0	|
+	|			|
+
+
+</pre>
+The sections must be loaded at the named physical locations at run time before reference.
+
+<p>
+On simple hardware without MMU this effect is sometimes obtained
+by selecting part of memory with I/O operations.
+
+<p>
+All parts of all sections may be in one bank for loading. Loader
+depending the breakpoint addresses may be physical or relative
+to a physical load region
+
+<p>
+In this example the program has two loads in the first page of
+relative space $(0::) and will switch between them dynamically
+<pre>
+
+PHYS_PAGE1	$equ	1*4096
+PHYS_PAGE2	$equ	2*4096
+PHYS_PAGE3	$equ	3*4096
+PHYS_PAGE32	$equ	32*4096
+PHYS_PAGE36	$equ	36*4096
+
+$(0::PHYS_PAGE1)
+.	program address space 0..4095
+.
+$(0::PHYS_PAGE2)
+.	program address space 0..4095
+.
+$(5:5*4096:PHYS_PAGE3)
+.	program address space 20480..240575
+.
+$(4:16384:PHYS_PAGE32)
+.	program address space 16384..20479
+.
+$(8:32768:PHYS_PAGE36)
+.	program address space 32768..36863
+.
+
+
+</pre>
+In that example the pages of address space are mapped to corresponding locator
+numbers and this is convenient. The locator number does not however influence
+the address space. That is pointed by the base address. Here the correspondence
+with locator number is abandoned with less readable effect
+<pre>
+
+$(10:8192)	. locator $(10) concerns addresses from 8192
+
+$(3:40960)	. locator $(3) concerns addresses from 40960
+
+</pre>
+<p>
+Listings show the program-logical addresses. To see the load
+addresses instead, use the -d flag as well as the -l flag
+
+
+<h4>7.1.2.2: The Breakpointed Location Counter: -v Option</h4>
+
+If -v option is applied, the treatment of breakpoint values is different.
+
+<p>
+The SEGMENT value in $(id:start:SEGMENT) is not assumed to be an address
+and is not added to the load addresses
+
+<p>
+Instead, the value is prefixed before the load addresses in the
+text-encoded binary output. See Section 9.1: Output File Formats
+
+<p>
+The breakpoint value may be a memory granule or paragraph address,
+a page identifier or a virtual translation index. By prefixing it
+instead of adding it, masmx -v assigns the breakpoint abstract to
+separate interpretation
+
+<p>
+Listings show the program-logical addresses. To see the segment selectors
+and offsets instead, use the -d flag as well as the -lv flags
+
+
+
+<h3>7.1.3: Simple Location Counter without Breakpoint:
+	 Base+Displacement in Flat Address Spaces</h3>
+
+If the target runs with a large flat address space, or the segment is at
+a high relative address in a large bank, and part of the segment is beyond
+the immediate address scope of the instruction set, the developer may
+cause a base register to be loaded with the a base address at run-time.
+
+<p>
+The locations in the segment are referenced as base+displacement
+tuples where the displacement does not include the large load address.
+But the large load address is included in the code load addresses:
+<pre>
+
+$(35:big_address_where_it_loads,r15)
+
+</pre>
+Then big_address_where_it_loads must be placed in r15 at run-time.
+
+<p>
+The following assembled base-displacement example shows: 
+
+<p>
+Line 4 declares a segment which will be accessed 
+using R15 as a cover or base register.
+
+<p>
+Lines 12..13 place the section start address in r15 at runtime
+
+<p>
+Lines 14..16 retrieve operands which r15 covers.
+Identifiers in section $(48) are base-displacement. r15 is referenced automatically
+
+<pre>
+
+$ masmx qplain -lnkyd
+MASMX 7r3
+3/qplain.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+  :                            1:         $include        "../aside.dem/ppc_603.def"
+  :                            2 
+  :                            3 SEGMENT .equ    511*1024
+  :                            4 $(48:SEGMENT,r15)
+30:0007FC00 0000000000400000  +5 part1   +       2048*2048d
+30:0007FC08 0000000000000064  +6 part2   +       100d
+  :                            7 part3   $res    2048*2048-16
+  :                            8 
+30:0047FC00 0007FC10          +9 	+	.absolute(part3)
+  :                            10 
+  :                            11 $(0:3*65536)
+00:00030000 640F0008          +12 start   oris    r15,, .absolute(part1)@ha     
+00:00030004 39E0FC00          +13         addi    r15, .absolute(part1)@l 
+00:00030008 806F0000          +14         lwz     r3, part1
+00:0003000C 808F0008          +15         lwz     r4, part2
+00:00030010 80AF0010          +16         lwz     r5, part3
+00:00030014 4E800020          +17         blr
+  :                            18         $end    start
+:$(00):00030000:00030018 :$(30):0007FC00:0047FC04 
+
+</pre>
+
+<h3>7.1.4: The Breakpointed Location Counter:
+             Base+Displacement in Translated Address Spaces</h3>
+
+The following example has a base+displacement segment at a high
+logical address which will be loaded at a different high absolute
+address, i.e. a physical load address known at
+assembly time.
+
+
+<p>
+Absolute here means linker-absolute not physically relocated. The
+breakpoint address does not change code's view of the data section
+
+<p>
+The physical address HARDWARE_LOADA is not visible to the code but is
+used in the load strings.
+
+<p>
+Multi-bank images for relocating hardware can be generated in this way.
+
+<p>
+The displacements used in operand reference do not reflect either
+HARDWARE_LOADA or SEGMENT, but SEGMENT is in r15
+
+<p>
+The assembly is run with -d Flag to show absolute load addresses.
+<pre>
+
+$ masmx rplain -lnkyd
+MASMX 7r3
+3/rplain.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+  :                            1:         $include        "../aside.dem/ppc_603.def"
+  :                            2 
+  :                            3 SEGMENT .equ    511*1024
+  :                            4 HARDWARE_LOADA .equ	511*32768
+  :                            5 
+  :                            6 $(48:SEGMENT:HARDWARE_LOADA,r15)
+30:00FF8000 0000000000400000  +7 part1   +       2048*2048d
+30:00FF8008 0000000000000064  +8 part2   +       100d
+  :                            9 part3   $res    2048*2048-16
+  :                            10 
+30:013F8000 0007FC10          +11 	+	.absolute(part3)
+  :                            12 
+  :                            13 $(0:3*65536)
+00:00030000 640F0008          +14 start   oris    r15,, .absolute(part1)@ha     
+00:00030004 39E0FC00          +15         addi    r15, .absolute(part1)@l 
+00:00030008 806F0000          +16         lwz     r3, part1
+00:0003000C 808F0008          +17         lwz     r4, part2
+00:00030010 80AF0010          +18         lwz     r5, part3
+00:00030014 4E800020          +19         blr
+  :                            20         $end    start
+:$(00):00030000:00030018 :$(30):0007FC00:0047FC04 
+
+
+</pre>
+<h3>7.1.5: Void Segments</h3>
+
+A void segment has zero base address, no breakpoint address, is not
+relocatable and has a base register
+
+<p>
+Data is described in a void segment but not generated. It reserves
+no storage but is a map of storage. Labels in a void segment map
+to displacements on the base register
+<pre>
+
+$(id:0,rX)
+
+</pre>
+<p>
+One location counter can be used for many different void segments if a
+zero breakpoint value is specified
+<pre>
+
+$(66::,rX)
+name1	descriptor_type_A
+
+$(66::,rY)
+name2	descriptor_type_B
+
+</pre>
+Void Segment addresses two cases, where 
+
+	<blockquote>
+	The data is supplied by a calling
+	routine which hands "this" routine
+	a parameter address in a register<br><br>
+
+	The data is generated in a large
+	array and based a part at a time 
+	with a register
+	</blockquote>
+
+It is safe to place data-generating macros in the void segment. 
+They will not generate data. This allows the same macros to construct
+data and to map instances of it into a void segment for attention.
+	
+<p>
+Macro "tree" in this example is called both in section $(55) ARRAY
+where it does generate data, and segment $(56) VSEGMENT, where it doesn't.
+<pre>
+
+MASMX 7r2
+3/pusingv.msm
+LTERM=#
+CONT_CHAR=
+STERM=.
+*EOF*
+  :                            1:         $include        "ppc1.def"
+  :                            2         $set_option     "u"
+  :                            3         $plist  8
+  :                            4         
+  :                            5 record* $proc        
+  :                            6 *       $tree
+  :                            7 h       +       record(1,1)
+  :                            8 t       $res    record(1,1)
+  :                            9         $root
+  :                            10         .align  2
+  :                            11         $end
+  :                            12         
+  :                            13 tree*   $proc
+  :                            14 *       $tree
+  :                            15 times   $do     3,dibber(times) record    tree(1,1)
+  :                            16         $root
+  :                            17         $end
+  :                            18 
+  :                            19 
+  :                            20 ARRAY   $equ    262144*24
+  :                            21 GRANULE $equ    22//4*4*2*3//8*8
+  :                            22 
+  :                            23 grains*       $proc
+  :                            24       $do     index=2,        $list   0
+  :                            25 $(55:ARRAY+index*GRANULE-GRANULE)
+  :                            26 cluster(index)* $tree
+  :                            27 times   $do     2,raddle(times)  tree 18
+  :                            28         $root
+  :                            29       $do     index=20000/GRANULE-1,  $list  1
+  :                            30         $end
+  :                            31 
+37:00600000 00000012          +32 index $do     20000/GRANULE,  grains
+37:00600018 00000012          +32 
+37:00600030 00000012          +32 
+37:00600048 00000012          +32 
+37:00600060 00000012          +32 
+37:00600078 00000012          +32 
+37:00604D10 00000012          +32 
+37:00604D28 00000012          +32 
+37:00604D40 00000012          +32 
+37:00604D58 00000012          +32 
+37:00604D70 00000012          +32 
+37:00604D88 00000012          +32 
+  :                            33 
+  :                            34 VSEGMENT $equ    0
+  :                            35 
+  :                            36 $(56:VSEGMENT,r12)
+  :                            37 .this_segment $equ $(55)
+38:00000000                   +38 times   $do     2,raddle(times) tree    18
+38:00000018                   +38 
+38:00000030                   +38 
+38:00000048                   +38 
+38:00000060                   +38 
+38:00000078                   +38 
+38:00000090                   +39 raddle2 tree    30
+38:000000B4                   +39 
+38:000000D8                   +39 
+  :                            40 $(0:32768/.lit)
+00:00008000 640C0060          +41         oris    r12,0,hi16(cluster(40).raddle(1))
+00:00008004 618C15F0          +42         ori     r12,r12,lo16(cluster(40).raddle(1))
+00:00008008 806C0018          +43         lwz     r3,raddle(1).dibber(2)
+00:0000800C 808C0000          +44         lwz     r4,raddle(1).dibber(1)
+00:00008010 80AC0078          +45         lwz     r5,raddle(2).dibber(3)
+00:00008014 80CC0048          +46         lwz     r6,raddle(2)
+00:00008018 80EC0090          +47         lwz     r7,raddle2
+00:0000801C 616C0000          +48         mr      r11,r12
+00:00008020 90EB0090          +49         stw     r7,raddle2(r11)
+00:00008024 A0EB0078          +50         lhz 	r7,raddle(2).dibber(3)(r11)
+00:00008028 8180802C          +51       lwz r12,.lit(cluster(20).raddle(2))
+*EOF*
+00:0000802c+00600AF8
+:$(00):00008000:00008030 :$(37):00600000:00604DA0 :$(38):00000000:000000FC 
+pusingv.msm: object code 18447 bytes: 0 errors: 0 undefined labels
+
+</pre>
+<h3>7.1.6: The Breakpointed Location Counter: Giant Address Spaces</h3>
+
+<h4>7.1.6.1: Very Large Direct Addressed Segments</h4>
+
+If breakpoint is prefixed with an asterisk, it is a
+*large_direct_base_address:
+<pre>
+
+$(id:address:*large_direct_base_address,base_register/literal_pool_tag)
+
+</pre>
+This *large_direct_address_base may be up to 192 bits wide, according
+to the second value in the $AWIDTH declaration, for example:
+<pre>
+
+	$AWIDTH	32:128
+
+</pre>
+which can be seen in the example below:
+
+<p>
+An array spanning many times 4 gigaquanta may therefore be declared.
+<pre>
+
+	$word	32
+	$quantum 8
+	$byte	8
+	$awidth	32:128
+
+ARRAY		$equ	5*/96
+ELEMENT_SIZE	$equ	1024*1024*1024
+HOW_MANY	$equ	112000
+
+element* $proc
+*	+	subscript
+	$res	ELEMENT_SIZE-4
+	$end
+	
+newpart* $proc
+$(45::*ARRAY+ELEMENT_SIZE*subscript-ELEMENT_SIZE)
+	$do	subscript=4,		$list	0
+part(subscript)*	element
+	$do	subscript=HOW_MANY-3,	$list	1
+	$end
+
+subscript	$do	HOW_MANY,	newpart
+
+2D:00000005000000000000000000000000:00000001      +23
+2D:00000005000000000000000040000000:00000002      +23 
+2D:00000005000000000000000080000000:00000003      +23 
+2D:000000050000000000006D5F40000000:0001B57E      +23 
+2D:000000050000000000006D5F80000000:0001B57F      +23 
+2D:000000050000000000006D5FC0000000:0001B580      +23 
+*EOF*
+:$(2d):00000000:40000000 
+Object Code 5264032 Bytes: 0 Errors: 0 Undefined Labels
+
+</pre>
+Some limitations may be encountered, and there are ways to go
+beyond them.
+
+<p>
+Firstly, if you have terabillions of array elements instead of
+just 112000, you could not put labels on all of them. The labels
+"part(1)" thru "part(112000)" exist during the above assembly.
+
+<p>
+This is not really a restriction, because applications do not
+address array elements through unique labels. They compute offsets
+and add them to the table base address.
+
+<p>
+Secondly, if you generate load information for many billions of
+locations in an array, you may not have a file system which can
+hold the output files, unless the file system is implemented in system memory.
+This in turn would mean that the application is assembled
+every time it's run, so it might in any case be more practical to
+construct truly astronomic arrays at application run time.
+
+<p>
+masmx has a concept of a normal address space, where each location
+counter addresses up to 4 gigaquanta, and a an increment of up to
+192 bits which may be iteratively stepped.
+
+<p>
+The $awidth directive in the example shows an intra-segment address
+space of 32 bits (4 gigabytes) and a maximum address space of 128 bits.
+<pre>
+
+	$awidth	32:128
+
+</pre>
+In the above example, location counter 45 starts at an address of
+5*/96 (five times 65536 tera tera bytes) and is stepped 112000 times
+by one gigabyte.
+
+<p>
+The extension value is not catenated but added, rightmost bit to
+rightmost bit
+<pre>
+
+                                                   _______________
+	running location counter:                  |_____________|
+                                                          +
+                   _______________________________________________
+	step value:|_____________________________________________|
+
+
+</pre>
+The values which go in location labels and in load strings are the sum of
+the location counter value at the point where label is declared,
+plus the step value.
+
+<p>
+The address space is flat although it may be used to represent
+a segmented space. Labels pointing into a giant space contain the
+whole address.
+
+<p>
+See also option flag -i, sign extended addressing (Section 3.2: Command
+Line Options).
+
+
+<h4>7.1.6.2: Very Large Load Address Base-Displacement Examples</h4>
+
+	<blockquote>
+	Giant Absolute Address Base-Displacement Example<br>
+	With Static Base-Displacement Referencing
+	</blockquote>
+
+This example is described as static because the base-displacement
+construct and the code-generating segment are assembled together.
+
+<p>
+Nevertheless the base register has to be loaded at runtime.
+
+<p>
+Whether ,register is given for base-displacement or not, giant
+addressing is specified by a giant breakpoint flagged with *
+<pre>
+
+$(id:base:*giant_breakpoint,register[/literal_pool])
+
+</pre>
+Where <b>,register</b> is also given then base-displacement label references
+are generated.
+
+<p>
+giant_breakpoint is an address expression up to 192 bits wide.
+
+<p>
+displacements may only be 32 bits in size, but giant_breakpoint up to 192
+bits wide may be set to new values billions of times.
+
+<p>
+Addresses progressing from base are added to giant_breakpoint
+to give load addresses.
+
+<pre>
+
+MASMX 7r2
+3/modest.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1:         $include        "ppc_64.def"
+  :                            2 
+  :                            3 SEGMENT $set    0x00FFFC0000000000
+  :                            4 $(48::*SEGMENT,r15)
+30:00FFFC0000000000:0000000000400000
+                              +5 part1   +       2048*2048d
+30:00FFFC0000000008:0000000000000064
+                              +6 part2   +       100d
+  :                            7 part3   $res    2048*2048-16
+  :                            8 
+  :                            9 $(0:3*65536)
+00:00030000 4800000D          +10 start   bl      loaded      
+00:00030004 00FFFC0000000000  +11         +       SEGMENT
+00:0003000C 7DE802A6          +12 loaded  mfspr   r15, LR
+00:00030010 E9EF0000          +13         ld      r15,,r15
+00:00030014 E86F0000          +14         ld      r3, part1
+00:00030018 E88F0008          +15         ld      r4, part2
+00:0003001C E8AF0010          +16         ld      r5, part3
+*EOF*
+:$(00):00030000:00030020 :$(30):00000000:00400000 
+modest.msm: object code 217 bytes: 0 errors: 0 undefined labels
+
+
+</pre>
+
+	<blockquote>
+	Giant Absolute Address Data Example
+	with Dynamic Base-Displacement Referencing
+	</blockquote>
+
+This example is described as dynamic because the base-displacement
+construct and the code-generating segment appear to be different segments.
+
+<p>
+The code is an array covering many times more address space than the
+base-displacement construct, which can be mapped to different array
+locations at different moments.
+
+<p>
+The base-displacement segment $(49) is called a void segment because
+its declaration doesn't generate code. This is achieved by having a
+base register but no address or relocation rule.
+
+<p>
+A giant array constructed as a stepped segment may be 
+randomly accessed by basing different parts of the array 
+at different moments for base-displacement addressing.
+
+<p>
+The use of a Void Segment to map  onto different parts of an array is
+not confined to giant address models. See Section 4.1.2.1.1.5: Void
+Segments
+<pre>
+
+MASMX 7r2
+3/qbig.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1:         $include        "ppc_64.def"
+  :                            2 
+  :                            3 ARRAY   $equ    0x00FFFC0000000000
+  :                            4 GRANULE $equ    2048*2048
+  :                            5 
+  :                            6 proces*	$proc
+  :                            7 $(48::*ARRAY+GRANULE*x-GRANULE)
+  :                            8         $do     x=3,    $list 0
+  :                            9         $do     x=4094, $list 1
+  :                            10 item(x)* +       x*2048*2048+ARRAY
+  :                            11         $end
+  :                            12 
+30:00FFFC0000000000:00FFFC0000400000
+                              +13 x	$do	4096,	proces
+30:00FFFC0000400000:00FFFC0000800000
+                              +13 
+30:00FFFC03FF400000:00FFFC03FF800000
+                              +13 
+30:00FFFC03FF800000:00FFFC03FFC00000
+                              +13 
+30:00FFFC03FFC00000:00FFFC0400000000
+                              +13 
+  :                            14 
+  :                            15 $(49::,r15)
+  :                            16 h       $res    8
+  :                            17 t       $res    2048*2048-8
+  :                            18 
+  :                            19 $(0:3*65536)
+00:00030000 4800000D          +20 start   bl      loaded      
+00:00030004 00FFFC017FC00000  +21         +       item(1536)
+00:0003000C 7DE802A6          +22 loaded  mflr	  r15
+00:00030010 E9EF0000          +23         ld	  r15,,r15
+00:00030014 E86F0000          +24         ld      r3, h
+00:00030018 E88F0008          +25         ld      r4, t
+*EOF*
+:$(00):00030000:0003001C :$(30):00000000:00000008 :$(31):00000000:00400000 
+qbig.msm: object code 213163 bytes: 0 errors: 0 undefined labels
+
+</pre>
+With *giant-stepped segments, the size of the giant part of the address
+is the second part of the $AWIDTH declaration, for example
+<pre>
+
+	$awidth 32:64
+
+</pre>
+The first or "ordinary" part of the $AWIDTH declaration may
+not be more than 32 bits, and that sets the 4-gigaquanta limit of base in
+<pre>
+
+$(id:base:
+
+</pre>
+Base + current location counter cannot accumulate to more
+than 4 gigaquanta without being stepped. The default of 
+the giant part of $AWIDTH is 48 and the limit is 192.
+
+<p>
+See also Section 8.2: $AWIDTH directive
+See also Section 9: Output File Formats, Relocation and Linking,
+Giant Address Spaces, Interfacing with GNU Tools.
+
+
+<h3>7.1.7: Literal Pool Tag</h3>
+
+Literals may be generated in any sort of segment where code is
+allowed. The only other sort of segment is a void segment, sometimes known
+as a dsect. That's a base-displacement segment with no addresses
+and no relocation rule.
+
+<p>
+Where a /literal_pool_tag appears in the location counter control
+<pre>
+
+$(id[:base][:breakpoint][,base_register]/literal_pool_tag)
+
+</pre>
+or
+<pre>
+
+$(id[:*relocation_alignment][,base_register]/literal_pool_tag)
+
+</pre>
+<b>/literal_pool_tag</b> gives a handle to the literal pool in the counter.
+
+<p>
+Literals are steered into a particular section or location counter by
+referencing the section's literal_pool_tag(when_declaring_a_literal)
+
+<p>
+Where automatic literals are enabled with -a flag, untagged literals
+go in the current (see 8.29: $LIT directive) default segment for literals.
+
+<p>
+Without -a flag, literals can only be generated via literal-pool-tag.
+
+<p>
+The literals are produced at the end of the section or section breakpoint.
+
+<p>
+Identical literals within a segment only happen once. All the references
+get the same literal within one breakpointed part (that's within the whole
+section if there isn't any breakpointing).
+
+<p>
+For example, in the definition header "8051.def":
+<pre>
+
+$(0:0/$literal)
+
+</pre>
+means start location counter zero at address zero, and 
+gives the tag "$literal" to a literal pool at the end of 
+the other code assembled in location counter zero. Tag 
+"$literal" may then be referenced to assemble literals 
+and return their address:
+<pre>
+
+	mov     dptr, #$literal("A Long String of Text")
+
+</pre>
+See also Sections 4.6: Function Macros and 4.5: Literals.
+A forward slash signals the start of the literal pool
+name. Therefore any expression which contains an operator 
+/ // /// */ /* in the preceding expressions should be 
+in parentheses. Or equated to a label in advance:
+<pre>
+
+OFFSET	$set	TOTAL_SIZE/GRANULE_LOGARITHM
+$(.array::BASE+OFFSET/$literals_tag)
+
+</pre>
+
+</h2>7.2: Relocatable Location Counters</h2>
+
+See also Section 9: Linking
+
+<pre>
+
+$(id:*alignment[:initial_offset][,base_reg][/literal_pool_tag])
+
+id is the number 0..71 of the location counter
+
+</pre>
+*alignment identifies relocatable code. It gets rounded to the
+containing power of 2. *alignment is recognised by leading asterisk.
+
+<p>
+initial_offset is optional. It declares a hole or unlabelled buffer
+at the front of the segment. initial_offset is usually absent = zero.
+
+<p>
+If base_reg is given, then references in the segment are base-displacement
+but not relocatable. This rule also applies to references to literals in
+the segment.
+
+<p>
+The code in the segment may be relocatable, but base-displacement
+references are never relocatable.
+
+<p>
+If base_reg is not given, the text-encoded binary output has
+relocation information against each reference to the segment.
+This rule applies to references to literals in the segment.
+
+<p>
+Assembling with the -nl flags displays which references are tagged
+with relocation information.
+
+<p>
+See Section 9:	Output File Formats, Relocation and Linking,
+    		Giant Address Spaces, Interfacing with GNU Tools
+
+
+
+
+
+<h1>8: Directives:</h1>                                         
 
 <h2>8.1:  $ASCII             Set Character Set to ASCII</h2>
 
@@ -5925,7 +6459,7 @@ welblech.msm: object code 215 bytes: 0 errors: 0 undefined labels
 $BYTE is defaulted to 8, and is only likely to be anything different
 if the target machine's address quantum is other than a byte, for
 example a word of 30 or 48 or 60 bits. See Section 8.41: $QUANTUM,
-Section 10: Byte-Addressing Machines with 32 and 64 Bit Bus: Managing 
+Appendix F.4: Byte-Addressing Machines with 32 and 64 Bit Bus: Managing 
 Alignments	
 
 <p>
@@ -8146,7 +8680,7 @@ relocation clauses for one field.
 
 <p>
 The check errors if the final value applied does not fit the field.
-See Sections 9.2.3.7-8, 10: Linking in Giant Space.
+See Sections 9.2.3.7-8, 9.10: Linking in Giant Space.
 
 <p>
 $RANGE_CHECK1 requests more stringent behaviour than $RANGE_CHECK:
@@ -13639,11 +14173,405 @@ $24:00000028
 
 </pre>
 
-<h1>10: Run-Time Algorithm Plotter</h1>
+<h1>5: masmx Internal Floating Format and Alternative Floating Formats</h1>
 
-<h2>10.1: Run-Time Integer Algorithm Plotter</h2>
 
-<h2>10:2: Run-Time Floating Algorithm Plotter</h2>
+<h2>5.1: masmx Floating Format</h2>
+
+The default masmx floating number is the the 192-bit
+value rounded to 96 bits with 23-bit midpointed exponent
+and 72-bit all-fractional mantissa.
+
+<p>
+The width and exponent-width of a floating item output in masmx default
+format can be adjusted with the directives
+<pre>
+
+	$FLOATING_POINT
+
+	$CHARACTERISTIC
+
+</pre>
+but the scheme
+<pre>
+
+	mid-point-exponent.normalised-fractional-mantissa.1s-complement
+
+</pre>
+is only changed with macro language
+
+<h2>5.2: IEEE754 Floating Values</h2>
+
+
+<h3>5.2.1: Differences between masmx FLoating Format at IEEE754 Floating Formats</h3>
+
+<p>
+This package contains macros for assembling 128-bit,  64- and 32-bit
+IEEE754 floating constants.
+
+<p>
+Macros use the directive $set to cache floating numbers as label
+values for manipulation
+
+<p>
+The masmx internal format is:
+<pre>
+
+	a fraction-only 168-bit precision mantissa,
+	normalising bit is represented, immediately
+	to the right of the binary point
+
+	a mid-pointed 23-bit exponent
+
+	the entire item is 1s-complemented for negative polarity:
+	sign bit = 1 indicates that all of the bits are inverted
+
+	__________________________________________________________________
+	|s|190 exponent 168|167          mantissa                       0|
+	|_|________________|_____________________________________________|
+
+
+
+</pre>
+IEEE754 32-bit, 64-bit, and 128-bit floating formats have
+<pre>
+
+	an integral mantissa part one bit in size which is not
+	represented. The encoded mantissa field starts with the
+	first fractional bit. The normalising bit is the absent
+	integral bit which has the imputed value 1.
+
+	a biased exponent 8, 11 or 15 bits in size
+
+	a sign bit which determines the polarity of the number.
+	The remaining bits are not inverted with negative polarity.
+
+	_____________________________________
+	|s|exponent|mantissa fractional part|
+	|_|________|________________________|
+	          ^
+	         |1| <- the unrepresented normalising integral bit
+
+
+</pre>
+For a given scale the IEEE754 biased exponent is 2 less than the
+masmx abstract format mid-pointed exponent.
+
+<p>
+For the value 1.75 the masmx internal format places the true fraction
+1110000000... at the top of the mantissa field, at the
+immediate right of the binary point, and sets the exponent at one
+greater than the mid-point, indicating that the integral value is
+obtained by hauling the mantissa one bit position upwards through
+the binary point:
+<pre>
+
+	The masmx Abstract Format
+	_____________________________________________________________
+	|s| 100 0000 0000 0000 0000 0001 | 1110 0000 0000 0000 ......
+	|_|______________________________|___________________________
+
+
+</pre>
+In the IEEE754 32-bit, 64-bit and 128-bit formats, 1.75 has a biased
+exponent one less than the mid point:
+<pre>
+
+	The IEEE754 64-bit Format
+	___________________________________________________________
+	|s| 011 1111 1111 | 1100 0000 0000 0000 0000...............
+	|_|_______________|________________________________________
+	                ^
+	               |1| <- the unrepresented normalising integral bit
+
+</pre>
+These differences can be seen in the this assembly.
+The first generated value is the masmx default, the second ieee754:
+<pre>
+
+MASMX 7r2
+0/-INPUT>>
+        $list   0
+        $word   32
+        $include        "ieee754.def"
+        $list   2
+        +               1.75
+        ieee754_64      1.75
+        $end
+  :                            41         $list   2
+00:00000000 400001E00000000000000000
+                              +42         +               1.75
+00:00000003 3FFC000000000000  +43         ieee754_64      1.75
+  :                            44         $end
+:$(00):00000000:00000005 
+-INPUT>>: object code 87 bytes: 0 errors: 0 undefined labels
+
+</pre>
+
+<h3>5.2.2: Macro-Language Generation of IEEE754 FLoating Constants</h3>
+
+The macro language for generating IEEE754 floating values is shown here.
+
+<p>
+These macros can be a guide for implementing any other floating
+format transformations:
+<pre>
+
+
+	$floating_point	192
+	$characteristic	24
+
+fieee754_32 $form 1, 8, 23
+fieee754_64 $form 1, 11, 52
+fieee754_128 $form 1, 15, 112
+
+p       $proc
+ieee754_32* $name 0
+
+tag     $set	 p(1,1)
+sign    $set    tag/*191
+        
+        $if     sign
+tag     $set    ^tag        
+        $endif
+
+characteristic $set (((tag/*183)**128)++((tag/*168)**127))-2
+mantissa $set   ((tag**(1*/168)-1)+(7*/141))/*144
+
+	$nop	adjust any rounding outflow
+	$nop	indicated by a 25th bit
+
+	$if	mantissa**1*/24
+mantissa $set	mantissa/*1
+characteristic $set characteristic+1
+	$endif
+
+        $nop	bits 166..144 -> bits 22..0. Normalising Bit 167 truncated
+        
+        fieee754_32 sign, characteristic, mantissa 
+        $end
+
+
+p       $proc
+ieee754_64* $name 0
+
+tag     $set	p(1,1)
+sign    $set    tag/*191
+        
+        $if     sign
+tag     $set    ^tag        
+        $endif
+
+characteristic $set (((tag/*180)**1024)++((tag/*168)**1023))-2
+mantissa $set   ((tag**(1*/168)-1)+(7*/112))/*115
+
+	$nop	adjust any rounding outflow
+	$nop	indicated by a 54th bit
+
+	$if	mantissa**(1*/53)
+mantissa $set	mantissa/*1
+characteristic $set characteristic+1
+	$endif
+
+        $nop	bits 166..115 -> bits 51..0. Normalising Bit 167 truncated
+        
+        fieee754_64 sign, characteristic, mantissa 
+        $end
+
+p	$proc
+ieee754_128* $name
+
+tag	$set	p(1, 1)
+sign	$set	tag/*191
+
+	$do	sign,tag	$set	^tag
+
+characteristic $set (((tag/*176)**16384)++((tag/*168**16383))-2
+mantissa $set	((tag**(1*/168)-1)+(7*/52))/*55
+
+	$nop	adjust any rounding outflow
+	$nop	indicated by a 114th bit
+
+	$if	mantissa**(1*/113)
+mantissa $set	mantissa/*1
+characteristic $set characteristic+1
+	$endif
+
+	$nop	bits 166..55 -> bits 111.0 Normalising bit 167 truncated
+
+	fieee754_128	sign, characteristic, mantissa
+	$end
+
+
+</pre>
+IEEE754 format floating numbers are supported on many
+architectures as well as matching XDR layout.
+
+<p>
+The $NOP directive has been used to comment the macro code.
+This is because the macros may be included in many different
+assemblies with different comment characters, # ; .
+
+<p>
+<b>$floating_point</b> and <b>$characteristic</b> directives set the maximum range
+and precision. The transient value is 192 bits in size
+
+<p>
+The directive $SET caches the value of the floating argument
+in the label "tag"
+
+<p>
+"tag" may contain a 1s-complement value. If it does, it's inverted after
+"sign" is isolated and evaluated. That's because IEEE754 formats only
+invert the sign bit for negative polarity, not the whole number.
+
+<p>
+The labels "characteristic" and "mantissa" cache manipulated
+fields from "tag"
+
+<p>
+sign, characteristic and mantissa are output under control of the
+form-template fieee754_32, fieee754_64 or fieee754_128.
+
+<p>
+These three form-templates are defined with the $FORM directive.
+
+<p>
+The $FORM directive drives instruction layouts and other small structures.
+This $form
+<pre>
+
+fieee754_32	$form	1, 8, 23
+
+</pre>
+Causes the "instruction" fieee754_32 to construct its arguments in
+this layout:
+<pre>
+
+	________________________________________________
+	| x | xxxx xxxx | xxx xxxx xxxx xxxx xxxx xxxx |
+	|___|___________|______________________________|
+         31   30     23   22                         0
+
+
+
+</pre>
+This $form
+<pre>
+
+fieee754_64	$form	1, 11, 52
+
+</pre>
+Causes the "instruction" fieee754_64 to construct its arguments in
+this layout:
+<pre>
+
+	____________________________________________________    _______
+	| x | xxx xxxx xxxx | xxxx xxxx xxxx xxxx xxxx xxxx .... xxxx |
+	|___|_______________|_______________________________    ______|
+	 63   62         52   51                                     0
+
+
+</pre>
+This $form
+<pre>
+
+fieee754_128	$form	1, 15, 112
+
+</pre>
+<p>
+causes the "instruction" <b>fieee754_128</b> to construct its arguments in
+this layout:
+<pre>
+
+	____________________________________________________    _______
+	| x | xxx xxxx xxxx xxxx | xxxx xxxx xxxx xxxx xxxx .... xxxx |
+	|___|____________________|__________________________    ______|
+	 127  126            112   111                               0
+
+
+</pre>
+The labels tag, sign, characteristic and mantissa aren't promoted with
+any trailing asterisk, so they only exist during the subassembly of
+the macro.
+
+<p>
+All the macros shown are called "p". They don't have to be.
+
+<p>
+Parameters referenced forms start with the macro name:
+<pre>
+
+	macro_name(x,y)
+
+</pre>
+for example in the macros shown
+<pre>
+
+	p(1,1)
+
+</pre>
+Giving many macros the same $PROC or $FUNC label means that blocks of
+macro language can be cut-and-pasted between different macros.
+
+<p>
+In this example the label "p" isn't available for calling. Only labels
+with asterisk* at the end can be seen outside the macro they are in.
+
+<p>
+The trailing asterisk on ieee754_32* ieee754_64* and ieee754_128* make
+those names visible as macros. They're the labels on the $name lines
+
+<p>
+An asterisk on the label of the $proc line would make that label visible:
+<pre>
+
+unique_macro_name*	$proc
+
+</pre>
+Then unique_macro_name must be unique. See Section 6.2.2.2: The $PROC 
+Header
+
+<p>
+Macros with non-unique labels are called by the labels on the $NAME lines,
+and these names are visible* and unique*.
+
+<p>
+The label on $PROC, $NAME or $FUNC is only visible for calling outside
+the macro if the LABEL* has an asterisk after it.
+
+<p>
+There is a layout directive $FORM and code-generating macros
+run from $PROC to $END. That's the essence of masmx.
+
+<p>
+Macros can all have the same label on the $PROC line to make them easy 
+to write. Then they must have unique names on the $NAME line
+to make them possible to call
+<pre>
+
+
+$ masmx ieeef -ln
+MASMX 7r2
+3/ieeef.msm
+*EOF*
+  :                            1         $word   32
+  :                            2:         $include "ieee754.def"
+  :                            3 
+00:00000000 3FE00000          +4         ieee754_32      1.75
+00:00000001 BFE00000          +5         ieee754_32      -1.75
+00:00000002 01B45BD15F9FB3FB  +6         ieee754_64      1.9e-300
+00:00000004 3FEFFFFFFFFFFFFE  +7         ieee754_64      0.9999999999999997779553950749686919152736663818359375
+  :                            8 
+00:00000006 7FFFA000000000000000000000000000
+                              +9 	ieee754_128	1.625
+00:0000000A 4530893B3F9CA1B98E9D33873CAF6153
+                              +10 	ieee754_128	1.8e400
+*EOF*
+:$(00):00000000:0000000E 
+
+
+</pre>
 
 
 
