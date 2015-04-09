@@ -664,4 +664,5 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz globule4 ..\test.zo3\globule4 -lok > ..\text.zo3\globule4.txt
 ..\masmz globules ..\test.zo3\globules -lok > ..\text.zo3\globules.txt
 ..\masmz garbules ..\test.zo3\garbules -lok > ..\text.zo3\garbules.txt
+..\masmz ragaline ..\test.zo3\ragaline -lok > ..\text.zo3\ragaline.txt
 

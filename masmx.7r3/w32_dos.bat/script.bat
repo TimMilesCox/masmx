@@ -670,6 +670,7 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx globule4 ..\test.o3\globule4 -lyok > ..\text.o3\globule4.txt
 ..\masmx globules ..\test.o3\globules -lyok > ..\text.o3\globules.txt
 ..\masmx garbules ..\test.o3\garbules -lyok > ..\text.o3\garbules.txt
+..\masmx ragaline ..\test.o3\ragaline -lyok > ..\text.o3\ragaline.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

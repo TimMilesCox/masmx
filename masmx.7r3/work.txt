@@ -265,9 +265,11 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     1.  Absolute Location Counters					7.1
 
-	1.  Breakpointed Location Counters and Hardware Segmentation	7.1.1
+	1.  Simple Absolute Location Counters				7.7.1
 
-	2.  Breakpointed Location Counters: -v Option			7.1.2
+	1.  Breakpointed Location Counters				7.1.2
+	    1.  Physical Address Offset					7.1.2.1
+	    2.  Breakpointed Location Counters: -v Option		7.1.2.2
 
 	3.  Simple Location Counter without Breakpoint:
 	    Base+Displacement in Flat Address Spaces			7.1.3
@@ -279,7 +281,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	6.  Breakpointed Location Counters: Giant Address Spaces	7.1.6
 
-	    1.  Very Large Direct Addressed Segments			7.1.6.1
+	    1.  Very Large Direct Addressed Sections			7.1.6.1
 
 	    2.  Very Large Load Address Base-Displacement Examples	7.1.6.2
 
@@ -692,8 +694,8 @@ MASMX 7r3
  
 </pre>
 The included macro package for generating IEEE754 constants is explained
-in section 12: masmx Floating Format and Alternative Formats and section
-12.2: IEEE754 Floating Formats
+in section 11: masmx Floating Format and Alternative Formats and section
+11.2: IEEE754 Floating Formats
 
 
 <h2>1.6: Structured Data and Repeat Data</h2>
@@ -6309,17 +6311,16 @@ $(.array::BASE+OFFSET/$literals_tag)
 
 </pre>
 
-</h2>7.2: Relocatable Location Counters</h2>
-
-See also Section 9: Linking
+<h2>7.2: Relocatable Location Counters</h2>
 
 <pre>
 
 $(id:*alignment[:initial_offset][,base_reg][/literal_pool_tag])
 
+</pre>
 id is the number 0..71 of the location counter
 
-</pre>
+<p>
 *alignment identifies relocatable code. It gets rounded to the
 containing power of 2. *alignment is recognised by leading asterisk.
 
@@ -6328,26 +6329,63 @@ initial_offset is optional. It declares a hole or unlabelled buffer
 at the front of the segment. initial_offset is usually absent = zero.
 
 <p>
-If base_reg is given, then references in the segment are base-displacement
-but not relocatable. This rule also applies to references to literals in
-the segment.
+The first section in the following assembly, $(33) at line 3
+is relocatable and no base register is used to address it.
+The text-encoded binary output has relocation information added to
+references (line 16) in this segment.
 
 <p>
-The code in the segment may be relocatable, but base-displacement
-references are never relocatable.
+Relocation tuples are printed just above the generated code
+at the left of the listing when -ln flags are opted
 
 <p>
-If base_reg is not given, the text-encoded binary output has
-relocation information against each reference to the segment.
-This rule applies to references to literals in the segment.
+The second section $(34) at line 6 in this example has a base register.
+Instruction  reference to labels and literals in that section
+are base+displacement
 
 <p>
-Assembling with the -nl flags displays which references are tagged
-with relocation information.
+The code in the segment will be relocated and pointers to it
+updated with relocation information (line 11), but base-displacement
+references (line 15) are never relocatable
+
+<pre>
+
+$ masmx ragaline -lnk
+MASMX 7r3
+3/ragaline.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1: 	$include ../aside.dem/ppc_603.def
+  :                            2: 	$include ieee754.def
+  :                            3 $(33:*8)                                  
+21:00000000 3FF8000000000000  +4 one	ieee754_64	1.5
+21:00000008 3FFC000000000000  +5 two	ieee754_64	1.75
+  :                            6 $(34:*8,30)
+22:00000000 BFC8000000000000  +7 first	ieee754_64	-1.5
+22:00000008 BFC4000000000000  +8 second	ieee754_64	-1.75
+  :                            9 $(.text:131072)
+01:00020000 48000009          +10 	bl	load_base30
+(+22)20
+01:00020004 00000000          +11 	+	.absolute(first)
+  :                            12 load_base30
+01:00020008 7FC802A6          +13 	mflr	r30
+01:0002000C 83DE0000          +14 	lwz	r30,,r30
+01:00020010 C81E0008          +15 	lfd	0, second
+(+21)10
+01:00020014 C8400008          +16 	lfd	2, two
+  :                            17 
+*EOF*
+:$(01):00020000:00020018 :$(21):00000000:00000010 :$(22):00000000:00000010 
+
+
+</pre>
+
 
 <p>
-See Section 9:	Output File Formats, Relocation and Linking,
-    		Giant Address Spaces, Interfacing with GNU Tools
+See also Section 9:	Output File Formats, Relocation and Linking,
+    			Giant Address Spaces, Interfacing with GNU Tools
 
 
 
