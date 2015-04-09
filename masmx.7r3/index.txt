@@ -143,9 +143,11 @@
 
     1.  Absolute Location Counters					7.1
 
-	1.  Breakpointed Location Counters and Hardware Segmentation	7.1.1
+	1.  Simple Absolute Location Counters				7.7.1
 
-	2.  Breakpointed Location Counters: -v Option			7.1.2
+	1.  Breakpointed Location Counters				7.1.2
+	    1.  Physical Address Offset					7.1.2.1
+	    2.  Breakpointed Location Counters: -v Option		7.1.2.2
 
 	3.  Simple Location Counter without Breakpoint:
 	    Base+Displacement in Flat Address Spaces			7.1.3
@@ -157,7 +159,7 @@
 
 	6.  Breakpointed Location Counters: Giant Address Spaces	7.1.6
 
-	    1.  Very Large Direct Addressed Segments			7.1.6.1
+	    1.  Very Large Direct Addressed Sections			7.1.6.1
 
 	    2.  Very Large Load Address Base-Displacement Examples	7.1.6.2
 
