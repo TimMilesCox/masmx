@@ -479,7 +479,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 		in Giant Address Space					9.2.3.10
 
 
-11. Describing Target Architecture in Text				11
+10. Describing Target Architecture in Text				11
 
     1.  Establishing Your Syntax					11.1
     2.	Describing the Target Architecture				11.2
@@ -497,7 +497,7 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	1.  Synthesising Legacy Functional Macros			11.3.1
 	2.  Synthesising Legacy Command Macros				11.3.2
 
-10. masmx Internal Floating Format and Alternative Floating Formats	10
+11. masmx Internal Floating Format and Alternative Floating Formats	10
     1.	masmx Floating Format						10.1
     2.	IEEE754 Floating Values						10.2
 	1.  Differences between masmx FLoating Format and IEEE754 Floating Formats
@@ -575,8 +575,7 @@ notation, C-Language notation, Motorola Old Notation or
 suffix-determined notation
 
 <p>
-See Section 4.2.2.1: Notation and Section 4.2.2.2: Expressions
-Number Constants
+See Section 4.2.2.1: Number Strings and Section 4.2: Expressions
 
 
 
@@ -796,21 +795,21 @@ A definition file included at the head of the assembly defines:
 
 	assembly language syntax<br><br>
 
-	the computer word size, up to 192 bits<br><br>
+	computer word size, up to 192 bits<br><br>
 
-	the data byte size<br><br>
+	initial data byte size<br><br>
 
-	the target data code, default ASCII<br><br>
+	target data code, default ASCII<br><br>
  
-	the address space<br><br>
+	address space<br><br>
 
-	the address quantum<br><br>
+	address quantum<br><br>
 
 	any address space segmentation or partitioning<br><br>
 
 	register sets and names<br><br>
 
-	the instruction set<br><br>
+	instruction set<br><br>
 
 	any pseudo-instructions used to generate constants<br><br>
 
@@ -933,7 +932,7 @@ a_name(1)	99*65536
 
 </pre>
 Macros generate and use labels which are discarded at the end of the macro expansion.
-Labels only remain available to the calling level of assembly if they are promoted
+Labels only remain available to the invoking level of assembly if they are promoted
 with trailing asterisk
 <pre>
 
@@ -1014,9 +1013,8 @@ $
 
 </pre>
 
-<h2>4.2: Command and Arguments>/h2>
-<h3>4.2.1: Expressions</h3>
-<h4>4.2.1.1: Operators</h4>
+<h2>4.2: Expressions</h2>
+<h3>4.2.1: Operators</h3>
 	
 Operators by rank are
 
@@ -1164,11 +1162,11 @@ MASMX 7r3
 
 
 
-<h4>4.2.1.2: Tokens</h4>
+<h3>4.2.2: Tokens</h3>
 
-<h4>4.2.1.2.1: Number Strings</h4>
+<h4>4.2.2.1: Number Strings</h4>
 
-<h4>4.2.1.2.1.1: masmx Default Number and String Notation</h4>
+<h4>4.2.2.1.1: masmx Default Number and String Notation</h4>
 
 Native masmx interprets number strings with leading zero as hex or
 octal, depending $octal or default $hex directives. Leading digit
@@ -1316,7 +1314,7 @@ beginning with $ or @ unless they are referenced in quotes
 
 
 
-<h4>4.2.1.2.1.3:  C-Language Number and Character String Notation</h4>
+<h4>4.2.2.1.2:  C-Language Number and Character String Notation</h4>
 
 With Assembly Flag -c 1000 and 0x3e8 both mean one thousand and
 leading zero is otherwise octal
@@ -1347,7 +1345,7 @@ MASMX 7r3
 
 </pre>
 
-<h4>4.2.1.2.1.4:  Motorola Old Number Notation</h4>
+<h4>4.2.2.1.3:  Motorola Old Number Notation</h4>
 
 Flag -m interprets
 <pre>
@@ -1357,7 +1355,7 @@ Flag -m interprets
 	%bit_image
 
 </pre> 
-<h4>4.2.1.2.1.5:  Suffix-Determined Number Notation</h4>
+<h4>4.2.2.1.4:  Suffix-Determined Number Notation</h4>
 
 Directive $suffix 2 interprets upper or lowercase last column of the number string
 <pre>
@@ -1376,7 +1374,7 @@ words suffix [s d l t q p h o]. See 4.2.2.3: Number constants
 
 
 
-<h4>4.2.1.2.2: Label References</h4>
+<h4>4.2.2.2: Label References</h4>
 
 
 Labels of any type (storage location line labels, equates, function
@@ -1444,9 +1442,9 @@ QDELIM='
 </pre>
 
 
-<h4>4.2.1.2.3: masmx-Supplied Functions</h4>
+<h4>4.2.2.3: masmx-Supplied Functions</h4>
 
-See also 4.6 masmx Internal Functions in Detail.
+See also 4.7 masmx Internal Functions in Detail.
 Internal functions are in summary:
 <pre>
 
@@ -1507,7 +1505,7 @@ Internal functions are in summary:
 
 
 </pre>
-<h4>4.2.1.2.4: Function Macro Reference</h4>
+<h4>4.2.2.4: Function Macro Reference</h4>
 
 Function macros deliver a value to assembly-time expressions
 
@@ -1560,13 +1558,13 @@ log2.msm=0<000003
 
 </pre>
 
-The assembly at 4.2.1.2.5 shows a function macro $net_ipv4 delivering a value which represents
+The assembly at 4.2.2.5 shows a function macro $net_ipv4 delivering a value which represents
 a network address composed from dotted decimal text
 
 <p>
 For more information on the construction of function macros see 4.2.5: Function Macros
 
-<h4>4.2.1.2.5: Macro Parameters</h4>
+<h4>4.2.2.5: Macro Parameters</h4>
 
 
 Macro actual arguments are accessed by using the label of 
@@ -1687,7 +1685,7 @@ address_B	$net_socket	172.29.6.8:23
 </pre>
 
 
-<h3>4.2.2: The Command Field</h3>
+<h3>4.3: The Command Field</h3>
 
 
 The command field (the first field which is preceded by any
@@ -1701,7 +1699,7 @@ of a $proc macro, or the name of a $form template.
 
 
 
-<h3>4.2.1 Directives</h3>
+<h3>4.3.1 Directives</h3>
 
 
 Directives are commands to the assembler. They are listed in Section 8: Directives
@@ -1778,10 +1776,10 @@ of a macro
 
 
 
-<h3>4.2.2: Storage Constants</h3>
+<h3>4.3.2: Storage Constants</h3>
 
 For complex data constants see section 5: Iterated Code and Structured Data
-and 4.2.3: $proc Macro Calls: Instructions and Structures 
+and 4.3.7: $proc Macro Calls: Instructions and Structures 
 
 <p>
 Simple data constants may be integers, microstructures of bit fields, 
@@ -1791,11 +1789,11 @@ floating numbers or text strings.
 </pre>
 
 
-<h4>4.2.2.3 Number Constants</h4>
+<h4>4.3.3 Number Constants</h4>
 
 Number item constants are assembled from an expression in the command
 field or a unary sign in the command field and an expression in the
-operand field
+argument field
 <pre>
 
 	+	INSTANCES*FACTOR
@@ -2085,7 +2083,7 @@ Floating numbers can be cached as label values and manipulated bitwise
 into the floating format of the target architecture
 <pre>
 
-	floating_value	$set	16384.0e+1000000
+floating_value	$set	16384.0e+1000000
 
 </pre>
 masmx internal floating precision is 192 bits with 168-bit simple fraction
@@ -2188,7 +2186,7 @@ can be escaped with macro language
 Macros supplied in this package generate IEEE754 floating constants. 
 
 <p>
-See Section 10: masmx Internal Floating Format and Alternative Floating Formats
+See Section 11: masmx Internal Floating Format and Alternative Floating Formats
 
 <p>
 This example generates the value 1.375e+1200000 with various typing.
@@ -2338,7 +2336,7 @@ If the number of fields does not divide into the total size,
 zero-filled slack bits are generated at the top.
 
 
-<h4>4.2.2.5: Text Strings</h4>
+<h3>4.3.5: Text Strings</h3>
 
 
 Text strings are a row of bytes composed from
@@ -2481,7 +2479,7 @@ See also Appendix F.4: Byte-Addressing Machines with 32- and 64-bit
 Bus, Managing Alignments
 
 
-<h4>4.2.2.6: $FORM Items</h4>
+<h3>4.3.6: $FORM Items</h3>
 
 $FORM declares a bit layout template from one word to 192 bits in size.
 The command field when using a form is the label of the $FORM:
@@ -2676,23 +2674,16 @@ $proc macros are described in detail with application to instruction
 code definition in Section 6.2: Describing Target Architecture in Text
 
 
-<h2>4.3: The Argument Field</h2>
+<h2>4.4: The Argument Field</h2>
 
 
-
-<h3>4.3.1: Instruction Operands and Storage Constant Arguments</h3>
-
-An argument to a macro or to a $form bitfield template is an expression
-or a literal reference
-
-
-<h4>4.2.3.1 Expressions</h4>
+<h3>4.4.1 Argument Expressions</h3>
 
 An argument expression generates a value which fits a target field,
 for example an operand field of an instruction
 <pre>
 
-		lwz	STORAGE_WORD_ADDRESS	; STORAGE_WORD_ADDRESS is an operand expression
+		lwz	r6, STORAGE_WORD_ADDRESS	; r6 and STORAGE_WORD_ADDRESS are operand expressions
 
 </pre>
 
@@ -2701,18 +2692,17 @@ Argument field expressions may have any tokens and operators which
 constant expressions have, except for words-size tags
 
 <p>
-The target field size in the instruction or structure named in the
-command field is the bitsize of the argument expression destination
+The size of the expression value is its target field size in the
+instruction or structure at the command field
 
 
-<h4>4.2.3.2: Literal Arguments</h4>
+<h3>4.4.2: Literal Arguments</h3>
 
-
-Literals are constants generated by reference. The address of a
-literal operand is placed in the address field of the instruction
+Literals are constants of any size generated by reference. The address
+of a literal operand is placed in the address field of the instruction
 <pre>
 
-	ld    r24, .literal_pool_name(0FFFC0000A000C000)
+	ld    r24, .literal_pool_name(0FFFC0000A000C000L)
 
 </pre>
 
@@ -2731,13 +2721,13 @@ automatic literal
 	add	r21, (LARGE_VALUE)
 
 </pre>
-See 4.2.4.3: Automatic Literals
+See 4.5.3: Automatic Literals
 
 <p>
-Literals are typically used where an operand value is beyond the range of values
-which may be placed in the operand field of an instruction as an immediate. Literals
-may also be referenced from constants which are not instruction code. In this example,
-an instruction points to a literal constant which points to another literal constant
+Literals are typically used where a value is too large to be encoded as an immediate
+operand within an instruction. Constants which are not instruction code may also 
+reference literals. In this example an instruction points to a literal constant which
+points to another literal constant
 <pre>
 
 $ masmx -lnky
@@ -2775,10 +2765,10 @@ $(.data:16384)
 </pre>
 
 
-<h3>4.2.4: Literals</h3>
+<h2>4.5: Literals</h2>
 
 
-<h4>4.2.4.1: A Literal is</h4>
+<h3>4.5.1: A Literal is</h3>
 
 
 A literal is a constant generated by reference. It is assembled at the
@@ -2788,10 +2778,10 @@ or structure which references it
 
 <p>
 Literals are not duplicated in any one program section. References requiring
-the same value read the same literal
+the same value retrieve the same literal
 
 
-<h4>4.2.4.2: The Literal Pools</h4>
+<h3>4.5.2: The Literal Pools</h3>
 
 
 Each of the 72 location counters may have one literal pool.
@@ -2799,14 +2789,14 @@ Each of the 72 location counters may have one literal pool.
 <p>
 If a location counter is breakpointed (the section is restarted
 with breakpoint steps within  the same location counter), each part
-has a literal table.
+may have a literal table.
 
 <p>
-Only 64 breakpoint parts of a section may have literal tables
+Only the first 64 breakpoint parts of a section may have literal tables
 
 
 
-<h4>4.2.4.3: Automatic Literals</h4>
+<h3>4.5.3: Automatic Literals</h3>
 
 Automatic literals are literals which are generated
 in the current default literal pool without referencing 
@@ -2814,33 +2804,35 @@ a literal pool tag.
 
 <p>
 The default literal pool is at the segment-end of the default
-location counter for literals.
+location counter for literals, initially locator $(0).
 
 <p>
-Option -a must be on to allow automatic literals.
+Command line flag -a opts automatic literals. Assembly source
+may set this and most other option flags, typically in target
+definition header files
+<pre>
 
-<p>
-Automatic literals are generated if any field in certain
-kinds of source lines is entirely in parentheses.
+	$set_option	"a"
+
+</pre>
+Automatic literals are then  generated if subfields in most
+source line positions are entirely in parentheses
 
 <p>
 Mostly these source lines are instructions, where the command
 is a macro which generates code under the control of a $FORM:
 <pre>
 
-	Load    r24, (0FFFC0000)
+	Load    r24, (0FFFC0000s)
 
 </pre>
-The fields generated to fill the $FORM are tested for automatic literal
-syntax when -a flag is on.
-
 <p>
 In that example, 0FFFC0000 is generated at the end of the assembly or
 location counter breakpoint. The address of the literal goes in the
 load instruction.
 
 <p>
-A unary plus in front of the opening parenthesis prevents an expression
+A unary sign in front of the opening parenthesis prevents an expression
 from being an automatic literal
 <pre>
 
@@ -2851,7 +2843,7 @@ from being an automatic literal
 to place value EXPRESSION in the address field of the instruction.
 
 
-<h4>4.2.4.4: Indirection Flag on a Literal</h4>
+<h3>4.5.4: Indirection Flag on a Literal</h3>
 
 Unary * on arguments is widely used to represent an indirection
 flag in binary code. masmx allows macro text to retrieve * at
@@ -2867,7 +2859,7 @@ A literal containing VERY_BIG_ADDRESS is generated
 Macro language places the address of the literal in the instruction.
 Macro language retrieves flag value1 or 0 for unary * 
 
-<h4>4.2.4.5: Literal Pool Tags</h4>
+<h3>4.5.5: Literal Pool Tags</h3>
 
 
 Literal Pool Tags are labels of literal pools, and referencing them
@@ -2894,7 +2886,7 @@ lits7  $LIT    7
 
 </pre>
 
-<h4>4.2.4.6: The $LIT Directive</h4>
+<h3>4.5.6: $lit Directive</h3>
 
 
 $LIT may have a label and may have an argument.
@@ -2917,14 +2909,30 @@ are generated without referencing a literal
 pool tag).
 
 <p>
-If $LIT has a label, the label becomes a literal
+If $lit has a label, the label becomes a literal
 tag for the literal pool.
 
 
-<h4>4.2.4.7: Nested Literals</h4>
+<h3>4.5.7: Nested Literals</h3>
 
 <p>
-It's possible to generate nested literals, but this may not be intended.
+It is possible to generate nested literals.
+
+There is an example of how this might usefully be done at
+4.4.4: Literal Arguments. The two-word literal at 0500C contains a
+byte count and a pointer to a string literal at 05000
+<pre>
+
+01:00002000 E860500C          +1122         ld      r3, (12, ("Hello World\n")d)
+[+0000:00000000/*02]18*/02
+01:00002004 48000003          +1123  bla message
+  :                            1124 $(.data:16384)
+  :                            1125  $res 4096
+  :                            1126  $end
+03:00005000+48656C6C6F20576F726C640A
+03:0000500c+0000000C00005000
+
+</pre>
 The nested literal is only generated if it both begins and ends with
 parenthesis. The opening parenthesis may have a flag * token in front:
 <pre>
@@ -2976,11 +2984,11 @@ MASMX 7r2
 
 
 </pre>
-<h1>4.5: Function Macros</h1>
+<h2>4.6: Function Macros</h2>
 
 Operand expressions may include user function macros,
 
-<h2>4.5.1: A User Function Is</h2>
+<h3>4.6.1: A Function Macro is</h3>
 
 Functions are not code subroutines (as they are in C-Language).
 
@@ -2991,7 +2999,7 @@ masmx functions are macros which return values at assembly time.
 User written functions return a computed value for use in an expression.
 
 <p>
-Functions mostly contain directives, because they don't
+Functions mostly contain directives, because they do not primarily
 generate code: 
 <pre>
 
@@ -3007,10 +3015,10 @@ simplog*	$func
 
 
 </pre>
-<h3>4.5.2: Directives for Constructing Functions</h3>
+<h3>4.6.2: Directives for Constructing Functions</h3>
 
 
-<h4>4.5.2.1: $FUNC -head of function</h4>
+<h4>4.6.2.1: $FUNC -head of function</h4>
 <pre>
 
 function_name  $FUNC
@@ -3081,7 +3089,7 @@ a second-pass-only function
 
 
 
-<h4>4.5.2.2: $NAME -entry point and invocation tag</h4>
+<h4>4.6.2.2: $NAME -entry point and invocation tag</h4>
 
 It's easier to code functions (like $PROCs) if
 they all have the same name. But it's easier to
@@ -3124,7 +3132,7 @@ Labels or anything else in quotes inside a macro body can be
 constructed to include macro parameters.
 
 
-<h4>4.5.2.3: $RETURN -value of result</h4>
+<h4>4.6.2.3: $RETURN -value of result</h4>
 
 
 The argument of $RETURN is an expression.
@@ -3139,7 +3147,7 @@ macros as well as $FUNC macros, although $PROC macros do not have
 a result value.
 
 
-<h4>4.5.2.4: $END -foot of function</h4>
+<h4>4.6.2.4: $END -foot of function</h4>
 
 $END is the last command on any subassembly.
 A $FUNC is a subassembly (a macro):
@@ -3153,7 +3161,7 @@ f       $func
 
 </pre>
 
-<h3>4.5.3: Code Generated During Function Evaluation</h3> 
+<h3>4.6.3: Code Generated During Function Evaluation</h3> 
 
 Code can't be generated inline to the current
 location counter during a $FUNC. That's treated
@@ -3187,12 +3195,12 @@ generate* $name
 
 </pre>
 
-<h2>4.6: masmx Internal Functions in Detail</h2>
+<h2>4.7: masmx Internal Functions in Detail</h2>
 
 
+<h3>4.7.1: $	location counter</h3?
 
-
-<h3>4.6.1: $	this location counter</h3>
+<h4>4.7.1.1: $	this location counter</h4>
 
 The expression $ returns the value of the current location counter. 
 For example the sequence
@@ -3244,7 +3252,7 @@ tube	$equ	$+1
 
 </pre>
 
-<h3>4.6.2: $(..)	named location counter</h3>
+<h4>4.7.1.2: $(..)	named location counter</h4>
 
 The expression $(..) returns the value of the location 
 counter identified in the brackets. For example the sequence
@@ -3261,17 +3269,49 @@ CONSTANT        +       $(1)+3
 The data word at location CONSTANT to contains the value 4103
 
 
-<h3>4.6.3: $a -absolute address</h3>
+<h3>4.7.2: $a	absolute address</h3>
 
-Simple reference to base-displacement addresses retrieve a displacement and
-base tuple excluding the section start address
-
-<p>
-$a is the absolute address relative to the program space. In base-displacement
-sections $a adds the base if that is known from an absolute location counter.
+$a is the absolute address relative to the program space
 
 <p>
-$a function retrieves future absolute addresses in relocatable segments.
+Constants of base-displacement labels and location counters only contain
+the displacement. $a adds the section base whether it is already known or
+relocatable
+
+<h4>4.7.2.1: $a	current absolute address</h4>
+
+$a without parameter is the current absolute address. Here $a value is shown
+beside the displacement value in $
+<pre>
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$word	16
+$(44:0FC00,5)
+	$res	10
+	+	$, $a:L
+	$end
+  :                            1  $word 16
+  :                            2 $(44:0FC00,5)
+  :                            3  $res 10
+2C:000A 000AFC0A              +4  + $, $a:L
+  :                            5  $end
+:$(2C):FC00:FC0C 
+
+
+</pre>
+<p>
+
+$a constants may be within macro text invoked in many different program sections
+with known or relocatable base address
+
+<p>
+$a also generates constants pointing to a base-displacement segment which is relocatable.
+The first $a(expression) example following illustrates
+
+
+<h4>4.7.2.2: $a(..)	absolute value of expression</h4>
 <pre>
 
 $ masmx -lnkx
@@ -3338,19 +3378,36 @@ $a has no function for addresses in void segments, where the base
 register value is runtime dynamic
 
 <p>
-A breakpoint value in the locator declaration can indicate a hardware
-translation or index known in advance for addresses which are already
-linker-absolute
+A breakpoint value in the locator declaration indicates a physical
+segment load address known in advance. It is seen here than in
+base-displacement $a retrieves the program-absolute address, $
+retrieves the displacement only, and the physical load address
+is not accessed
 <pre>
 
-	$(17:PROGRAM_VISIBLE_ADDRESS:HARDWARE_LOAD_ADDRESS)
+$ masmx -lnkyx
+MASMX 7r3
+0/-INPUT>>
+	$word	32
+	$quantum 8
+$(12:0C000:0FC0000,5)
+	+	identify, $a(identify)d
+	$res	40
+identify
+	$end
+  :                            1  $word 32
+  :                            2  $quantum 8
+  :                            3 $(12:0C000:0FC0000,5)
+0C:00000000 000000300000C030  +4  + identify, $a(identify)d
+  :                            5  $res 40
+  :                            6 identify
+  :                            7  $end
+identify=$0C:00000030,00000005
+-INPUT>>=0<00000000
+:$(0C):0000C000:0000C030 
 
 </pre>
-$a retrieves PROGRAM_VISIBLE_ADDRESS and <i>not</i> HARDWARE_LOAD_ADDRESS.
-A separate function $bank_index retrieves that
-
-<p>
-A starred breakpoint address is not a hardware translate or index but part of
+A starred breakpoint address is not a load address translation value or index but part of
 program-visible addresses in the section. $a retrieves the large absolute value
 <pre>
 
@@ -3378,8 +3435,6 @@ here=$0E:0000000A,00000014
 
 </pre>
 
-
-If the constant overflows, the link step fails with an error message.
 
 
 
@@ -5619,6 +5674,8 @@ $(3:40960)	. locator $(3) concerns addresses from 40960
 Listings show the program-logical addresses. To see the load
 addresses instead, use the -d flag as well as the -l flag
 
+Program code never accesses the physical load
+address except via masmx internal function $bank_index (Section 4.6.5)
 
 <h4>7.1.2.2: The Breakpointed Location Counter: -v Option</h4>
 
@@ -14173,10 +14230,10 @@ $24:00000028
 
 </pre>
 
-<h1>5: masmx Internal Floating Format and Alternative Floating Formats</h1>
+<h1>11: masmx Internal Floating Format and Alternative Floating Formats</h1>
 
 
-<h2>5.1: masmx Floating Format</h2>
+<h2>11.1: masmx Floating Format</h2>
 
 The default masmx floating number is the the 192-bit
 value rounded to 96 bits with 23-bit midpointed exponent
@@ -14200,10 +14257,10 @@ but the scheme
 </pre>
 is only changed with macro language
 
-<h2>5.2: IEEE754 Floating Values</h2>
+<h2>11.2: IEEE754 Floating Values</h2>
 
 
-<h3>5.2.1: Differences between masmx FLoating Format at IEEE754 Floating Formats</h3>
+<h3>11.2.1: Differences between masmx FLoating Format at IEEE754 Floating Formats</h3>
 
 <p>
 This package contains macros for assembling 128-bit,  64- and 32-bit
@@ -14308,7 +14365,7 @@ MASMX 7r2
 
 </pre>
 
-<h3>5.2.2: Macro-Language Generation of IEEE754 FLoating Constants</h3>
+<h3>11.2.2: Macro-Language Generation of IEEE754 FLoating Constants</h3>
 
 The macro language for generating IEEE754 floating values is shown here.
 

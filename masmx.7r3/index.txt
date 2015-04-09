@@ -357,7 +357,7 @@
 		in Giant Address Space					9.2.3.10
 
 
-11. Describing Target Architecture in Text				11
+10. Describing Target Architecture in Text				11
 
     1.  Establishing Your Syntax					11.1
     2.	Describing the Target Architecture				11.2
@@ -375,7 +375,7 @@
 	1.  Synthesising Legacy Functional Macros			11.3.1
 	2.  Synthesising Legacy Command Macros				11.3.2
 
-10. masmx Internal Floating Format and Alternative Floating Formats	10
+11. masmx Internal Floating Format and Alternative Floating Formats	10
     1.	masmx Floating Format						10.1
     2.	IEEE754 Floating Values						10.2
 	1.  Differences between masmx FLoating Format and IEEE754 Floating Formats
