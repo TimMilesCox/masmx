@@ -5593,14 +5593,14 @@ But the breakpointed value pointing to a hardware-relocated location
 has the syntax
 <pre>
 
-$(id:logical_base_address:absolute_address)
+$(id:logical_base_address:physical_address)
 
 </pre>
 Load addresses are computed from breakpointed segment start plus offset
 minus base.
 
 <p>
-But references are relative to the logical base only (the first address).
+Code references are relative to the logical base only (the first address).
 <pre>
 
 $(5::SEGMENT1)
@@ -5649,7 +5649,7 @@ $(0::PHYS_PAGE1)
 $(0::PHYS_PAGE2)
 .	program address space 0..4095
 .
-$(5:5*4096:PHYS_PAGE3)
+$(5:20480:PHYS_PAGE3)
 .	program address space 20480..240575
 .
 $(4:16384:PHYS_PAGE32)
@@ -5701,7 +5701,27 @@ separate interpretation
 Listings show the program-logical addresses. To see the segment selectors
 and offsets instead, use the -d flag as well as the -lv flags
 
+<pre>
 
+$ masmx -lnkxyv
+MASMX 7r3
+0/-INPUT>>
+	$set_option	"d"
+$(4:04000:99)
+	$res	10
+	+	$
+	+$a
+	$end
+  :                            1  $set_option "d"
+  :                            2 $(4:04000:99)
+  :                            3  $res 10
+04:000063:00000A 00400A       +4  + $
+04:000063:00000B 00400B       +5  +$a
+  :                            6  $end
+-INPUT>>=0<000000
+:$(04):004000:00400C 
+
+</pre>
 
 <h3>7.1.3: Simple Location Counter without Breakpoint:
 	 Base+Displacement in Flat Address Spaces</h3>
@@ -5777,7 +5797,7 @@ assembly time.
 
 <p>
 Absolute here means linker-absolute not physically relocated. The
-breakpoint address does not change code's view of the data section
+breakpoint address does not change code's view of the storage sections
 
 <p>
 The physical address HARDWARE_LOADA is not visible to the code but is
@@ -5957,23 +5977,105 @@ pusingv.msm: object code 18447 bytes: 0 errors: 0 undefined labels
 <h4>7.1.6.1: Very Large Direct Addressed Segments</h4>
 
 If breakpoint is prefixed with an asterisk, it is a
-*large_direct_base_address:
+<i>*giant_breakpoint</i> 
 <pre>
 
-$(id:address:*large_direct_base_address,base_register/literal_pool_tag)
+$(id:<i>base</i>:*<i>giant_breakpoint</i>[,base_register][/literal_pool_tag])
 
 </pre>
-This *large_direct_address_base may be up to 192 bits wide, according
-to the second value in the $AWIDTH declaration, for example:
-<pre>
-
-	$AWIDTH	32:128
-
-</pre>
-which can be seen in the example below:
+<p>
+<i>giant_breakpoint</i> is an address expression up to 192 bits wide.
 
 <p>
-An array spanning many times 4 gigaquanta may therefore be declared.
+displacements within the breakpointed part may only reach four gigaquanta beyond <i>base</i>,
+but the section may have billions of breakpointed parts at locations up to
+0FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF (4 tera-peta-peta-petaquanta
+or 4 giga-yotta-yottaquanta)
+
+<p>
+Linear load addresses in the breakpointed part start at <i>base</i> plus <i>giant_breakpoint</i>
+
+<p>
+The radix of <i>giant_breakpoint</i> is the linear address space of the target architecture,
+for PowerPC64 64 bits
+<pre>
+
+	$awidth	32:64
+
+</pre>
+Load code and label references are in one linear space. Each breakpoint part may start at the
+exact giant address reached in the previous part. This example is a linking assembly which
+catenates four relocatables each containing space of three gigabytes. Load code is distributed
+sparsely in this assembly
+<pre>
+
+$ masmx globules -lnkydx
+MASMX 7r3
+3/globules.msm
+../result.txo/globule1.txo:$(25) 3221225476 bytes decimal from hexadecimal 00000000 to C0000004 +000FC00A80000028
+../result.txo/globule2.txo:$(25) 3221225476 bytes decimal from hexadecimal 00000000 to C0000004 +000FC00B4000002C
+../result.txo/globule3.txo:$(25) 3221225476 bytes decimal from hexadecimal 00000000 to C0000004 +000FC00C00000030
+../result.txo/globule3.txo:$(27) 8 bytes decimal from hexadecimal 00000000 to 00000008 +000FC010000B0000
+../result.txo/globule4.txo:$(25) 3221225476 bytes decimal from hexadecimal 00000000 to C0000004 +000FC00CC0000034
+*EOF*
+  :                            1: 	$include	../aside.dem/ppc64map.def
+  :                            2 
+  :                            3 $(27::*000FC010000B0000)
+  :                            4 $(25::*000FC00A80000000)
+19:000FC00A80000000:000FC00A80000028
+                              +5 	+	globule1:d
+19:000FC00A80000008:000FC00B40000030
+                              +6 	+	globule2:d
+19:000FC00A80000010:000FC00C00000030
+                              +7 	+	globule3:d
+19:000FC00A80000018:000FC00CC0000038
+                              +8 	+	globule4:d
+19:000FC00A80000020:000FC00D80000038
+                              +9 	+	tally:d
+  :                            10 	$list	2
+  :                            11 $(25::*$)
+  :                            12: 	$include,$binary	../result.txo/globule1
+19:000FC00B40000028:0000005A  +4 0000005A
+  :                            13 $(25::*$)
+  :                            14: 	$include,$binary	../result.txo/globule2
+19:000FC00B4000002C:0000005B  +4 0000005B
+  :                            15 $(25::*$)
+  :                            16: 	$include,$binary	../result.txo/globule3
+19:000FC00CC0000030:0000005C  +4 0000005C
+1B:000FC010000B0000:6162636465662020
+                              +7 6162636465662020
+  :                            17 $(25::*$)
+  :                            18: 	$include,$binary	../result.txo/globule4
+19:000FC00CC0000034:0000005D  +4 0000005D
+  :                            19 $(25::*$)
+19:000FC00D80000038:00000063  +20 tally	+	99
+  :                            21 rally	$equ	$
+*EOF*
+$map=:N129:P:0:00000000
+drastique+=$1B:000FC010000B0000
+globule1+=$19:000FC00A80000028
+globule2+=$19:000FC00B40000030
+globule3+=$19:000FC00C00000030
+globule4+=$19:000FC00CC0000038
+rally=$19:000FC00D8000003C
+tally=$19:000FC00D80000038
+trip1+=$19:000FC00B40000028
+trip2+=$19:000FC00B4000002C
+trip3+=$19:000FC00CC0000030
+trip4+=$19:000FC00CC0000034
+../result.txo/globule4.txo=1<00000005
+../result.txo/globule3.txo=1<00000005
+../result.txo/globule2.txo=1<00000005
+../result.txo/globule1.txo=1<00000005
+../aside.dem/ppc64map.def=1<00000005
+globules.msm=0<00000003
+
+@:000FC00D80000038:$(19):00000000:00000004 
+@:000FC010000B0000:$(1B):00000000:00000008 
+
+</pre>
+Another example shows 128-bit addressing, covering potentially
+256 exa-exaquanta
 <pre>
 
 	$word	32
@@ -6010,47 +6112,13 @@ subscript	$do	HOW_MANY,	newpart
 Object Code 5264032 Bytes: 0 Errors: 0 Undefined Labels
 
 </pre>
-Some limitations may be encountered, and there are ways to go
-beyond them.
-
-<p>
-Firstly, if you have terabillions of array elements instead of
-just 112000, you could not put labels on all of them. The labels
-"part(1)" thru "part(112000)" exist during the above assembly.
-
-<p>
-This is not really a restriction, because applications do not
-address array elements through unique labels. They compute offsets
-and add them to the table base address.
-
-<p>
-Secondly, if you generate load information for many billions of
-locations in an array, you may not have a file system which can
-hold the output files, unless the file system is implemented in system memory.
-This in turn would mean that the application is assembled
-every time it's run, so it might in any case be more practical to
-construct truly astronomic arrays at application run time.
-
-<p>
-masmx has a concept of a normal address space, where each location
-counter addresses up to 4 gigaquanta, and a an increment of up to
-192 bits which may be iteratively stepped.
-
-<p>
-The $awidth directive in the example shows an intra-segment address
-space of 32 bits (4 gigabytes) and a maximum address space of 128 bits.
-<pre>
-
-	$awidth	32:128
-
-</pre>
 In the above example, location counter 45 starts at an address of
 5*/96 (five times 65536 tera tera bytes) and is stepped 112000 times
 by one gigabyte.
 
 <p>
-The extension value is not catenated but added, rightmost bit to
-rightmost bit
+The giant breakpoint value is not catenated but added to the location
+counter rightmost bit to rightmost bit to obtain absolute addresses
 <pre>
 
                                                    _______________
@@ -6061,54 +6129,47 @@ rightmost bit
 
 
 </pre>
-The values which go in location labels and in load strings are the sum of
-the location counter value at the point where label is declared,
-plus the step value.
-
-<p>
-The address space is flat although it may be used to represent
-a segmented space. Labels pointing into a giant space contain the
-whole address.
-
-<p>
-See also option flag -i, sign extended addressing (Section 3.2: Command
-Line Options).
+The addresses values in location labels and in load strings are
+the sum of the location counter plus step or giant breakpoint value.
 
 
 <h4>7.1.6.2: Very Large Load Address Base-Displacement Examples</h4>
 
 	<blockquote>
+        <b>
 	Giant Absolute Address Base-Displacement Example<br>
 	With Static Base-Displacement Referencing
+	</b>
 	</blockquote>
 
 This example is described as static because the base-displacement
 construct and the code-generating segment are assembled together.
 
 <p>
-Nevertheless the base register has to be loaded at runtime.
+Base register r15 is loaded to access the first part of the array
 
 <p>
 Whether ,register is given for base-displacement or not, giant
 addressing is specified by a giant breakpoint flagged with *
 <pre>
 
-$(id:base:*giant_breakpoint,register[/literal_pool])
+$(id:<i>base</i>:*<i>giant_breakpoint</i>,<i>register</i>[/literal_pool])
 
 </pre>
-Where <b>,register</b> is also given then base-displacement label references
+Where <i>register</i> is also stated base-displacement label references
 are generated.
 
 <p>
-giant_breakpoint is an address expression up to 192 bits wide.
+<i>giant_breakpoint</i> is an address expression up to 192 bits wide.
 
 <p>
-displacements may only be 32 bits in size, but giant_breakpoint up to 192
-bits wide may be set to new values billions of times.
+displacements within the breakpointed part may only reach four gigaquanta beyond <i>base</i>,
+but the section may have billions of breakpointed parts at locations up to
+0FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF (4 tera-peta-peta-petaquanta
+or 4 giga-yotta-yottaquanta)
 
 <p>
-Addresses progressing from base are added to giant_breakpoint
-to give load addresses.
+Linear load addresses in the breakpointed part start at <i>base</i> plus <i>giant_breakpoint</i>
 
 <pre>
 
@@ -6144,8 +6205,10 @@ modest.msm: object code 217 bytes: 0 errors: 0 undefined labels
 </pre>
 
 	<blockquote>
-	Giant Absolute Address Data Example
-	with Dynamic Base-Displacement Referencing
+        <b>
+	Giant Absolute Address Data Example<br>
+	with Dynamic Base-Displacement Reference
+	</b>
 	</blockquote>
 
 This example is described as dynamic because the base-displacement
@@ -6249,38 +6312,32 @@ as a dsect. That's a base-displacement segment with no addresses
 and no relocation rule.
 
 <p>
-Where a /literal_pool_tag appears in the location counter control
+Where <i>/literal_pool_tag</i> appears in the location counter control
 <pre>
 
-$(id[:base][:breakpoint][,base_register]/literal_pool_tag)
+$(id[:base][:breakpoint][,base_register]/<i>literal_pool_tag</i>)
 
 </pre>
 or
 <pre>
 
-$(id[:*relocation_alignment][,base_register]/literal_pool_tag)
+$(id[:*relocation_alignment][,base_register]/<i>literal_pool_tag</i>)
 
 </pre>
-<b>/literal_pool_tag</b> gives a handle to the literal pool in the counter.
+<i>literal_pool_tag</i> gives a handle to the literal pool in the counter.
 
 <p>
-Literals are steered into a particular section or location counter by
-referencing the section's literal_pool_tag(when_declaring_a_literal)
+Literals are assigned to a specific program section by reference to the tag
+<pre>
+ 
+	<i>literal_pool_tag</i>(LITERAL_VALUE)
 
-<p>
-Where automatic literals are enabled with -a flag, untagged literals
-go in the current (see 8.29: $LIT directive) default segment for literals.
-
-<p>
-Without -a flag, literals can only be generated via literal-pool-tag.
+</pre>
+Without -a flag, literals can only be generated via literal-pool-tag. See
+4.5: Literals
 
 <p>
 The literals are produced at the end of the section or section breakpoint.
-
-<p>
-Identical literals within a segment only happen once. All the references
-get the same literal within one breakpointed part (that's within the whole
-section if there isn't any breakpointing).
 
 <p>
 For example, in the definition header "8051.def":
@@ -6315,18 +6372,21 @@ $(.array::BASE+OFFSET/$literals_tag)
 
 <pre>
 
-$(id:*alignment[:initial_offset][,base_reg][/literal_pool_tag])
+$(<i>id:*alignment[:initial_offset][,base_reg][/literal_pool_tag]</i>)
 
 </pre>
-id is the number 0..71 of the location counter
+<i>id</i> is the number 0..71 of the location counter
 
 <p>
-*alignment identifies relocatable code. It gets rounded to the
+<i>*alignment</i> identifies relocatable code. It gets rounded to the
 containing power of 2. *alignment is recognised by leading asterisk.
 
 <p>
-initial_offset is optional. It declares a hole or unlabelled buffer
+<i>initial_offset</i> is optional. It declares a hole or unlabelled buffer
 at the front of the segment. initial_offset is usually absent = zero.
+
+<p>
+<i>base_register</i> and <i>literal_pool_tag</i> are optional
 
 <p>
 The first section in the following assembly, $(33) at line 3
@@ -6346,11 +6406,11 @@ are base+displacement
 <p>
 The code in the segment will be relocated and pointers to it
 updated with relocation information (line 11), but base-displacement
-references (line 15) are never relocatable
+references (lines 15, 17) are never relocatable
 
 <pre>
 
-$ masmx ragaline -lnk
+$ masmx -lnk ragaline
 MASMX 7r3
 3/ragaline.msm
 LTERM=#
@@ -6362,7 +6422,7 @@ STERM=.
   :                            3 $(33:*8)                                  
 21:00000000 3FF8000000000000  +4 one	ieee754_64	1.5
 21:00000008 3FFC000000000000  +5 two	ieee754_64	1.75
-  :                            6 $(34:*8,30)
+  :                            6 $(34:*8,30/.literals34)
 22:00000000 BFC8000000000000  +7 first	ieee754_64	-1.5
 22:00000008 BFC4000000000000  +8 second	ieee754_64	-1.75
   :                            9 $(.text:131072)
@@ -6375,9 +6435,11 @@ STERM=.
 01:00020010 C81E0008          +15 	lfd	0, second
 (+21)10
 01:00020014 C8400008          +16 	lfd	2, two
-  :                            17 
+01:00020018 C89E0010          +17 	lfd	4, .literals34(ieee754_64 37.5e-115)
+  :                            18 
 *EOF*
-:$(01):00020000:00020018 :$(21):00000000:00000010 :$(22):00000000:00000010 
+22:00000010+2862783DA15ED470
+:$(01):00020000:0002001C :$(21):00000000:00000010 :$(22):00000000:00000018 
 
 
 </pre>
