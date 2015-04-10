@@ -62,11 +62,12 @@
 	1.  A Function Macro is						4.6.1
 	2.  Directives used Constructing Functions			4.6.2
 	    1.	$FUNC	Function Head					4.6.2.1
+		1.  Second-Pass-Only Functions				4.6.2.1.1
+		2.  Non-Idempotent Functions				4.6.2.1.2
      	    2.	$NAME	Entry Point and Value Tag			4.6.2.2
 	    3.	$RETURN	Value of Result					4.6.2.3
 	    4.	$END	Function Foot					4.6.2.4
-	3.  Non-Idempotent Functions					4.6.3
-	4.  2nd Pass Only Functions					4.6.4
+	3.  Code Generated During Function Evaluation			4.6.3
 
     7.  masmx Internal Functions in Detail			 	4.7
 
@@ -145,7 +146,7 @@
 
 	1.  Simple Absolute Location Counters				7.7.1
 
-	1.  Breakpointed Location Counters				7.1.2
+	2.  Breakpointed Location Counters				7.1.2
 	    1.  Physical Address Offset					7.1.2.1
 	    2.  Breakpointed Location Counters: -v Option		7.1.2.2
 

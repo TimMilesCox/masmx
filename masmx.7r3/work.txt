@@ -29,6 +29,9 @@ See also the licensing notice at the foot of this document
 masmx is a freeware meta-assembler for any target.
 
 <p>
+masmx is easy to use
+
+<p>
 masmx can assemble absolute system images in one step from source.
 
 <p>
@@ -41,7 +44,24 @@ The cumulative linker constructs each program section as absolute or as a new re
 Integers and floating numbers are any format and size up to 192 bits
 
 <p>
-Address spaces are the size of any target architecture
+Memory spaces where code may be loaded and where instructions may access are,<br>
+subject to limits of target architecture, locations with linear address reaching
+
+	<blockquote>
+	0FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF
+	</blockquote>
+
+(4 tera-peta-peta-petaquanta or 4096 exa-exa-exaquanta or 4-giga-yotta-yottaquanta<br>
+of words or bytes, whichever the target address quantum is)
+
+<p>
+Memories with this order of size are not immediately foreseen, but masmx
+calculates and labels numbers of this size,<br> and there is no reason
+why the maximum of address radix should be less than the number radix
+
+<p>
+Segmented memory, base-displacement addressing, preprogrammed physical
+memory relocation and memory address translation are all supported
 
 <p>
 masmx has a slender native syntax, and interprets all other assembly
@@ -82,7 +102,7 @@ Typical masmx targets are low-power targets where as few instructions
 as possible are executed.
 
 <p>
-masmx saves on electronics and on energy. masmx may be used as the substance
+masmx saves electronics and energy. masmx may be used as the substance
 of thin-layer compilers. It makes the miniature more possible, and has the
 potential to multiply the performance of giant servers by ten- and twentyfold
 
@@ -184,11 +204,12 @@ Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	1.  A Function Macro is						4.6.1
 	2.  Directives used Constructing Functions			4.6.2
 	    1.	$FUNC	Function Head					4.6.2.1
+		1.  Second-Pass-Only Functions				4.6.2.1.1
+		2.  Non-Idempotent Functions				4.6.2.1.2
      	    2.	$NAME	Entry Point and Value Tag			4.6.2.2
 	    3.	$RETURN	Value of Result					4.6.2.3
 	    4.	$END	Function Foot					4.6.2.4
-	3.  Non-Idempotent Functions					4.6.3
-	4.  2nd Pass Only Functions					4.6.4
+	3.  Code Generated During Function Evaluation			4.6.3
 
     7.  masmx Internal Functions in Detail			 	4.7
 
@@ -550,7 +571,7 @@ Target architecture is described to masmx in macro language. See
 	<blockquote>
 	Section 3:  Getting Started<br><br>
 
-	Section 11: Describing Target Architecture in Text
+	Section 10: Describing Target Architecture in Text
 	</blockquote>
 
 <h2>1.2: Any Syntax</h2>
@@ -566,7 +587,7 @@ masmx interprets imported notation for code, data and even
 arithmetic and manipulation operators 
 
 <p>
-See Section 11.1: Establishing your Syntax
+See Section 10.1: Establishing your Syntax
 
 
 <h3>1.2.2:  Number String and Character String Notation</h3>
@@ -698,11 +719,11 @@ in section 11: masmx Floating Format and Alternative Formats and section
 11.2: IEEE754 Floating Formats
 
 
-<h2>1.6: Structured Data and Repeat Data</h2>
+<h2>1.6: Structured Data and Structured Code Name Spaces</h2>
 
 <h3>1.6.1:  Structured Data</h3>
 
-mamsx can construct complex hierarchical data. See section 5 Iterated Coded and
+mamsx can construct complex hierarchical data. See section 4.6 Iterated Coded and
 Structured Data
 
 
@@ -1766,7 +1787,7 @@ See also option -m, Motorola old Number Notation, and option -Q
 
 <p>
 
-A token in the command field only begins with a quote if it is a text string (4.2.2.5)
+A token in the command field only begins with a quote if it is a text string (4.3.5)
 
 <p>
 Directive names and macro names always are recognised in the command field without quotes
@@ -1788,12 +1809,11 @@ Simple data constants may be integers, microstructures of bit fields,
 floating numbers or text strings.
 
 
-</pre>
 
 
-<h4>4.3.3 Number Constants</h4>
+<h3>4.3.3 Number Constants</h3>
 
-Number item constants are assembled from an expression in the command
+Number storage constants are assembled from an expression in the command
 field or a unary sign in the command field and an expression in the
 argument field
 <pre>
@@ -1803,7 +1823,7 @@ argument field
 	-8.5
 
 </pre>
-Number items starting with a digit need no unary operator
+Number items starting with a digit or unary operator
 
 <p>
 Unary + - ^ prepended to the first token of the constant expression
@@ -1836,8 +1856,8 @@ MASMX 7r3
 :$(00):0000:0010 
 
 </pre>
-Number constants in apostrophe are in the current data code juxtaposed
-at the current $byte size
+Constants in apostrophe are character string values serving as numbers.  The bytes
+are right-justified in the current data code and juxtaposed at the current $byte size
 <pre>
 
 $ masmx -lnk
@@ -1880,14 +1900,14 @@ with names like DW and DD) as macros.
 Number constants may have trailing length overrides. Their meanings are
 <pre>
 
-:s or S = 1 * word size 
-:d or D = 2 * word size
-:l or L = 2 * word size
-:t or T = 3 * word size
-:q or Q = 4 * word size
-:p or P = 5 * word size
-:h or H = 6 * word size
-:o or O = 8 * word size
+	:s or S = 1 * word size 
+	:d or D = 2 * word size
+	:l or L = 2 * word size
+	:t or T = 3 * word size
+	:q or Q = 4 * word size
+	:p or P = 5 * word size
+	:h or H = 6 * word size
+	:o or O = 8 * word size
 
 </pre>
 Integers occupy their containing number of words in the absence of a length suffix
@@ -1986,7 +2006,7 @@ MASMX 7r3
 :$(00):0000:0003 
 
 </pre>
-$suffix-determined number notation (4.2.1.2: Number String Notation) masks
+$suffix-determined number notation (4.2.2.1: Number String Notation) masks
 length flags [d q h o] if the length flag is not separated. Fraction strings
 containing decimal point are decimal and a suffix is interpreted as size in
 words and not as notation
@@ -2346,7 +2366,7 @@ Text strings are a row of bytes composed from
 
 	"text in quotes ";	. text in quotes
 
-	:one_byte_expression;	. the substring character before a 1-byte integer 
+	:one_byte_expression	. the substring character before a 1-byte integer 
 
 </pre>
 These line-continued parts produce
@@ -2355,7 +2375,8 @@ These line-continued parts produce
 	"text_in quotes":one_byte_expression
 
 </pre>
-Text substrings and one-byte integers may be combined without restriction
+Text substrings and one-byte integers may be combined without restriction. There is
+a substring character between each part
 
 <p>
 These lines
@@ -2657,7 +2678,7 @@ second_macro*	$name
 
 </pre>
 Macro language plus parameters can be displayed step-by step if the
-value $plist is greater than current macro nesting depth, plus the
+value $plist is greater than current macro nesting depth, given
 option flags -p (display $proc macros) -q (display $func macros).
 
 <p>
@@ -2713,7 +2734,7 @@ The constant is generated at the end  of the program section where ".literal_poo
 is declared.
 
 <p>
-See Program Sections, 2.4: Literals, 4.4.5: Literal Pool Tags, 4.4.6: $lit directive
+See 7: Constructing Program Sections, 7.1.7: Literal Pool Tag, 4.5: Literals, 4.5.5: Literal Pool Tags, 4.5.6: $lit directive
 
 <p>
 With assembly flag -a an operand entirely in parentheses is an 
@@ -2892,15 +2913,15 @@ lits7  $LIT    7
 
 
 $LIT may have a label and may have an argument.
-If $LIT has an argument it must be the identity
+If $lit has an argument it must be the identity
 of a location counter 0..71.
 
 <p>
-If $LIT has no argument its effective argument
+If $lit has no argument its effective argument
 is the identity of the current location counter.
 
 <p>
-$LIT sets the default location counter
+$lit sets the default location counter
 for literals to the value in its argument or
 to the current location counter.
 
@@ -2921,7 +2942,7 @@ tag for the literal pool.
 It is possible to generate nested literals.
 
 There is an example of how this might usefully be done at
-4.4.4: Literal Arguments. The two-word literal at 0500C contains a
+4.4.2: Literal Arguments. The two-word literal at 0500C contains a
 byte count and a pointer to a string literal at 05000
 <pre>
 
@@ -2939,8 +2960,8 @@ The nested literal is only generated if it both begins and ends with
 parenthesis. The opening parenthesis may have a flag * token in front:
 <pre>
 
-$ masmx constanz -ln
-MASMX 7r2
+$ masmx constanz -lnyk
+MASMX 7r3
 3/constanz.msm
   :                            1 	$word		32
   :                            2 constanza $form		1, 31
@@ -2956,11 +2977,10 @@ MASMX 7r2
   :                            12 $(5:050000)
 05:00050000 80050003          +13  	instanza	*(instanza *(instanza *(99)))
   :                            14 	$end
-05:00050003+80050002
-05:00050002+80050001
 05:00050001+00000063
+05:00050002+80050001
+05:00050003+80050002
 :$(05):00050000:00050004 
-constanz.msm: object code 95 bytes: 0 errors: 0 undefined labels
 
 </pre>
 This is next example does not generate a nested literal. It is an
@@ -3029,6 +3049,9 @@ function_name  $FUNC
 
 </pre>
 There must be a label when the command is $FUNC.
+
+<h4>4.6.2.1.1: Second-Pass-Only Functions</h4>
+
 $FUNC can have an argument
 <pre>
 
@@ -3039,9 +3062,15 @@ fname*  $FUNC	*
 </pre>
 * is the only argument $FUNC can have. It means
 "second pass only", or don't expand this macro on
-the first assembly pass. The use of this is
-explained in Section 8.22: $FUNC directive.
+the first assembly pass.
 
+<p>
+One reason for a second-pass-only function may be that its
+value is not required on the first pass. Another reason
+may be that two executions of the same call have a
+cumulative effect which is undesirable 
+
+<h4>4.6.2.1.2: Non-Idempotent Functions</h4>
 <p>
 Second-pass-only functions are used to generate a data item
 once only by reference.
@@ -3054,7 +3083,7 @@ second pass because its label was generated on the first pass:
 
 f*      $func
 	$if     $t(f(1,1))=0  . Non-existent?
-"f(1,1)"** generate f(1,1)    . generate label and data
+"f(1,1)"** generate f(1,1)    . out-of-line $proc call generate label and data
 	$endif
 	$return f(1,1)        . return label value
 	$end
@@ -3063,21 +3092,19 @@ f*      $func
 	call    f(ROUTINE)
 
 </pre>
-One way of solving this problem is a literal,
-which doesn't get duplicated and doesn't have
-a label. But the functional result of a literal
-is the address of a constant, and you may want
-your function to do something more complicated
-than that.
+One way of solving this problem is a literal. Literals
+are generated on the second pass only and do not have
+labels
 
 <p>
-Another way of solving the problem is to stop
-"f" from expanding on the first pass:
+However a function call may be necessary for some
+action more complex than generating a literal. This
+is one use of the second-pass-only function
 <pre>
 
 f*      $func	*
 	$if     $t(f(1,1))=0  . Non-existent?
-"f(1,1)"** generate f(1,1)    . Generate Label and Data
+"f(1,1)"** generate f(1,1)    . out-of-line $proc call generate label and data
 	$endif
 	$return f(1,1)        . return label value
 	$end
@@ -3085,12 +3112,8 @@ f*      $func	*
 	.
 	call    f(ROUTINE)
 
+
 </pre>
-The * asterisk argument on the $FUNC directive makes the function
-a second-pass-only function
-
-
-
 <h4>4.6.2.2: $NAME -entry point and invocation tag</h4>
 
 It's easier to code functions (like $PROCs) if
@@ -3381,7 +3404,7 @@ register value is runtime dynamic
 
 <p>
 A breakpoint value in the locator declaration indicates a physical
-segment load address known in advance. It is seen here than in
+segment load address known in advance. It is seen here that in
 base-displacement $a retrieves the program-absolute address, $
 retrieves the displacement only, and the physical load address
 is not accessed
@@ -3524,28 +3547,50 @@ The value of label base is 05000.
 
 <h3>4.6.5: $bank_index -absolute or virtual memory space identity</h3>
 
-
-$bank_index retrieves the current absolute or virtual load pointer named
-in the breakpoint field of the location counter switch statement
-<pre>
-
-$(locator_number:program_visible_base_address:BREAKPOINT_LOAD_POINTER)
-
-</pre>
-If assembly flag -v is not set, this breakpoint value is the absolute load
-address of the section assembling. A section defined by locator number
-may be breakpointed many times in one or many assemblies, making many
-absolute banks. The value is an absolute word or byte address, and translates
-the program-relative section base address to construct load string addresses
+$bank_index concerns targets which assign memory blocks dynamically
+into windows of address space. See 7.1.2, 7.1.4, Breakpointed Location Counters
 
 <p>
-If assembly flag -v is set, this value is an abstraction like a handle
-or descriptor index, and the binary output appends it to load string
-addresses without interpreting it. A section defined by location counter
-may breakpointed many times, constructing many banks
+$bank_index retrieves the current absolute or virtual load pointer for the
+memory block currently assembling. That is the in the <i>breakpoint value</i>
+in the location counter switch statement
+<pre>
+
+$(locator_number:program_visible_base_address:<i>breakpoint value</i>)
+
+</pre>
+If assembly flag -v is not set, this <i>breakpoint value</i> is the absolute load
+address of the segment assembling. A section defined by locator number may have
+many breakpoints, making many segments of the same section with different load
+addresses, although the segments may share program-visible address space
+
+<p>
+If assembly flag -v is set, <i>breakpoint value</i> is an abstraction like a
+handle or block identifier, and the binary output appends it to load string
+addresses without interpreting it. A section defined by location counter may
+have many segments with different storage block identifiers. See 7.1.2.2: 
+Breakpointed Location Counters: -v Option
+
+<p>
+Whether the section breakpoint address is absolute or a translatable
+value, $bank_index function retrieves the current breakpoint value
+without the developer otherwise knowing it. Identifying the memory
+block allows macro code to export an entry point or vector
+<pre>
 
 
 
+p	$proc
+entryP*	$name
+*	$equ	vector_value($bank_index, $)
+	j	p(1, 1)
+	$end
+
+
+callname* entryP callroutine
+
+
+</pre>
 
 <h3>4.6.6: $n -value of instruction $NAME, macro entry tag</h3>
 
@@ -5576,28 +5621,36 @@ If the base register is specified, labels of locations in the
 segment have a tuple base+displacement attribute.
 
 
-<h3>7.1.2: The Breakpointed Location Counter</h3>
+<h3>7.1.2: Breakpointed Location Counters</h3>
+
+Breakpointed location counters concern targets where software assigns
+memory blocks dynamically into windows of address space
+<p>
+<i>breakpoint value</i> in the location counter switch identifies
+the load space for which the the current segment is assembling
+<pre>
+
+$(id:logical_base_address:<i>breakpoint value</i>)
+
+</pre>
+
+The section identified by location counter may have many segments in
+different memory blocks. The segments may share program-visible addresses 
+
 <h4>7.1.2.1 Physical Address Offset</h4>
 
 The breakpointed location counter may be used to describe the absolute
-locations of hardware-relocated banks.
+locations of physically-relocated banks.
 
 <p>
-The simple absolute start address declaration has the syntax
+A locator with a breakpoint value has the syntax
 <pre>
 
-$(id:base_address)
+$(id:<i>logical_base_address</i>:<i>physical_address</i>)
 
 </pre>
-But the breakpointed value pointing to a hardware-relocated location
-has the syntax
-<pre>
-
-$(id:logical_base_address:physical_address)
-
-</pre>
-Load addresses are computed from breakpointed segment start plus offset
-minus base.
+Load addresses are computed from <i>physical_address</i> plus location 
+counter minus <i>logical_base_address</i>
 
 <p>
 Code references are relative to the logical base only (the first address).
@@ -5611,17 +5664,18 @@ $(5::SEGMENT2)
 .
 
 	_________________________
-	| SEGMENT1 Location 0	|
-	|			|
+	| physical SEGMENT1	|
+	| Logical Location 0	|
 	|			|
 	|			|
 	|_______________________|
-	| SEGMENT2 Location 0	|
+	| physical SEGMENT2	|
+	| Logical Location 0	|
 	|			|
 
 
 </pre>
-The sections must be loaded at the named physical locations at run time before reference.
+The segments must be loaded at the named physical locations at run time before reference.
 
 <p>
 On simple hardware without MMU this effect is sometimes obtained
@@ -5684,8 +5738,8 @@ address except via masmx internal function $bank_index (Section 4.6.5)
 If -v option is applied, the treatment of breakpoint values is different.
 
 <p>
-The SEGMENT value in $(id:start:SEGMENT) is not assumed to be an address
-and is not added to the load addresses
+The <i>breakpoint value</i> value in $(id:logical_start_address:<i>breakpoint value</i>)
+is not assumed to be an address and is not added to the load addresses
 
 <p>
 Instead, the value is prefixed before the load addresses in the
