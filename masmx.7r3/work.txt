@@ -26,7 +26,9 @@ See also the licensing notice at the foot of this document
 <h2>What's masmx?</h2>
 
 <p>
-masmx is a freeware meta-assembler for any target.
+masmx is a freeware meta-assembler for any target<br>
+masmx ready-made binaries run as 32-bit programs on all popular PCs<br>
+freeware means free access to the downloadable source
 
 <p>
 masmx is easy to use
@@ -41,11 +43,12 @@ masmx can assemble relocatable code and has an internal linker.
 The cumulative linker constructs each program section as absolute or as a new relocatable
 
 <p>
-Integers and floating numbers are any format and size up to 192 bits
+Integers and floating numbers are any format and size up to 192 bits.<br>
+192 bits are not excessive because systems already compute and exchange 128-bit numbers
 
 <p>
-Memory spaces where code may be loaded and where instructions may access are,<br>
-subject to limits of target architecture, locations with linear address reaching
+Maximum memory space depends on target architecture. The highest address where masmx
+can assemble and load code is
 
 	<blockquote>
 	0FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF
@@ -55,13 +58,17 @@ subject to limits of target architecture, locations with linear address reaching
 of words or bytes, whichever the target address quantum is)
 
 <p>
-Memories with this order of size are not immediately foreseen, but masmx
-calculates and labels numbers of this size,<br> and there is no reason
-why the maximum of address radix should be less than the number radix
+Memories this large are not immediately expected, but masmx
+calculates and labels numbers of this size.<br>
+There is no reason why in an assembler for any target
+the maximum address range should be less than the maximum number size
 
 <p>
 Segmented memory, base-displacement addressing, preprogrammed physical
 memory relocation and memory address translation are all supported
+
+<p>
+masmx also assembles images for the simplest 8-bit architectures
 
 <p>
 masmx has a slender native syntax, and interprets all other assembly
@@ -624,7 +631,8 @@ masmx can construct absolute arrays and instruction segments to fit
 in address spaces up to 2*/192 bits.
 
 <p>
-Absolute object code may be incremented with new source or relocatable code
+Absolute and relocatable object code may be incremented
+with new source or relocatable code
 
 <p>
 The memory space in programs may be larger than any known file systems,
@@ -663,9 +671,9 @@ Internally generated 192-bit floating values have 23-bit exponent and
 Negative polarity is represented with the entire value in 1s complement
 
 <p>
-Size, layout and representation of floating constants are programmable and
-derived from masmx 192-bit internal representation. There is no restriction
-on target representations. Macro code can achieve any representation
+Size, layout and representation of floating constants are programmable. Floating
+constant values are derived from masmx 192-bit internal floating values. There is
+no restriction on target representations. Macro code can achieve any representation
 
 <p>
 Supplied macros generate IEEE754 floating constants in 32-bit, 64-bit and
@@ -738,8 +746,9 @@ large size. See Section 5.2.2: Bit-Aligned Structures
 
 masmx naming techniques allow a single set of macros for a given target
 architecture to enable any application to access complex bit-aligned data.
-See Section 5.2.2.3: Macro Code Access to Bit-Aligned Structures
-
+See Section 5.2.2.3: Macro Code Access to Bit-Aligned Structures. This
+feature handles bit-field structures and overlays of any complexity
+consistently and efficiently
 
 <h3>1.6.4: Repeat Data</h3>
 
@@ -762,7 +771,9 @@ Name Spaces
 Directives $xqt_i and $xqt_fp combine with target-specific macro language
 to translate algorithmic expressions with run-time variable tokens into
 an instruction plan. See Section 6.1: Run-Time Integer Algorithm Plotter
-and Section 6.2: Run-Time Floating Algorithm Plotter
+and Section 6.2: Run-Time Floating Algorithm Plotter. This feature is more
+compiler-like than assembler-like and allows algorithms involving run-time
+variables to be coded in the form of algebraic expressions
 
 
 <h1>2: Developer Environment</h1>
@@ -846,7 +857,7 @@ A definition file included at the head of the assembly defines:
 The line of assembly language code has an arbitrary number of fields
 <pre>
 
-[label]	[command]		[argument1[,argument1_subfield2,...]]	[argumentN[,argumentN_subfield2,...]]	[. comment ]
+[label]	[command]	[argument1[,argument1_subfield2,...]]	[argumentN[,argumentN_subfield2,...]]	[. comment ]
 
 </pre>
 Lines may be continued. The default continuation symbol ; can be changed with directive $cont_char
@@ -1002,14 +1013,16 @@ assembly level externalises the label
 
 <p>
 A label declared at the main assembly with <b>$set</b> directive cannot accidentally
-be exported from the assembly by subsequent sets. <b>$set</b> labels may be changed
-in value but a label global to the assembly cannot be changed to an exported label
+be exported from the assembly by subsequent sets.<br>
+<b>$set</b> labels may be changed in value but a label global to the assembly
+cannot be changed to an exported label
 
 <p>
 Macros can therefore use many asterisks to make sure they are updating a
-global (and not a nested macro-local) <b>$set</b> label without risking a
-clash with other assemblies. In this sample assembly the output file does
-not contain an exported label, or in this case anything at all
+global <b>$set</b> label and not a nested macro-local <b>$set</b> label.<br>
+A label name initially set to the inclusion level of the main assembly is
+not accidentally exported. In this sample assembly the output file<br>
+does not contain an exported label, or in this case anything at all
 <pre>
 
 $ masmx attestor -lnx
@@ -1332,7 +1345,7 @@ place
 
 </pre>
 
-Option -m Motorola Old Number Notation (4.2.1.2.1.4) also masks labels
+Option -m Motorola Old Number Notation (4.2.2.1.3) also masks labels
 beginning with $ or @ unless they are referenced in quotes
 
 
@@ -1511,8 +1524,8 @@ Internal functions are in summary:
 
 	$r(..)		location counter identity of named address
 
-	$rel		relocation aligment of current program section
-			returns zero for absolute sections and nozero
+	$rel		relocation alignment of current program section
+			returns zero for absolute sections and nonzero
 			for relocatable sections
 
 	$rel(..)	relocation alignment of named program section
@@ -1591,7 +1604,7 @@ For more information on the construction of function macros see 4.2.5: Function 
 
 
 Macro actual arguments are accessed by using the label of 
-the macro in a functional way
+the containing macro in a functional way
 <pre>
 
 p       $proc
@@ -1636,7 +1649,8 @@ containing network socket addresses
 
 <p>
 The $proc callname $net_socket is in the command field in order to generate a
-constant. $net_socket obtains the value of the network part of the address
+constant.<br>
+$net_socket obtains the value of the network part of the address
 by referencing $func macro $net_ipv4
 
 <p>
@@ -1823,7 +1837,7 @@ argument field
 	-8.5
 
 </pre>
-Number items starting with a digit or unary operator
+Number items start with a digit or unary operator
 
 <p>
 Unary + - ^ prepended to the first token of the constant expression
@@ -2644,9 +2658,44 @@ L       $EQU    2
 </pre>
 p(0, 2) will return the value of L, which is 2.
 
+
 <p>
-When a nested macro is called, actual parameters plus any new tokens
-are re-ordered for the nested macro:
+One macro may send all its actual arguments to another macro by<br>
+using the paraform <i>macro_name()</i>. Extra arguments may be added 
+<pre>
+
+$ masmx forward -lnky
+MASMX 7r3
+3/forward.msm
+*EOF*
+  :                            1 	$word	16
+  :                            2 	$quantum 8
+  :                            3 
+  :                            4 p	$proc
+  :                            5 first*	$name
+  :                            6 	second	p()	102
+  :                            7 	$end
+  :                            8 
+  :                            9 p	$proc
+  :                            10 second*	$name
+  :                            11 ?	$do	p(),	+	p(?, 1)
+  :                            12 	$end
+  :                            13 
+00:0000 0065                  +14 	first	101	99	100
+00:0002 0063                  +14 
+00:0004 0064                  +14 
+00:0006 0066                  +14 
+  :                            15 
+*EOF*
+:$(00):0000:0008 
+
+</pre>
+
+
+
+<p>
+Actual parameters forwarded individually to a nested macro
+plus any new tokens may be re-ordered for the nested macro:
 <pre>
 
 	first_macro	left, right, centre	off_centre
@@ -2838,12 +2887,8 @@ definition header files
 	$set_option	"a"
 
 </pre>
-Automatic literals are then  generated if subfields in most
-source line positions are entirely in parentheses
-
-<p>
-Mostly these source lines are instructions, where the command
-is a macro which generates code under the control of a $FORM:
+An automatic literal is then generated where any argument in
+an instruction or constant line is entirely in parentheses
 <pre>
 
 	Load    r24, (0FFFC0000s)
@@ -2868,9 +2913,10 @@ to place value EXPRESSION in the address field of the instruction.
 
 <h3>4.5.4: Indirection Flag on a Literal</h3>
 
-Unary * on arguments is widely used to represent an indirection
-flag in binary code. masmx allows macro text to retrieve * at
-the start of all field and subfield arguments
+Unary * on source code arguments is widely used to represent
+an indirection flag in binary code.<br>
+masmx allows macro text to retrieve * at the start of all field
+and subfield arguments, including literals
 <pre>
 
 	lr	r3, *(VERY_BIG_ADDRESS)
@@ -2879,8 +2925,8 @@ the start of all field and subfield arguments
 A literal containing VERY_BIG_ADDRESS is generated
 
 <p>
-Macro language places the address of the literal in the instruction.
-Macro language retrieves flag value1 or 0 for unary * 
+Macro language places the address of the literal in the instruction.<br>
+Macro language retrieves flag value 0 or 1 for unary * absent or present
 
 <h3>4.5.5: Literal Pool Tags</h3>
 
@@ -2927,7 +2973,7 @@ to the current location counter.
 
 <p>
 The default location counter for literals is
-only used by automatic literals (literals which
+used for automatic literals (literals which
 are generated without referencing a literal
 pool tag).
 
@@ -2983,7 +3029,7 @@ MASMX 7r3
 :$(05):00050000:00050004 
 
 </pre>
-This is next example does not generate a nested literal. It is an
+This is next example does not generate a nested literal. It contains an
 expression within a literal:
 <pre>
 
@@ -3066,8 +3112,8 @@ the first assembly pass.
 
 <p>
 One reason for a second-pass-only function may be that its
-value is not required on the first pass. Another reason
-may be that two executions of the same call have a
+value is not required on the first pass.<br> Another reason
+may be that two passes of the same function have a
 cumulative effect which is undesirable 
 
 <h4>4.6.2.1.2: Non-Idempotent Functions</h4>
@@ -3083,7 +3129,7 @@ second pass because its label was generated on the first pass:
 
 f*      $func
 	$if     $t(f(1,1))=0  . Non-existent?
-"f(1,1)"** generate f(1,1)    . out-of-line $proc call generate label and data
+"f(1,1)"** generate f(1,1)    . out-of-line $proc call generates label and data
 	$endif
 	$return f(1,1)        . return label value
 	$end
@@ -3223,7 +3269,7 @@ generate* $name
 <h2>4.7: masmx Internal Functions in Detail</h2>
 
 
-<h3>4.7.1: $	location counter</h3?
+<h3>4.7.1: $	location counter</h3>
 
 <h4>4.7.1.1: $	this location counter</h4>
 
@@ -3244,7 +3290,8 @@ label bampot has the value 261
 $ masmx -lnk
 MASMX 7r3
 0/-INPUT>>
-	$word	32
+	$word   32
+	$awidth	32:96
 
 ASTRONOMIC	$set	07FFFF8000380000000040000
 	    
@@ -3257,21 +3304,22 @@ tube	$equ	$+1
 	+	tube
 	+	here
 	$end
-  :                            1  $word 32
-  :                            2 
-  :                            3 ASTRONOMIC $set 07FFFF8000380000000040000
-  :                            4      
-  :                            5 $(43:1024:*ASTRONOMIC)
-  :                            6  
-  :                            7  $res 512
-  :                            8 here
-  :                            9 tube $equ $+1
-  :                            10 
-2B:000000040600:7FFFF8000380000000040601
-                              +11  + tube
-2B:000000040603:7FFFF8000380000000040600
-                              +12  + here
-  :                            13  $end
+  :                            1  $word   32
+  :                            2  $awidth 32:96
+  :                            3 
+  :                            4 ASTRONOMIC $set 07FFFF8000380000000040000
+  :                            5      
+  :                            6 $(43:1024:*ASTRONOMIC)
+  :                            7  
+  :                            8  $res 512
+  :                            9 here
+  :                            10 tube $equ $+1
+  :                            11 
+2B:7FFFF8000380000000040600:7FFFF8000380000000040601
+                              +12  + tube
+2B:7FFFF8000380000000040603:7FFFF8000380000000040600
+                              +13  + here
+  :                            14  $end
 :$(2B):00000400:00000606 
 
 
@@ -3280,7 +3328,7 @@ tube	$equ	$+1
 <h4>4.7.1.2: $(..)	named location counter</h4>
 
 The expression $(..) returns the value of the location 
-counter identified in the brackets. For example the sequence
+counter identified in the brackets. For example
 <pre>
 
 text    $equ    0
@@ -3332,9 +3380,7 @@ $a constants may be within macro text invoked in many different program sections
 with known or relocatable base address
 
 <p>
-$a also generates constants pointing to a base-displacement segment which is relocatable.
-The first $a(expression) example following illustrates
-
+$a also generates constants pointing to a base-displacement segment which is relocatable
 
 <h4>4.7.2.2: $a(..)	absolute value of expression</h4>
 <pre>
@@ -3399,14 +3445,14 @@ $a(name) has the absolute value
 	QUITE_LARGE_ADDRESS+intervening_displacement
 
 </pre>
-$a has no function for addresses in void segments, where the base
+$a has no function for addresses in void sections, where the base
 register value is runtime dynamic
 
 <p>
 A breakpoint value in the locator declaration indicates a physical
-segment load address known in advance. It is seen here that in
-base-displacement $a retrieves the program-absolute address, $
-retrieves the displacement only, and the physical load address
+segment load address known in advance.<br> It is seen here that in
+base-displacement $a(<i>location</i>) retrieves the program-absolute address,<br>
+<i>location</i> retrieves the displacement only, and the physical load address
 is not accessed
 <pre>
 
@@ -3416,18 +3462,18 @@ MASMX 7r3
 	$word	32
 	$quantum 8
 $(12:0C000:0FC0000,5)
-	+	identify, $a(identify)d
+	+	location, $a(location)d
 	$res	40
-identify
+location
 	$end
   :                            1  $word 32
   :                            2  $quantum 8
   :                            3 $(12:0C000:0FC0000,5)
-0C:00000000 000000300000C030  +4  + identify, $a(identify)d
+0C:00000000 000000300000C030  +4  + location, $a(location)d
   :                            5  $res 40
-  :                            6 identify
+  :                            6 location
   :                            7  $end
-identify=$0C:00000030,00000005
+location=$0C:00000030,00000005
 -INPUT>>=0<00000000
 :$(0C):0000C000:0000C030 
 
@@ -3463,7 +3509,7 @@ here=$0E:0000000A,00000014
 
 
 
-<h3>4.6.4: $b	section base address</h3>
+<h3>4.7.3: $b	section base address</h3>
 
 $b function in an absolute section retrieves the initial start address
 of the section
@@ -3545,27 +3591,27 @@ The value of label base is 05000.
 
 
 
-<h3>4.6.5: $bank_index -absolute or virtual memory space identity</h3>
+<h3>4.7.4: $bank_index -absolute or virtual memory space identity</h3>
 
 $bank_index concerns targets which assign memory blocks dynamically
 into windows of address space. See 7.1.2, 7.1.4, Breakpointed Location Counters
 
 <p>
 $bank_index retrieves the current absolute or virtual load pointer for the
-memory block currently assembling. That is the in the <i>breakpoint value</i>
+memory block currently assembling. That is the in the <i>breakpoint_value</i>
 in the location counter switch statement
 <pre>
 
-$(locator_number:program_visible_base_address:<i>breakpoint value</i>)
+$(locator_number:program_visible_base_address:<i>breakpoint_value</i>)
 
 </pre>
-If assembly flag -v is not set, this <i>breakpoint value</i> is the absolute load
+If assembly flag -v is not set, <i>breakpoint_value</i> is the absolute load
 address of the segment assembling. A section defined by locator number may have
 many breakpoints, making many segments of the same section with different load
 addresses, although the segments may share program-visible address space
 
 <p>
-If assembly flag -v is set, <i>breakpoint value</i> is an abstraction like a
+If assembly flag -v is set, <i>breakpoint_value</i> is an abstraction like a
 handle or block identifier, and the binary output appends it to load string
 addresses without interpreting it. A section defined by location counter may
 have many segments with different storage block identifiers. See 7.1.2.2: 
@@ -3592,12 +3638,15 @@ callname* entryP callroutine
 
 </pre>
 
-<h3>4.6.6: $n -value of instruction $NAME, macro entry tag</h3>
+<h3>4.7.5: $n -value of instruction $NAME, macro entry tag</h3>
 
 $n has the latent value of a $name macro entry point
 
 <p>
-$n may be used both procedural and functional macros
+$n is the same value as the paraform macro_name(0, 0), but truncated to 32 bits instead of 192 bits
+
+<p>
+$n may be used in both procedural and functional macros
 <pre>
 
 p	$proc
@@ -3669,12 +3718,8 @@ either a two- or a three-byte relative-jump instruction:
 "$rel2"* $name   2
 "$rel3"* $name   3
 target  $set    $rel(1,1)-$-$n
-	$if     target<-128)
-	$flag   You may only jump from instr. trailing edge - 128
-	$endif
-	$if     target>127
-	$flag   You may only jump from instr. trailing edge + 127
-	$endif
+	$do     target<-128,	$flag   You may only jump from instr. trailing edge - 128
+	$do     target>127,	$flag   You may only jump from instr. trailing edge + 127
 	$return target
 	$end
 
@@ -3728,17 +3773,21 @@ jnc*    $name   JNC_CODE
 
 </pre>
 
-<h3>4.6.7: $net(..) -the unrelocated value of an expression</h3>
+<h3>4.7.6: $net(..) -the unrelocated value of an expression</h3>
 
 Few algebraic operations are allowed on relocatable addresses.
-very few operations are allowed. See 4.2.2.2.1: Operators
+See 4.2.1: Operators
 
 <p>
-Range checks at assembly may be required to prevent intermediate truncation
-and to use the same macro text for absolute and relocatable code
+masmx Linking assembly guards internally against truncation on absolute relocation.
 
 <p>
-Linking assembly guards against truncation on absolute relocation
+Assembling from source, range checks may be needed to prevent intermediate truncation,
+or final truncation in absolute assembly. It is desirable to to assemble relocatable
+and absolute with the same macro text
+
+<p>
+This test
 <pre>
 
 p	$proc
@@ -3748,31 +3797,40 @@ target	$set	p(1, 1)
 	$do	target>16777261,	$flag	you can't jump there
 
 </pre>
-would always error where p(1, 1) is relocatable, because operator &gt;
+would always error where p(1, 1) is relocatable or external, because operator &gt;
 is not allowed on a relocatable.
 
 <p>
-The following is allowed
+This is allowed
 <pre>
 
 	$do	$net(target)>16777261,	$flag	you can't jump there
 
 </pre>
-Labels which are not present are treated as external and therefore
-relocatable.
+Targets in relocatable segments have relocation requests added to references.<br>
+Labels which are not present are external and relocation requests are added to references
 
 <p>
-Shift right /* algebraic shift right */- AND ** are always allowed on
-relocatable values, to allow relocation of split and shifted fields.
+The operators allowed on relocatable tokens are
+<pre>
 
-<p>
-Addition and subtraction are always allowed on relocatable fields.
+	+	plus
+
+	-	minus
+
+	/*	shift right
+
+        */-	algebraic shift right
+
+	**	AND
+
+</pre>
+Other operators require <b>$net()</b> function of relocatable tokens
 
 
 
+<h3>4.7.7: $o(.) -is this option set?</h3>
 
-<h3>4.6.8: $o(.) -is this option set?</h3>
-_________________________________________
 
 An expression whose value is 'A'..'Z' or 'a'..'z' is allowed in the
 parentheses, and 1 is returned if the equivalent flag is on, for example:
@@ -3790,41 +3848,42 @@ on the command line, or with the  $SET_OPTIONS directive.
 
 
 
-<h3>4.6.9: $r -region</h3>
-_________________________
+<h3>4.7.8: $r region</h3>
 
 
-<h4>4.6.9.1: $r</h4>
-___________________
+<h4>4.7.8.1: $r	identity of current location counter</h4>
 
 Returns the identity, not the value, of the current 
 location counter 0..71. 
 
 
-<h4>4.6.9.2: $r(..)</h4>
-_______________________
+<h4>4.7.8.2: $r(<i>location</i>)	location counter containing target <i>location</i></h4>
 
-returns the identity of named address expression's location counter
-
-<p>
-There should be a label in parentheses and "$R(label)" 
-will return be the identity 0..71, of the location 
-counter under which the label is generated.
-				  
-				  
-<h3>4.6.10: $rel(..) -is this a relocatable location counter?</h3>
-_________________________________________________________________
-
-An expression identifying a location counter 0..71 is in the parentheses,
-and $REL(x) tells you if it's a relocatable segment. No parentheses,
-and $REL tells you if the current segment is relocatable. The
-result isn't always 0 or 1. It's the load alignment factor of
-the segment which is 0 for absolute and 1 or something higher
-for relocatable.
+identifies the program section where the named <i>location</i> is
 
 <p>
-This function can be cascaded with the previous one to
-detect whether a label is relocatable
+The first token in expression <i>location</i> must identifiably belong to
+a program section, as a location label does, in order for its section
+to be identified
+				  
+				  
+<h3>4.7.9: $rel	relocation factor of location counter</h3>
+
+The relocation factor of a location counter is zero if the program
+section is absolute and nonzero if the program counter is relocatable.
+A nonzero relocation factor is not guaranteed to be 1. It is the
+alignment quantum of the section and may be represented as negative
+(where only buffers are in the segment and no code)
+
+<h4>4.7.9.1:	$rel	relocation factor of current location counter</h4>
+
+<h4>4.7.9.2:	$rel(<i>locator</i>)
+
+<i>locator</i> is a value in the range 0..71
+
+<p>
+Function <b>$rel</b> may be cascaded with function <b>$r</b> to detect
+if the current location or a named label is relocatable
 <pre>
 
 	$if     $rel($r(label))
@@ -3832,63 +3891,15 @@ detect whether a label is relocatable
 	.
 
 </pre>
-<h3>4.6.11: $t(..) -what type of label</h3>
-__________________________________________
+<h3>4.7.10: $t(label)	Label Type</h3>
 
 The return value from the $t(..) function is a type 
-associated with a label. The type will either be 
-assigned by the assembler or by the developer.
-
-<p>
-In this example, the developer has designated a type value, 
-128, to mean registers. The imaginary architecture
-here does not place registers in the memory address 
-space, and the register tags must be detected in 
-order to generate the correct instruction variant.
-
-<p>
-The contents of the parentheses must resolve to a label, 
-typically an actual parameter to a macro.
-
-<p>
-There may be unary + - * # on the front of the argument. This is
-not predictable for macro language examining actual parameters.
-
-<p>
-$t function steps over one unary symbol + - * # if present before
-examining the label.
-
-<p>
-A macro parameter is examined here to decide 
-whether it is the tag of a register or some other kind 
-of address before the correct variant of the instruction 
-can be chosen:
-<pre>
-
-"$instruction" $form    6, 6, 36
-"$register_instruction" $form 6, 6, 6, 30
-"$REGISTERS" $equ       128
-R0      $equ,$registers 0
-R1      $equ,$registers 1
-	.
-	.
-R63     $equ,$registers 63
+associated with a label. The type is assigned either 
+by the assembler or by the developer.
 
 
-p       $proc
-store*  $name   12
-	$if     $t(p(1,2))=$REGISTERS
-	$register_instruction $n+32, p(1, 1), p(1, 2), 0
-	$else
-	$instruction    $n, p(1,1), p(1,2)
-	$endif
-	$end
+<h4>4.7.10.1: Label Type Undefined</h4>
 
-
-</pre>
-
-<h4>4.6.11.1: Label Type Undefined</h4>
-______________________________________
 
 Labels which have not been defined before the start
 of the second assembly pass may be tested for type, 
@@ -3897,8 +3908,8 @@ label during the second assembly pass generates an
 external reference, or if -u flag is set, an error.
 
 
-<h4>4.6.11.2: Label Type Location</h4>
-_____________________________________
+<h4>4.7.10.2: Label Type Location</h4>
+
 
 A label has the type of a storage address if it
 has been encountered on column 1 of a source line, and
@@ -3916,8 +3927,8 @@ An address label has an associated location counter and
 is either absolute or relocatable.
 
 
-<h4>4.6.11.3: Label Type $EQU</h4>
-_________________________________
+<h4>4.7.10.3: Label Type $EQU</h4>
+
 
 The label of a $EQU line has an absolute or a relocatable 
 value according to the the argument to which it's equated.
@@ -3931,8 +3942,8 @@ Any label name may be defined independently in different
 subassemblies.
 
 
-<h4>4.6.11.4: Label Type $SET</h4>
-_________________________________
+<h4>4.7.10.4: Label Type $SET</h4>
+
 
 The label of a $SET line has an absolute or a relocatable 
 value according to the argument to which it's set.
@@ -3950,8 +3961,8 @@ The label of a $DO, which accumulates in value as
 a relative-1 counter, has a type of $SET.
 	
 
-<h4>4.6.11.5: Label Type $EQUF</h4>
-__________________________________
+<h4>4.7.10.5: Label Type $EQUF</h4>
+
 
 $EQUF equates a label to a list of values and the label has
 the type $EQUF. This enables macro processing to assign to
@@ -4020,8 +4031,8 @@ gives a result of 0.
 
 
 
-<h4>4.6.11.6: Label Type $DIRECTIVE</h4>
-_______________________________________
+<h4>4.7.10.6: Label Type $DIRECTIVE</h4>
+
 
 The labels of directives available when the assembler begins 
 to execute have the type $DIRECTIVE. The developer may also
@@ -4035,8 +4046,8 @@ MACEND  $equ,$directive $end
 
 </pre>
 
-<h4>4.6.11.7: Label Type $FUNCTION</h4>    
-______________________________________
+<h4>4.7.10.7: Label Type $FUNCTION</h4>    
+
 
 The internal functions available when the assembler begins
 to execute have the type $FUNCTION. The developer may also
@@ -4059,8 +4070,8 @@ Without the quotes $ is evaluated functionally and "." receives
 the current location value. That would render "." an unusable function
 
 
-<h4>4.6.11.8: Label Type $PROC</h4>
-__________________________________
+<h4>4.7.10.8: Label Type $PROC</h4>
+
 
 The label on column 1 of the $PROC card is the name of the
 macro. Its meaning is all the images from $PROC to $END, and
@@ -4188,11 +4199,11 @@ secondly var	4
 
 
 </pre>
-<h4>4.6.11.9: Label Type $NAME</h4>
-__________________________________
+<h4>4.7.10.9: Label Type $NAME</h4>
+
 
 $NAME is used within macro text $PROC..$END or $FUNC..$END
-to give alternative call names associated with a call value
+to give alternative call names with latent values
 to the macro. $NAME labels return a type of $NAME.
 
 <p>
@@ -4213,18 +4224,18 @@ dropit* $name   2
 	$end
 
 </pre>
-If the developer has called many procedural macros P, then
-P is not used as a call name, but the $NAME names are:
+The developer may have many procedural macros p. This makes the
+argument reference paraforms p(1, 1) p(1, 2) similar in syntax
+and easy to read in many different macros. p is not used as a
+call name, but the $NAME names are. p with no asterisk is only
+a visible name within macro p, and this is why multiple macros
+may have the same name
 <pre>
 
 	grabit  r12, input_port
 	dropit  r12, output_port
 
 </pre>
-Whatever macro you're writing, if it's called "p",
-its argument paraforms are then p(1,1) p(1,2) etc, 
-which makes it easy to write the macros. $NAME then 
-makes it easier to call the macros.
 
 <p>
 If the macro is instead called "pqrpqr" then its parameters are
@@ -4237,8 +4248,8 @@ so exported from a $PROC must be unique to the next subassembly level
 upwards.
 
 
-<h4>4.6.11.10: Label Type $FUNC</h4> 
-___________________________________
+<h4>4.7.10.10: Label Type $FUNC</h4> 
+
 
 Developer-written function labels return a type of $FUNC.
 Developer-written functions are all functions which are 
@@ -4257,6 +4268,9 @@ $FUNC macros are expanded when encountered during evaluation
 of an operand expression, for example
 <pre>
 
+$(1:START_OF_VARIABLES)
+
+
 @*      $func
 	$return $(1)
 	$end
@@ -4264,16 +4278,15 @@ of an operand expression, for example
 length_of_variables     $set    @-START_OF_VARIABLES
 
 </pre>
-This example is from the mapping of external RAM in a
-microcontroller-based system. The developer uses location counter $(1)
+The developer uses location counter $(1)
 to map external RAM and wishes $(1) to be known as @. 
 	
 <p>
 @ returns the next available address in variable space.
 
 
-<h4>4.6.11.11: Label Type $FORM</h4>
-___________________________________
+<h4>4.7.10.11: Label Type $FORM</h4>
+
 
 A label declared as $FORM returns the type $FORM and
 describes the layout of an instruction or similar
@@ -4300,12 +4313,31 @@ stb*    $name   STB
 
 </pre>
 
-<h4>4.6.11.12: Label Types Assigned by the Developer</h4>
-________________________________________________________
+<h4>4.7.10.12: Label Types Assigned by the Developer</h4>
+
 
 Label type values 128..255 are available to the developer
-who may designate them to associate special attributes with
-certain names. For example, a definition file for M68K might
+who may use them to associate distinct attributes with
+certain names.
+
+<p>
+The developer may assign types to names and the type
+may be retrieved with function $t(..)
+
+<p>
+This accommodates the frequent practice with CISC
+targets like M68K of assigning one mnemonic name
+reflecting functionality to several instructions
+which have differing opcodes according to memory, register
+or immediate operand and according to operand size
+
+<p>
+Names like ADD and MOVE may be many different
+instructions which can only be fixed by understanding
+what sort of operands are addressed 
+
+<p>
+A definition file for M68K might
 contain
 <pre>
 
@@ -4338,12 +4370,11 @@ ssp     $equ,special_register   $0407
 usp     $equ,special_register   $0007
 cr      $equ,special_register   1
 
-Because the 68K target (and nearly all CISC targets)
-use the same mnemonics, ADD, MOV etc, for functional
-groups of instructions which have different opcodes
-depending on the class of operands (memory, various
-register classes), names may be typed and the type
-may be retrieved with $T(..)
+</pre>
+
+Correspondingly the instruction part of the target definition interrogates
+the operand types of the actual arguments to instructions
+<pre>
 
 p       $proc
 mov.b*  $name   MOV_B
@@ -4354,20 +4385,33 @@ mov.l*  $name   MOV_L
 	.
 
 </pre>
-<h3>4.6.12: $zenith -High Address of Section + Literals</h3>
+<h3>4.7.11: $zenith -High Address of Section + Literals</h3>
+
+<b>$zenith</b> is the high address of a section including its literals.<br>
+To obtain the final high address, <b>$zenith</b> is retrieved after all of the section
+is assembled on the second assembly pass. Then all literals have been added.
 
 
-<h4>4.6.12.1: $zenith -this Section</h4>
+<h4>4.7.11.1: $zenith -this Section</h4>
+
+Example
+<pre>
+
+	$do	$zenith>LIMIT,	$flag	section overrun
+
+</pre>
 
 
+<h4>4.7.11.2: $zenith(locator) -named Section</h4>
 
-<h4>4.6.12.2: $zenith -named Section</h4>
+Example
+<pre>
 
+	$do	$zenith(_STATIC)>_STATIC_LIMIT,	$flag	static section overrun	
 
+</pre>
 
-
-
-<h1>6: Iterated Code and Structured Data</h1>
+<h1>5: Iterated Code and Structured Data</h1>
 
 
 <h2>5.1: $do and $proc Macros</h2>
