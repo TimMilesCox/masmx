@@ -26,9 +26,14 @@ See also the licensing notice at the foot of this document
 <h2>What's masmx?</h2>
 
 <p>
-masmx is a freeware meta-assembler for any target<br>
+masmx is a freeware meta-assembler for any target
+
+<p>
+Developed as a cross-assembler for embedded targets<br>
 masmx ready-made binaries run as 32-bit programs on all popular PCs<br>
-freeware means free access to the downloadable source
+
+<p>
+Freeware means free access to the downloadable source
 
 <p>
 masmx is easy to use
@@ -90,7 +95,7 @@ Anyone who understands the target architecture can do this.
 User interface is a shell or command prompt
 
 <p>
-binaries for all popular platforms are downloadable. Installation = copy the binaries
+Binaries for all popular platforms are downloadable. Installation = copy the binaries
 
 <p>
 masmx source code is in git and download zip. Build for new developer platforms is a one-line shell command
@@ -110,7 +115,7 @@ as possible are executed.
 
 <p>
 masmx saves electronics and energy. masmx may be used as the substance
-of thin-layer compilers. It makes the miniature more possible, and has the
+of thin-layer compilers.<br>It makes the miniature more possible, and has the
 potential to multiply the performance of giant servers by ten- and twentyfold
 
 <p>
@@ -118,17 +123,16 @@ Complex EPROM and Flash structures may be described in a few cryptic lines of so
 
 <p>
 The maximum integer, floating point and address radix of 192 bits make
-masmx a toolchain for experimental large architectures, or for multi-architecture systems with special hardware modules.
+masmx a toolchain for experimental large architectures,<br>
+or for multi-architecture systems with special hardware modules.
 
 <p>
-masmx is also a toolchain for the smallest architectures. The supplied
-definition header for 8051 has been used on mission-critical projects by
-prestige clients.
+masmx is also a toolchain for the smallest architectures. The supplied definition header for 8051<br>
+has been used on mission-critical projects by prestige clients.
 
 <p>
-32-bit and 64-bit PowerPC assemblies with incremental and absolute linking
-are illustrated in Section 9 of this manual. masmx has generated PowerPC RT
-kernels with the same macro text.
+32-bit and 64-bit PowerPC assemblies with incremental and absolute linking are illustrated<br>
+in Section 9 of this manual. masmx has generated PowerPC RT kernels with the same macro text.
 
 <p>
 Target architecture definitions are source code include files.
@@ -140,8 +144,8 @@ This manual shows how to use masmx for any architecture present or future.
 For assistance building macro definition text for a new target, contact masmx@gmx.ch.
 
 <p>
-masmx may be hosted on MAC OS X PowerPC G4, MAC OS X Intel ix86,
-Sun SPARC Solaris, UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
+masmx may be hosted on MAC OS X PowerPC G4, MAC OS X Intel ix86, Sun SPARC Solaris,<br>
+UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 
 <pre>
@@ -601,8 +605,8 @@ See Section 10.1: Establishing your Syntax
 
 
 Number and character strings are assembled in masmx native
-notation, C-Language notation, Motorola Old Notation or
-suffix-determined notation
+notation, C-Language notation,<br>
+Motorola Old Notation or suffix-determined notation
 
 <p>
 See Section 4.2.2.1: Number Strings and Section 4.2: Expressions
@@ -635,22 +639,21 @@ Absolute and relocatable object code may be incremented
 with new source or relocatable code
 
 <p>
-The memory space in programs may be larger than any known file systems,
-if the distribution of loaded code does not saturate target application
-memory and does not therefore overload the file system
-
-<p>
 A masmx link is an assembly which uses masmx linker features.
-Text-encoded-binary <b>.txo</b> files are included plus macro
-language to which processes text-encoded-binary.
+Text-encoded-binary files are included<br>plus macro
+text which processes text-encoded-binary.
 See section 9.2.2: masmx Linking in Principle
 
 <p>
-Base-displacement addressing modes are supported for accessing
-data or code at high effective adresses beyond the direct-address
-range of instruction sets. Data segments in 32-bit and 64-bit
-PowerPC are an example of base-displacement addressing. See
-Section 7: Constructing Program Sections
+The memory space in programs may be larger than any known file systems,<br>
+if load code distribution in target memory is below saturation<br>
+to the degree that the developer platform file system contains it
+
+<p>
+Base-displacement addressing modes are supported for accessing data or code<br>
+at high effective addresses beyond the direct-address range of instruction sets.<br>
+Data segments in 32-bit and 64-bit PowerPC<br>are an example of base-displacement addressing.<br>
+See Section 7: Constructing Program Sections
 
 
 
@@ -671,13 +674,13 @@ Internally generated 192-bit floating values have 23-bit exponent and
 Negative polarity is represented with the entire value in 1s complement
 
 <p>
-Size, layout and representation of floating constants are programmable. Floating
-constant values are derived from masmx 192-bit internal floating values. There is
-no restriction on target representations. Macro code can achieve any representation
+Size, layout and representation of floating constants are programmable. Floating constant values are<br>
+ derived from masmx 192-bit internal floating values. There is no restriction on target representations.<br>
+Macro code can achieve any representation
 
 <p>
-Supplied macros generate IEEE754 floating constants in 32-bit, 64-bit and
-128-bit formats, and in the popular non-IEEE654 80-bit representation
+Supplied macros generate IEEE754 floating constants in 32-bit, 64-bit and 128-bit formats,<br>
+and in the popular non-IEEE654 80-bit representation
 
 <p>
 IEEE754 floating formats have an unrepresented integral bit. A sign flag alone 
@@ -722,9 +725,8 @@ MASMX 7r3
 :$(00):00000000:00000028 
  
 </pre>
-The included macro package for generating IEEE754 constants is explained
-in section 11: masmx Floating Format and Alternative Formats and section
-11.2: IEEE754 Floating Formats
+The included macro package for generating IEEE754 constants is explained in section 11: masmx Floating<br>
+Format and Alternative Formats and section 11.2: IEEE754 Floating Formats
 
 
 <h2>1.6: Structured Data and Structured Code Name Spaces</h2>
@@ -737,43 +739,40 @@ Structured Data
 
 <h3>1.6.2: Bit-Aligned Structured Data</h3>
 
-masmx can construct and label complex hierarchical data which does not map to
-the target architecture and can only be described as bit-fields of arbitrarily
-large size. See Section 5.2.2: Bit-Aligned Structures
+masmx can construct and label complex hierarchical data which does not map to the target architecture<br>
+and can only be described as bit-fields of arbitrarily large size. See Section 5.2.2: Bit-Aligned Structures
 
 
 <h3>1.6.3: Accessing Bit-Aligned Structured Data</h3>
 
-masmx naming techniques allow a single set of macros for a given target
-architecture to enable any application to access complex bit-aligned data.
-See Section 5.2.2.3: Macro Code Access to Bit-Aligned Structures. This
-feature handles bit-field structures and overlays of any complexity
-consistently and efficiently
+masmx naming techniques allow a single set of macros for a given target architecture to enable any application<br>
+to access complex bit-aligned data. See Section 5.2.2.3: Macro Code Access to Bit-Aligned Structures.<br>
+This feature handles bit-field structures and overlays of any complexity consistently and efficiently
 
 <h3>1.6.4: Repeat Data</h3>
 
-masmx generates repeating data and data structures with the $do directive and
-subscripted labels. See Section 5.1: $do and macros
+masmx generates repeating data and data structures with the $do directive and subscripted labels.<br>
+See Section 5.1: $do and macros
 
 
 <h3>1.6.5: Functionally Compartmented Name Spaces</h3>
 
 
-Hierarchic label structures can be used to compartment name spaces like
-languages structured by function. See Section 5.2.1.4: Structured Code
-Name Spaces
+Hierarchic label structures can be used to compartment name spaces like languages structured by function.<br>
+See Section 5.2.1.4: Structured Code Name Spaces
 
 
 
 <h2>1.7: Run-Time Algorithm Plotting</h2>
 
 
-Directives $xqt_i and $xqt_fp combine with target-specific macro language
-to translate algorithmic expressions with run-time variable tokens into
-an instruction plan. See Section 6.1: Run-Time Integer Algorithm Plotter
-and Section 6.2: Run-Time Floating Algorithm Plotter. This feature is more
-compiler-like than assembler-like and allows algorithms involving run-time
-variables to be coded in the form of algebraic expressions
+Directives $xqt_i and $xqt_fp combine with target-specific macro language to translate algorithmic expressions<br>
+with run-time variable tokens into an instruction plan. See Section 6.1: Run-Time Integer Algorithm Plotter and<br>
+Section 6.2: Run-Time Floating Algorithm Plotter
+
+<p>
+This feature is more compiler-like than assembler-like and allows algorithms involving run-time variables<br>
+to be coded in the form of algebraic expressions
 
 
 <h1>2: Developer Environment</h1>
@@ -785,8 +784,8 @@ Assembly examples in this document are captures from the Unix
 bash shell
 
 <p>
-masmx on Microsoft platforms does not need any shell more sophisticated
-than the original DOS command line screen
+masmx on Microsoft platforms runs with the simple command prompt
+sometimes called the DOS screen or shell
 
 <p>
 The command line is documented at Appendix A: masmx Command Line 
@@ -898,8 +897,8 @@ A label may be in "" and then it starts with anything and contains anything
 Without case-sensitive option -k all labels and references are translated to uppercase
 
 <p>
-$ in column one is a program section control called a location counter with syntax
-<b>$(number[:attributes])</b> See section <b>7: Constructing Program Sections</b>
+$ in column one is a program section control called a location counter with syntax <b>$(number[:attributes])</b><br>
+See section 7: Constructing Program Sections
 
 <p>
 A label starting with $ is declared in quotes but usually referenced without quotes
@@ -965,9 +964,8 @@ a_name(2)	99*65535
 a_name(1)	99*65536
 
 </pre>
-Macros generate and use labels which are discarded at the end of the macro expansion.
-Labels only remain available to the invoking level of assembly if they are promoted
-with trailing asterisk
+Macros generate and use labels which are discarded at the end of the macro expansion.<br>
+Labels only remain available to the invoking level of assembly if they are promoted with trailing asterisk
 <pre>
 
 $ masmx -lnxk visible visible
@@ -1077,8 +1075,8 @@ Operators in the same rank have left-to-right precedence as they are
 encountered in the expression
 
 <p>
-Operators of higher rank are evaluated first and operated last. An expression
-generates an integer until a decimal exponent operator *+ *- is actioned or a
+Operators of higher rank are evaluated first and operated last.<br>
+An expression generates an integer until a decimal exponent operator *+ *- is actioned or a
 decimal point is encountered
 
 <p>
@@ -1260,9 +1258,8 @@ immediat.msm: object code 62 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
-The default data code $ascii means more exactly characters unchanged
-from editor input and may therefore be ASCII extended to Roman-8 or
-UTF-8. These have the same code points 0..127 as ASCII
+The default data code $ascii means more exactly characters unchanged from editor input and may therefore be<br>
+ASCII extended to Roman-8 or UTF-8. These have the same code points 0..127 as ASCII
 
 <p>
 Character value string tokens are available to expressions whatever the
@@ -1273,8 +1270,8 @@ See also directives 8.1 $ascii, 8.8: $data_code and 8.5: $byte
 
 <p>
 If apostrophe has been chosen as the quote character, a command
-token starting apostrophe is a left-justified byte string and not
-an integer value string, but quoted tokens in expressions are value
+token starting apostrophe is a left-justified byte string<br>
+and not an integer value string, but quoted tokens in expressions are value
 strings, not labels
 <pre>
 
@@ -1421,8 +1418,8 @@ macro names, $DO loop tags) may be referenced in expressions
 
 </pre>
 Most labels return an absolute or a relocatable value. Some labels work
-functionally and return a computed value. See 4.2.1.2.3:
-Assembler-Supplied Functions and 4.2.1.2.4 Function Macro Reference
+functionally and return a computed value.<br>
+See 4.2.1.2.3: Assembler-Supplied Functions and 4.2.1.2.4 Function Macro Reference
 
 <p>
 Labels may be bounded with quotes on reference
@@ -1449,12 +1446,13 @@ left-justified string of arbitrary length space or zero padded to
 containing word
 
 <p>
-If $quote has been changed to ' apostrophe, labels in ' will not
-be detected in expressions. The character values between ' are
-right justified as values juxtaposed at current $byte size and
-translated from input to current $data_code, default 8-bit ASCII. 
+If $quote has been changed to ' apostrophe, labels in ' will not be detected in expressions.
+The character values between ' are right justified<br>
+as values juxtaposed at current $byte size and translated from input to current $data_code,
+default 8-bit ASCII.<br>
 See also 8.8 $DATA_CODE directive and 8.5 $BYTE directive
 <pre>
+
 
 $ masmx -lnkz
 MASMX 7r3
@@ -1594,7 +1592,7 @@ log2.msm=0<000003
 
 </pre>
 
-The assembly at 4.2.2.5 shows a function macro $net_ipv4 delivering a value which represents
+The assembly at 4.2.2.5 shows a function macro $net_ipv4 delivering a value which represents<br>
 a network address composed from dotted decimal text
 
 <p>
@@ -1726,8 +1724,8 @@ address_B	$net_socket	172.29.6.8:23
 
 
 The command field (the first field which is preceded by any
-whitespace) can contain a directive, a constant, a name
-of a $proc macro, or the name of a $form template.
+whitespace) can contain a directive, a constant,<br>
+a name of a $proc macro, or the name of a $form template.
 <pre>
 
 [label] COMMAND [arguments]
@@ -1779,14 +1777,14 @@ and frequently are, for example
 .macend $equ,"$directive"       "$end"
 
 </pre>
-Quotes are used in these PowerPC examples in case flag -m
-(Motorola old number notation) is opted. The quotes force the
-"$xxxxxx" tokens to be seen as labels and not as hex strings.
+Quotes are used in these PowerPC examples in case flag -m (Motorola old number notation) is opted.<br>
+The quotes force the "$xxxxxx" tokens to be seen as labels and not as hex strings.
 
 <p>
 A small number of directives, $WORD, $BYTE and others,
 work functionally in expressions
 
+<p>
 Both user macro functions and masmx internal functions need to
 be in quotes to rename their functionality. Otherwise they work
 functionally
@@ -1827,9 +1825,7 @@ floating numbers or text strings.
 
 <h3>4.3.3 Number Constants</h3>
 
-Number storage constants are assembled from an expression in the command
-field or a unary sign in the command field and an expression in the
-argument field
+Number items start with a digit or unary operator
 <pre>
 
 	+	INSTANCES*FACTOR
@@ -1837,7 +1833,6 @@ argument field
 	-8.5
 
 </pre>
-Number items start with a digit or unary operator
 
 <p>
 Unary + - ^ prepended to the first token of the constant expression
@@ -1870,8 +1865,10 @@ MASMX 7r3
 :$(00):0000:0010 
 
 </pre>
-Constants in apostrophe are character string values serving as numbers.  The bytes
-are right-justified in the current data code and juxtaposed at the current $byte size
+Constants in apostrophe are character string values serving as numbers
+
+<p>
+The bytes are right-justified in the current data code and juxtaposed at the current $byte size
 <pre>
 
 $ masmx -lnk
@@ -1906,9 +1903,8 @@ $(12:65536)
 :$(0C):10000:10014 
 
 </pre>
-Number line items are in canonical byte order, and the only way to
-change that is by implementing pseudo-directives (often implemented
-with names like DW and DD) as macros.
+Number line items are in canonical byte order, and the only way to change that is by implementing<br>
+pseudo-directives (often implemented with names like DW and DD) as macros.
 
 <p>
 Number constants may have trailing length overrides. Their meanings are
@@ -2020,10 +2016,9 @@ MASMX 7r3
 :$(00):0000:0003 
 
 </pre>
-$suffix-determined number notation (4.2.2.1: Number String Notation) masks
-length flags [d q h o] if the length flag is not separated. Fraction strings
-containing decimal point are decimal and a suffix is interpreted as size in
-words and not as notation
+$suffix-determined number notation (4.2.2.1: Number String Notation) masks length flags [d q h o]<br>
+if the length flag is not separated. Fraction strings containing decimal point are decimal and a suffix<br>
+is interpreted as size in words and not as notation
 <pre>
 
 $ masmx suffix -lnk
@@ -2122,9 +2117,8 @@ into the floating format of the target architecture
 floating_value	$set	16384.0e+1000000
 
 </pre>
-masmx internal floating precision is 192 bits with 168-bit simple fraction
-and 23-bit midpointed scale equivalent in range to decimal
-exponents [+|-]1262611
+masmx internal floating precision is 192 bits with 168-bit simple fraction and 23-bit<br>
+midpointed scale equivalent in range to decimal exponents [+|-]1262611
 <pre>
 
 
@@ -2181,9 +2175,8 @@ Without number_size, characteristic_width is for the current default
 floating number size
 
 <p>
-characteristic width is the characteristic field + sign, or
-everything except the mantissa. So for example a target which supports
-the 80-bit coprocessor format with 15-bit exponent might have
+characteristic width is the characteristic field + sign, or everything except the mantissa.<br>
+So for example a target which supports the 80-bit coprocessor format with 15-bit exponent might have
 <pre>
 
 	$floating_point	80
@@ -2225,9 +2218,8 @@ Macros supplied in this package generate IEEE754 floating constants.
 See Section 11: masmx Internal Floating Format and Alternative Floating Formats
 
 <p>
-This example generates the value 1.375e+1200000 with various typing.
-A size override h for hexaword follows the fraction in each number,
-so they are all 192 bits
+This example generates the value 1.375e+1200000 with various typing.<br>
+A size override h for hexaword follows the fraction in each number, so they are all 192 bits
 <pre>
 
 
@@ -2266,10 +2258,9 @@ floatalong $set 1.375h*+1200000
 
 
 </pre>
-The decimal scale operator not only adds scale to a fraction string, but may also
-join two integer expressions to construct a floating number, with the mantissa taken
-from the left and the exponent from the right. Any length override is typed after the
-fraction and before the *+ *- operator
+The decimal scale operator not only adds scale to a fraction string, but may also join two integer expressions<br>
+to construct a floating number, with the mantissa taken from the left and the exponent from the right. Any length<br>
+override is typed after the fraction and before the *+ *- operator
 <pre>
 
 $ masmx floating -lnky
@@ -2338,9 +2329,8 @@ MASMX 7r3
 <h4>4.2.2.4: Split Integers</h4>
 
 
-A split integer item is a small list of equal size fields. The
-size of the total is one word. The suffixes [d l t q p h o] can
-make the size  two, three, four, five, six or eight words.
+A split integer item is a small list of equal size fields. The size of the total is one word.<br>
+The suffixes [d l t q p h o] can make the size  two, three, four, five, six or eight words.
 
 <p>
 The source syntax of split integers has commas between the fields:
@@ -2727,8 +2717,8 @@ second_macro*	$name
 
 </pre>
 Macro language plus parameters can be displayed step-by step if the
-value $plist is greater than current macro nesting depth, given
-option flags -p (display $proc macros) -q (display $func macros).
+value $plist is greater than current macro nesting depth,<br>
+given option flags -p (display $proc macros) -q (display $func macros).
 
 <p>
 Listing and -pq displays are on the second assembly pass.
@@ -2778,9 +2768,8 @@ of a literal operand is placed in the address field of the instruction
 
 </pre>
 
-The instruction contains the <i>address</i> of the 64-bit constant 0FFFC0000A000C000.
-The constant is generated at the end  of the program section where ".literal_pool_name"
-is declared.
+The instruction contains the <i>address</i> of the 64-bit constant 0FFFC0000A000C000.<br>
+The constant is generated at the end  of the program section where ".literal_pool_name" is declared.
 
 <p>
 See 7: Constructing Program Sections, 7.1.7: Literal Pool Tag, 4.5: Literals, 4.5.5: Literal Pool Tags, 4.5.6: $lit directive
@@ -2796,10 +2785,9 @@ automatic literal
 See 4.5.3: Automatic Literals
 
 <p>
-Literals are typically used where a value is too large to be encoded as an immediate
-operand within an instruction. Constants which are not instruction code may also 
-reference literals. In this example an instruction points to a literal constant which
-points to another literal constant
+Literals are typically used where a value is too large to be encoded as an immediate operand within<br>
+an instruction. Constants which are not instruction code may also  reference literals. In this example<br>
+an instruction points to a literal constant which points to another literal constant
 <pre>
 
 $ masmx -lnky
@@ -2843,9 +2831,8 @@ $(.data:16384)
 <h3>4.5.1: A Literal is</h3>
 
 
-A literal is a constant generated by reference. It is assembled at the
-foot of its containing program section, which may be any section regardless
-of where the literal is referenced. Its address goes into the instruction
+A literal is a constant generated by reference. It is assembled at the foot of its containing program section,<br>
+which may be any section regardless of where the literal is referenced. Its address goes into the instruction>br>
 or structure which references it
 
 <p>
@@ -2987,9 +2974,8 @@ tag for the literal pool.
 <p>
 It is possible to generate nested literals.
 
-There is an example of how this might usefully be done at
-4.4.2: Literal Arguments. The two-word literal at 0500C contains a
-byte count and a pointer to a string literal at 05000
+There is an example of how this might usefully be done at 4.4.2: Literal Arguments.<br>
+The two-word literal at 0500C contains a byte count and a pointer to a string literal at 05000
 <pre>
 
 01:00002000 E860500C          +1122         ld      r3, (12, ("Hello World\n")d)
@@ -3449,11 +3435,9 @@ $a has no function for addresses in void sections, where the base
 register value is runtime dynamic
 
 <p>
-A breakpoint value in the locator declaration indicates a physical
-segment load address known in advance.<br> It is seen here that in
-base-displacement $a(<i>location</i>) retrieves the program-absolute address,<br>
-<i>location</i> retrieves the displacement only, and the physical load address
-is not accessed
+A breakpoint value in the locator declaration indicates a physical segment load address known in advance.<br>
+It is seen here that in base-displacement $a(<i>location</i>) retrieves the program-absolute address,<br>
+<i>location</i> retrieves the displacement only, and the physical load address is not accessed
 <pre>
 
 $ masmx -lnkyx
@@ -3478,8 +3462,8 @@ location=$0C:00000030,00000005
 :$(0C):0000C000:0000C030 
 
 </pre>
-A starred breakpoint address is not a load address translation value or index but part of
-program-visible addresses in the section. $a retrieves the large absolute value
+A starred breakpoint address is not a load address translation value or index but part of program-visible<br>
+addresses in the section. $a retrieves the large absolute value
 <pre>
 
 $ masmx -lnkx
@@ -3593,35 +3577,29 @@ The value of label base is 05000.
 
 <h3>4.7.4: $bank_index -absolute or virtual memory space identity</h3>
 
-$bank_index concerns targets which assign memory blocks dynamically
-into windows of address space. See 7.1.2, 7.1.4, Breakpointed Location Counters
+$bank_index concerns targets which assign memory blocks dynamically into windows of address space.<br>
+See 7.1.2, 7.1.4, Breakpointed Location Counters
 
 <p>
-$bank_index retrieves the current absolute or virtual load pointer for the
-memory block currently assembling. That is the in the <i>breakpoint_value</i>
-in the location counter switch statement
+$bank_index retrieves the current absolute or virtual load pointer for the memory block currently assembling.<br>
+That is the <i>breakpoint_value</i> in the location counter switch statement
 <pre>
 
 $(locator_number:program_visible_base_address:<i>breakpoint_value</i>)
 
 </pre>
-If assembly flag -v is not set, <i>breakpoint_value</i> is the absolute load
-address of the segment assembling. A section defined by locator number may have
-many breakpoints, making many segments of the same section with different load
-addresses, although the segments may share program-visible address space
+If assembly flag -v is not set, <i>breakpoint_value</i> is the absolute load address of the segment assembling.<br>
+A section defined by locator number may have many breakpoints, making many segments of the same section with different<br>
+load addresses, although the segments may share program-visible address space
 
 <p>
-If assembly flag -v is set, <i>breakpoint_value</i> is an abstraction like a
-handle or block identifier, and the binary output appends it to load string
-addresses without interpreting it. A section defined by location counter may
-have many segments with different storage block identifiers. See 7.1.2.2: 
-Breakpointed Location Counters: -v Option
+If assembly flag -v is set, <i>breakpoint_value</i> is an abstraction like a handle or block identifier,<br>
+and the binary output appends it to load string addresses without interpreting it. A section defined by location counter<br>
+may have many segments with different storage block identifiers. See 7.1.2.2: Breakpointed Location Counters: -v Option
 
 <p>
-Whether the section breakpoint address is absolute or a translatable
-value, $bank_index function retrieves the current breakpoint value
-without the developer otherwise knowing it. Identifying the memory
-block allows macro code to export an entry point or vector
+Whether the section breakpoint address is absolute or a translatable value, $bank_index function retrieves the current breakpoint<br>
+value without the developer otherwise knowing it. Identifying the memory block allows macro code to export an entry point or vector
 <pre>
 
 
@@ -3783,8 +3761,8 @@ masmx Linking assembly guards internally against truncation on absolute relocati
 
 <p>
 Assembling from source, range checks may be needed to prevent intermediate truncation,
-or final truncation in absolute assembly. It is desirable to to assemble relocatable
-and absolute with the same macro text
+or final truncation in absolute assembly.<br>
+It is also desirable to to assemble relocatable and absolute with the same macro text
 
 <p>
 This test
@@ -3870,10 +3848,10 @@ to be identified
 <h3>4.7.9: $rel	relocation factor of location counter</h3>
 
 The relocation factor of a location counter is zero if the program
-section is absolute and nonzero if the program counter is relocatable.
+section is absolute and nonzero if the program counter is relocatable.<br>
 A nonzero relocation factor is not guaranteed to be 1. It is the
-alignment quantum of the section and may be represented as negative
-(where only buffers are in the segment and no code)
+alignment quantum of the section and where only buffers are in the segment<br>
+and no code, the alignment quantum is represented as negative
 
 <h4>4.7.9.1:	$rel	relocation factor of current location counter</h4>
 
@@ -3900,27 +3878,25 @@ by the assembler or by the developer.
 
 <h4>4.7.10.1: Label Type Undefined</h4>
 
-
-Labels which have not been defined before the start
-of the second assembly pass may be tested for type, 
-which will be 0. Any other reference to an undefined
-label during the second assembly pass generates an
-external reference, or if -u flag is set, an error.
+A label which is not defined during the first assembly passed is external
+and has the type zero meaning undefined. Any reference to it other than<br>
+<b>$t()</b> function generates a link request for external resolution,
+or if -u flag is set, an error.
 
 
 <h4>4.7.10.2: Label Type Location</h4>
 
 
 A label has the type of a storage address if it
-has been encountered on column 1 of a source line, and
-is not the label of a $EQU, $SET, $EQUF, $PROC, 
-$FUNC, a $NAME in a $PROC or $FUNC, or the counter tag 
+has been encountered on column 1 of a source line,<br>
+and is not the label of a $EQU, $SET, $EQUF, $PROC, 
+$FUNC, a $NAME in a $PROC or $FUNC, or the counter tag<br> 
 of a $DO, or the tag of a $LIT directive. 
 	
 <p>
 The type and value of address labels cannot be changed.
 However the same label name can be used independently
-in different subassemblies (macro depths).
+at different macro depths
 	
 <p>
 An address label has an associated location counter and 
@@ -3939,7 +3915,7 @@ per subassembly. A warning is output if they are.
 
 <p>
 Any label name may be defined independently in different
-subassemblies.
+subassemblies (macro depths).
 
 
 <h4>4.7.10.4: Label Type $SET</h4>
@@ -3964,72 +3940,77 @@ a relative-1 counter, has a type of $SET.
 <h4>4.7.10.5: Label Type $EQUF</h4>
 
 
-$EQUF equates a label to a list of values and the label has
-the type $EQUF. This enables macro processing to assign to
-subassemblies a transparent number of subparameters.
+$EQUF equates a label to a list of values.
 
 <p>
-When parameter reference is resolved, the preassembled values
-in the $EQUF label are individually accessed, thus
+A $equf name supplied as actual argument to a macro 
+appears to macro text as a list of subfields. There
+may be other subfields of the field in front. Extra
+trailing subfields replace $equf subfield values
+(line 10) starting at the second position
 <pre>
 
-load    $proc
-	lwz     load(1, 1), load(1, 2)(load(1, 3))
-
-
-table_reference $equf   lookup, r31
-
-	load    r3, table_reference
-
-resolves to
-
-	lwz r3,lookup(r31)
-
-</pre>
-If the $EQUF name is a component of an expression, 
-it's its first value, "lookup" in this example, which is
-considered a principal value and is returned.
-<pre>
-
-MASMX 7r2
-3/lodation.msm
+$ masmx -lnky macaroon
+MASMX 7r3
+3/macaroon.msm
 LTERM=#
-CONT_CHAR=
+CONT_CHAR=\
 STERM=.
 *EOF*
-  :                            1:         $include "ppc1.def"
-  :                            2 load*   $proc
-  :                            3      lwz   load(1,1),load(1, 2)(load(1,3))
-  :                            4         $end
+  :                            1: 	$include	../aside.dem/ppc_603.def
+  :                            2 
+  :                            3 macaroon $equf	600, r31
+  :                            4 more	$equf	r3, 600, r31
   :                            5 
-  :                            6 lookup  $equ    101
-  :                            7 table_reference $equf   lookup, r31
-  :                            8 
-00:00000000 807F0065          +9         load    r3, table_reference
-  :                            10 
+  :                            6 $(.text:131072)
+  :                            7 
+01:00020000 807F0258          +8 	lwz	r3, macaroon
+01:00020004 807F0258          +9 	lwz	more
+01:00020008 807E0258          +10 	lwz	more,,r30
+  :                            11 
+  :                            12 
 *EOF*
-:$(00):00000000:00000004 
-lodation.msm: object code 54 bytes: 0 errors: 0 undefined labels
+:$(01):00020000:0002000C 
+
+</pre>
+If an $EQUF name is a token of expression, its value is its
+first attribute, so macaroon+20 would have a value of 620
+
+<p>
+Individual values in the $EQUF list may be retrieved with label\&xi;<br>
+more\2 has the value 600
+
+<p>
+The first $equf subfield may be a relocatable address, but
+<i>equf_label</i>\1 is not relocatable
+
+<pre>
+
+$ masmx crusti -lnky
+MASMX 7r3
+3/crusti.msm
+LTERM=#
+CONT_CHAR=\
+STERM=.
+*EOF*
+  :                            1: 	$include	../aside.dem/ppc_603.def
+  :                            2 
+  :                            3 $(.data:*4)
+  :                            4 croutons
+  :                            5 bisque $equf croutons, r29
+  :                            6 
+  :                            7 $(.text:131072)
+  :                            8 
+(+03)10
+01:00020000 80C00000          +9 	lwz	r6, croutons
+(+03)10
+01:00020004 80DD0000          +10 	lwz	r6, bisque
+01:00020008 80DD0000          +11 	lwz	r6, bisque\1
+*EOF*
+:$(01):00020000:0002000C 
 
 
 </pre>
-Any of the values in the $EQUF may be retrieved with label\X
-
-<p>
-In that assembly. table_reference\1 would retrieve the value
-"lookup", equal to 101.
-
-<p>
-table_reference\2 would be the tag value identifying r31
-
-<p>
-Any $EQUF attributes retrieved via \selector are net of relocation.
-
-<p>
-Any \selection outside the set which has been declared (here 1 and 2)
-gives a result of 0.
-
-
 
 <h4>4.7.10.6: Label Type $DIRECTIVE</h4>
 

@@ -665,4 +665,7 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz globules ..\test.zo3\globules -lok > ..\text.zo3\globules.txt
 ..\masmz garbules ..\test.zo3\garbules -lok > ..\text.zo3\garbules.txt
 ..\masmz ragaline ..\test.zo3\ragaline -lok > ..\text.zo3\ragaline.txt
+..\masmz forward ..\test.zo3\forward -lok > ..\text.zo3\forward.txt
+..\masmz macaroon ..\test.zo3\macaroon -lok > ..\text.zo3\macaroon.txt
+..\masmz crusti ..\test.zo3\crusti -lok > ..\text.zo3\crusti.txt
 

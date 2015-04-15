@@ -1,0 +1,15 @@
+	$word	16
+	$quantum 8
+
+p	$proc
+first*	$name
+	second	p()	102
+	$end
+
+p	$proc
+second*	$name
+?	$do	p(),	+	p(?, 1)
+	$end
+
+	first	101	99	100
+

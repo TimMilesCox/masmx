@@ -1,0 +1,11 @@
+	$include	../aside.dem/ppc_603.def
+
+$(.data:*4)
+croutons
+bisque $equf croutons, r29
+
+$(.text:131072)
+
+	lwz	r6, croutons
+	lwz	r6, bisque
+	lwz	r6, bisque\1

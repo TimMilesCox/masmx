@@ -97,7 +97,7 @@
 	    1.	$rel	current relocation factor			4.7.9.1
 	    2.  $rel(..) relocation factor of named locator		4.7.9.2
 
-	10. $t(..)	type of a label					4.7.10
+	10. $t(..)	Label Type					4.7.10
 	    1.		undefined					4.7.10.1
 	    2.		location					4.7.10.2
 	    3.		$EQU						4.7.10.3

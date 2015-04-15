@@ -1,0 +1,10 @@
+	$include	../aside.dem/ppc_603.def
+
+macaroon $equf	600, r31
+more	$equf	r3, 600, r31
+
+$(.text:131072)
+
+	lwz	r3, macaroon
+	lwz	more
+	lwz	more,,r30
