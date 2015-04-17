@@ -674,6 +674,9 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx forward ..\test.o3\forward -lyok > ..\text.o3\forward.txt
 ..\masmx macaroon ..\test.o3\macaroon -lyok > ..\text.o3\macaroon.txt
 ..\masmx crusti ..\test.o3\crusti -lyok > ..\text.o3\crusti.txt
+..\masmx afar ..\test.o3\afar -lyok > ..\text.o3\afar.txt
+..\masmx seriozha ..\test.o3\seriozha -lyok > ..\text.o3\seriozha.txt
+..\masmx leriozha ..\test.o3\leriozha -lyok > ..\text.o3\leriozha.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

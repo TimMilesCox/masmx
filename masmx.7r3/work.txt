@@ -65,8 +65,8 @@ of words or bytes, whichever the target address quantum is)
 <p>
 Memories this large are not immediately expected, but masmx
 calculates and labels numbers of this size.<br>
-There is no reason why in an assembler for any target
-the maximum address range should be less than the maximum number size
+There is no reason why an assembler for all targets should have
+less maximum address range than maximum number size
 
 <p>
 Segmented memory, base-displacement addressing, preprogrammed physical
@@ -84,7 +84,7 @@ All existing source code assembles unchanged
 Intermediate binary encoding and target S-Records or I-Records are in text
 
 <p>
-The accompanying masmx definitions headers for 8051 and for PowerPC
+The accompanying masmx definition headers for 8051 and for PowerPC
 are field proven in live commercial use.
 
 <p>
@@ -632,7 +632,7 @@ Integer constants occupy by default their containing number of words
 
 <p>
 masmx can construct absolute arrays and instruction segments to fit
-in address spaces up to 2*/192 bits.
+in address spaces up to 1*/192 bits.
 
 <p>
 Absolute and relocatable object code may be incremented
@@ -662,8 +662,8 @@ See Section 7: Constructing Program Sections
 masmx default floating constant size is 96 bits rounded from 192 bits
 
 <p>
-Internally generated 192-bit floating values have 23-bit exponent and
-168-bit fractional mantissa
+Internally generated 192-bit floating values have 23-bit midpointed exponent
+and 168-bit fractional mantissa
 <pre>
 
 	__________________________________________________________________
@@ -680,7 +680,7 @@ Macro code can achieve any representation
 
 <p>
 Supplied macros generate IEEE754 floating constants in 32-bit, 64-bit and 128-bit formats,<br>
-and in the popular non-IEEE654 80-bit representation
+and in the popular non-IEEE754 80-bit representation
 
 <p>
 IEEE754 floating formats have an unrepresented integral bit. A sign flag alone 
@@ -814,7 +814,7 @@ existing source. File includes may be extensively nested
 
 	$list	0
 	$include	target.def
-	$list	2
+	$list
 	$include	existing_application.msm
 
 </pre>
@@ -827,6 +827,8 @@ A definition file included at the head of the assembly defines:
 	<blockquote>
 
 	assembly language syntax<br><br>
+
+	directive and function rename and resynthesis<br><br>
 
 	computer word size, up to 192 bits<br><br>
 
@@ -880,28 +882,51 @@ See 4.2.2.2.2.5: Macro Parameters
 
 <h2>4.1: Labels</h2>
 
-A label starts in column 1 and ends in whitespace. A label may contain letters,
-digits, $_?!@: and starts with a letter or _?!@
+A label starts in column 1 and ends in whitespace. A label may contain
+<pre>
+
+	letters digits $ _ ? ! @ :
+
+</pre>
+and starts with a letter or [ _ ? ! @ : ]
 
 <p>
 : in this list of legal label characters represents the substring separator which is
 default colon : but may be another value, often period . 
 
 <p>
+If for example period . is chosen for substring character
+<pre>
+
+	$sterm	'.'
+
+</pre>
+then the list of legal label characters becomes
+<pre>
+
+	letters digits $ _ ? ! @ .
+
+</pre>
+and starts with a letter or [ _ ? ! @ . ]
+
+<p>
 A reference containing substring separator may reference a simple label or a structured location
 
 <p>
-A label may be in "" and then it starts with anything and contains anything
+A label may also start with $ and is then declared in quotes
+<pre>
 
-<p>
-Without case-sensitive option -k all labels and references are translated to uppercase
+"$mylabel"
 
-<p>
+</pre>
 $ in column one is a program section control called a location counter with syntax <b>$(number[:attributes])</b><br>
 See section 7: Constructing Program Sections
 
 <p>
-A label starting with $ is declared in quotes but usually referenced without quotes
+A label declared in quotes starts with anything and contains anything
+
+<p>
+Without case-sensitive option -k all labels and references are translated to uppercase
 
 <p>
 A label may have an arbitrary number of subscripts
@@ -1411,7 +1436,7 @@ words suffix [s d l t q p h o]. See 4.2.2.3: Number constants
 
 
 Labels of any type (storage location line labels, equates, function
-macro names, $DO loop tags) may be referenced in expressions
+macro names, $do loop tags) may be referenced in expressions
 <pre>
 
 	+       this*that+the_other
@@ -1441,7 +1466,7 @@ ab	$equ	40
 :$(00):000000:000003 
 
 </pre>
-A command field bounded with $quote is not an expression but a
+A command field bounded with quotes is not an expression but a
 left-justified string of arbitrary length space or zero padded to
 containing word
 
@@ -1463,13 +1488,11 @@ QDELIM='
 	+'ab'		. a number
 	'ab'		. a string
 	$end
-QDELIM='
   :                            1 ab $equ 40
   :                            2  $quote ''''
-  :                            3 QDELIM='
-00:000000 006162              +4  +'ab'	 . a number
-00:000001 616200              +5  'ab'   . a string
-  :                            6  $end
+00:000000 006162              +3  +'ab'  . a number
+00:000001 616200              +4  'ab'  . a string
+  :                            5  $end
 :$(00):000000:000002 
 
 
@@ -1480,6 +1503,10 @@ QDELIM='
 
 See also 4.7 masmx Internal Functions in Detail.
 Internal functions are in summary:
+
+<p>
+Assembling with -k option,  directives, masmx-internal functions and all names supplied by masmx must be typed lowercase
+
 <pre>
 
 
@@ -1611,7 +1638,7 @@ add*    $name   1
 	$end
 
 </pre>
-Actual arguments map to these reference paraforms when the $proc name is p 
+Actual arguments map to these reference paraforms when the $proc name is, for example, p 
 <pre>
 
 
@@ -1781,8 +1808,7 @@ Quotes are used in these PowerPC examples in case flag -m (Motorola old number n
 The quotes force the "$xxxxxx" tokens to be seen as labels and not as hex strings.
 
 <p>
-A small number of directives, $WORD, $BYTE and others,
-work functionally in expressions
+Four directives, $word, $byte, $awidth, $quantum, work functionally in expressions and return the value which they have set
 
 <p>
 Both user macro functions and masmx internal functions need to
@@ -1803,6 +1829,9 @@ A token in the command field only begins with a quote if it is a text string (4.
 
 <p>
 Directive names and macro names always are recognised in the command field without quotes
+
+<p>
+Assembling with -k option,  directives, masmx-internal functions and all names supplied by masmx must be typed lowercase
 
 <p>
 Number storage constants start with a digit, sign or single quote, or have the name
@@ -2118,7 +2147,7 @@ floating_value	$set	16384.0e+1000000
 
 </pre>
 masmx internal floating precision is 192 bits with 168-bit simple fraction and 23-bit<br>
-midpointed scale equivalent in range to decimal exponents [+|-]1262611
+midpointed binary exponent equivalent in range to decimal exponents [+|-]1262611
 <pre>
 
 
@@ -2165,17 +2194,17 @@ stored floating-point constant.
 
 <p>
 The $characteristic directive sets the characteristic size for a given
-number size
+floating <i>number_size</i>
 <pre>
 
-	$characteristic,number_size	characteristic_width
+	$characteristic,<i>number_size</i>	<i>characteristic_width</i>
 
 </pre>
-Without number_size, characteristic_width is for the current default
-floating number size
+Without <i>number_size</i> subcommand, <i>characteristic_width</i> is the characteristic field size<br>
+applied to floating numbers of the current default size
 
 <p>
-characteristic width is the characteristic field + sign, or everything except the mantissa.<br>
+characteristic width is the scale field + sign, or everything except the mantissa.<br>
 So for example a target which supports the 80-bit coprocessor format with 15-bit exponent might have
 <pre>
 
@@ -2218,8 +2247,9 @@ Macros supplied in this package generate IEEE754 floating constants.
 See Section 11: masmx Internal Floating Format and Alternative Floating Formats
 
 <p>
-This example generates the value 1.375e+1200000 with various typing.<br>
-A size override h for hexaword follows the fraction in each number, so they are all 192 bits
+This example generates storage constants of value 1.375e+1200000 in masmx-internal format typed in various source syntax.<br>
+A size override h for hexaword follows the fraction in each number, so the stored constants are all 192 bits
+instead of the default 96 bits
 <pre>
 
 
@@ -2467,15 +2497,17 @@ See also Appendix A: Command Line, Options -zc for space or zero pad
 Text string constants are described further in 
 
 	<blockquote>
-	Section 8.5: $BYTE Directive<br><br>
-	Section 8.41: $QUOTE Directive<br><br>
-	Section 8.49: $STERM Directive<br><br>
-	Section 8.8: $DATA_CODE Directive<br><br>
-	Section 8.1: $ASCII Directive
+	Section 8.5: $byte Directive<br><br>
+	Section 8.41: $quote Directive<br><br>
+	Section 8.49: $sterm Directive<br><br>
+	Section 8.8: $data_code Directive<br><br>
+	Section 8.1: $ascii Directive
 	</blockquote>
 
-Text strings generate enough words (size set by $WORD) to 
-contain a byte (size set by $BYTE) per symbol in the string.
+Text strings generate enough words (size set by directive $word) to 
+contain a byte (size set by directive $byte) per symbol in the string.<br>
+Bytes can straddle word boundaries without restriction if
+$byte is not a factor of $word. New strings start at a new word
 
 <p>
 Each character between "quotes" is a symbol and an expression
@@ -2502,8 +2534,36 @@ If there are bits unfilled  after the last whole byte position
 in the last word in the string, they are zero filled.
 
 <p>
+Byte size may be larger than word size, but may not exceed 32 bits
+<pre>
+
+$ masmx -lnkyx
+MASMX 7r3
+0/-INPUT>>
+	$word	16
+	$data_code      'a':1*/23++'a',1*/23++'b',1*/23++'c'
+	$byte	24
+	"abc"
+	$end
+  :                            1  $word 16
+  :                            2  $data_code      'a':1*/23++'a',1*/23++'b',1*/23++'c'
+  :                            3  $byte 24
+00:0000 80006180006280006300  +4  "abc"
+  :                            5  $end
+$bits=$00:0048
+-INPUT>>=0<0000
+:$(00):0000:0005 
+
+</pre>
+Automatic label <b>$bits</b> indicates here that the string contains 72 bits or three 24-bit characters.<br>
+The containing storage is five sixteen-bit words or 80 bits
+
+<p>
 See also Appendix F.4: Byte-Addressing Machines with 32- and 64-bit
 Bus, Managing Alignments
+
+<p>
+See also escape sequences with assembly flag -c
 
 
 <h3>4.3.6: $FORM Items</h3>
@@ -2548,6 +2608,8 @@ That's how instructions are in masmx.
 Instruction names are not known to masmx until
 they are the names of macros or macro entry points:
 <pre>
+
+instruction_form $form	8, 12, 12
 
 p       $proc
 add*    $name   6
@@ -2832,7 +2894,7 @@ $(.data:16384)
 
 
 A literal is a constant generated by reference. It is assembled at the foot of its containing program section,<br>
-which may be any section regardless of where the literal is referenced. Its address goes into the instruction>br>
+which may be any section regardless of where the literal is referenced. Its address goes into the instruction<br>
 or structure which references it
 
 <p>
@@ -3154,7 +3216,7 @@ call them if they have unique names as well:
 <pre>
 
 f       $func	*
-Distant_Routine* $NAME
+Distant_Routine* $name
 	$if     $t(f(1,1))=0  . Non-existent?
 "f(1,1)"** generate f(1,1)    . Generate Label and Data
 	$endif
@@ -3170,8 +3232,8 @@ exactly as in the $PROC context:
 <pre>
 
 f       $func	*
-Distant_Routine* $NAME '0'
-Distant_Destiny* $NAME '1'
+Distant_Routine* $name '0'
+Distant_Destiny* $name '1'
 	$if     $t("f(1,1):f(0,1)")=0  . Non-existent?
 "f(1,1):f(0,1)"** generate f(1,1, $N)
 			      . Generate Label and Data
@@ -3902,8 +3964,47 @@ at different macro depths
 An address label has an associated location counter and 
 is either absolute or relocatable.
 
+<p>
+The type of a location or storage address label is 127. This type value does not have a masmx-supplied name
+<pre>
 
-<h4>4.7.10.3: Label Type $EQU</h4>
+$ masmx -lnkyx
+MASMX 7r3
+0/-INPUT>>
+$(5:05000)
+startup	+       $t(startup)
+	$end
+  :                            1 $(5:05000)
+05:005000 00007F              +2 startup + $t(startup)
+  :                            3  $end
+startup=$05:005000
+-INPUT>>=0<000000
+:$(05):005000:005001 
+
+</pre>
+A location label is always associated with a a location counter, and so are labels
+of types $set and $equ, if they are equated to a storage address
+<pre>
+
+$(5:05000)
+startup	+       $t(startup)
+forward	$set	startup
+along	$equ	forward
+	$end
+  :                            1 $(5:05000)
+05:005000 00007F              +2 startup +       $t(startup)
+  :                            3 forward $set startup
+  :                            4 along $equ forward
+  :                            5  $end
+along=$05:005000
+forward=$05:005000
+startup=$05:005000
+-INPUT>>=0<000000
+:$(05):005000:005001 
+
+</pre>
+
+<h4>4.7.10.3: Label Type $equ</h4>
 
 
 The label of a $EQU line has an absolute or a relocatable 
@@ -3917,27 +4018,33 @@ per subassembly. A warning is output if they are.
 Any label name may be defined independently in different
 subassemblies (macro depths).
 
+<p>
+See 8.14: $equ directive 
 
-<h4>4.7.10.4: Label Type $SET</h4>
+
+<h4>4.7.10.4: Label Type $set</h4>
 
 
-The label of a $SET line has an absolute or a relocatable 
+The label of a $set line has an absolute or a relocatable 
 value according to the argument to which it's set.
 
 <p>
-$SET labels are intended to be reassigned at will.
-$SET is actioned on both assembly passes.
+$set labels are intended to be reassigned at will.
+$set is actioned on both assembly passes.
 
 <p>
 Any label name may be defined independently in different
 subassemblies.
 
 <p>
-The label of a $DO, which accumulates in value as
+The label of a $do, which accumulates in value as
 a relative-1 counter, has a type of $SET.
+
+<p>
+See 8.46: $set directive 
 	
 
-<h4>4.7.10.5: Label Type $EQUF</h4>
+<h4>4.7.10.5: Label Type $equf</h4>
 
 
 $EQUF equates a label to a list of values.
@@ -3974,7 +4081,7 @@ STERM=.
 
 </pre>
 If an $EQUF name is a token of expression, its value is its
-first attribute, so macaroon+20 would have a value of 620
+first attribute, so macaroon+20 has a value of 620
 
 <p>
 Individual values in the $EQUF list may be retrieved with label\&xi;<br>

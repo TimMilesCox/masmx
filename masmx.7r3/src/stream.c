@@ -14,7 +14,7 @@ static void stringline(char *qstring, char *param, txo *image)
    int			 positions = cache_line;
    int			 bits = 0;
    long			 symbol;
-   long			 mask = (1 << byte) - 1;
+   long			 mask = (byte == 32) ? 0xFFFFFFFF : (1 << byte) - 1;
    long			 buffer;
    char			*q = substitute(qstring, param);
 

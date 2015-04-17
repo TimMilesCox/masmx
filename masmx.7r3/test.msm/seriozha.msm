@@ -1,0 +1,15 @@
+	$set_option	"c"
+	$byte 32
+	'ab'
+	"ab"
+	'ab\x80000063'
+	"ab\x80000063"
+
+mungle	$record	'ab'	"cd"	'mn\x8000006f'	"xy\x8000007a" 99
+	80
+	80
+	80
+	100
+	8
+	$root
+

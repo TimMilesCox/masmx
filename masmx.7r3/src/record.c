@@ -317,7 +317,7 @@ static int precord(object *l, char *line, char **data, int nest)
 
       if ((*argument == qchar) || (x > 192))
       {
-         mask = (1 << byte) - 1;
+         mask = mask = (byte == 32) ? 0xFFFFFFFF : (1 << byte) - 1;;
 
          for (;;)
          {
