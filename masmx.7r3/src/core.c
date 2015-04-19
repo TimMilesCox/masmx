@@ -6794,7 +6794,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		  {
 		     while (*argument == 32) argument++;
 		     if (*argument == 0) break;
-		     limit = first_at(argument, ": ");
+		     limit = first_at(argument, ", ");
 		     v = expression(argument, limit, param);
 
 		     for (;;)
