@@ -1,13 +1,13 @@
 <center>
 
 <div style=font-family:Times">
-<h1>MASMX.7r2</h1>
+<h1>MASMX.7r3</h1>
 
 
 <i>
-Copyright Tim Cox, 2012<br>
+Copyright Tim Cox, 2015<br>
 
-This document describes the masmx.7r2 target-independent meta-assembler
+This document describes the masmx.7r3 target-independent meta-assembler
 <br>
 The masmx.7r2 meta-assembler is free software licensed with the GNU General Public Licence Version 3
 <br>
@@ -340,10 +340,10 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     6.	$characteristic		set floating exponent field size	8.6
 
     7.	$cont_char	change line continue character			8.7
-    8.	$data_code	define/select alternate character set		8.8
+    8.	$data_code	define/select character string code points	8.8
     9.	$do		generate repeated code				8.9
     10.	$else		conditional assembly				8.10
-    11.	$endif		conditional assembly				8.11
+    11.	$elseif		conditional assembly				8.11
     12.	$end		foot of macro or assembly			8.12
     13.	$endif		conditional assembly				8.13
     14.	$equ		assign a value to label				8.14
@@ -434,7 +434,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	2.		return from within $PROC..$END			8.44.2
 
     45.	$root		end of a structured name space which was	
-			begun with $TREE or $BRANCH			8.45
+			begun with $tree, $branch or $record		8.45
 
     46.	$set		assign value to a reassignable label		8.46
 
@@ -1283,7 +1283,7 @@ immediat.msm: object code 62 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
-The default data code $ascii means more exactly characters unchanged from editor input and may therefore be<br>
+The default data code $ascii means more exactly characters unchanged from source input and may therefore be<br>
 ASCII extended to Roman-8 or UTF-8. These have the same code points 0..127 as ASCII
 
 <p>
@@ -1334,7 +1334,7 @@ expressions
 
 <p>
 It is not in simple cases necessary to reference labels in quotes, but macro
-text sometimes does that in order to manipulate parameter values
+text in some circumstances must
 
 <pre>
 
@@ -1367,7 +1367,7 @@ place
 
 </pre>
 
-Option -m Motorola Old Number Notation (4.2.2.1.3) also masks labels
+Option -m Motorola Old Number Notation (4.2.2.1.3) masks labels
 beginning with $ or @ unless they are referenced in quotes
 
 
@@ -1375,7 +1375,7 @@ beginning with $ or @ unless they are referenced in quotes
 <h4>4.2.2.1.2:  C-Language Number and Character String Notation</h4>
 
 With Assembly Flag -c 1000 and 0x3e8 both mean one thousand and
-leading zero is otherwise octal
+leading zero without x or X is octal
 
 <p>
 -c Flag also zero-fills character strings to containing word unless
@@ -1502,10 +1502,10 @@ QDELIM='
 <h4>4.2.2.3: masmx-Supplied Functions</h4>
 
 See also 4.7 masmx Internal Functions in Detail.
-Internal functions are in summary:
 
 <p>
-Assembling with -k option,  directives, masmx-internal functions and all names supplied by masmx must be typed lowercase
+Assembling with -k option,  directives, masmx-internal functions and all names supplied by masmx must be typed lowercase<br>
+Internal functions are in summary:
 
 <pre>
 
@@ -1755,7 +1755,7 @@ whitespace) can contain a directive, a constant,<br>
 a name of a $proc macro, or the name of a $form template.
 <pre>
 
-[label] COMMAND [arguments]
+[label] <i>command</i> [arguments]
 
 </pre>
 
@@ -1770,25 +1770,25 @@ Directives are commands to the assembler. They are listed in Section 8: Directiv
 Some directives control assembly settings, for example
 <pre>
 
-	$word		BITS
-	$quantum	BITS
-	$list		INCLUDE_DEPTH
+	$word		<i>BITS</i>
+	$quantum	<i>BITS</i>
+	$list		<i>INCLUDE_DEPTH</i>
 
 </pre>
 Others declare labels
 <pre>
 
-label1	$set	VALUE
-label2	$equf	VALUE1, VALUE2...
-label	$equ	VALUE
-label3	$name	VALUE
+<i>label1</i>	$set	<i>VALUE</i>
+<i>label2</i>	$equf	<i>VALUE1</i>, <i>VALUE2..</i>
+<i>label</i>	$equ	<i>VALUE</i>
+<i>label3</i>	$name	<i>VALUE</i>
 
 </pre>
 Others govern conditional assembly
 <pre>
 
-	$if		CONDITION
-	$elseif		CONDITION
+	$if		<i>CONDITION</i>
+	$elseif		<i>CONDITION</i>
 	$endif
 
 </pre>
@@ -1854,12 +1854,13 @@ floating numbers or text strings.
 
 <h3>4.3.3 Number Constants</h3>
 
-Number items start with a digit or unary operator
+Number items start with a digit, a unary operator or character values in apostrophe
 <pre>
 
 	+	INSTANCES*FACTOR
 	15
 	-8.5
+	'xy'
 
 </pre>
 
@@ -1932,7 +1933,7 @@ $(12:65536)
 :$(0C):10000:10014 
 
 </pre>
-Number line items are in canonical byte order, and the only way to change that is by implementing<br>
+Number storage values are in canonical byte order, and the only way to change that is by implementing<br>
 pseudo-directives (often implemented with names like DW and DD) as macros.
 
 <p>
@@ -2626,7 +2627,7 @@ Then the lines in assembly language files are macro calls like these:
 	mov     That, There
 
 </pre>
-$proc macros assembly may be nested up to 24-deep to include many
+$proc macros assembly may be nested up to 24-deep and may include many
 instructions or data structures:
 <pre>
 
@@ -2704,7 +2705,7 @@ for example:
 L       $EQU    2
 	.
 	.
-	move,L  etc,etc
+	move,L  location1,location2
 
 
 </pre>
@@ -2713,7 +2714,7 @@ p(0, 2) will return the value of L, which is 2.
 
 <p>
 One macro may send all its actual arguments to another macro by<br>
-using the paraform <i>macro_name()</i>. Extra arguments may be added 
+using the paraform <i>macro_label()</i>. Extra arguments may be added 
 <pre>
 
 $ masmx forward -lnky
@@ -3912,12 +3913,14 @@ to be identified
 The relocation factor of a location counter is zero if the program
 section is absolute and nonzero if the program counter is relocatable.<br>
 A nonzero relocation factor is not guaranteed to be 1. It is the
-alignment quantum of the section and where only buffers are in the segment<br>
-and no code, the alignment quantum is represented as negative
+alignment quantum of the section and it is represented as negative if the<br>
+segment contains only buffers and no code
 
-<h4>4.7.9.1:	$rel	relocation factor of current location counter</h4>
+<h4>4.7.9.1:	$rel</h4>
 
-<h4>4.7.9.2:	$rel(<i>locator</i>)
+$rel without parameter is the relocation factor of the current location counter</h4>
+
+<h4>4.7.9.2:	$rel(<i>locator</i>)</h4>
 
 <i>locator</i> is a value in the range 0..71
 
@@ -3957,13 +3960,9 @@ of a $DO, or the tag of a $LIT directive.
 	
 <p>
 The type and value of address labels cannot be changed.
-However the same label name can be used independently
+However the same label name can be used independently and differently
 at different macro depths
 	
-<p>
-An address label has an associated location counter and 
-is either absolute or relocatable.
-
 <p>
 The type of a location or storage address label is 127. This type value does not have a masmx-supplied name
 <pre>
@@ -3982,8 +3981,8 @@ startup=$05:005000
 :$(05):005000:005001 
 
 </pre>
-A location label is always associated with a a location counter, and so are labels
-of types $set and $equ, if they are equated to a storage address
+A location label is associated with a a location counter and is either absolute or relocatable.<br>
+So are labels of types $set and $equ, if they are equated to a storage address
 <pre>
 
 $(5:05000)
@@ -4008,15 +4007,14 @@ startup=$05:005000
 
 
 The label of a $EQU line has an absolute or a relocatable 
-value according to the the argument to which it's equated.
+value according to the the argument to which it is equated.
 
 <p>
 $EQU labels are not intended to be equated more than once
-per subassembly. A warning is output if they are.
 
 <p>
-Any label name may be defined independently in different
-subassemblies (macro depths).
+A label name may be defined independently and differently
+at different macro depths
 
 <p>
 See 8.14: $equ directive 
@@ -4026,19 +4024,15 @@ See 8.14: $equ directive
 
 
 The label of a $set line has an absolute or a relocatable 
-value according to the argument to which it's set.
+value according to the argument to which it is set.
 
 <p>
-$set labels are intended to be reassigned at will.
+$set labels may be redefined without restriction.
 $set is actioned on both assembly passes.
 
 <p>
-Any label name may be defined independently in different
-subassemblies.
-
-<p>
-The label of a $do, which accumulates in value as
-a relative-1 counter, has a type of $SET.
+A label name is defined independently and differently
+at different macro depths.
 
 <p>
 See 8.46: $set directive 
@@ -4121,11 +4115,9 @@ STERM=.
 
 <h4>4.7.10.6: Label Type $DIRECTIVE</h4>
 
-
-The labels of directives available when the assembler begins 
-to execute have the type $DIRECTIVE. The developer may also
-alias those directives by giving equates the type of 
-$DIRECTIVE, thus
+The names of the 51 directives are labels. See Section 8
+They can be given extra names which also have the label 
+type directive
 <pre>
 
 MACRO   $equ,$directive $proc
@@ -4502,20 +4494,11 @@ Example
 <h1>5: Iterated Code and Structured Data</h1>
 
 
-<h2>5.1: $do and $proc Macros</h2>
-<pre>
+<h2>5.1: $do Directive and $proc Macros</h2>
 
+A 32-bit computer has an integer-to-ASCII routine which translates
+to eight columns with the help of a 10,000 word table
 
-	$DO	count,repeated_source_line
-
-</pre>
-<p>
-This example discusses a 32-bit computer, and an integer-to-ASCII
-conversion routine which uses a 10,000 word table to translate an integer
-to eight ascii digits in five instructions, plus a store instruction. 
-
-<p>
-The table has to contain 10,000 4-byte elements:
 <pre>
 
 	"0000"
@@ -4526,288 +4509,52 @@ The table has to contain 10,000 4-byte elements:
 	"9999"
 
 </pre>
+
+The conversion takes four instructions and a store 
 <p>
-Instead of coding all that stuff by hand, you code (the nested $DO shown
-is all one line, using ; continuation)
+masmx codes this 10,000-word constant under loop control
 <pre>
 
-	$WORD   32
 
 values_table
-thousa	$do             10,;
-hundre	$do             10,;
-ten	$do             10,;
-unit	$do             10,	;
-	+               '0'+thousa-1, '0'+hundre-1, '0'+ten-1, '0'+unit-1
+thousands	$do             10,;
+hundreds	$do             10,;
+tens		$do             10,;
+units		$do             10,	+	'0'+thousands-1, '0'+hundreds-1, '0'+tens-1, '0'+units-1
 
 
 	load    reg1, integer
+.
 	doubleshiftright        reg1, 32
 	divide  reg1, 10000, IMMEDIATE
 	load    reg1, values_table, Indexreg1
 	load    reg2, values_table, Indexreg2
+.
 	doublestore reg1, eightbytefield
 
-</pre>
-<p>
-This is the same table with different line-continues:
-<pre>
-
-values_table
-Thousands $do 10,Hundreds $do 10,tens $do 10,units $do 10, ;      
-	'0'+Thousands-1, ;
-	'0'+Hundreds-1,  ;
-	'0'+Tens-1,      ;
-	'0'+units-1
 
 </pre>
 <p>
-A label (Thousands, Hundreds etc) on the $DO 
-line is a relative-1 counter tag.
+A label on a $do line is a counter incrementing from 1 
 
-
-<h2>7.2 Subscripted Labels</h2>
-
-<p>
-Labels may be generated with subscripts on the end.
-
-<p>
-Macro language can produce the subscripted new labels, and so
-can developers manually.
-
-<p>
-In the following example:
-
-<p>
-Line 3 references a label which does not exist
-
-<p>
-Line 4 is a count of labels one(x) with one subscript.
-
-<p>
-Line 5 is a count of labels one(8,x) with two subscripts.
-
-<p>
-Line 6 references a subscripted label which does
-exist, "one(1)", and gets its value, the address 00000F.
-
-<p>
-There is no label "one(2)". Therefore line 7 counts all the labels
-"one(2,x)", and there are none. The resulting value is 0.
-
-<p>
-There is no label "one(3)". Therefore line 8 counts all the labels
-"one(3,x)", and there are none. The resulting value is 0.
-
-<p>
-Line 9 gets a count of all the one(x) labels with one subscript, as line 4. 
-
-<p>
-Line 11 would change the number of one(x) labels to 3 if flag <b>-k</b> were
-set, and line 7 would then get the value 00000F as line 6.
-
-<p>
-Line 16 references a label which does not exist.
-
-<p>
-Assembly is with <b>-u</b> option to highlight whether any labels are
-undefined.
-
-<p>
-Only two labels are marked as undefined: unsubscripted <b>one</b> at line 3,
-and  <b>two</b> at line 16.
-<pre>
-
-MASMX 7r2
-3/simple.msm
-*EOF*
-  :                            1         $res    4
-  :                            2 one(9)  $res    4
-undefined name in simple.msm on Line 3: ONE
-00:000008 000000              +3        +       one
-00:000009 000002              +4         +       one()
-00:00000A 000004              +5        +       one(8)
-00:00000B 00000F              +6         +       one(1)
-00:00000C 000000              +7         +       one(2)
-00:00000D 000000              +8         +       one(3)
-00:00000E 000002              +9         +       one()
-  :                            10 one(1)
-  :                            11       $do     $o('k'),one(2)
-  :                            12 one(8,1)
-  :                            13 one(8,2)
-  :                            14 one(8,3)
-  :                            15 one(8,4)
-undefined name in simple.msm on Line 16: TWO
-00:00000F 000000              +16         +       two(7)
-*EOF*
-:$(00):000000:000010 
-simple.msm: object code 135 bytes: 0 errors: 2 undefined labels
 
 
 </pre>
-<p>
-It's possible to have several subscripts and to generate
-the subscripts from $DO tags:
-<pre>
+<h2>5.2: Structured Data and Structured Code Name Spaces</h2>
 
-MASMX 7r2
-3/similar.msm
-*EOF*
-  :                            1 $(0:64)
-  :                            2 label(1)
-  :                            3 times   $do     8,label(1,times)       $res    1
-  :                            4 times $do 5,label(2,1,times) $res 1
-  :                            5 label(1,1,1)
-00:00004D 000040              +6         +       label(1,1)
-00:00004E 000042              +7         +       label(1,3)
-00:00004F 000044              +8         +       label(1,5)
-00:000050 000040              +9         +       label(1)
-00:000051 000045              +10         +       label(1,6)
-00:000052 000000              +11         +       label(2)
-00:000053 000005              +12         +       label(2,1)
-00:000054 000048              +13         +       label(2,1,1)
-00:000055 000000              +14         +       label(99)
-00:000056 000001              +15         +       label()
-  :                            16 
-*EOF*
-:$(00):000040:000057 
-similar.msm: object code 107 bytes: 0 errors: 0 undefined labels
+<h3>5.2.1: Word-Aligned Structures $TREE / $BRANCH..$ROOT</h3>
 
-</pre>
-
-<p>
-It's possible to reference subscripted labels functionally and
-retrieve a count of how many there are. Line 15 of the example above
-is a request for a count of any "label(" with one subscript.
-
-<p>
-Where labels have two subscripts, "label(1)" means a count of how many
-begin "Label(1,", and so on, unless label(1) specifically exists.
-
-<p>
-However "label" exists in examples with one, two  and three subscripts in
-this example, and that's unwise because, although the assembler's resulting
-behaviour is determinate, user confusion could be promoted.
-
-<p>
-Line 6 gets the value of label(1,1) because that exists on line 3.
-However this known value masks the functional ability to count
-the number of labels like the label(1,1,1) on line 5.
-
-<p>
-Line 9 gets the value of label(1), because that exists on line 2.
-The functional ability to count the number of labels generated
-on line 3 is masked.
-
-<p>
-All of "label(2.." are label(2,x,y) with three subscripts.
-Therefore line 12 is a count of label(2,1,x) and line 13 is
-the value of label(2,1,1)
-
-<p>
-Line 11 resolves to zero because there is no label(2), and the
-number of label(2,x) is none.
-
-<p>
-Line 14 resolves to zero because there is no label(99), and the
-number of label(99,x) is none.
-
-<p>
-Line 15 counts the one label in label(x) with one subscript.
-
-
-
-<h3>7.2.1: Subscripted Labels alongside Base-Register-in-Parenthesis</h3>
-
-<p>
-These syntax examples shows a subscripted label followed by a base
-register tag in parentheses, and then a subscripted label without
-any base register:
-<pre>
-
-index	$do	240,name_of(index)	+	GENERATOR_FORMULA(index)
-
-...
-
-	lwz     r3, name_of(99)(r2)
-	lwz	r4, name_of(1)
-
-</pre>
-<p>
-The example shows PowerPC code, but the action for safe
-assembler interpretation is general in principle.
-
-<p>
-The first of the two load instructions does not present a problem.
-The last parenthesed token on the line (r2) is interpreted as a
-base-register tag, and that is intended.
-
-<p>
-The label name_of(99) is also evaluated as intended.
-
-<p>
-On the second load instruction, (1) could be evaluated as a
-base-register tag, and that is not intended. name_of(1) is a label.
-
-<p>
-Interpretation is made definitive by interpreting only typed values
-like r1 or r2 as a base register in macro language, if subscripted
-labels are in use.
-
-<p>
-The supplied definition "ppc_603.def", for example, takes the default
-action that a simple integer expression in parentheses is accepted as
-a base-register tag.
-
-<p>
-This is the correct default for assembly code generated by gcc.
-
-<p>
-Subscripted labels will never be generated from c code, and gcc for
-PowerPC encodes into assembler with plain numbers for base registers
-for the load/store instructions.
-
-<p>
-The code fragment above is knowingly written for masmx and for masmx
-data structuring, and is a different matter from gcc compilation.
-The supplied definition "ppc_603.def", can be switched in advance to
-require tagged base register names like r1 and r3:
-<pre>
-
-__registers_by_name	$set		1
-			$include	"ppc_603.def"
-
-
-</pre>
-<h2>7.3: Structured Data and Structured Code Name Spaces</h2>
-
-
-<h3>7.3.1: simple structures $TREE..$ROOT</h3>
+<h4>5.2.1.1: Simple Structures $TREE..$ROOT</h4>
 
 
 <p>
-It's possible to generate and to reference subscripted
-labels in an automatic way. 
+The input side of an 8-bit application scans four serial channels as quickly
+as possible.<br> A dozen instructions sample each channel in unrolled sequence. 
 
 <p>
-In the following example, the input side of
-a device driver scans four serial channels as quickly
-as possible. 30 bytes of code are generated to sample
-each channel in turn. 
-
-<p>
-Here also, the $TREE and $ROOT directives are used to 
+$TREE and $ROOT directives are used to 
 build a structured label space for each channel's
-registers. $TREE and $ROOT can be used within or 
-outwith a macro.
-
-<p>
-The components of the structure are referenced by
-stringing together the components of their labels
-with the $STERM character, which for 8051 is . (period)
-
-<p>
-A small part of the label table is shown at the end of the assembly
+registers
 <pre>
 
 MASMX 7r2
@@ -4977,7 +4724,7 @@ More complex examples can be found in Section
 8.54: $TREE Directive.
 
 
-<h3>7.3.2: branched structures $BRANCH..$ROOT</h3>
+<h4>5.2.1.2: Overlaid Structures $BRANCH..$ROOT</h4>
 
 
 <p>
@@ -5122,7 +4869,7 @@ transport.msm: object code 32 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
-<h3>7.3.3: Complex Structures</h3>
+<h4>5.2.1.3: Complex Structures</h4>
 
 
 <p>
@@ -5597,7 +5344,13 @@ complex.msm: object code 2976 bytes: 0 errors: 0 undefined labels
 
 </pre>
 
+<h4>5.2.1.4: Structured Code Name Spaces</h4>
 
+<h3>5.2.2: Bit-Aligned Structures $RECORD..$ROOT</h3>
+
+<h4>5.2.2.1: Simple Structures $RECORD..$ROOT</h4>
+<h4>5.2.2.2: Overlaid Structures $RECORD,$BRANCH..$ROOT</h4>
+<h4>5.2.2.3: Macro Code Access to Bit-Aligned Structures</h4>
 
 <h1>6: Run-Time Algorithm Plotter</h1>
 
@@ -8280,7 +8033,7 @@ Object Code 58 Bytes: 0 Errors: 0 Undefined Labels
 
 </pre>
 <p>
-A function \macro to haul up a base register value from parentheses allows
+A function <b>index$</b> to haul up a base register value from parentheses allows
 source code written with the syntax <b>address(Register)</b> to assemble.
 
 <p>
@@ -10607,7 +10360,13 @@ an expression and the label will be searched:
 	f	-6, +"!p(,1 1)!"
 
 </pre>
-<h2>8.42: $RES               Declare a Storage Buffer</h2>             
+
+<h2>8.42: $record</h2>
+<h3>8.42.1: $record		bit-aligned data structures</h3>
+<h3>8.42.1: $record,$branch	bit-aligned structure overlay</h3>
+
+
+<h2>8.43: $RES               Declare a Storage Buffer</h2>             
 
 <p>
 $RES declares a buffer, i.e. it advances the current location
@@ -10669,7 +10428,7 @@ linitup.msm: object code 72 bytes: 0 errors: 0 undefined labels
 
 </pre>
 
-<h2>8.43: $RETURN            Return a Value from $FUNC..$END</h2>
+<h2>8.44: $RETURN            Return a Value from $FUNC..$END</h2>
 
 <p>
 $RETURN may be used to jump out of any macro <b>$PROC..$END</b>
@@ -10707,7 +10466,7 @@ Functional results are 192 bits.
  
 
 
-<h2>8.44: $ROOT              Foot of Structured Name Space</h2>
+<h2>8.45: $ROOT              Foot of Structured Name Space</h2>
 
 <p>
 $ROOT is the end of a structured name space. See Section
@@ -10715,7 +10474,7 @@ $ROOT is the end of a structured name space. See Section
 
 
 
-<h2>8.45: $SET               Assign Reassignable Value to Label</h2>
+<h2>8.46: $SET               Assign Reassignable Value to Label</h2>
 
 
 <p>
@@ -10748,9 +10507,9 @@ which is zero
 	$do	$t(alabelname)=0,	....
 
 </pre>
-<h2>8.46: $SET_OPTION</h2>
+<h2>8.47: $SET_OPTION</h2>
 
-<h3>8.46.1:Set Option Flags</h3>
+<h3>8.47.1:Set Option Flags</h3>
 
 <pre>
 
@@ -10796,7 +10555,7 @@ The option letters are case significant.
 Flags <b>-ksy</b> are only actioned on the command line,
 not via <b>$set_option</b> directive
 
-<h3>8.46.1: Interaction of Run Options and List Directives</h3>
+<h3>8.47.1: Interaction of Run Options and List Directives</h3>
 
 
 <p>
@@ -10862,7 +10621,7 @@ The option values are listed in Section 3.1: The Command Line
 
 
 
-<h2>8.47: $SNAP              List Label Table</h2>
+<h2>8.48: $SNAP              List Label Table</h2>
 
 
 <p>
@@ -10907,7 +10666,7 @@ pass, unless it has a subcommand of 1
 </pre>
 
 
-<h2>8.48: $STERM             Change the Substring Sentinel Character</h2>
+<h2>8.49: $STERM             Change the Substring Sentinel Character</h2>
 <pre>
 
 	$term	divider_character
@@ -11039,7 +10798,7 @@ interrogates for substrings with the colon : character
 
 
 </pre>
-<h2>8.49: $STORE		Set Default Output Name</h2>
+<h2>8.50: $STORE		Set Default Output Name</h2>
 
 <p>
 Directive <b>$STORE</b> sets a default name for the file where the output
@@ -11064,7 +10823,7 @@ is the same as
 	$store	"reloca1.txo"
 
 </pre>
-<h2>8.50: $SUFFIX    Use Suffix for Number String Interpretation</h2> 
+<h2>8.51: $SUFFIX    Use Suffix for Number String Interpretation</h2> 
 
 
 <p>
@@ -11194,7 +10953,7 @@ Object Code 71 Bytes: 0 Errors: 0 Undefined Labels
 
 
 </pre>
-<h2>8.51: $TEXT              Translate Input Text Patterns</h2>
+<h2>8.52: $TEXT              Translate Input Text Patterns</h2>
 
 <p>
 $TEXT directive is used for syntax translations which cannot
@@ -11214,7 +10973,7 @@ them will not be used.
 
 
 
-<h2>8.52: $TRACE             Display Value</h2>
+<h2>8.53: $TRACE             Display Value</h2>
         
 <p>
 Directive
@@ -11254,7 +11013,7 @@ When a macro actual argument is an automatic literal, $TRACE
 obtains the literal value and not the literal address
 
 
-<h2>8.53: $TREE              Head of Structured Name Space</h2>
+<h2>8.54: $TREE              Head of Structured Name Space</h2>
 
 
 <p>
@@ -11666,7 +11425,7 @@ ppcsinga.msm: object code 924 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
-<h2>8.54: $TWOS_COMPLEMENT   Change Negative Value Representation</h2>
+<h2>8.55: $TWOS_COMPLEMENT   Change Negative Value Representation</h2>
 
 
 <p>
@@ -11738,7 +11497,7 @@ Object Code 221 Bytes: 0 Errors: 0 Undefined Labels
 
 </pre>
 
-<h2>8.55: $WORD              Set the Size of a Target Computer Word</h2>
+<h2>8.56: $WORD              Set the Size of a Target Computer Word</h2>
 
 <p>
 Directive
@@ -11831,6 +11590,12 @@ A suitable parameter set for 8-bit microcontrollers is
 
 	$word   8
 	$awidth 16
+
+
+<h2>8.57: $xqt_i		run-time integer algorithm plotter</h2>
+<h2>8.58: $xqt_fp		run-time floating algorithm plotter</h2>
+<h2>8.59: $zero_code_point  character string escaped zero value</h2>
+
 
 
 
@@ -14516,6 +14281,956 @@ $24:00000028
 
 </pre>
 
+<h1>10:  Describing Target Architecture in Text</h1>
+
+<h2>10.1: Establishing your Syntax</h2>
+
+
+<p>
+When masmx starts running,
+<ul>
+	semicolon is line continuation
+<pre></pre>
+
+	period is line termination (comment)
+<pre></pre>
+
+	period does not terminate the line
+	if it is followed immediately with a nonspace
+	token, as
+        <pre>
+
+		$include	file.name
+		+		1.8	. floating value
+
+        </pre>
+	Any other comment character terminates the
+	line unconditionally:
+        <pre>
+
+		$lterm		'#'
+
+		+		1.75	#floating value
+
+	</pre>
+	No symbol inside single or double quotes terminates the line
+<pre></pre>
+
+	text string delimiter is "
+<pre></pre>
+
+	substring delimiter is colon
+<pre></pre>
+
+	leading zero on a number is hex
+<pre></pre>
+	numbers beginning 1..9 are decimal
+<pre></pre>
+	numbers beginning \ are bit-pattern binary
+
+</ul>
+<p>
+If you don't want semicolon to mean line continuation
+that's the first thing you change. If you don't want
+line continuations at all
+<pre>
+
+	$CONT_CHAR       0
+
+</pre>
+<p>
+Continuation character is not recognised if if is followed immediately
+by a nonspace token
+<pre>
+
+$ masmx -ln
+MASMX 7r2
+0/-INPUT>>
+	$cont_char       '\'
+CONT_CHAR=\
+	$word		32
+	+		\10101010\	bit pattern 0xAA and line continue
+			*/16\		shift left 16 and line continue
+			++3     	. OR 3
+	$end
+  :                            1  $cont_char '\'
+  :                            2  $word  32
+00:00000000 00AA0003          +3  +  \10101010*/16++3  . OR 3
+  :                            4  $end
+:$(00):00000000:00000001 
+-INPUT>>: object code 54 bytes: 0 errors: 0 undefined labels
+
+</pre>
+<p>
+If you want comment to be semicolon
+<pre>
+
+	$LTERM  ';'
+
+</pre>
+<p>
+If you want text strings to be bounded by apostrophe
+<pre>
+
+	$QUOTE  027
+
+</pre>
+<p>
+or maybe
+<pre>
+
+	$QUOTE  ''''
+
+</pre>
+<p>
+However macro language does not recognise parameterised label
+references inside single quotes-see Section 8.42: $QUOTE directive.
+
+<p>
+If you want substring delimiter to be period
+<pre>
+
+	$STERM  '.'
+
+</pre>
+<p>
+If you want inputs with leading zero to be octal and
+displays to be octal
+<pre>
+
+	$OCTAL
+
+</pre>
+<p>
+If you change your mind
+<pre>
+
+	$HEX
+
+</pre>
+<p>
+If you have number strings in your code with trailing 
+flags like 123q or 0abaH 
+<pre>
+
+	$SUFFIX 2
+
+</pre>
+<p>
+If you want leading 0... to be octal and leading 0x... to be hex
+<pre>
+
+	$SET_OPTION     "c"
+
+</pre>
+If you want leading $... to be hex
+<pre>
+
+	$SET_OPTION     "m"
+
+</pre>
+If you want both
+<pre>
+
+	$SET_OPTION     "mc"
+
+</pre>
+<p>
+If you've done that and you still want to access masmx-supplied
+functions like location counter "$" and identity of location
+counter "$r" without using quotes, you alias masmx 
+function names (It's assumed here you've changed $STERM to period):
+<pre>
+
+.           $equ,"$function"    "$"
+.locator_id $equ,"$function"    "$r"
+.class      $equ,"$function"    "$t"
+
+</pre>
+<p>
+This equates
+<pre>
+
+	.		to location counter function		"$"
+
+	.locator_id	to function yielding id of
+			current counter of reference	    	"$r"
+
+	.class		to function yielding label type		"$t"
+
+
+</pre>
+<p>
+if "$" "$r" "$t" are in quotes as shown. This retrieves the functional
+identities of
+<pre>
+
+	"$"		for	. 
+
+	"$r" 		for	.locator_id
+
+	"$t"		for	.class
+
+
+</pre>
+<p>
+Without the quotes $ $r $t return their functional value instead
+of their identity.
+
+<p>
+The quotes are necessary to give "$" "$r" "$t" the new names
+. .locator_id .class
+
+<p>
+Directives beginning with $ when Motorola Hex (option <b>-m</b>) is
+asserted are still recognised in the command field, but not
+in the subcommand or argument fields. If your code has many
+directives with other names, you may alias masmx directives:
+<pre>
+
+.equ    $equ,"$directive"       "$equ"
+.if     .equ,"$directive"       "$if"
+.elseif .equ,"$directive"       "$elseif"
+.else   .equ,"$directive"       "$else"
+.endif  .equ,"$directive"       "$endif"
+.macro  .equ,"$directive"       "$proc"
+.macend .equ,"$directive"       "$end"
+
+</pre>
+<p>
+If your code has directives with no masmx equivalent, you write
+the required directives as macros.
+<pre>
+
+.org*   .macro
+$(0:.org(1,1))
+	.macend
+
+.align* .macro
+granule $set   1*/.align(1,1)
+	$res    (.+granule-1**-granule)-.
+	.macend
+
+.globl*	.macro
+".globl(1,1)"**	$blank
+	.macend
+
+</pre>
+
+<p>
+If your code contains operators that aren't
+<pre>
+
+= ^= > < -- ++ /* */ ** + - /// // / * *+ *- ^ ()
+
+</pre>
+<p>
+you need to translate some text on input
+<pre>
+
+	$text   /!=/^=/
+	$text	\<=\-1<\
+	$text	/>=/+1>/
+	$text   \%\///\
+	$text   /|/++/
+	$text   \<<\*/\
+	$text   \>>\/*/
+	$text   /&/**/
+	$text   /^/--/
+	$text   /~/^/
+
+</pre>
+<p>
+or perhaps
+<pre>
+
+	$text   / EQ /=/
+	$text   / NE /^=/
+	$text   \ LT \<\
+	$text   / GT />/
+	$text	\ LE \-1<\
+	$text	/ GE /+1>/
+	$text   \ MOD \///\
+	$text   / OR /++/
+	$text   \ SHL \*/\
+	$text   \ SHR \/*\
+	$text   \ ASHR \*/-\
+	$text   / AND /**/
+	$text   / XOR /--/
+	$text   / NOT /^/
+
+</pre>
+<p>
+All $TEXT directive lines must be together in your header.
+masmx will only search one sequence of $TEXT in the label
+table, for efficiency.
+
+<h2>10.2: Describing the Target Architecture</h2>
+
+
+<p>
+The directives which are central to masmx are described here
+in related groups and described in alphabetical order in
+Section 8: Directives.
+
+<p>
+All directives appear in the instruction field of the assembly 
+language line.
+
+
+
+<h3>10.2.1: $WORD, $BYTE, $QUANTUM, $AWIDTH</h3>
+
+	       
+<p>
+It's nowhere assumed that your machine has a word size like
+8, 16, 32 or 64, or that its address quantum is an 8-bit byte.
+
+<p>
+These four directives describe the basics of the machine
+to masmx.
+<pre>
+
+
+	$WORD   bits_in_computer_word
+
+</pre>
+<p>
+$WORD defines the smallest amount of code that can be generated 
+from one source line. See also $QUANTUM. One guide to selecting 
+word is the size of the smallest instruction in the instruction
+set. If the machine has single-octet instructions $WORD must be
+8. 32 is suitable for PowerPC, 16 for m68k or ColdFire.
+<pre>
+
+	$BYTE   bits_per_character
+
+</pre>
+<p>
+$BYTE defaults to 8. It can be set to anything and character 
+strings are packed accordingly.
+<pre>
+
+	$QUANTUM  bits_in_addressable_location
+
+</pre>
+<p>
+$QUANTUM is the same as $WORD for very few computer 
+architectures. Nevertheless $WORD automatically sets 
+$QUANTUM and $AWIDTH. For PowerPC and Alpha:
+<pre>
+
+	$WORD      32
+	$QUANTUM   8
+
+</pre>
+<p>
+are suitable settings.
+<pre>
+
+	$AWIDTH         bits_in_address
+
+</pre>
+<p>
+$AWIDTH describes how many bits are used to express 
+a load address in the the assembly output file. 8-bit 
+microprocessors and microcontrollers have a word size 
+of 8 but usually an address width of 16, so it is 
+necessary to override the default address width set 
+by $WORD:
+<pre>
+
+	$WORD           8
+	$AWIDTH         16
+
+</pre>
+<p>
+$AWIDTH has a second part for the giant part of
+address space, for example:
+<pre>
+
+	$awidth         32:64
+
+</pre>
+<p>
+This allows the 32-bit location counters to be stepped
+through astronomic space when constructing giant code
+and data. One instruction stream or array scalar may only
+be constructed to a size of 4 gigaquanta, but an array
+of either may be constructed up to 2 power 192 in size
+
+<p>
+See also section 9:	Output File Formats, Relocation and Linking,
+			Giant Address Spaces, Interfacing with GNU Tools
+
+
+<h3>10.2.2: $FORM, $PROC, $NAME, $END</h3>
+
+
+<p>
+These four directives are the building blocks of machine
+instructions and architectural descriptors.
+
+<h4>10.2.2.1: The $FORM Template</h4>
+<pre>
+
+label   $FORM   bit_field_width, ...,bit_field_width
+
+</pre>
+<p>
+$FORM describes a microstructure, especially an instruction 
+layout, of any size up to 192 bits. For example, load/store
+instructions for PowerPC have the layout
+<pre>
+
+"$load_store_instruction" $form   6, 5, 5, 16    
+
+
+</pre>
+<h4>10.2.2.2: The $PROC Header</h4>
+<pre>      
+
+label   $PROC
+
+</pre>
+<p>
+$PROC begins an inline macro which may be used in the command field
+(a $FUNC is a value-generating macro used in expressions).
+
+<p>
+The label on a $PROC or a $FUNC can only be used as a macro
+call if it has an asterisk* to make it visible outside the macro.
+
+<p>
+In the following example, "p" is not visible outside the macro,
+and could be used as the header label of other macros without problems.
+
+<p>
+Because "p" is not visible outside the macro, the macro can only be
+called with the names "lwz" and "stw"
+
+<p>
+The label of a $PROC is used functionally to 
+reference actual arguments, for example 
+<pre>
+
+p       $proc
+	.
+lwz*	$name	OPCODE_LWZ
+stw*	$name	OPCODE_STW
+	.
+	$instruction_form   p(0, 1), p(1, 1) .index\p(1, 2), p(1, 2)
+	$end
+
+</pre>
+<p>
+p(0, 1) references the command on the call line,
+p(1, 1) the first argument subfield. See Section 
+4.2.3.2.2.3: Macro Parameters
+
+
+<h4>10.2.2.3: The $NAME Entry Point</h4>
+ <pre> 
+
+label*   $NAME   value
+
+</pre>
+<p>
+$NAME lines are entry points in $PROCs and $FUNCs.
+
+<p>
+$NAME assigns a value to the call name which can be
+referenced as any of p(0, 1) or p(0, 0) or $N.
+
+<p>
+The label* on a $NAME directive can only be used to call the
+macro if it is made visible outside the macro by being promoted
+with an asterisk*
+
+<p>
+One $PROC macro may generate several instructions
+with similar layout. Such a macro has several
+$NAME entry points.
+
+<h4>10.2.2.4: The $END Macro Footer</h4>
+
+<p>
+$END ends a subassembly (the macro or the main assembly).
+
+
+<h4>6.2.2.5: Minimal Instruction Macro Example</h4>
+
+<p>
+$FORM, $PROC and $NAME and $END describe an imaginary computer
+architecture to the assembler:
+<pre>
+
+standard_format $FORM   8, 16
+
+instruction     $PROC
+
+load*           $NAME   0
+store*          $NAME   1
+add*            $NAME   2
+subtract*       $NAME   3
+
+		standard_format     $N, instruction(1, 1)
+
+		$END
+
+</pre>
+<p>
+The label on a $PROC, a $FUNC or a $NAME can only be used as a macro
+call if it has an asterisk* to make it visible outside the macro.
+
+<p>
+"instruction" is not visible outside the macro, and can be used as the
+header label of other macros.
+
+<p>
+These lines of code
+<pre>
+
+	load    4094
+	add     4097
+	subtract 100
+	store   2047
+
+</pre>
+<p>
+will generate
+<pre>
+
+	000ffe
+	021001
+	030064
+	0107ff
+
+</pre>
+
+
+<h4>10.2.2.6: The Two-pass $PROC</h4>
+
+
+label   $PROC	*
+
+<p>
+If the first argument on a $PROC line is * then the $PROC is two-pass
+in the second pass of the main assembly.
+
+<p>
+This allows forward references to local labels within the $PROC.
+
+<p>
+Labels defined in a $PROC are dropped when the $END image is encountered, unless they  are flagged*** for visibility to one or more higher assembly 
+levels.
+
+<p>
+Labels should only be promoted if other parts of the assembly need them,
+but they may be forward-referenced within the macro.
+
+<p>
+The forward reference need not be resolved on the first assembly pass.
+
+<p>
+On the second pass, a preliminary pass within the macro expansion is
+necessary for any labels which are forward-referenced and not global.
+
+
+
+<h4>10.2.2.7 The Out of Line $PROC</h4>
+
+
+<p>
+A location counter with the strict syntax $(expression) can be coded
+as the first or second argument on a $PROC directive
+<pre>
+
+p	$proc	* $(4)
+enter*	$name
+	.
+	.
+	$end
+
+aside*	$proc	$(6)
+	.
+	.
+	$end
+
+</pre>
+<p>
+The $(expression) part may be the second argument when the two-pass
+asterisk * flag is the first argument.
+
+
+<h4>10.2.2.8: Nested Macro Descriptions</h4>
+
+<p>
+Macros are mostly defined one at a time.  They can call each other to
+a large nesting depth:
+<pre>
+
+p*	$proc
+	+	$l
+	q
+	$end
+
+q*	$proc
+	+	$l
+	r
+	$end
+
+r*	$proc
+	+	$l
+	$end
+
+</pre>
+<p>
+A command "p" also causes "q" and "r" to assemble.
+
+<p>
+Macro descriptions may also be written in a nested way:
+<pre>
+
+one*	$proc
+two*	$proc
+three*	$proc
+	$end
+	three
+	$end
+	two
+	$end
+
+</pre>
+<p>
+This is rarely necessary but may be an advantage.
+
+<p>
+"one" causes "two" to exist and to be called, and the call "two"
+causes "three" to exist and to be called.
+
+<p>
+"one" exists during the whole of the main assembly. "two" exists when
+"one" is subassembling. "three" exists when "two" is subassembling.
+
+<p>
+The macros "p" "q" and "r" are now described in a nested way, which
+makes "q" and "r" invisible most of the time:
+<pre>
+
+p*      $proc
+        +       $l
+q*      $proc
+        +       $l
+r*      $proc
+        +       $l
+        $end
+        r
+        $end
+        q
+        $end
+
+</pre>
+<p>
+So command "p" causes "q" to exist and to be called, and that causes
+"r" to exist and to be called.
+
+<p>
+The names of inner macros are not visible to the main assembly. 
+
+<p>
+It's possible to declare one macro within another in order to
+repeat-call the inner macro at the point where it's declared
+($DO only repeats one line, but that line can be a macro call):
+<pre>
+
+macro1*	$proc
+
+	.
+	.
+
+p	$proc
+copyright* $name
+	load	start+A_LOT-index
+	store	start+A_LOT-index+1
+	$end
+
+index	$do	A_LOT,	copyright
+
+	.
+	.
+
+	$end
+
+</pre>
+<h2>10.3: Synthesising Legacy Automatic Macros</h2>
+
+<h3>10.3.1: Synthesising Legacy Functional Macros</h3>
+
+<p>
+The developer using masmx can implement function macros to replace
+fixed functions of other assemblers. For example:
+
+<p>
+A legacy assembler may have a fixed macro <b>@</b>, meaning
+"location counter of variables".
+
+<p>
+The developer using masmx can implement this function with these lines:
+<pre>
+
+@*	$func
+	$return	$(1)
+	$end
+
+</pre>
+<p>
+To explain these lines in detail:
+<ul>
+
+	<pre></pre><b>@</b> is a label like any other label.
+	It's the label of the macro.
+
+	<pre></pre>there is an asterisk on <b>@*</b> to make it visible
+	to the calling assembly
+
+	<pre></pre><b>$func</b> is the directive at the head
+	of a function macro
+
+	<pre></pre>a function macro is a macro which returns a value
+	at assembly time. Other kinds of macros generate code
+
+	<pre></pre>the returned value is accessed in this case with the 	label <b>@</b>
+
+	<pre></pre>functional values are tokens in expressions:
+	<b>44/@+1*2++018</b>
+
+	<pre></pre><b>$return</b> is a directive which returns
+	the value to its right
+
+	<pre></pre>the value in this case is the current state
+	of a location counter
+
+	<pre></pre>here, the returned value is location counter one.
+	In the supplied definition 8051.def, <b>$(1)</b> counts
+	the locations filled by variables. <b>$</b> is a masmx internal
+	function name, meaning "location counter."
+
+	<pre></pre><b>$end</b> ends any macro started with
+	<b>$func</b> or <b>$proc</b>. 
+
+	<pre></pre><b>$end</b> outside a macro ends the assembly.
+
+	<pre></pre>the result size of a user-written function macro
+	is 192 bits
+
+
+</ul>
+
+<p>
+Here are a couple of assemblies which use function macro "@"
+<pre>
+
+MASMX/24592 1r1X
+@.msm 5
+CONT_CHAR=
+LTERM=;
+QDELIM='
+STERM=.
+*EOF*  :                        620:         $list   2
+  :                        621: @*      $func
+  :                        622:         $note   You Said @ so I think you mean the
+  :                        623:         $note   location counter for variables
+  :                        624:         $return $(1)
+  :                        625:         $end
+  :                        692:         $list   2   
+  :                        693: $(1:1024)
+  :                        2: 
+  :                        3: first_buffer VAR        2048
+Note: @.msm Line 4: You Said @ so I think you mean the
+Note: @.msm Line 4: location counter for variables
+00:0000 0C63          +4         +       @+99
+*EOF*:$(00):0000:0002 :$(01):0400:0C00 
+Object Code 58 Bytes: 0 Errors: 0 Undefined Labels
+
+</pre>
+<p>
+However you may need to generate little-endian.
+
+<h3>10.3.2: Synthesising Legacy Command Macros</h3>
+
+<p>
+masmx generates big-endian number values. Pseudo-instructions which
+little-endian assemblers have for constant-generation (DW, DD etc)
+are implemented as macros for masmx.
+
+<p>
+For example, 8051 developers are used to a pseudo-directive <b>DW</b>
+from other assemblers.
+
+<p>
+That <b>DW</b> generates 16-bits little-endian. So we implement <b>DW</b>
+here to do the same thing:
+<pre>
+
+
+MASMX/24592 1r1X
+@.msm 5
+CONT_CHAR=
+LTERM=;
+QDELIM='
+STERM=.
+*EOF*  :                        72:         $list   2
+  :                        73: dw*     $proc
+  :			   74: ?       $do dw(1), +  dw(1,?), dw(1,?)/*8:d  
+  :                        75:         $note   You like to be in Little End Land?
+  :                        76:         $note   Here you am!
+  :                        77:         $end
+  
+  :                        624:         $list   2
+  :                        625: @*      $func
+  :                        626:         $note   You Said @ so I think you mean the
+  :                        627:         $note   location counter for variables
+  :                        628:         $return $(1)
+  :                        629:         $end
+  
+  :                        696:         $list   2   
+  :                        697: $(1:1024)
+  :                        2: 
+  :                        3: first_buffer VAR        2048
+
+Note: @.msm Line 4: You Said @ so I think you mean the
+Note: @.msm Line 4: location counter for variables
+Note: @.msm Line 4: You like to be in Little End Land?
+Note: @.msm Line 4: Here you am!
+00:0000 630C          +4         dw      @+99
+*EOF*:$(00):0000:0002 :$(01):0400:0C00 
+Object Code 58 Bytes: 0 Errors: 0 Undefined Labels
+
+</pre>
+<p>
+That is an example of a user written function ("@") used as
+an token in an expression. Plus an example of a user-written
+procedural macro, "DW".
+
+<p>
+A procedural macro generates code and runs from the
+directive $PROC to the directive $END
+
+<p>
+A function macro returns a value to an expression and runs from
+the directive $FUNC to the directive $END
+
+<p>
+The "DW" macro contains (apart from $note directives) these lines:
+<pre>
+
+dw*     $proc  
+?       $do     dw(1),  +       dw(1, ?), dw(1, ?)/*8:d
+        $end 
+
+</pre>
+<p>
+To explain the <b>DW</b> macro
+<ul>
+
+	<b>dw</b> is a label like other labels. It's the label of the macro
+<pre></pre>
+	<b>dw*</b> has an asterisk to make it visible to the calling
+	assembly
+<pre></pre>
+	<b>$proc</b> is the directive at the start of a
+	code-producing macro
+<pre></pre>
+	the application writer may string <b>dw</b> values on a
+	line, with a syntax:
+<pre>
+
+		dw	144, labelname, 15*90
+
+</pre>
+	therefore the the macro uses a <b>$do</b> directive, and
+	uses a tag <b>?</b> on the <b>$do</b> to index into
+	the actual arguments
+<pre></pre>
+	<b>?</b> is a label like any other. Its choice is arbitrary.
+	<b>?</b> has no asterisk, so it only exists while the macro
+	<b>dw</b> is subassembling.
+
+<pre></pre>
+	The label of a <b>$DO</b>, here <b>?</b>, is an incrementing tag.
+	It starts from 1 and goes up.
+<pre></pre>
+	<b>dw(1)</b> is the number of comma-separated
+	subfields in the first argumentof <b>dw</b>. It's the repeat
+	count. Here its value is one for the one actual parameter
+	<b>@+99</b>
+<pre></pre>
+	the repeat count after any <b>$do</b>, here <b>dw(1)</b>,
+	is followed by
+	a comma. The rest of the line is a line of assembly code which
+	gets repeated. This line usually contains some parameterised
+	values.
+<pre></pre>
+	In the <b>dw</b> macro, the inner line of assembly code is
+<pre>
+
+		+       dw(1, ?), dw(1, ?)/*8:d
+
+</pre>
+        here this line is assembled once only, for the one actual
+	parameter <b>@+99</b>
+<pre></pre>
+	The parameter paraform 
+<pre>
+		dw(1, ?)
+</pre>
+	is field 1, subfield [?] of macro <b>dw</b>. It's referenced twice
+	per actual parameter.
+<pre></pre>
+	The command code of <b>+</b> means a number constant.
+	<b>-</b> or <b>^</b> (1s complement) also work as number
+	constant commands
+<pre></pre>
+	Where masmx source has something like
+<pre>
+
+		+	expression, expression
+
+</pre>
+
+	or
+<pre>
+		+	expression, expression, expression:q
+
+</pre>
+	That means put values in equal-size fields of a word or multiword.
+<pre></pre>
+	Supplied definition <b>8051.def</b> has 8 bits for word size.
+<pre></pre>
+	This line
+<pre>
+
+		+	dw(1, ?), dw(1, ?)/*8:d
+
+</pre>
+	Ends <b>:d</b> for double, so 16-bits total.
+<pre></pre>
+	And has one comma, so two 8-bit fields.
+<pre></pre>
+	The expression on the left, <b>dw(1, ?)</b> places the actual
+	parameter value in the left eight bits. Truncation makes that
+	the LSB.
+<pre></pre>
+	The expression on the right, <b>dw(1, ?)/*8</b> shifts the actual
+	parameter value eight bits right,  and places that in the right
+	eight bits. The shift makes this the MSB of the value.
+<pre></pre>
+	<b>$end</b> directive ends the macro
+</ul>
+
+
+
 <h1>11: masmx Internal Floating Format and Alternative Floating Formats</h1>
 
 
@@ -17181,7 +17896,7 @@ Tim Cox
 <p>
 +41 78 629 86 11
 <p>
-01 January 2012
+24. April 2015
 
 <i>
 <pre>

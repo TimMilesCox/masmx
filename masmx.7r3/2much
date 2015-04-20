@@ -1,0 +1,30 @@
+4.7.10.5
+$equf too much stuff. Move it to 8: directives
+
+4.7.10.8
+$proc too much stuff. check for duplcation and move it
+
+4.7.10.9
+$name too much stuff. See what's already in $proc, $func, $directives
+
+4.7.10.10
+$func too much stuff. It has its own chapter
+
+4.7.10.11
+$form move most of this description to where the fictional jump instruction is
+in source line command field
+
+
+5.1
+It says about $do but not about macros at that point
+
+slim that stuff about subscripted labels. You've done it once under source line
+
+8: Most of these descriptions are repeats. Some are overdone by about 1000 words
+
+especially	$func
+		$proc
+
+10:	cut 75%
+
+11:	just talk about IEEE754 and the macro library for it
