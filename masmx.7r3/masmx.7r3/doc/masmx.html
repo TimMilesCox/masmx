@@ -1267,7 +1267,7 @@ MASMX 7r3
 Characters in apostrophe are right justified value strings
 
 <p>
-Each character produces its value in the current data code and
+Each character produces its value in the current $data_code and
 $byte size, default 8 bits
 <pre>
 
@@ -1473,8 +1473,8 @@ containing word
 <p>
 If $quote has been changed to ' apostrophe, labels in ' will not be detected in expressions.
 The character values between ' are right justified<br>
-as values juxtaposed at current $byte size and translated from input to current data code,
-default 8-bits and ASCII.<br>
+as values juxtaposed at current $byte size and translated from input to current $data_code,
+default 8-bit ASCII.<br>
 See also 8.8 $DATA_CODE directive and 8.5 $BYTE directive
 <pre>
 
@@ -1908,7 +1908,7 @@ MASMX 7r3
 	$quantum 8     
 $(12:65536)
 	'abc'
-	$data_code	97,65	. generate A for a
+	$data_code	97:65	. generate A for a
 	'abc'
 	$byte	12
 	'abc'
@@ -1921,7 +1921,7 @@ $(12:65536)
   :                            2  $quantum 8     
   :                            3 $(12:65536)
 0C:10000 00616263              +4  'abc'
-  :                            5  $data_code 97,65 . generate A for a
+  :                            5  $data_code 97:65 . generate A for a
 0C:10004 00416263              +6  'abc'
   :                            7  $byte 12
 0C:10008 41062063              +8  'abc'
@@ -2446,14 +2446,16 @@ are effectively
 	"string of text":10:"another line of text and more of that line"
 
 </pre>
-byte size, quote symbol and substring symbol may be set to different values
-from defaults [ 8-bits " : ] with directives $byte $quote $sterm
+byte size, quote symbol and substring symbol may each be set to a different
+value from their defaults of 8, " and : with directives $BYTE $QUOTE $STERM
 
 <p>
-Text string contents are read in source code as octets of Latin-1, Roman-8 or UTF-8.
-256 code points including 128 ASCII code points may be translated to values set with
-directive $data_code
+Generated string data values may be altered from ASCII to a to a data code
+assembled and switched with the $DATA_CODE directive
 
+<p>
+Text string contents are read from source code as Latin-1, Roman-8 or UTF-8
+according to text-editor
 <pre>
 
 
@@ -2464,11 +2466,11 @@ MASMX 7r3
 	$quantum 8     
 $(12:65536)
 	"abc"
-	$data_code	97,65	. generate A for a
+	$data_code	97:65	. generate A for a
 	"abc"
 	$byte   12
 	"abc"
-	$ascii			. switch to unchanged input
+	$ascii			. switch back to plain ASCII
 	"abc"
 	$byte	8
 	"abc"
@@ -2477,11 +2479,11 @@ $(12:65536)
   :                            2  $quantum 8     
   :                            3 $(12:65536)
 0C:10000 61626320              +4  "abc"
-  :                            5  $data_code 97,65 . generate A for a
+  :                            5  $data_code 97:65 . generate A for a
 0C:10004 41626320              +6  "abc"
   :                            7  $byte 12
 0C:10008 041062063020          +8  "abc"
-  :                            9  $ascii   . switch to unchanged input
+  :                            9  $ascii   . switch back to plain ASCII
 0C:1000E 061062063020          +10  "abc"
   :                            11  $byte 8
 0C:10014 61626320              +12  "abc"
@@ -2540,12 +2542,12 @@ $ masmx -lnkyx
 MASMX 7r3
 0/-INPUT>>
 	$word	16
-	$data_code      'a', 1*/23++'a',1*/23++'b',1*/23++'c'
+	$data_code      'a':1*/23++'a',1*/23++'b',1*/23++'c'
 	$byte	24
 	"abc"
 	$end
   :                            1  $word 16
-  :                            2  $data_code      'a', 1*/23++'a',1*/23++'b',1*/23++'c'
+  :                            2  $data_code      'a':1*/23++'a',1*/23++'b',1*/23++'c'
   :                            3  $byte 24
 00:0000 80006180006280006300  +4  "abc"
   :                            5  $end
@@ -6396,20 +6398,13 @@ See also Section 9:	Output File Formats, Relocation and Linking,
 
 
 <p>
-$ascii switches string contents and values in apostrophes to source input
-values unchanged
+$ASCII sets the generated character code for text constants bound by
+the quote symbol to ASCII. $DATA_CODE defines and/or selects an alternate 
+generated character code for text constants.
 
 <p>
-Directives $ascii and $data_code switch text strings between unchanged input
-(ASCII / Roman-8 / Latin-1) and tabled byte translation values stored by $data_code
-for code points 0..255
+Input is always in ASCII. The initial selection for encoding is $ASCII.
 
-<p>
-Source input is is octets with ASCII in code points 0..127. Language elements
-outside of strings are assembled from ASCII simple
-
-<p>
-Assembly initial setting is $ascii
 
 
 <h2>8.2:  $AWIDTH            Output File Load Address Width</h2>
@@ -6610,11 +6605,13 @@ Receiving Field         |_______|_______|_______|_______|_______|_______|
 
 </pre>
 <p>
-$data_code directive tables and activates byte translate values for strings
+The $DATA_CODE directive may be used to organise a completely different
+data code translation.
 
 <p>
-If $word is not a  multiple of the $byte, bytes in strings straddle words.
-New strings start at a word, expect in bit-aligned $record structures
+There are special considerations where $WORD size is not an exact 
+multiple of the $BYTE size. Here is an example of 7-bit character
+data generated for a 30-bit architecture.
 <pre>
 
 $ ../masmx qzuli -ln
@@ -7065,13 +7062,16 @@ CONT_CHAR=\
 <h2>8.8:  $DATA_CODE             Set Alternative Character Set</h2>
 
 <p>
-$data_code tables and activates byte translate values for quoted
-text strings and value strings in apostrophe
+$DATA_CODE is used to declare an alternate data code for quoted
+text strings and to select it.
 
 <p>
-masmx input is octets containing ASCII values in code points 0..127.
-$data_code directive allows "text strings" and +'character value constants'
-to be composed in another character code
+masmx reads ASCII input, but $DATA_CODE directive lets "text strings"
+and +'number constants' be generated in another target data code.
+
+<p>
+The initial alternate data code is the same as ASCII, but $DATA_CODE
+can change all or part of it. For example:
 <pre>
 
 MASMX/-240 1r1X
@@ -7081,8 +7081,8 @@ code.msm 5
   :                        3:         $byte   8
   :                        4:         $awidth 32
 00:00000000 41424320      +5         "ABC"
-  :                        6:         $data_code  'A', 0c1, 0c2, 0c3, 0c4, 0c5, 0c6, 0c7, 0c8, 0c9
-  :                        7:         $data_code  32, 64
+  :                        6:         $data_code  'A':0c1, 0c2, 0c3, 0c4, 0c5, 0c6, 0c7, 0c8, 0c9
+  :                        7:         $data_code  32:64
 00:00000004 C1C2C3C4C5C64040+8         "ABCDEF"
   :                        9:         $ascii
 00:0000000C 4142434445462020+10         "ABCDEF"
@@ -7093,25 +7093,20 @@ Object Code 73 Bytes: 0 Errors: 0 Undefined Labels
 
 </pre>
 <p>
-Here the $data_code has generated alternative 
+Here the $DATA_CODE directive has been used to generate alternative 
 values for the first nine letters of the alphabet, and for the 
 space character.
 
 <p>
-$data_code also switches to the alternative data code as it constructs it.
+$DATA_CODE also switches to the alternative data code as it constructs it.
 
 <p>
-$ascii directive switches to the assembly initial setting of unchanged
-input values (ASCII / Roman-8 / Latin-1 / UTF-8) for strings, but leaves
-the tabled translate values available
+$ASCII switches back to ASCII text generation,
+but leaves the alternate code available.
 
 <p>
-$data_code with or without arguments switches to byte translate. The initial
-translate table has all code points unchanged. $data_code may table translate
-values for code points 0..255
-
-<p>
-Both assembly passes begin in $ascii mode
+$DATA_CODE without any operands switches to the previously constructed data
+code again. Both assembly passes begin in ASCII character mode.
 
 
 <h2>8.9: $DO                Generate Repeated Code</h2>     

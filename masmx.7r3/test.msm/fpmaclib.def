@@ -1,0 +1,53 @@
+p       $proc
+$x_load* $name
+	FP_LOAD		p(1)
+	$end
+
+p       $proc
+$x_load_negative* $name
+	FP_LOAD_NEGATIVE p(1)
+	$end
+
+p	$proc
+$x_add*	$name
+	FP_ADD		p(1)
+	$end
+
+p       $proc
+$x_subtract* $name
+	FP_SUBTRACT	p(1)
+	$end
+
+p       $proc
+$x_multiply* $name
+	FP_MULTIPLY	p(1)
+	$end
+
+p       $proc
+$x_divide* $name
+	FP_DIVIDE	p(1)
+	$end
+
+$x_reserve* $proc
+	FPUSH
+	$end
+
+$x_retrieve_add* $proc
+        FP_ADD		FP_STACK_TOP
+        FPOP
+        $end
+
+$x_retrieve_subtract* $proc
+        FP_SUBTRACT	FP_STACK_TOP
+        FPOP
+        $end
+
+$x_retrieve_multiply* $proc
+        FP_MULTIPLY	FP_STACK_TOP
+        FPOP
+        $end
+
+$x_retrieve_divide* $proc
+	FP_DIVIDE	FP_STACK_TOP
+	FPOP
+	$end
