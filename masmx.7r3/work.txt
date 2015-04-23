@@ -5352,10 +5352,480 @@ complex.msm: object code 2976 bytes: 0 errors: 0 undefined labels
 
 <h1>6: Run-Time Algorithm Plotter</h1>
 
-<h2>6.1: Run-Time Integer Algorithm Plotter</h2>
+<p>
+Assemblers mostly resolve expressions whose tokens are all known at assembly time
+
+<p>
+<b>$xqt_fp</b> and <b>$xqt_i</b> directives code an instruction plan in a<br>
+compiler-like fashion however, to solve expressions involving run-time variables<br>
+first resolving subexpressions whose tokens are known at assembly time
+
+<p>
+These instruction steps are planned with the support of target-specific macros with<br>
+fixed call-names known to masmx 
+
+
+<h2>6.1: Run-Time Integer Algorithm Plotter $xqt_i</h2>
+
+<b>$xqt_i</b> processes integers and can resolve all expression steps
+between constants at assembly time,<br> planning the fewest possible instructions
+for run time calculation
+
+<p>
+In this example the subexpression right of the OR operator <b>++</b> has been
+resolved at assembly time, but left of <b>++</b> a multiply, two adds and a
+shift must take place at runtime
+
+<p>
+The running accumulation is maintained in 48 bits, but it is judged to contain
+only 24 significands until a double load, an add, a negative add, a multiply, or
+a boolean operation on 48 bits has taken place. The first operation <b>one,,w0*4</b>
+could be executed in one multiply step because it was known that the multiplicand
+had 24 or less significands. These rules are in the target-specific macro code and
+not in masmx
+
+<pre>
+
+$ masmx boolean -lnk
+MASMX 7r3
+3/boolean.msm
+  :                            1 	$path		../
+  :                            2: 	$include	def/rta.def
+  :                            3: 	$include	language/fpxpress.def
+  :                            4: 	$include	language/i_xpress.def
+  :                            5 	$path
+  :                            6 
+  :                            7 $(3:03000)
+03:003000 000001              +8 one	1
+03:003001 000000000002        +9 two	2d
+03:003003 000000000003        +10 three	3d
+  :                            11 $(0:64)
+00:000040 603000              +12 	$xqt_i	two+one,,w0*4+three*/16++12*/40
+00:000041 960018              +12 
+00:000042 E00100              +12 
+00:000043 D73001              +12 
+00:000044 D73003              +12 
+00:000045 360010              +12 
+00:000046 900101              +12 
+00:000047 980102              +12 
+  :                            13 	$do	$<256,$(0:256)
+  :                            14 	$end
+00:000100+000004
+00:000101+0C0000000000
+:$(00):000040:000103 :$(03):003000:003005 
+
+
+</pre>
+
+Target specific macros required for $xqt_i have these names and this outline scheme
+
+<pre>
+
+p	$proc
+$i_load*	$name
+	LOAD	p(1)
+	$end
+
+p	$proc
+$i_load_negative*	$name
+	LOAD_NEGATIVE	p(1)
+	$end
+
+$i_testequal*	$name
+	TEST_EQUAL	p(1)
+	$end
+
+p	$proc
+$i_testunequal*	$name
+	TEST_NE	p(1)
+	$end
+
+p	$proc
+$i_testgreater*	$name
+	TEST_GREATER	p(1)
+	$end
+
+p	$proc
+$i_testless*	$name
+	TEST_LESS	p(1)
+	$end
+
+p	$proc
+$i_shift*	$name
+	SHIFT	p(1)
+	$end
+
+p	$proc
+$i_shift_right*	$name
+	SHIFT_RIGHT	p(1)
+	$end
+
+p	$proc
+$i_or*	$name
+	OR	p(1)
+	$end
+
+p	$proc
+$i_and*	$name
+	AND	p(1)
+	$end
+
+p	$proc
+$i_xor*	$name
+	XOR	p(1)
+	$end
+
+p	$proc
+$i_add*	$name
+	ADD	p(1)
+	$end
+
+p	$proc
+$i_subtract*	$name
+	SUBTRACT	p(1)
+	$end
+
+p	$proc
+$i_multiply*	$name
+	MULTIPLY	p(1)
+	$end
+
+p	$proc
+$i_divide*	$name
+	DIVIDE	p(1)
+	$end
+
+p	$proc
+$i_covered_quotient*	$name
+	DIVIDE_ROUNDED	p(1)
+	$end
+
+p	$proc
+$i_remainder*	$name
+	MODULO	p(1)
+	$end
+
+p	$proc
+$i_reserve*	$proc
+	PUSH
+$end
+
+$i_retrieve_testequal*	$proc
+	TEST_EQUAL	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_testunequal*	$proc
+	TEST_NE	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_testgreater*	$proc
+	TEST_GREATER	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_testless*	$proc
+	TEST_LESS	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_shift*	$proc
+	SHIFT	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_shift_right*	$proc
+	SHIFT_RIGHT	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_or*	$proc
+	OR	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_and*	$proc
+	AND	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_xor*	$proc
+	XOR	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_add*	$proc
+	ADD	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_subtract*	$proc
+	SUBTRACT	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_multiply*	$proc
+	MULTIPLY	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_divide*	$proc
+	DIVIDE	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_covered_quotient*	$proc
+	DIVIDE_ROUNDED	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_remainder*	$proc
+	MODULO	STACK_TOP
+	POP
+	$end
+
+</pre>
+
+<p>
+This outline scheme can be included directly in conjunction with simple $proc macros which populate the names
+<pre>
+
+	LOAD		LOAD_NEGATIVE	TEST_EQUAL	TEST_NE		TEST_GREATER	TEST_LESS
+	SHIFT		SHIFT_RIGHT	OR		AND		XOR
+	ADD		SUBTRACT	MULTIPY		DIVIDE		DIVIDE_ROUNDED	MODULO
+
+</pre>
+These macros apply an argument p(1) to a result register. The four TEST_ macros have a result of<br>
+one for true and zero for untrue
+
+<p>
+The macro
+<pre>
+
+	PUSH
+
+</pre>
+saves the result register either in a real stack or in a list of registers<br>
+managed at assembly time with macro text
+
+<p>
+The function
+<pre>
+
+	STACK_TOP
+
+</pre>
+is the most recent stored value in the stack or save register list
+
+<p>
+The macro
+<pre>
+
+	POP
+
+</pre>
+is shown separately as a point where the stacked value is cleared after use,<br>
+because function macros in masmx may not generate code, for the case where the<br>
+save area is really a stack
+
+<p>
+Interim results may be in detail saved, retrieved and cleared a number of ways according
+to target architecture, for example
+<pre>
+
+;		In ColdFire saves/retrieves only PUSH macro generates an instruction
+;		LOAD and arithmetic macros must distinguish register / storage / immediate argument
+
+PUSH*		$proc			; ColdFire
+		move.l		d0, -(a7)
+		$end
+
+STACK_TOP*	$equf		(a7)+	; ColdFire
+POP		$equ,$directive	$nop	; ColdFire
+
+.		____________________________________
+
+#		in PowerPC saves/retrieves, only PUSH macro generates an instruction
+#		LOAD and arithmetic macros must distinguish register / storage / immediate argument
+#		arithmetic macros must load storage arguments to a GPR designated as threshold
+
+LISTP		$set	1		# PPC32
+SAVE(1)		$equ	r20
+SAVE(2)		$equ	r21
+SAVE(3)		$equ	r22
+
+PUSH*		$proc			# PPC32
+		$do	LISTP>3,	$flag	assign more save registers
+		mr	r0,SAVE(LISTP)
+LISTP*		$set	LISTP+1
+		$end
+
+STACK_TOP*	$func
+		$return	SAVE(LISTP-1)	# PPC32
+		$end
+
+POP*		$proc			# PPC32
+LISTP**		$set	LISTP-1
+		$end	
+
+
+</pre>
 
 <h2>6:2: Run-Time Floating Algorithm Plotter</h2>
 
+<p>
+<b>$xqt_fp</b> includes constants as well as variables in expressions,
+but does not attempt assembly-time calculation of expression steps between floating
+constants
+
+<p>
+<b>$xqt_fp</b> concerns four-function arithmetic only
+in size
+
+<p>
+Here a simple algorithm with five inputs is executed in five instructions, including
+operand acquisition from storage
+<pre>
+
+
+$ masmx -ln r2xample.msm
+MASMX 7r3
+3/r2xample.msm
+*EOF*
+  :                            1 	$path		../def
+  :                            2: 	$include	rta.def
+  :                            3 	$path		../language
+  :                            4: 	$include	stack.def
+  :                            5: 	$include	fpxpress.def
+  :                            6 	$path
+  :                            7 $(0:0)
+  :                            8 
+00:000000 B60040              +9 floating_algorithm*  $vector fp_routine
+  :                            10 
+  :                            11 $(0:64)
+  :                            12 
+  :                            13 fp_routine 
+                                	$head_far	 params(one,	float		;
+                                				two,	float		;
+  :                            16 				three,	float)
+  :                            17 
+00:000040 4FF003              +18 	$xqt_fp		one*1.75*+1200000*two/3.0*-625000-three
+00:000041 770100              +18 
+00:000042 77F007              +18 
+00:000043 7F0104              +18 
+00:000044 6FF00B              +18 
+  :                            19 
+  :                            20 
+00:000045 3D0000              +21 	fret		0
+  :                            22 
+  :                            23 	$do		$<256,$(0:256)
+  :                            24 	
+*EOF*
+00:000100+7CD38BB7B396D7AA20B6E083
+00:000104+2051D5B8447B77478A23F5F7
+:$(00):000000:000108 
+r2xample.msm: object code 190 bytes: 0 errors: 0 undefined labels
+
+
+</pre>
+masmx has taken an expression with five operands and four operators, and
+turned it into a sequence of five instructions which deliver the four-word
+floating result of the operations in the result registers <b>a:b:mantissa2:mantissa3</b>
+
+<p>
+Three of these tokens are identifiers whose content is only known at runtime
+
+<p>
+<b>$xqt_fp</b> directive scans an expression and calls macro code to write an
+instruction plan. The tokens which are constants appear as literals at the foot
+of the program
+
+<p>
+A <b>#define</b> preprocess and masmx <b>$text</b> substitution are both usually
+absent in assembly for RTA1, but would not conflict
+
+<p>
+masmx decides whether a token is a self-evident value or a variable reference
+by these rules
+
+	<blockquote>
+	a field of digits is a value<br><br>
+	a label on a line where a storage value is, is a location<br><br>
+	a label equated or set to digits is a value<br><br>
+	a label equated or set to a storage label or to a location counter is a location<br><br>
+	a label equated or set to another label is what that label is<br><br>
+	a <b>$equf</b> label is a location
+	</blockquote>
+
+Therefore a construction
+<pre>
+
+bucket	$equ	4096
+
+</pre>
+would not cause a storage reference, but an immediate value.
+
+<p>
+The construction
+<pre>
+
+bucket	$equf	4096
+
+</pre>
+would cause a storage reference
+
+<p>
+In RTA1 the supporting macro language in <b>fpxpress.def</b> and <b>i_xpress.def</b> potentially
+uses all of <b>[r k x y a b mantissa2 mantissa3 8 9 10 11 d$save d$save1 d$save2 d$ave3]</b>
+
+<p>
+Register variables in in macro constructs <b>params() scalars()</b> and external stack names in
+<b> xframe()</b> are <b>$equf</b> labels and therefore referenced as variables
+
+<p>
+In this assembly <b>FACTOR</b> has been generated as a constant (visible at
+the foot of the program) because <b>$equ</b> connected <b>FACTOR</b> to a
+number value and not a stored location
+<pre>
+
+$ ~/masmx mammoth -lnk
+MASMX 7r3
+3/mammoth.msm
+*EOF*
+  :                            1 	$path		../
+  :                            2: 	$include	def/rta.def
+  :                            3: 	$include	language/stack.def
+  :                            4: 	$include	language/fpxpress.def
+  :                            5 $(0)
+00:000000 B60040              +6 mammoth* $vector	sum
+  :                            7 $(3:03000)
+03:003000 40000F800000000000000000
+                              +8 left	16384*+0
+03:003004 7CD38AFBEEFAC15E58C049D8
+                              +9 right	1.2*+1200000
+  :                            10 
+  :                            11 $(0:64)
+  :                            12 
+  :                            13 FACTOR	$equ	1.875
+  :                            14 
+                                sum	$head_far	 params(first,	float	;
+  :                            16 				second,	float	)
+  :                            17 
+00:000040 4FF007              +18 	$xqt_fp		-left-right+first+second*FACTOR
+00:000041 770100              +18 
+00:000042 6F3000              +18 
+00:000043 6F3004              +18 
+00:000044 67F003              +18 
+00:000045 3D0000              +19 	$ret
+  :                            20 	$do	$<256,$(0:256)
+  :                            21 
+*EOF*
+00:000100+400001F00000000000000000
+:$(00):000000:000104 :$(03):003000:003008 
+
+
+</pre>
 
 
 <h1>7: Constructing Program Sections</h1>

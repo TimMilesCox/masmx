@@ -83,81 +83,81 @@ $i_remainder*	$name
 	$end
 
 p	$proc
-$i_reserve*	$proc*
+$i_reserve*	$proc
 	PUSH
 $end
 
-$i_retrieve_testequal*	$proc*
+$i_retrieve_testequal*	$proc
 	TEST_EQUAL	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_testunequal*	$proc*
+$i_retrieve_testunequal*	$proc
 	TEST_NE	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_testgreater*	$proc*
+$i_retrieve_testgreater*	$proc
 	TEST_GREATER	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_testless*	$proc*
+$i_retrieve_testless*	$proc
 	TEST_LESS	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_shift*	$proc*
+$i_retrieve_shift*	$proc
 	SHIFT	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_shift_right*	$proc*
+$i_retrieve_shift_right*	$proc
 	SHIFT_RIGHT	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_or*	$proc*
+$i_retrieve_or*	$proc
 	OR	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_and*	$proc*
+$i_retrieve_and*	$proc
 	AND	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_xor*	$proc*
+$i_retrieve_xor*	$proc
 	XOR	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_add*	$proc*
+$i_retrieve_add*	$proc
 	ADD	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_subtract*	$proc*
+$i_retrieve_subtract*	$proc
 	SUBTRACT	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_multiply*	$proc*
+$i_retrieve_multiply*	$proc
 	MULTIPLY	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_divide*	$proc*
+$i_retrieve_divide*	$proc
 	DIVIDE	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_covered_quotient*	$proc*
+$i_retrieve_covered_quotient*	$proc
 	DIVIDE_ROUNDED	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_remainder*	$proc*
+$i_retrieve_remainder*	$proc
 	MODULO	STACK_TOP
 	POP
 	$end
