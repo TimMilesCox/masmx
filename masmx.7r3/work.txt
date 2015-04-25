@@ -513,30 +513,30 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 		in Giant Address Space					9.2.3.10
 
 
-10. Describing Target Architecture in Text				11
+10. Describing Target Architecture in Text				10
 
-    1.  Establishing Your Syntax					11.1
-    2.	Describing the Target Architecture				11.2
-	1.  $WORD, $BYTE, $QUANTUM, $AWIDTH				11.2.1
-	2.  $FORM, $PROC, $NAME, $END					11.2.2
-	    1.	The $FORM Template					11.2.2.1
-	    2.	The $PROC Header					11.2.2.2
-	    3.	The $NAME Entry Point					11.2.2.3
-	    4.	The $END Macro Footer					11.2.2.4
-	    5.  Minimal Instruction Macro Example			11.2.2.5
-	    6.	The Two-pass $PROC					11.2.2.6
-	    7.	The Out of Line $PROC					11.2.2.7
-	    8.	Nested Macro Descriptions				11.2.2.8
-    3.  Synthesising Legacy Automatic Macros				11.3
-	1.  Synthesising Legacy Functional Macros			11.3.1
-	2.  Synthesising Legacy Command Macros				11.3.2
+    1.  Establishing Your Syntax					10.1
+    2.	Describing the Target Architecture				10.2
+	1.  $WORD, $BYTE, $QUANTUM, $AWIDTH				10.2.1
+	2.  $FORM, $PROC, $NAME, $END					10.2.2
+	    1.	The $FORM Template					10.2.2.1
+	    2.	The $PROC Header					10.2.2.2
+	    3.	The $NAME Entry Point					10.2.2.3
+	    4.	The $END Macro Footer					10.2.2.4
+	    5.  Minimal Instruction Macro Example			10.2.2.5
+	    6.	The Two-pass $PROC					10.2.2.6
+	    7.	The Out of Line $PROC					10.2.2.7
+	    8.	Nested Macro Descriptions				10.2.2.8
+    3.  Synthesising Legacy Automatic Macros				10.3
+	1.  Synthesising Legacy Functional Macros			10.3.1
+	2.  Synthesising Legacy Command Macros				10.3.2
 
-11. masmx Internal Floating Format and Alternative Floating Formats	10
-    1.	masmx Floating Format						10.1
-    2.	IEEE754 Floating Values						10.2
+11. masmx Internal Floating Format and Alternative Floating Formats	11
+    1.	masmx Floating Format						11.1
+    2.	IEEE754 Floating Values						11.2
 	1.  Differences between masmx FLoating Format and IEEE754 Floating Formats
-									10.2.1
-	2.  Macro Language Generation of IEEE754 Floating Constants	10.2.2
+									11.2.1
+	2.  Macro Language Generation of IEEE754 Floating Constants	11.2.2
 
 
 
@@ -851,6 +851,9 @@ A definition file included at the head of the assembly defines:
 	integer encoding and floating point formats<br><br>
 
 	</blockquote>
+
+
+See 10.1: Establishing Syntax, 10.2: Describing Target Architecture
 
 <h1>4: The Assembly Language Source Line</h1>
 
@@ -2647,6 +2650,7 @@ p       $proc
 
 
 	p returns a count of all the fields on the calling line
+	including command field and if present label field
 
 	p() returns a count of fields in the actual arguments
 
@@ -2743,8 +2747,24 @@ MASMX 7r3
 </pre>
 
 
+<div	style="color:a0a0a0">
+<blockquote>
+Paraform <i>macro_label</i> without parenthesis sends all the text of the calling line to another macro.<br>
+The fields forwarded as arguments include the command plus any label on the call line to the forwarding macro.<br>
+Therefore in the newly called macro, if all the call-line text is forwarded as arguments
 
-<p>
+	<blockquote>
+	<i>macro_label</i> minus <i>macro_label()</i> = 2 indicates <i>macro_label(1,1)</i>
+	is the label on the call line to the forwarding macro<br><br>
+	
+ 	<i>macro_label</i> minus <i>macro_label()</i> = 1 indicates <i>macro_label(1,1)</i>
+	is the command on the call line to the forwarding macro
+	</blockquote>
+</blockquote>
+
+</div>
+<br>
+<br>
 Actual parameters forwarded individually to a nested macro
 plus any new tokens may be re-ordered for the nested macro:
 <pre>
@@ -5588,7 +5608,8 @@ $i_retrieve_remainder*	$proc
 </pre>
 
 <p>
-This outline scheme can be included directly in conjunction with simple $proc macros which populate the names
+This outline scheme can be included directly in conjunction with simple $proc macros which populate these names
+with instruction code which updates a designated result register
 <pre>
 
 	LOAD		LOAD_NEGATIVE	TEST_EQUAL	TEST_NE		TEST_GREATER	TEST_LESS
@@ -5596,8 +5617,8 @@ This outline scheme can be included directly in conjunction with simple $proc ma
 	ADD		SUBTRACT	MULTIPY		DIVIDE		DIVIDE_ROUNDED	MODULO
 
 </pre>
-These macros apply an argument p(1) to a result register. The four TEST_ macros have a result of<br>
-one for true and zero for untrue
+These macros apply an argument p(1) to a result register. Instructions in the four TEST_ macros have<br>
+a runtime result of one for true and zero for untrue
 
 <p>
 The macro
@@ -5626,8 +5647,8 @@ The macro
 
 </pre>
 is shown separately as a point where the stacked value is cleared after use,<br>
-because function macros in masmx may not generate code, for the case where the<br>
-save area is really a stack
+because function macros in masmx may not generate code. This allows the case where the<br>
+save area is really a stack and a separate instruction moreover must clear the saved item
 
 <p>
 Interim results may be in detail saved, retrieved and cleared a number of ways according
