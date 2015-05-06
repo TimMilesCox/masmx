@@ -83,9 +83,9 @@ $i_remainder*	$name
 	$end
 
 p	$proc
-$i_reserve*	$proc
+$i_reserve*	$name
 	PUSH
-$end
+	$end
 
 $i_retrieve_testequal*	$proc
 	TEST_EQUAL	STACK_TOP

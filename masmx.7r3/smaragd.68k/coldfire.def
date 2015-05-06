@@ -243,6 +243,73 @@ ble.b*    $name   0x6F
 	$b_cs	p(0, 0), $target
 	$end
 
+
+p	$proc	;	some integer instructions [w|l]->dregister
+mulu*	$name
+muls*	$name
+divu*	$name
+divs*	$name
+
+	$end
+
+p	$proc	;	some integer instructions dregister<->store
+		;	long only
+add*	$name	13
+sub*	$name
+or*	$name
+and*	$name
+eor*	$name
+
+
+	$if	$t(p(1, 2))="$d_reg"
+	  $if	$t(p(1, 1))**128
+	  $i_rr	p(0, 0), p(1, 2), 2, $t("p(1, 1)")**7, p(1, 1)
+	  $elseif ($t("p(1, 1)")="$a_reg_@")|
+		++($t("p(1, 1)")="$a_reg_@-")|
+		++($t("p(1, 1)")="$a_reg_@+")
+	  $i_rr	p(0, 0), p(1, 2), 2, $t("p(1, 1)")**7, $ibase\p(1, 1)
+	  $elseif $inside\p(1, 1)=2
+	  $i_rm	p(0, 0), p(1, 2), 2, 5, $base_a\p(1, 1), $displacement\p(1, 1)
+	  $elseif $inside\p(1, 1)=3
+	  $i_rx	p(0, 0), p(1, 2), 2, 6, $base_a\p(1, 1:1),|
+					$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
+					$displacement8\p(1, 1:1)
+	  $elseif p(1, #1)
+	  $i_rl	p(0, 0), p(1, 2), 2, 7, 4, p(1, 1)
+
+	  $elseif $itype\p(1, 1)="$a_reg"
+	  $note SX
+	  $i_rm	p(0, 0), p(1, 2), 2, 5, $ibase\p(1, 1), p(1, 1)
+	  $elseif $t(p(1, 1))=$equf
+	  $note	SQ
+	  $i_rm p(0, 0), p(1, 2), 2, 5, p(1, 1)\2, p(1, 1)
+
+	  $elseif (p(1, 1)<-32768)++(p(1, 1)>32767)++(p(1, 1:2)=l)
+	  $i_rl p(0, 0), p(1, 2), 2, 7, 1, p(1, 1)
+          $else
+	  $note	SO
+	  $i_rm p(0, 0), p(1, 2), 2, 7, 0, p(1, 1)
+	  $endif
+
+	$elseif	$t(p(1, 1))="$d_reg"
+	$else
+	$flag	source or destination must be d0..d7
+	$endif
+	$end
+
+p	$proc	;	some floating instructions [b|w|l|s|d]<->fp
+fmove*	$name
+
+	$end
+
+p	$proc	;	some floating instructions [b|w|l|s|d]->fp
+fadd*	$name
+fsub*	$name
+fmul*	$name
+fdiv*	$name
+
+	$end
+
 p	$proc
 lea*	$name	7*/4++4
 	$if		$t(p(1, 2))=$a_reg
@@ -389,6 +456,10 @@ rte*	$name	0x4e73
 p	$proc				; 4,3,3,3,3,32
 cmpi*	$name	6*/4++2*/7++0*/10++0
 andi*	$name	1*/4++2*/7++0*/10++0	; 0000 0010 1000 0rrr
+ori*	$name
+eori*	$name
+addi*	$name
+subi*	$name
 
 	$do	$t(p(1, 2))^=$d_reg,	$flag must subtract from d0..d7
 	$do	p(1, #1)=0,		$flag must subtract immediate
