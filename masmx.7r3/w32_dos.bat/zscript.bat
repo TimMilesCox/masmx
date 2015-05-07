@@ -669,4 +669,6 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz macaroon ..\test.zo3\macaroon -lok > ..\text.zo3\macaroon.txt
 ..\masmz crusti ..\test.zo3\crusti -lok > ..\text.zo3\crusti.txt
 ..\masmz afar ..\test.zo3\afar -lok > ..\text.zo3\afar.txt
+..\masmz skillin ..\test.zo3\skillin -lok > ..\text.zo3\skillin.txt
+..\masmz nodcodl ..\test.zo3\nodcodl -lok > ..\text.zo3\nodcodl.txt
 

@@ -677,6 +677,8 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx afar ..\test.o3\afar -lyok > ..\text.o3\afar.txt
 ..\masmx seriozha ..\test.o3\seriozha -lyok > ..\text.o3\seriozha.txt
 ..\masmx leriozha ..\test.o3\leriozha -lyok > ..\text.o3\leriozha.txt
+..\masmx skillin ..\test.o3\skillin -lyok > ..\text.o3\skillin.txt
+..\masmx nodcodl ..\test.o3\nodcodl -lyok > ..\text.o3\nodcodl.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

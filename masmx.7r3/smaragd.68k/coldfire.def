@@ -15,6 +15,7 @@
 "$a_reg_@+" 	$equ	131
 "$a_reg_@-"	$equ	132
 "$special_reg"	$equ	133
+"$fp_reg"	$equ	134
 
 d0	$equ,"$d_reg"	0
 d1	$equ,"$d_reg"	1
@@ -94,6 +95,15 @@ a7	$equ,"$a_reg"	7
 "a5@+"	$equ,"$a_reg_@+"	5
 "a6@+"	$equ,"$a_reg_@+"	6
 "a7@+"	$equ,"$a_reg_@+"	7
+
+fp0	$equ,"$fp_reg"		0
+fp1	$equ,"$fp_reg"		1
+fp2	$equ,"$fp_reg"		2
+fp3	$equ,"$fp_reg"		3
+fp4	$equ,"$fp_reg"		4
+fp5	$equ,"$fp_reg"		5
+fp6	$equ,"$fp_reg"		6
+fp7	$equ,"$fp_reg"		7
 
 sr	$equ,"$special_reg"	0
 "$8_bits" $equ,"$special_reg"	2
@@ -282,7 +292,7 @@ eor*	$name
 	  $i_rm	p(0, 0), p(1, 2), 2, 5, $ibase\p(1, 1), p(1, 1)
 	  $elseif $t(p(1, 1))=$equf
 	  $note	SQ
-	  $i_rm p(0, 0), p(1, 2), 2, 5, p(1, 1)\2, p(1, 1)
+	  $i_rm p(0, 0), p(1, 2), 2, 5, +"p(1, 1)"\2, p(1, 1)
 
 	  $elseif (p(1, 1)<-32768)++(p(1, 1)>32767)++(p(1, 1:2)=l)
 	  $i_rl p(0, 0), p(1, 2), 2, 7, 1, p(1, 1)
@@ -292,6 +302,29 @@ eor*	$name
 	  $endif
 
 	$elseif	$t(p(1, 1))="$d_reg"
+	  $if	$t(p(1, 2))="$a_reg"
+	  $flag	dR->aR not possible
+	  $elseif ($t("p(1, 2)")="$a_reg_@")|
+		++($t("p(1, 2)")="$a_reg_@+")|
+		++($t("p(1, 2)")="$a_reg_@-")
+	  $i_rr	p(0, 0), p(1, 1), 6, $t("p(1, 2)")**7, $ibase\p(1, 2)
+	  $elseif $inside\p(1, 2)=2
+	  $i_rm	p(0, 0), p(1, 1), 6, 5, $base_a\p(1, 2), $displacement\p(1, 2)
+	  $elseif $inside\p(1, 2)=3
+	  $i_rx	p(0, 0), p(1, 1), 6, 6, $base_a\p(1, 2:1),|
+					$idx_d\p(1, 2:1), $idx_w\p(1, 2:1), 0,|
+					$displacement8\p(1, 2:1)
+	  $elseif p(1, #2)
+	  $flag	write to immediate impossible
+	  $elseif  $itype\p(1, 2)="$a_reg"
+	  $i_rm	p(0, 0), p(1, 1), 6, 5, $ibase\p(1, 2), p(1, 2)
+	  $elseif  $t(p(1, 2))=$equf
+	  $i_rm	p(0, 0), p(1, 1), 6, 5, +"p(1, 2)"\2, p(1, 2)
+	  $elseif (p(1, 2)<-32768)++(p(1, 2)>32767)++(p(1, 2:2)=l)
+	  $i_rl	p(0, 0), p(1, 1), 6, 7, 1, p(1, 2)
+	  $else
+	  $i_rm	p(0, 0), p(1, 1), 6, 7, 0, p(1, 2)
+	  $endif
 	$else
 	$flag	source or destination must be d0..d7
 	$endif

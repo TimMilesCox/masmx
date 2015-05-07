@@ -27,3 +27,14 @@ $(0:32768)
 	add	slowburning, d6
 	add	woodburning, d6
 
+	add	d4, (a5)
+	add	d1, (a3)+
+	add	d2, -(a3)
+	add	d4, 12(a5)
+	add	d4, (12, a5)
+	add	d4, janglies
+	add	d5, (10, a5,d1.l*4)
+	add	d6, (slowburning).l
+	add	d6, slowburning
+	add	d6, woodburning
+
