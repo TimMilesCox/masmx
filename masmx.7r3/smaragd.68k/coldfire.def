@@ -124,7 +124,8 @@ sr	$equ,"$special_reg"	0
 "$i_rm"	$form	4, 3, 3, 3, 3, 16
 "$i_rl"	$form	4, 3, 3, 3, 3, 32
 "$i_rx"	$form	4, 3, 3, 3, 3, 4, 3, 1, 8
-"$i_rf"	$form	4, 3, 3, 3, 3, 3, 3, 3, 7
+"$i_fp"	$form	4, 3, 3, 3, 3, 3, 3, 3, 7
+"$i_fm"	$form	4, 3, 3, 3, 3, 3, 3, 3, 7, 16
 
 "$b_cs"	$form	8, 8
 "$b_cl"	$form	8, 8, 16
@@ -373,17 +374,62 @@ eor*	$name	11	; eor is only in store mode
 	$endif
 	$end
 
-p	$proc	;	some floating instructions [b|w|l|s|d]<->fp
-fmove*	$name
 
-	$end
 
 p	$proc	;	some floating instructions [b|w|l|s|d]->fp
-fadd*	$name
-fsub*	$name
+
+fmove.l* $name	0
+fmove.s* $name	0++1*/7
+fmove.w* $name	0++4*/7
+fmove.d* $name	0++5*/7
+fmove.b* $name	0++6*/7
+fmove*	$name	fmove.d
+
+fadd.l*	$name	34++0*/7	; 000 0100010 -> 1111 001 000 [000=l] 0100010
+fadd.s*	$name	34++1*/7	; 001 0100010 -> 1111 001 000 [001=s] 0100010
+fadd.w*	$name	34++4*/7	; 100 0100010 -> 1111 001 000 [100=w] 0100010
+fadd.d*	$name	34++5*/7	; 101 0100010 -> 1111 001 000 [101=d] 0100010
+fadd.b*	$name	34++6*/7	; 110 0100010 -> 1111 001 000 [110=b] 0100010
+fadd*	$name	fadd.l
+
+
+fsub*	$name	fsub.d
+
 fmul*	$name
 fdiv*	$name
 
+	$if	$t(p(1, 2))=$fp_reg
+	$if	$t(p(1, 1))=$fp_reg
+	$i_fp	15, 1, 0, 0, 0, 0, 0, p(1, 2), p(0, 0)
+	$elseif	$t(p(1, 1))=$d_reg
+	$i_fp	15, 1, 0, 0, p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0)
+	$elseif	$t(p(1, 1))=$a_reg
+	$flag	a0..a7 may not be floating source operand
+	$elseif	($t("p(1, 1)")="$a_reg_@")++|
+		($t("p(1, 1)")="$a_reg_@+")++|
+		($t("p(1, 1)")="$a_reg_@-")
+	$i_fp	15, 1, 0, $t("p(1, 1)")**7, $ibase\p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0)
+	$elseif	$inside\p(1, 1)=2
+	$i_fm	15, 1, 0, 5, $base_a\p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0), $displacement\p(1, 1)
+	$elseif	$inside\p(1, 1)=3
+	$flag	operand double index format disallowed for floating operation
+	$elseif	p(1, #1)
+	$flag	floating immediate operand disallowed
+	$elseif	$itype\p(1, 1)="$a_reg"
+	$i_fm	15, 1, 0, 5, $ibase\p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)
+	$elseif	$t(p(1, 1))=$equf
+	$i_fm	15, 1, 0, 5, +"p(1, 1)"\2, 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)
+	$else
+	$flag	operand not within recognised category
+	$endif
+	$elseif	p(0, 0)**127=fmove.l
+	$if	$t(p(1, 1))=$fp_register
+        $else
+	$flag	fmove must be to or from fp0..fp7
+	$endif
+	$else
+	$flag	floating arithmetic destination must be fp0..fp7
+	$endif
 	$end
 
 p	$proc
