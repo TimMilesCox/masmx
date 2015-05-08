@@ -38,3 +38,5 @@ $(0:32768)
 	add	d6, slowburning
 	add	d6, woodburning
 
+	eor	d7, janglies
+	eori	#99, d7

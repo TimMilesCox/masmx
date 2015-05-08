@@ -124,6 +124,7 @@ sr	$equ,"$special_reg"	0
 "$i_rm"	$form	4, 3, 3, 3, 3, 16
 "$i_rl"	$form	4, 3, 3, 3, 3, 32
 "$i_rx"	$form	4, 3, 3, 3, 3, 4, 3, 1, 8
+"$i_rf"	$form	4, 3, 3, 3, 3, 3, 3, 3, 7
 
 "$b_cs"	$form	8, 8
 "$b_cl"	$form	8, 8, 16
@@ -258,20 +259,61 @@ p	$proc	;	some integer instructions [w|l]->dregister
 mulu*	$name
 muls*	$name
 divu*	$name
-divs*	$name
+divs*	$name	
 
+	$end
+
+
+p	$proc	;	treat [l|w] as radically different instructions
+divs.w*	$name	8++7*/4
+divu.w*	$name	8++3*/4
+muls.w*	$name	12++7*/4
+mulu.w*	$name	12++3*/4
+
+	$if	$t(p(1, 2))=$d_reg
+	$if	$t(p(1, 1))=$d_reg
+		$i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, 0, p(1, 1)
+	$elseif	$t(p(1, 1))=$a_reg
+		$flag	divisor may not be a0..a7
+	$elseif	($t("p(1, 1)")="$a_reg_@")++|
+		($t("p(1, 1)")="$a_reg_@+")++|
+		($t("p(1, 1)")="$a_reg_@-")
+		$i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, $t("p(1, 1)")**7, $ibase\p(1, 1)
+	$elseif	$inside\p(1, 2)=2
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $base_a\p(1, 1), $displacement\p(1, 1)
+	$elseif	$inside\p(1, 2)=3
+		$i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 6, $base_a\p(1, 1:1),|
+							 $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
+							 $displacement8\p(1, 1:1)
+	$elseif	p(1, #1)
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 4, p(1, 1)
+
+	$elseif	$itype\p(1, 1)="$a_reg"
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $ibase\p(1, 1), p(1, 1)
+	$elseif	$t(p(1, 1))=$equf
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, +"p(1, 1)"\2, p(1, 1)
+	$elseif	(p(1, 1)<-32768)++(p(1, 1)>32767)++(p(1, 1:2)=l)
+		$i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
+	$else
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, p(1, 1)
+	$endif
+	$else
+	$flag	->d0..7 only
+	$endif
 	$end
 
 p	$proc	;	some integer instructions dregister<->store
 		;	long only
 add*	$name	13
-sub*	$name
-or*	$name
-and*	$name
-eor*	$name
+sub*	$name	9
+or*	$name	8
+and*	$name	12
+eor*	$name	11	; eor is only in store mode
+			; with d_reg sending
+			; no a_reg or immediate on receive side
+			; can use eori ->d_reg
 
-
-	$if	$t(p(1, 2))="$d_reg"
+	$if	($t(p(1, 2))="$d_reg")**(p(0, 0)^=eor)
 	  $if	$t(p(1, 1))**128
 	  $i_rr	p(0, 0), p(1, 2), 2, $t("p(1, 1)")**7, p(1, 1)
 	  $elseif ($t("p(1, 1)")="$a_reg_@")|
@@ -327,6 +369,7 @@ eor*	$name
 	  $endif
 	$else
 	$flag	source or destination must be d0..d7
+	$do	p(0, 0)=eor,	$note	eor must have d0..d7 source. See eori instruction
 	$endif
 	$end
 
@@ -487,12 +530,12 @@ rte*	$name	0x4e73
 	$end
 
 p	$proc				; 4,3,3,3,3,32
-cmpi*	$name	6*/4++2*/7++0*/10++0
-andi*	$name	1*/4++2*/7++0*/10++0	; 0000 0010 1000 0rrr
-ori*	$name
-eori*	$name
-addi*	$name
-subi*	$name
+cmpi*	$name	6*/4++2*/7++0*/10++0	; 000 010 110 0000 -> 0000 110 010 000 rrr
+andi*	$name	1*/4++2*/7++0*/10++0	; 000 010 001 0000 -> 0000 001 010 000 rrr
+ori*	$name	0++0*/4++2*/7++0*/10	; 000 010 000 0000 -> 0000 000 010 000 rrr
+eori*	$name	0++5*/4++2*/7++0*/10	; 000 010 101 0000 -> 0000 101 010 000 rrr
+addi*	$name	0++3*/4++2*/7++0*/10	; 000 010 011 0000 -> 0000 011 010 000 rrr
+subi*	$name	0++2*/4++2*/7++0*/10	; 000 010 010 0000 -> 0000 010 010 000 rrr
 
 	$do	$t(p(1, 2))^=$d_reg,	$flag must subtract from d0..d7
 	$do	p(1, #1)=0,		$flag must subtract immediate
