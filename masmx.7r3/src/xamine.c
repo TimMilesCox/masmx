@@ -163,23 +163,26 @@ static char *edge(char *s, char *m)
 
 static int oper_ator(char *c, long len)
 {
-   char *q, *r;
-   int i, j;
+   char		*q, *p;
+   int		 i, j, symbol;
 
    for (i = 0; i < OPERATORS; i++)
    {
       j = len;
       q = c;
-      r = o[i];
-      while ((*r) && (j))
+      p = o[i];
+
+      while ((symbol = *p) && (j))
       {
-	 if (*r != *q) break;
-	 r++;
+	 if (symbol != *q) break;
+	 p++;
 	 q++;
 	 j--;
       }
-      if (*r == 0) return i;	/* o[i];*/
+
+      if (symbol == 0) return i;	/* o[i];*/
    }
+
    return -1; /* NULL; */
 }
 
@@ -232,7 +235,11 @@ static char *next_operator(char *s, char *e, char *list, int exclude)
 
          if (!bdepth)
          {
+            if (symbol == ' ') break;
+            if (symbol == ',') break;
+
             y = oper_ator(s, e - s);
+
             if (y < 0)
             {
             }

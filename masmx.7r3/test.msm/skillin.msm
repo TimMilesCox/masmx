@@ -42,5 +42,5 @@ $(0:32768)
 	eori	#99, d7
 
 	fmove.s	janglies, fp0
-	fadd.l	(a7)+, fp0
+	fadd.s	(a7)+, fp0
 

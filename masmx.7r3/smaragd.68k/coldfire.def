@@ -390,13 +390,28 @@ fadd.s*	$name	34++1*/7	; 001 0100010 -> 1111 001 000 [001=s] 0100010
 fadd.w*	$name	34++4*/7	; 100 0100010 -> 1111 001 000 [100=w] 0100010
 fadd.d*	$name	34++5*/7	; 101 0100010 -> 1111 001 000 [101=d] 0100010
 fadd.b*	$name	34++6*/7	; 110 0100010 -> 1111 001 000 [110=b] 0100010
-fadd*	$name	fadd.l
+fadd*	$name	fadd.d
 
-
+fsub.l*	$name	40
+fsub.s*	$name	40++1*/7
+fsub.w* $name   40++4*/7
+fsub.d* $name   40++5*/7
+fsub.b* $name   40++6*/7
 fsub*	$name	fsub.d
 
-fmul*	$name
-fdiv*	$name
+fmul.l*	$name	35
+fmul.s*	$name	35++1*/7
+fmul.w* $name   35++4*/7
+fmul.d* $name   35++5*/7
+fmul.b* $name   35++6*/7
+fmul*	$name	fmul.d
+
+fdiv.l*	$name	32
+fdiv.s*	$name	32++1*/7
+fdiv.w* $name   32++4*/7
+fdiv.d* $name   32++5*/7
+fdiv.b* $name   32++6*/7
+fdiv*	$name	fdiv.d
 
 	$if	$t(p(1, 2))=$fp_reg
 	$if	$t(p(1, 1))=$fp_reg
