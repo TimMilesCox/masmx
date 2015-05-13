@@ -235,8 +235,10 @@ static char *next_operator(char *s, char *e, char *list, int exclude)
 
          if (!bdepth)
          {
+            #if 0
             if (symbol == ' ') break;
             if (symbol == ',') break;
+            #endif
 
             y = oper_ator(s, e - s);
 

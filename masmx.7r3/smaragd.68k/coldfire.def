@@ -433,7 +433,7 @@ fdiv*	$name	fdiv.d
 	$elseif	$itype\p(1, 1)="$a_reg"
 	$i_fm	15, 1, 0, 5, $ibase\p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)
 	$elseif	$t(p(1, 1))=$equf
-	$i_fm	15, 1, 0, 5, +"p(1, 1)"\2, 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)
+	$i_fm	15, 1, 0, 5, +("p(1, 1)"\2), 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)
 	$else
 	$flag	operand not within recognised category
 	$endif

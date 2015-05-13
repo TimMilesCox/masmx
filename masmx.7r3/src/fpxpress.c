@@ -64,6 +64,21 @@ static int complex_beyond(char *s, char *e, char *list)
    return 0;
 }
 
+/*************************************************
+
+	detect if part of an expression
+	contains variables
+
+	result 0 = it contains runtime variables
+	result 1 = it's all known now
+
+	association with a location counter = storage
+	$equf = storage
+	referenced but external = storage
+
+*************************************************/
+
+
 static int number(char *s, char *e)
 {
    object		*l;
@@ -270,6 +285,13 @@ static void fp_xpress(char *s, char *e)
 
    if ((unary == '+') || (unary == '-'))
    {
+      if (*(s + 1) == '(')
+      {
+         fp_xpress(s + 2, e);
+         if (unary == '-') fpxpress_asmq(" $x_reverse");
+         return;
+      }
+
       if (number(s + 1, e) == 0)
       {
          if (unary == '+') fpxpress_assemble(" $x_load ",          s + 1, e);

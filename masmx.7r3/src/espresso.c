@@ -356,6 +356,13 @@ static void i_xpress(char *s, char *e)
    {
       if (number(s + 1, e) == 0)
       {
+         if (*(s + 1) == '(')
+         {
+            i_xpress(s + 2, e);
+            if (unary == '-') fpxpress_asmq(" $i_reverse");
+            return;
+         }
+
          if (unary == '+') fpxpress_assemble(" $i_load ",          s + 1, e);
          else              fpxpress_assemble(" $i_load_negative ", s + 1, e);
 
