@@ -76,6 +76,9 @@ static int complex_beyond(char *s, char *e, char *list)
 	$equf = storage
 	referenced but external = storage
 
+	user-defined types 128..255 are treated as locations
+	they are typically registers
+
 *************************************************/
 
 
@@ -99,6 +102,7 @@ static int number(char *s, char *e)
    if (l->l.valued == 0) return 0;
    if (l->l.r.l.xref < 0) return 0;
    if (l->l.valued == EQUF) return 0;
+   if (l->l.valued & 128) return 0;
 
    return 1;
 }

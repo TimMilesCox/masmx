@@ -89,6 +89,11 @@ p	$proc
 	PUSH
 	$end
 
+p	$proc
+"$i_reverse"	$name
+	REVERSE
+	$end
+
 "$i_retrieve_testequal"*	$proc
 	TEST_EQUAL	STACK_TOP
 	POP
@@ -196,6 +201,11 @@ p       $proc
 
 "$x_reserve"* $proc
 	FPUSH
+	$end
+
+p	$proc
+"$x_reverse"* $name
+	FP_REVERSE
 	$end
 
 "$x_retrieve_add"* $proc

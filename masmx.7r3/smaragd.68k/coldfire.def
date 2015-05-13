@@ -331,16 +331,16 @@ eor*	$name	11	; eor is only in store mode
 	  $i_rl	p(0, 0), p(1, 2), 2, 7, 4, p(1, 1)
 
 	  $elseif $itype\p(1, 1)="$a_reg"
-	  $note SX
+	  $do	$o('V'-'A'),	$note SX
 	  $i_rm	p(0, 0), p(1, 2), 2, 5, $ibase\p(1, 1), p(1, 1)
 	  $elseif $t(p(1, 1))=$equf
-	  $note	SQ
+	  $do	$o('V'-'A'),	$note	SQ
 	  $i_rm p(0, 0), p(1, 2), 2, 5, +"p(1, 1)"\2, p(1, 1)
 
 	  $elseif (p(1, 1)<-32768)++(p(1, 1)>32767)++(p(1, 1:2)=l)
 	  $i_rl p(0, 0), p(1, 2), 2, 7, 1, p(1, 1)
           $else
-	  $note	SO
+	  $do	$o('V'-'A'),	$note	SO
 	  $i_rm p(0, 0), p(1, 2), 2, 7, 0, p(1, 1)
 	  $endif
 

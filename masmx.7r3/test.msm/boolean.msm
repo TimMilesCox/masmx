@@ -9,8 +9,11 @@ one	1
 two	2d
 three	3d
 $(0:32768)
+	$plist
+	$xqt_i	two+one.w*4+three*/16++12*/20
 	$plist	3
-	$xqt_i	two+one.w*4+three*/16++12*/40
+	$xqt_i	d2.w+d3+d4
+	$plist
 	$do	$<256,$(0:256)
 	$end
 
