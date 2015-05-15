@@ -415,7 +415,7 @@ fdiv*	$name	fdiv.d
 
 	$if	$t(p(1, 2))=$fp_reg
 	$if	$t(p(1, 1))=$fp_reg
-	$i_fp	15, 1, 0, 0, 0, 0, 0, p(1, 2), p(0, 0)
+	$i_fp	15, 1, 0, 0, 0, 0, p(1, 1), p(1, 2), p(0, 0)
 	$elseif	$t(p(1, 1))=$d_reg
 	$i_fp	15, 1, 0, 0, p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0)
 	$elseif	$t(p(1, 1))=$a_reg
@@ -423,7 +423,11 @@ fdiv*	$name	fdiv.d
 	$elseif	($t("p(1, 1)")="$a_reg_@")++|
 		($t("p(1, 1)")="$a_reg_@+")++|
 		($t("p(1, 1)")="$a_reg_@-")
+	$if	$itype\p(1, 1)=$a_reg
 	$i_fp	15, 1, 0, $t("p(1, 1)")**7, $ibase\p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0)
+	$else
+	$i_fp	15, 1, 0, $t("p(1, 1)")**7, p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0)
+	$endif
 	$elseif	$inside\p(1, 1)=2
 	$i_fm	15, 1, 0, 5, $base_a\p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0), $displacement\p(1, 1)
 	$elseif	$inside\p(1, 1)=3

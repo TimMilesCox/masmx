@@ -90,7 +90,7 @@ p	$proc
 	$end
 
 p	$proc
-"$i_reverse"	$name
+"$i_reverse"*	$name
 	REVERSE
 	$end
 

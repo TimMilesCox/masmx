@@ -1,0 +1,63 @@
+
+p	$proc
+FPUSH*	$name
+	fmove	fp0, -(a7)
+	$end
+
+p	$proc
+FOP*	$name
+"$TYPE"	$set	$t(p(1, 1))
+	$if	$t(p(1, 1))=$fp_reg
+"$FOP"*	$equ,$fp_reg	p(1, 1)
+	$elseif	$t(p(1, 1))=$d_reg
+"$FOP"*	$equ,$d_reg	p(1, 1)
+	$elseif	$t(p(1, 1))=$a_reg
+	$flag	sending register may not be a0..a7
+	$elseif	($t(p(1, 1))=$a_reg_@)++|
+		($t(p(1, 1))="$a_reg_@+")++|
+		($t(p(1, 1))="$a_reg_@-")
+"$FOP"*	$equ,$TYPE	p(1, 1)
+	$elseif	$t(p(1, 1))=127
+	move	#p(1, 1), a0
+"$FOP"*	$equ,$a_reg_@	p(1, 1)
+	$elseif	$inside\p(1, 1)=2
+"$FOP"*	$equf	$inside\p(1, 1), $base_a\p(1, 1)
+	$elseif	$itype\p(1, 1)="$a_reg"
+"$FOP"*	$equf	p(1, 1), $ibase\p(1, 1)
+	$elseif	$t(p(1, 1))=$equf
+"$FOP"*	$equf	p(1, 1), p(1, 2)
+	$else
+"$FOP"*	$equf	$literal(ieee754_64 p(1))
+	$endif
+	$end
+
+
+p	$proc
+FP_LOAD* $name
+	FOP	p(1)
+	fmove	$FOP, fp0
+	$end
+
+p	$proc
+FP_ADD* $name
+	FOP	p(1)
+	fadd	$FOP, fp0
+	$end
+
+p	$proc
+FP_SUBTRACT* $name
+	FOP	p(1)
+	fsub	$FOP, fp0
+	$end
+
+p	$proc
+FP_MULTIPLY* $name
+	FOP	p(1)
+	fmul	$FOP, fp0
+	$end
+
+p	$proc
+FP_DIVIDE* $name
+	FOP	p(1)
+	fdiv	$FOP, fp0
+	$end

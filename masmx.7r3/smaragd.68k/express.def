@@ -1,0 +1,78 @@
+;		In ColdFire saves/retrieves only PUSH macro generates an instruction
+;		LOAD and arithmetic macros must distinguish register / storage / immediate argument
+
+PUSH*		$proc			; ColdFire
+		move.l		d0, -(a7)
+		$end
+
+STACK_TOP*	$equf		"(a7)+"	; ColdFire
+POP		$equ,$directive	$nop	; ColdFire
+
+p       $proc
+SHIFT*	$name
+REG	$set,"$d_reg"	d0
+	$do	p()>1,REG	$set,"$d_reg"	p(2)
+	$if	($t(p(1, 1))="$d_reg")++($t(p(1, 1))=127)++$t(p(1, 1))=$equf)++($t(p(1, 1))="$a_reg")
+	  $if	($t(p(1, 1))="$d_reg")**(p(1, 1)=d1)
+	  $else
+	  $if	p(1, 1:2)=w
+	  move.w	p(1, 1:1), d1
+	  $else
+	  move.l	p(1, 1:1), d1
+	  $endif
+	  $endif
+	  lsl	d1, REG
+	$elseif	p(1, 1)>16
+	move.w	#p(1, 1), d1
+	lsl	d1, REG
+	$else
+        $do     p(1, 1)/8,      lsl     #8, REG
+        $do     p(1, 1)**7^=0,  lsl     #p(1, 1)**7, REG
+	$endif
+        $end
+
+p	$proc
+LOAD*	$name
+	$if	($t(p(1, 1:2))=$special_reg)**(p(1, 1:2)=w)
+	$do	$o('V'-'A'),	$note	shorty
+	move.w	p(1, 1:1),	d0
+	$else
+	move.l	p(1),	d0
+	$endif
+	$end
+
+
+p	$proc
+OR*	$name
+"$type"	$set	$t(p(1,1))
+	$if	($type=127)++($type=$equf)++($type**128)
+	$do	$o('V'-'A'),	$note	or not quite immediately
+	or	p(1), d0
+	$else
+	or	#p(1), d0
+	$endif
+	$end
+
+p	$proc
+ADD*	$name
+"$type" $set    $t(p(1, 1))
+        $if     ($type=127)++($type=$equf)++($type**128)
+	$do	$o('V'-'A'),	$note	not quite immediately
+	add	p(1), d0
+	$else
+	add	#p(1), d0
+	$endif
+	$end
+
+p	$proc
+MULTIPLY* $name
+"$type"	$set	$t(p(1, 1))
+	$if	p(1, 1:2)=l
+	$else
+	$if	($type=127)++($type=$equf)++($type**128)
+	muls.w	p(1), d0
+	$else
+	muls.w	#p(1), d0
+	$endif
+	$endif
+	$end

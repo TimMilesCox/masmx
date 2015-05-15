@@ -1,6 +1,7 @@
 	$path		../smaragd.68k
 	$include	coldfire.def
 	$include	express.def
+	$include	fpxpress.def
 	$path
 	$include	espresso.def
 	$include	ieee754.def
