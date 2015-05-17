@@ -4,6 +4,9 @@ FPUSH*	$name
 	fmove	fp0, -(a7)
 	$end
 
+FP_STACK_TOP	$equ,"$a_reg_@+"	7
+FPOP		$equ,$directive		$nop
+
 p	$proc
 FOP*	$name
 "$TYPE"	$set	$t(p(1, 1))
@@ -18,8 +21,12 @@ FOP*	$name
 		($t(p(1, 1))="$a_reg_@-")
 "$FOP"*	$equ,$TYPE	p(1, 1)
 	$elseif	$t(p(1, 1))=127
-	move	#p(1, 1), a0
-"$FOP"*	$equ,$a_reg_@	p(1, 1)
+	$if	p(1, *1)
+	move	p(1, 1), a0
+	$else
+	lea	p(1, 1), a0
+	$endif
+"$FOP"*	$equ,$a_reg_@	a0
 	$elseif	$inside\p(1, 1)=2
 "$FOP"*	$equf	$inside\p(1, 1), $base_a\p(1, 1)
 	$elseif	$itype\p(1, 1)="$a_reg"
@@ -61,3 +68,16 @@ FP_DIVIDE* $name
 	FOP	p(1)
 	fdiv	$FOP, fp0
 	$end
+
+p	$proc
+FP_LOAD_NEGATIVE* $name
+	FP_LOAD $literal(ieee754_64 0.0), fp0
+	fsub	p(1, 1), fp0
+	$end
+
+p	$proc
+FP_REVERSE*	$name
+	fmove	fp0, fp1
+	FP_LOAD_NEGATIVE fp1
+	$end
+

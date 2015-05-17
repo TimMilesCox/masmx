@@ -442,7 +442,24 @@ fdiv*	$name	fdiv.d
 	$flag	operand not within recognised category
 	$endif
 	$elseif	p(0, 0)**127=fmove.l
-	$if	$t(p(1, 1))=$fp_register
+	$if	$t(p(1, 1))=$fp_reg
+
+	$trace	$t("p(1, 2)")
+	$if	$t("p(1, 2)")="$a_reg_@"++|
+		$t("p(1, 2)")="$a_reg_@+"++|
+		$t("p(1, 2)")="$a_reg_@-"
+	$if	$itype\p(1, 2)=$a_reg
+	$note	(a)
+	$i_fp	15, 1, 0, $t("p(1, 2)")**7, $ibase\p(1, 2), 3, p(0, 0)/*7, p(1, 1), p(0, 0)
+	$else
+	$note	a@
+	$i_fp	15, 1, 0, $t("p(1, 2)")**7, p(1, 2), 3, p(0, 0)/*7, p(1, 1), p(0, 0)
+	$endif
+
+;	elseifs go here for other storage targets
+
+	$endif
+
         $else
 	$flag	fmove must be to or from fp0..fp7
 	$endif
@@ -460,7 +477,11 @@ lea*	$name	7*/4++4
 	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $ibase\p(1, 1),|
 			p(1, 1)
 	  $else
+	  $if	(p(1, 1)<32768)**(p(1, 1)>32767)
 	    $i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
+	  $else
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, p(1, 1)
+	  $endif
 	  $endif
 	$else
 	  $flag	receiving operand must be a0..a7
@@ -653,9 +674,11 @@ move*	$name	move.l
 			$displacement8\p(1, 2:1)
 
 	  $else
-
+	  $if		(p(1, 2)<-32768)**(p(1, 2)>32767
 	    $i_rl	p(0, 0), 1, 7, $from, $fror, p(1, 2)
-
+	  $else
+	    $i_rm	p(0, 0), 0, 7, $from, $fror, p(1, 2)
+	  $endif
 	  $endif
 
 	$elseif	$tot**128
@@ -693,7 +716,11 @@ move*	$name	move.l
 			$displacement8\p(1, 1:1)
 
 	  $else
+	  $if	(p(1, 1)<-32768)**(p(1, 1)>32767
 	    $i_rl	p(0, 0), $tor, $tom, 7, 1, p(1, 1)
+	  $else
+	    $i_rm	p(0, 0), $tor, $tom, 7, 0, p(1, 1)
+	  $endif
 	  $endif
 	$else
 	  $flag	two-address version not yet macro-coded

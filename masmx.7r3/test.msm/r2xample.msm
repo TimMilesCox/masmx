@@ -57,18 +57,16 @@ one	$res	8
 two	$res	8
 three	$res	8
 
+$(5:16384+1024)
+rastore	$res	8
+rapointer $res	4
+
 $(1:131072)
 
 fp_routine
-	move	#$a(one), a5
-	$plist	4
+	lea		$a(one), a5
 	$xqt_fp		one*1.75*+1200000*two/3.0*-625000-three
-	$plist
 
+	$xqt_fp		d5+fp6+a2@+"a4@-"+"a3@+"*(*rapointer)/rastore
 
-a4@M	$equ,"$a_reg_@-"	4
-a3@P	$equ,"$a_reg_@+"	3
-
-	$xqt_fp		d5+fp6+a2@+"a4@-"+"a3@+"
-
-;	sret
+	rts

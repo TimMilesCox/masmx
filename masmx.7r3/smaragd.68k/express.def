@@ -1,12 +1,12 @@
 ;		In ColdFire saves/retrieves only PUSH macro generates an instruction
 ;		LOAD and arithmetic macros must distinguish register / storage / immediate argument
 
-PUSH*		$proc			; ColdFire
+PUSH*		$proc				; ColdFire
 		move.l		d0, -(a7)
 		$end
 
-STACK_TOP*	$equf		"(a7)+"	; ColdFire
-POP		$equ,$directive	$nop	; ColdFire
+STACK_TOP	$equ,"$a_reg_@+"	"(a7)+"	; ColdFire
+POP		$equ,$directive	$nop		; ColdFire
 
 p       $proc
 SHIFT*	$name

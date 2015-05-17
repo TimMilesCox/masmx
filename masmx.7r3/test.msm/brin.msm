@@ -7,7 +7,7 @@
 	$include	ieee754.def
 	$path
 
-$(3:03000)
+$(3:03000/$literal)
 one	$res	8
 two	$res	8
 first	$res	4
@@ -33,5 +33,6 @@ $(0:64)
 	$xqt_fp	33.6*44.7
 	$xqt_fp	+(33.6*44.7)
 
-	$do	$<256,$(0:256)
+	$trace	$r($literal)
+
 
