@@ -13,7 +13,7 @@ two	$res	8
 first	$res	4
 second	$res	4
 
-$(0:64)
+$(0:64,pc/$azlit)
         $xqt_fp	(one+two)-(two*one)
 	$xqt_fp	+(one+two)
 	$xqt_fp	-(one+two)
@@ -34,5 +34,4 @@ $(0:64)
 	$xqt_fp	+(33.6*44.7)
 
 	$trace	$r($literal)
-
 

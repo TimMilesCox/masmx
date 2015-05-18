@@ -34,7 +34,7 @@ FOP*	$name
 	$elseif	$t(p(1, 1))=$equf
 "$FOP"*	$equf	p(1, 1), p(1, 2)
 	$else
-"$FOP"*	$equf	$literal(ieee754_64 p(1))
+"$FOP"*	$equf	$azlit(ieee754_64 p(1)
 	$endif
 	$end
 
@@ -71,13 +71,13 @@ FP_DIVIDE* $name
 
 p	$proc
 FP_LOAD_NEGATIVE* $name
-	FP_LOAD $literal(ieee754_64 0.0), fp0
-	fsub	p(1, 1), fp0
+	FP_LOAD 0.0, fp0
+	FP_SUBTRACT	p(1, 1)
 	$end
 
 p	$proc
 FP_REVERSE*	$name
-	fmove	fp0, fp1
-	FP_LOAD_NEGATIVE fp1
+	FPUSH
+	FP_LOAD_NEGATIVE FP_STACK_TOP
 	$end
 

@@ -27,17 +27,19 @@ characteristic $set characteristic+1
 	$endif
 
         $nop	bits 166..144 -> bits 22..0. Normalising Bit 167 truncated
-        
+
+	$do	tag=0,characteristic	$set	0
+
         fieee754_32 sign, characteristic, mantissa 
         $end
 
 
 p       $proc
-ieee754_64* $name 0
+ieee754_64* $name
 
 tag     $set	p(1,1)
 sign    $set    tag/*191
-        
+
         $if     sign
 tag     $set    ^tag        
         $endif
@@ -54,8 +56,10 @@ characteristic $set characteristic+1
 	$endif
 
         $nop	bits 166..115 -> bits 51..0. Normalising Bit 167 truncated
+
+	$do	tag=0,characteristic	$set	0
         
-        fieee754_64 sign, characteristic, mantissa 
+        fieee754_64 sign, characteristic, mantissa
         $end
 
 p	$proc
@@ -78,6 +82,8 @@ characteristic $set characteristic+1
 	$endif
 
 	$nop	bits 166..55 -> bits 111.0 Normalising bit 167 truncated
+
+	$do	tag=0,characteristic	$set	0
 
 	fieee754_128	sign, characteristic, mantissa
 	$end

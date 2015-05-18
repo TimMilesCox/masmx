@@ -61,12 +61,12 @@ $(5:16384+1024)
 rastore	$res	8
 rapointer $res	4
 
-$(1:131072)
+$(1:131072,pc/$azlit)
 
 fp_routine
 	lea		$a(one), a5
 	$xqt_fp		one*1.75*+1200000*two/3.0*-625000-three
 
-	$xqt_fp		d5+fp6+a2@+"a4@-"+"a3@+"*(*rapointer)/rastore
+	$xqt_fp		d5+fp6+a2@+"-(a4)"+"a3@+"*(*rapointer)/rastore
 
 	rts

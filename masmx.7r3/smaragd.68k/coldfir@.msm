@@ -175,11 +175,11 @@ not_last
 
 qaside	tst	qaside_h
 	beq	first	$8_bits
-	move	qaside_t, a0
+	move	(qaside_t).l, a0
 	move	a1, [tcb.h.next, a0]
 	bra	last	$8_bits
-first	move	a1, qaside_h 	
-last	move	a1, qaside_t
+first	move	a1, (qaside_h).l 	
+last	move	a1, (qaside_t).l
 	bra	pick
 
 
