@@ -672,4 +672,5 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz skillin ..\test.zo3\skillin -lok > ..\text.zo3\skillin.txt
 ..\masmz nodcodl ..\test.zo3\nodcodl -lok > ..\text.zo3\nodcodl.txt
 ..\masmz afar ..\test.zo3\afar -lok > ..\text.zo3\afar.txt
+..\masmz meringue ..\test.zo3\meringue -lok > ..\text.zo3\meringue.txt
 

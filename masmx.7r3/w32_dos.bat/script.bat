@@ -680,6 +680,7 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx skillin ..\test.o3\skillin -lyok > ..\text.o3\skillin.txt
 ..\masmx nodcodl ..\test.o3\nodcodl -lyok > ..\text.o3\nodcodl.txt
 ..\masmx afar ..\test.o3\afar -lyok > ..\text.o3\afar.txt
+..\masmx meringue ..\test.o3\meringue -lyok > ..\text.o3\meringue.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire
