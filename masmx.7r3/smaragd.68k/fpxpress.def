@@ -41,38 +41,108 @@ FOP*	$name
 
 p	$proc
 FP_LOAD* $name
-	FOP	p(1)
+	FOP	p()
+	$if	$t(p(2, 1))=$special_reg
+	$if	p(2, 1)=s
+	fmove.s	$FOP, fp0
+	$elseif	p(2, 1)=l
+	fmove.l	$FOP, fp0
+	$elseif	p(2, 1)=w
+	fmove.w	$FOP, fp0
+	$elseif	p(2, 1)=b
+	fmove.b	$FOP, fp0
+	$else
+	fmove.l	$FOP, fp0
+	$endif
+	$else
 	fmove	$FOP, fp0
+	$endif
 	$end
 
 p	$proc
 FP_ADD* $name
-	FOP	p(1)
+	FOP	p()
+	$if	$t(p(2, 1))=$special_reg
+	$if	p(2, 1)=s
+	fadd.s	$FOP, fp0
+	$elseif	p(2, 1)=l
+	fadd.l	$FOP, fp0
+	$elseif	p(2, 1)=w
+	fadd.w	$FOP, fp0
+	$elseif	p(2, 1)=b
+	fadd.b	$FOP, fp0
+	$else
+	fadd.l	$FOP, fp0
+	$endif
+	$else
 	fadd	$FOP, fp0
+	$endif
 	$end
 
 p	$proc
 FP_SUBTRACT* $name
-	FOP	p(1)
+	FOP	p()
+	$if	$t(p(2, 1))=$special_reg
+	$if	p(2, 1)=s
+	fsub.s	$FOP, fp0
+	$elseif	p(2, 1)=l
+	fsub.l	$FOP, fp0
+	$elseif	p(2, 1)=w
+	fsub.w	$FOP, fp0
+	$elseif	p(2, 1)=b
+	fsub.b	$FOP, fp0
+	$else
+	fsub.l	$FOP, fp0
+	$endif
+	$else
 	fsub	$FOP, fp0
+	$endif
 	$end
 
 p	$proc
 FP_MULTIPLY* $name
-	FOP	p(1)
+	FOP	p()
+	$if	$t(p(2, 1))=$special_reg
+	$if	p(2, 1)=s
+	fmul.s	$FOP, fp0
+	$elseif	p(2, 1)=l
+	fmul.l	$FOP, fp0
+	$elseif	p(2, 1)=w
+	fmul.w	$FOP, fp0
+	$elseif	p(2, 1)=b
+	fmul.b	$FOP, fp0
+	$else
+	fmul.l	$FOP, fp0
+	$endif
+	$else
 	fmul	$FOP, fp0
+	$endif
 	$end
 
 p	$proc
 FP_DIVIDE* $name
-	FOP	p(1)
+	FOP	p()
+	$if	$t(p(2, 1))=$special_reg
+	$if	p(2, 1)=s
+	fdiv.s	$FOP, fp0
+	$elseif	p(2, 1)=l
+	fdiv.l	$FOP, fp0
+	$elseif	p(2, 1)=w
+	fdiv.w	$FOP, fp0
+	$elseif	p(2, 1)=b
+	fdiv.b	$FOP, fp0
+	$else
+	fdiv.l	$FOP, fp0
+	$endif
+	$else
 	fdiv	$FOP, fp0
+	$endif
 	$end
 
 p	$proc
 FP_LOAD_NEGATIVE* $name
 	FP_LOAD 0.0, fp0
-	FP_SUBTRACT	p(1, 1)
+	FP_SUBTRACT	p()
 	$end
 
 p	$proc

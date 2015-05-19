@@ -121,6 +121,21 @@ pc	$equ,"$special_reg"	255
 "l*4"	$equ,"$special_reg"	1*/2++2
 "l*8"	$equ,"$special_reg"	1*/2++3
 
+;	[ w l ] are only encoded [ 0 1 ]
+;	in the index width construct (a0, d0.w[ *1 *2 *4 *8])
+
+;	and otherwise get their encoding values
+;	from instruction names, for example  move.[b w l]
+
+;	however their values here combined with type $special_reg
+;	can be used for recognition in macro language
+;	and are used in the set [ b w l s d ]
+
+b	$equ,$special_reg	2*/2
+s	$equ,$special_reg	3*/2
+d	$equ,$special_reg	4*/2
+
+
 "$i_rr"	$form	4, 3, 3, 3, 3
 "$i_rm"	$form	4, 3, 3, 3, 3, 16
 "$i_rl"	$form	4, 3, 3, 3, 3, 32

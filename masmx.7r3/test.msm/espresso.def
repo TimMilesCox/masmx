@@ -1,87 +1,87 @@
 
 p	$proc
 "$i_load"*	$name
-	LOAD	p(1)
+	LOAD	p()
 	$end
 
 p	$proc
 "$i_load_negative"*	$name
-	LOAD_NEGATIVE	p(1)
+	LOAD_NEGATIVE	p()
 	$end
 
 p	$proc
 "$i_testequal"*	$name
-	TEST_EQUAL	p(1)
+	TEST_EQUAL	p()
 	$end
 
 p	$proc
 "$i_testunequal"*	$name
-	TEST_NE	p(1)
+	TEST_NE	p()
 	$end
 
 p	$proc
 "$i_testgreater"*	$name
-	TEST_GREATER	p(1)
+	TEST_GREATER	p()
 	$end
 
 p	$proc
 "$i_testless"*	$name
-	TEST_LESS	p(1)
+	TEST_LESS	p()
 	$end
 
 p	$proc
 "$i_shift"*	$name
-	SHIFT	p(1)
+	SHIFT	p()
 	$end
 
 p	$proc
 "$i_shift_right"*	$name
-	SHIFT_RIGHT	p(1)
+	SHIFT_RIGHT	p()
 	$end
 
 p	$proc
 "$i_or"*	$name
-	OR	p(1)
+	OR	p()
 	$end
 
 p	$proc
 "$i_and"*	$name
-	AND	p(1)
+	AND	p()
 	$end
 
 p	$proc
 "$i_xor"*	$name
-	XOR	p(1)
+	XOR	p()
 	$end
 
 p	$proc
 "$i_add"*	$name
-	ADD	p(1)
+	ADD	p()
 	$end
 
 p	$proc
 "$i_subtract"*	$name
-	SUBTRACT	p(1)
+	SUBTRACT	p()
 	$end
 
 p	$proc
 "$i_multiply"*	$name
-	MULTIPLY	p(1)
+	MULTIPLY	p()
 	$end
 
 p	$proc
 "$i_divide"*	$name
-	DIVIDE	p(1)
+	DIVIDE	p()
 	$end
 
 p	$proc
 "$i_covered_quotient"*	$name
-	DIVIDE_ROUNDED	p(1)
+	DIVIDE_ROUNDED	p()
 	$end
 
 p	$proc
 "$i_remainder"*	$name
-	MODULO	p(1)
+	MODULO	p()
 	$end
 
 p	$proc
@@ -171,32 +171,32 @@ p	$proc
 
 p       $proc
 "$x_load"* $name
-	FP_LOAD		p(1)
+	FP_LOAD		p()
 	$end
 
 p       $proc
 "$x_load_negative"* $name
-	FP_LOAD_NEGATIVE p(1)
+	FP_LOAD_NEGATIVE p()
 	$end
 
 p	$proc
 "$x_add"*	$name
-	FP_ADD		p(1)
+	FP_ADD		p()
 	$end
 
 p       $proc
 "$x_subtract"* $name
-	FP_SUBTRACT	p(1)
+	FP_SUBTRACT	p()
 	$end
 
 p       $proc
 "$x_multiply"* $name
-	FP_MULTIPLY	p(1)
+	FP_MULTIPLY	p()
 	$end
 
 p       $proc
 "$x_divide"* $name
-	FP_DIVIDE	p(1)
+	FP_DIVIDE	p()
 	$end
 
 "$x_reserve"* $proc
