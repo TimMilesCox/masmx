@@ -73,6 +73,6 @@ fp_routine
 	$xqt_fp		d5+fp6+a2@+"-(a4)"+"a3@+"*(*rapointer)/rastore
 
 	$plist	3
-	$xqt_fp		westward w+ho w*(*rapointer s)
+	$xqt_fp		(westward w)+(ho w)*(*rapointer s)
 	$plist
 	rts

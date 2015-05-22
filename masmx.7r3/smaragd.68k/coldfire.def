@@ -152,6 +152,10 @@ d	$equ,$special_reg	4*/2
 	$return	$t($type2(1, 2))
 	$end
 
+"$id2"*	$func
+	$return	$id2(1, 2)
+	$end
+
 f	$func
 ;
 ;	when no displacement is coded outside the parentheses
@@ -175,7 +179,7 @@ f	$func
 
 "$idx_d"*	$name		; d-register
 	$do	$t(f(1, 3:1))=$a_reg,		$return	8++f(1, 3:1)
-	$do	$t(f(1, 3:1))^=$d_reg,		$flag	index not d0..d7
+	$do	$t(f(1, 3:1))^=$d_reg,		$flag	index not d0..d7/a0..a7
 	$return	f(1, 3:1)
 
 "$idx_w"*	$name		; width++scale
@@ -199,6 +203,35 @@ f	$func
 	$return	f(1, 1)
 
 	$end
+
+f	$func
+$iform*	$name
+	$do	$t(f(1, 1))=$d_reg,	$return	0++f(1, 1)*/3
+	$do	$t(f(1, 1))=$a_reg,	$return	1++f(1, 1)*/3
+	$do	$t("f(1, 1)")=$a_reg_@,	$return	2++$ibase\f(1, 1)*/3
+	$do	$t("f(1, 1)")="$a_reg_@+",	$return 3++$ibase\f(1, 1)*/3
+	$do	$t("f(1, 1)")="$a_reg_@-",	$return 4++$ibase\f(1, 1)*/3
+	$do	$inside\f(1, 1)=2,	$do     $type2\f(1, 1:1)=$special_reg,	|
+					$do	$id2\f(1, 1)=pc,	$return 7++2*/3
+	$do	$inside\f(1, 1)=2,	$return	5++$base_a\f(1, 1)*/3
+	$do	$itype\f(1, 1)=$a_reg,	$return	5++$ibase\f(1, 1)*/3
+	$do	$t(f(1, 1))=$equf,	$do	"f(1, 1)"\2=pc,		$return	7++2*/3
+	$do	$t(f(1, 1))=$equf,	$return	5++(f(1, 1)\2)*/3
+	$do	$inside\f(1, 1)=3,	$do	$type2\f(1, 1:1)=$special_reg,	|
+					$do	$id2\p(1, 1:1)=pc,	$return	7++3*/3
+	$do	$inside\f(1, 1)=3,	$return	6++$base_a\f(1, 1)*/3
+	$do	f(1, #1),	$return	7++4*/3
+	$do	$t(f(1, 1))=123,"$LL"	$equf	f(1, 1)
+	$do	$t(f(1, 1))=123,	$return	$iform($LL)
+	$do	($t(f(1, 1))=0)++($t(f(1, 1))=127),	|
+		$do	($t(f(1, 1:2))=$special_reg)**(f(1, 1:2)=l)++|
+			(f(1, 1)<-32768)++|
+			(f(1, 1)>32767),				$return	7++1*/3
+	$do	($t(f(1, 1))=0)++($t(f(1, 1))=127),			$return	7
+	$flag	operand style not resolved
+	$return	8
+	$end
+
 
 p	$proc
 
@@ -462,6 +495,9 @@ fdiv*	$name	fdiv.d
 	$else
 	$i_fm	15, 1, 0, 5, +("p(1, 1)"\2), 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)
 	$endif
+	$elseif	$t(p(1, 1))=123		; literal table tag
+"$_AR"	$equf	p(1, 1)			; force generate the literal, label its reference
+	p(0,0)	$_AR, p(1, 2)		; recurse in order that the p(1, 1) is $_AR
 	$else
 	$flag	operand not within recognised category
 	$endif
@@ -492,14 +528,78 @@ fdiv*	$name	fdiv.d
 	$endif
 	$end
 
+
+	$if	1	
+
+p	$proc
+lea*	$name	7*/4++4
+
+	$if	$t(p(1, 2))=$a_reg
+
+"$FO"	$set	$iform(p(1, 1))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+
+	$if	$MO=0
+	$flag	d0..d7 cannot have an effective address
+	$elseif	$MO=1
+	$flag	a0..a7 cannot have an effective address
+	$elseif	$MO=2
+	$i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, 2, p(1, 1)
+	$elseif	($MO=3)++($MO=4)
+	$flag	lea instruction may not update a0..a7
+	$elseif	$MO=5
+	$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $RO, p(1, 1)
+	$elseif	$MO=6
+	$i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 6,	|
+		$base_a\p(1, 1:1), $idx_d\p(1, 1:1),	|
+		$idx_w\p(1, 1:1), 0, $displacement8\p(1, 1:1)
+	$elseif	$FO=7
+	$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, p(1, 1)
+	$elseif	$FO=7++1*/3
+	$i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
+	$elseif	$FO=7++4*/3
+	$flag	effective address is already immediate
+	$elseif	$FO=7++2*/3
+	$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, p(1, 1)-$-2	
+	$elseif	$FO=7++3*/3
+	$i_rx   p(0, 0), p(1, 2), p(0, 0)/*4, 7, 3,	|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0, $displacement8\p(1, 1:1) 
+	$endif
+
+	$else
+	$flag	receiving operand must be a0..a7
+	$endif
+
+	$end
+
+	$else
+
 p	$proc
 lea*	$name	7*/4++4
 	$if		$t(p(1, 2))=$a_reg
 	  $if		$t(p(1, 1))=$a_reg_@
 	    $i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, 2, p(1, 1)
+	  $elseif	$inside\p(1, 1)=2
+	    $if		$base_a\p(1, 1)=pc
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, p(1, 1)-$-2
+	    $else
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $base_a\p(1, 1), p(1, 1)
+            $endif
+	  $elseif	$t(p(1, 1))=$equf
+	    $if		("p(1, 1)"\2)=pc
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, p(1, 1)-$-2
+	    $else
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, +"p(1, 1)"\2, p(1, 1)
+	    $endif	
 	  $elseif	$itype\p(1, 1)=$a_reg
 	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $ibase\p(1, 1),|
 			p(1, 1)
+	  $elseif	$inside\p(1, 1)=3
+	$note	3
+            $i_rx       p(0, 0), p(1, 2), p(0, 0)/*4, 6,        |
+                        $base_a\p(1, 1:1), $idx_d\p(1, 1:1),    |
+                        $idx_w\p(1, 1:1), 0, $displacement8\p(1, 1:1)
 	  $else
 	  $if	(p(1, 1)<32768)**(p(1, 1)>32767)
 	    $i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
@@ -512,10 +612,21 @@ lea*	$name	7*/4++4
 	$endif
 	$end
 
+	$endif
+
 p	$proc
-adda*	$name	7*/4++13
-suba*	$name	7*/4++9
-cmpa*	$name	7*/4++11
+
+adda.w	$name	3*/4++13
+suba.w	$name	3*/4++9
+cmpa.w	$name	3*/4++11
+
+adda.l*	$name	7*/4++13
+suba.l*	$name	7*/4++9
+cmpa.l*	$name	7*/4++11
+
+adda*	$name	adda.l
+suba*	$name	suba.l
+cmpa*	$name	cmpa.l
 
 	$if		$t(p(1, 2))=$a_reg
 
@@ -535,6 +646,15 @@ cmpa*	$name	7*/4++11
 	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5,	|
 			$base_a\p(1, 1:1), $displacement\p(1, 1:1)
 
+	  $elseif	$t("p(1, 1)")=$equf
+	$note EQUF
+	    $if		("p(1, 1)"\2)=pc
+	$note PC
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, p(1, 1)-$-2
+	    $else
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, +"p(1, 1)"\2, p(1, 1)
+	    $endif
+
 	  $elseif	$inside\p(1, 1:1)=3	; (displacement, a_, d_[.])
 
 	    $i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 6,	|
@@ -542,10 +662,20 @@ cmpa*	$name	7*/4++11
 			$idx_w\p(1, 1:1), 0, $displacement8\p(1, 1:1)
 
 	  $elseif	p(1, #1)			; immediate
-	    $i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 4, p(1, 1)
+	    $if	p(0, 0)/*4=3
+	    $i_rm	p(0, 0), p(1, 2), 3, 7, 4, p(1, 1)
+	    $else
+	    $i_rl	p(0, 0), p(1, 2), 7, 7, 4, p(1, 1)
+	    $endif
 
-	  $else
+	  $elseif	($t(p(1, 1:1))=$special_reg)**(p(1, 1)=l)++|
+			($net(p(1, 1))<-32768)++|
+			($net(p(1, 1))>32767)
+	$note	a32
 	    $i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
+	  $else
+	$note	a16
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, p(1, 1)
 	  $endif
 	$else
 	  $flag	receiving operand must be a0..a7
