@@ -215,22 +215,27 @@ $iform*	$name
 					$do	$id2\f(1, 1)=pc,	$return 7++2*/3
 	$do	$inside\f(1, 1)=2,	$return	5++$base_a\f(1, 1)*/3
 	$do	$itype\f(1, 1)=$a_reg,	$return	5++$ibase\f(1, 1)*/3
-	$do	$t(f(1, 1))=$equf,	$do	"f(1, 1)"\2=pc,		$return	7++2*/3
-	$do	$t(f(1, 1))=$equf,	$return	5++(f(1, 1)\2)*/3
+;	$do	$t(f(1, 1))=$equf,	$do	f(1, 2)=pc,		$return	7++2*/3
+;	$do	$t(f(1, 1))=$equf,	$return	5++f(1, 2)*/3
 	$do	$inside\f(1, 1)=3,	$do	$type2\f(1, 1:1)=$special_reg,	|
 					$do	$id2\p(1, 1:1)=pc,	$return	7++3*/3
 	$do	$inside\f(1, 1)=3,	$return	6++$base_a\f(1, 1)*/3
-	$do	f(1, #1),	$return	7++4*/3
-	$do	$t(f(1, 1))=123,"$LL"	$equf	f(1, 1)
-	$do	$t(f(1, 1))=123,	$return	$iform($LL)
-	$do	($t(f(1, 1))=0)++($t(f(1, 1))=127),	|
-		$do	($t(f(1, 1:2))=$special_reg)**(f(1, 1:2)=l)++|
-			(f(1, 1)<-32768)++|
-			(f(1, 1)>32767),				$return	7++1*/3
-	$do	($t(f(1, 1))=0)++($t(f(1, 1))=127),			$return	7
-	$flag	operand style not resolved
-	$return	8
+"$O"	$equ	f(1, 1)
+"$X"	$equ	f(1, 2)
+	$trace	$O
+	$trace	$X
+	$do	$X=pc,							$return	7++2*/3
+	$do	$X^=0,			$return	5++$X*/3
+
+	$do	f(1, #1),						$return	7++4*/3
+
+	$do	($t(f(1, 1:2))=$special_reg)**(f(1, 1:2)=l)++|
+		($net($O)<-32768)++|
+		($net($O)>32767),					$return 7++1*/3
+
+									$return 7
 	$end
+
 
 
 p	$proc
