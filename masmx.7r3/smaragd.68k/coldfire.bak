@@ -215,11 +215,13 @@ $iform*	$name
 					$do	$id2\f(1, 1)=pc,	$return 7++2*/3
 	$do	$inside\f(1, 1)=2,	$return	5++$base_a\f(1, 1)*/3
 	$do	$itype\f(1, 1)=$a_reg,	$return	5++$ibase\f(1, 1)*/3
+;	$do	$t(f(1, 1))=$equf,	$do	f(1, 2)=pc,		$return	7++2*/3
+;	$do	$t(f(1, 1))=$equf,	$return	5++f(1, 2)*/3
 	$do	$inside\f(1, 1)=3,	$do	$type2\f(1, 1:1)=$special_reg,	|
 					$do	$id2\p(1, 1:1)=pc,	$return	7++3*/3
 	$do	$inside\f(1, 1)=3,	$return	6++$base_a\f(1, 1)*/3
-"$O"*	$equ	f(1, 1)
-"$X"*	$equ	f(1, 2)
+"$O"	$equ	f(1, 1)
+"$X"	$equ	f(1, 2)
 	$trace	$O
 	$trace	$X
 	$do	$X=pc,							$return	7++2*/3
@@ -308,6 +310,14 @@ ble.b*    $name   0x6F
 	$end
 
 
+p	$proc	;	some integer instructions [w|l]->dregister
+mulu*	$name
+muls*	$name
+divu*	$name
+divs*	$name	
+
+	$end
+
 
 p	$proc	;	treat [l|w] as radically different instructions
 divs.w*	$name	8++7*/4
@@ -315,44 +325,32 @@ divu.w*	$name	8++3*/4
 muls.w*	$name	12++7*/4
 mulu.w*	$name	12++3*/4
 
-mulu*	$name	mulu.w
-muls*	$name	muls.w
-divu*	$name	divu.w
-divs*	$name	divs.w
-
-"$FO"	$equ	$iform(p(1, 1))
-"$MO"	$equ	$FO**7
-"$RO"	$equ	$FO/*3
-
 	$if	$t(p(1, 2))=$d_reg
-	$if	$MO=0
+	$if	$t(p(1, 1))=$d_reg
 		$i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, 0, p(1, 1)
-	$elseif	$MO=1
+	$elseif	$t(p(1, 1))=$a_reg
 		$flag	divisor may not be a0..a7
-	$elseif	($MO=2)++|
-		($MO=3)++|
-		($MO=4)
-		$i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, $MO, $RO
-	$elseif	$MO=5
-		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $RO, p(1, 1)
-	$elseif	$MO=6
-		$i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 6, $RO,|
+	$elseif	($t("p(1, 1)")="$a_reg_@")++|
+		($t("p(1, 1)")="$a_reg_@+")++|
+		($t("p(1, 1)")="$a_reg_@-")
+		$i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, $t("p(1, 1)")**7, $ibase\p(1, 1)
+	$elseif	$inside\p(1, 2)=2
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $base_a\p(1, 1), $displacement\p(1, 1)
+	$elseif	$inside\p(1, 2)=3
+		$i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 6, $base_a\p(1, 1:1),|
 							 $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
 							 $displacement8\p(1, 1:1)
-	$elseif	$FO=7++4*/3
-		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 4, $O
-	$elseif	$FO=7++1*/3
-		$i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, $O
-	$elseif	$FO=7
-		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, $O
-	$elseif	$FO=7++2*/3
-		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, $O-$-2
-	$elseif	$FO=7++3*/3
-		$i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 3, |
-							 $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
-							 $displacement8\p(1, 1:1)-$-2
+	$elseif	p(1, #1)
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 4, p(1, 1)
+
+	$elseif	$itype\p(1, 1)="$a_reg"
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $ibase\p(1, 1), p(1, 1)
+	$elseif	$t(p(1, 1))=$equf
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, +"p(1, 1)"\2, p(1, 1)
+	$elseif	(p(1, 1)<-32768)++(p(1, 1)>32767)++(p(1, 1:2)=l)
+		$i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
 	$else
-		$flag	no style of sending operand could be selected
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, p(1, 1)
 	$endif
 	$else
 	$flag	->d0..7 only
