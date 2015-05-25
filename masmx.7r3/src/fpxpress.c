@@ -107,7 +107,7 @@ static int number(char *s, char *e)
    return 1;
 }
 
-static void fpxpress_assemble(char *name, char *start, char *end)
+static void fpxpress_assemble(char *name, char *start, char *end, char *tag)
 {
    char			 assembly[1040];
    char			*p = assembly;
@@ -121,7 +121,18 @@ static void fpxpress_assemble(char *name, char *start, char *end)
    __literal = number(start, end);
 
    while (symbol = *name++) *p++ = symbol;
-   if (__literal)           *p++ = '(';
+
+   if (__literal)
+   {
+      while (symbol = *tag++)
+      {
+         if (symbol == ' ') break;
+         *p++ = symbol;
+      }
+
+      *p++ = '(';
+   }
+   
    while ((start != end) && (symbol = *start++)) *p++ = symbol;
    if (__literal)           *p++ = ')';
 
@@ -150,31 +161,31 @@ static void fpxpress_asmq(char *name)
    masm_level--;
 }
 
-static void trailing_fp_operation(int x, char *s, char *e)
+static void trailing_fp_operation(int x, char *s, char *e, char *tag)
 {
    if (*s == '(') s++;
 
    switch (x)
    {
       case PLUS:
-         fpxpress_assemble(" $x_add ", s, e);
+         fpxpress_assemble(" $x_add ", s, e, tag);
          break;
 
       case MINUS:
-         fpxpress_assemble(" $x_subtract ", s, e);
+         fpxpress_assemble(" $x_subtract ", s, e, tag);
          break;
 
       case MULTIPLY:
-         fpxpress_assemble(" $x_multiply ", s, e);
+         fpxpress_assemble(" $x_multiply ", s, e, tag);
          break;
 
       case DIVIDE:
-         fpxpress_assemble(" $x_divide ", s, e);
+         fpxpress_assemble(" $x_divide ", s, e, tag);
 
    }
 }
 
-static void fp_xpress(char *s, char *e)
+static void fp_xpress(char *s, char *e, char *tag)
 {
    char			*p,
                         *q = s;
@@ -192,13 +203,13 @@ static void fp_xpress(char *s, char *e)
 
       if (complex(q, e))
       {
-         fp_xpress(q, e);
+         fp_xpress(q, e, tag);
 
          switch (*p)
          {
             case '-':
                fpxpress_asmq(" $x_reserve ");
-               fp_xpress(s, p);
+               fp_xpress(s, p, tag);
                fpxpress_asmq(" $x_retrieve_subtract ");
                break;
 
@@ -207,7 +218,7 @@ static void fp_xpress(char *s, char *e)
                if (complex_beyond(s, p, "+\0-\0*+\0*-\0"))
                {
                   fpxpress_asmq(" $x_reserve ");
-                  fp_xpress(s, p);
+                  fp_xpress(s, p, tag);
                   fpxpress_asmq(" $x_retrieve_add ");
                   break;
                }
@@ -217,19 +228,19 @@ static void fp_xpress(char *s, char *e)
 
                while (q = next_operator(s, p, "+\0-\0", 0))
                {
-                  trailing_fp_operation(x, s, q);
+                  trailing_fp_operation(x, s, q, tag);
                   x = oper_ator(q, p - q);
                   s = q + ufield[x];
                }
 
-               trailing_fp_operation(x, s, p);
+               trailing_fp_operation(x, s, p, tag);
                break;
 
             case '*':
                if (complex_beyond(s, p, "*\0/\0*+\0*-\0"))
                {
                   fpxpress_asmq(" $x_reserve ");
-                  fp_xpress(s, p);
+                  fp_xpress(s, p, tag);
                   fpxpress_asmq(" $x_retrieve_multiply ");
                   break;
                }
@@ -238,41 +249,41 @@ static void fp_xpress(char *s, char *e)
 
                while (q = next_operator(s, p, "*\0/\0", 0))
                {
-                  trailing_fp_operation(x, s, q);
+                  trailing_fp_operation(x, s, q, tag);
                   x = oper_ator(q, p - q);
                   s = q + ufield[x];
                }
 
-               trailing_fp_operation(x, s, p);
+               trailing_fp_operation(x, s, p, tag);
                break;
 
             case '/':
                fpxpress_asmq(" $x_reserve ");
-               fp_xpress(s, p);
+               fp_xpress(s, p, tag);
                fpxpress_asmq(" $x_retrieve_divide ");
          }
       }
       else
       {
-         fp_xpress(s, p);
+         fp_xpress(s, p, tag);
          if (*q == '(') q++;
 
          switch(*p)
          {
             case '-':
-               fpxpress_assemble(" $x_subtract ", q, e);
+               fpxpress_assemble(" $x_subtract ", q, e, tag);
                break;
 
             case '+':
-               fpxpress_assemble(" $x_add ", q, e);
+               fpxpress_assemble(" $x_add ", q, e, tag);
                break;
 
             case '*':
-               fpxpress_assemble(" $x_multiply ", q, e);
+               fpxpress_assemble(" $x_multiply ", q, e, tag);
                break;
 
             case '/':
-               fpxpress_assemble(" $x_divide ", q, e);
+               fpxpress_assemble(" $x_divide ", q, e, tag);
          }
       }
 
@@ -281,7 +292,7 @@ static void fp_xpress(char *s, char *e)
 
    if (*s == '(')
    {
-      fp_xpress(s + 1, e);
+      fp_xpress(s + 1, e, tag);
       return;
    }
 
@@ -291,21 +302,21 @@ static void fp_xpress(char *s, char *e)
    {
       if (*(s + 1) == '(')
       {
-         fp_xpress(s + 2, e);
+         fp_xpress(s + 2, e, tag);
          if (unary == '-') fpxpress_asmq(" $x_reverse");
          return;
       }
 
       if (number(s + 1, e) == 0)
       {
-         if (unary == '+') fpxpress_assemble(" $x_load ",          s + 1, e);
-         else              fpxpress_assemble(" $x_load_negative ", s + 1, e);
+         if (unary == '+') fpxpress_assemble(" $x_load ",          s + 1, e, tag);
+         else              fpxpress_assemble(" $x_load_negative ", s + 1, e, tag);
 
          return;
       }
    }
 
-   fpxpress_assemble(" $x_load ", s, e);
+   fpxpress_assemble(" $x_load ", s, e, tag);
 }
 
 #endif

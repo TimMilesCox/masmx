@@ -5895,6 +5895,10 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
    #endif
 
+   #ifdef SUPERSET
+   char			*xmodifier = "";
+   #endif
+
    int			 prelif  =  ifdepth,
 			 preskip = skipping;
 
@@ -5954,7 +5958,14 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
       {
          while (*limit == 32) limit++;
          search = edge(limit, " ");
+
+         #ifdef SUPERSET
+         if ((known == FP_XPRESS) || (known == ESPRESSO)) xmodifier = limit;
+         else
+         #endif
+
          subfunction = expression(limit, search, param);
+
          argument = getop(search);
       }
    }
@@ -8154,7 +8165,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                limit = argument;
                while (*limit++);
-               fp_xpress(argument, limit);
+               fp_xpress(argument, limit, xmodifier);
                break;
                #endif
 
@@ -8165,7 +8176,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                limit = argument;
                while (*limit++);
-               i_xpress(argument, limit);
+               i_xpress(argument, limit, xmodifier);
                break;
                #endif
 
