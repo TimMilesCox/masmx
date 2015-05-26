@@ -1,6 +1,7 @@
 	$path		../smaragd.68k
 	$include	coldfire.def
 	$path
+	$include	ieee754.def
 
 $(8:65536)
 woodburning	$res	4
@@ -12,7 +13,7 @@ $(53::,a5)
 	$res	12
 janglies	$res	4
 
-$(0:32768)
+$(0:32768,pc/$azlit)
 	add	d6, d7
 	add	a4, d4
 	add	(a5), d4
@@ -43,4 +44,4 @@ $(0:32768)
 
 	fmove.s	janglies, fp0
 	fadd.s	(a7)+, fp0
-
+	fmul.s	$azlit(ieee754_32 1.1), fp0

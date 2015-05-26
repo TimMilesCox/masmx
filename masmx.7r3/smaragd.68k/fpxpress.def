@@ -34,11 +34,10 @@ FOP*	$name
 	$elseif	$t(p(1, 1))=$equf
 "$FOP"*	$equf	p(1, 1), p(1, 2)
 	$else
-"$FOP"*	$equf	p(1, 1), p(1, 2)
+"$FOP"*	$equf	p()
 ; "$FOP"*	$equf	$azlit(ieee754_64 p(1))
 	$endif
 	$end
-
 
 p	$proc
 FP_LOAD* $name
@@ -116,7 +115,7 @@ FP_MULTIPLY* $name
 	fmul.l	$FOP, fp0
 	$endif
 	$else
-	fmul	$FOP, fp0
+	fmul	p(1), fp0
 	$endif
 	$end
 
@@ -136,7 +135,7 @@ FP_DIVIDE* $name
 	fdiv.l	p(1), fp0
 	$endif
 	$else
-	fdiv	$FOP, fp0
+	fdiv	p(1), fp0
 	$endif
 	$end
 

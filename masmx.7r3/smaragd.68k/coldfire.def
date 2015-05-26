@@ -218,8 +218,8 @@ $iform*	$name
 	$do	$inside\f(1, 1)=3,	$do	$type2\f(1, 1:1)=$special_reg,	|
 					$do	$id2\p(1, 1:1)=pc,	$return	7++3*/3
 	$do	$inside\f(1, 1)=3,	$return	6++$base_a\f(1, 1)*/3
-"$O"*	$equ	f(1, 1)
-"$X"*	$equ	f(1, 2)
+"$O"	$equ	f(1, 1)
+"$X"	$equ	f(1, 2)
 	$trace	$O
 	$trace	$X
 	$do	$X=pc,							$return	7++2*/3
@@ -340,13 +340,13 @@ divs*	$name	divs.w
 							 $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
 							 $displacement8\p(1, 1:1)
 	$elseif	$FO=7++4*/3
-		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 4, $O
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 4, p(1, 1)
 	$elseif	$FO=7++1*/3
-		$i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, $O
+		$i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
 	$elseif	$FO=7
-		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, $O
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, p(1, 1)
 	$elseif	$FO=7++2*/3
-		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, $O-$-2
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, p(1, 1)-$-2
 	$elseif	$FO=7++3*/3
 		$i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 3, |
 							 $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
@@ -469,6 +469,86 @@ fdiv.d* $name   32++5*/7
 fdiv.b* $name   32++6*/7
 fdiv*	$name	fdiv.d
 
+	$if	1
+
+	$if	$t(p(1, 2))=$fp_reg
+
+	$if	$t(p(1, 1))=$fp_reg
+	$i_fp	15, 1, 0, 0, 0, 0, p(1, 1), p(1, 2), p(0, 0)
+	$else
+
+"$FO"	$set	$iform(p(1, 1))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+
+	$trace	$FO
+
+	$if	$MO=0
+	$i_fp	15, 1, 0, 0, p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0)
+	$elseif	$MO=1
+	$flag	a0..a7 may not be floating source operand
+	$elseif	($MO=2)++($MO=3)++($MO=4)
+	$i_fp	15, 1, 0, $MO, $RO, 2, p(0, 0)/*7, p(1, 2), p(0, 0)
+	$elseif	$MO=5
+	$i_fm	15, 1, 0, 5, $RO, 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)
+	$elseif	$MO=6
+	$flag	floating source operand may not be double-index addressed
+	$elseif	($FO=7)++($FO=7++1*/3)
+	$flag	floating source operand may not be plain direct addressed
+	$note	may be disp16(a?) or (disp16, a?/pc) or $equf disp, a?/pc
+	$elseif	$FO=7++4*/3
+	$flag	floating source operand may not be immediate
+	$note	may be literal at displacement, pc
+	$elseif	$FO=7++2*/3
+	$i_fm	15, 1, 0, 7, 2, 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)-$-2
+	$elseif	$FO=7++3*/3
+	$flaf	floating source operand may not be double-index addressed
+	$else
+	$flag	unknown style of floating source operand
+	$endif
+	$endif
+
+	$elseif	p(0, 0)**127=fmove.l
+	$if	$t(p(1, 1)=$fp_reg
+
+"$FO"	$set	$iform(p(1, 2))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+
+	$if	$MO=0
+	$i_fp	15, 1, 0, 0, p(1, 2), 2, p(0, 0)/*7, p(1, 1), p(0, 0)
+	$elseif	$MO=1
+	$flag	a0..a7 may not be floating store target
+	$elseif	($MO=2)++($MO=3)++($MO=4)
+	$i_fp	15, 1, 0, $MO, $RO, 2, p(0, 0)/*7, p(1, 1), p(0, 0)
+	$elseif	$MO=5
+	$i_fp	15, 1, 0, 5, $RO, 2, p(0, 0)/*7, p(1, 1), p(0, 0), p(1, 2)
+	$elseif	$MO=6
+	$flag	floating store target may not be double-index addressed
+	$elseif	($FO=7)++($FO=7++1*/3)
+	$flag	floating store target may not be plain direct addressed
+	$note	may be disp16(a?) or (disp16, a?/pc) or $equf disp, a?/pc
+	$elseif	$FO=7++4*/3
+	$flag	store targets are never immediate operands
+	$elseif	($FO=7++2*/3)**($FO=7++3*/3)
+	$flag	store targets may not be in pc-relative constant pool
+	$else
+	$flag	unknown style of floating store target
+	$endif
+
+
+
+
+	$else
+	$flag	fmove must be to or from fp0..fp7
+	$endif
+	$else
+	$flag	floating arithmetic destination must be fp0..fp7
+	$endif
+
+	$else
+
+
 	$if	$t(p(1, 2))=$fp_reg
 	$if	$t(p(1, 1))=$fp_reg
 	$i_fp	15, 1, 0, 0, 0, 0, p(1, 1), p(1, 2), p(0, 0)
@@ -533,6 +613,11 @@ fdiv*	$name	fdiv.d
 	$else
 	$flag	floating arithmetic destination must be fp0..fp7
 	$endif
+
+
+	$endif
+
+
 	$end
 
 
