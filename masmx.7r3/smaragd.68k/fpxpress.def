@@ -34,8 +34,10 @@ FOP*	$name
 	$elseif	$t(p(1, 1))=$equf
 "$FOP"*	$equf	p(1, 1), p(1, 2)
 	$else
-"$FOP"*	$equf	p()
-; "$FOP"*	$equf	$azlit(ieee754_64 p(1))
+"$UP"*	$equf	p(1)
+"$FOP"*	$equf	$UP
+	$do	$o('V'),	$trace	$FOP
+	$do	$o('V'),	$trace	$FOP\2
 	$endif
 	$end
 
@@ -52,7 +54,7 @@ FP_LOAD* $name
 	$elseif	p(2, 1)=b
 	fmove.b	$FOP, fp0
 	$else
-	fmove.l	$FOP, fp0
+	fmove.d	$FOP, fp0
 	$endif
 	$else
 	fmove	$FOP, fp0
@@ -72,7 +74,7 @@ FP_ADD* $name
 	$elseif	p(2, 1)=b
 	fadd.b	$FOP, fp0
 	$else
-	fadd.l	$FOP, fp0
+	fadd.d	$FOP, fp0
 	$endif
 	$else
 	fadd	$FOP, fp0
@@ -92,7 +94,7 @@ FP_SUBTRACT* $name
 	$elseif	p(2, 1)=b
 	fsub.b	$FOP, fp0
 	$else
-	fsub.l	$FOP, fp0
+	fsub.d	$FOP, fp0
 	$endif
 	$else
 	fsub	$FOP, fp0
@@ -112,10 +114,10 @@ FP_MULTIPLY* $name
 	$elseif	p(2, 1)=b
 	fmul.b	$FOP, fp0
 	$else
-	fmul.l	$FOP, fp0
+	fmul.d	$FOP, fp0
 	$endif
 	$else
-	fmul	p(1), fp0
+	fmul	$FOP, fp0
 	$endif
 	$end
 
@@ -132,10 +134,10 @@ FP_DIVIDE* $name
 	$elseif	p(2, 1)=b
 	fdiv.b	$FOP, fp0
 	$else
-	fdiv.l	p(1), fp0
+	fdiv.d	$FOP, fp0
 	$endif
 	$else
-	fdiv	p(1), fp0
+	fdiv	$FOP, fp0
 	$endif
 	$end
 

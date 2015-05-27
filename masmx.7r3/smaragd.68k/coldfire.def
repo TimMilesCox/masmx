@@ -208,9 +208,9 @@ f	$func
 $iform*	$name
 	$do	$t(f(1, 1))=$d_reg,	$return	0++f(1, 1)*/3
 	$do	$t(f(1, 1))=$a_reg,	$return	1++f(1, 1)*/3
-	$do	$t("f(1, 1)")=$a_reg_@,	$return	2++$ibase\f(1, 1)*/3
-	$do	$t("f(1, 1)")="$a_reg_@+",	$return 3++$ibase\f(1, 1)*/3
-	$do	$t("f(1, 1)")="$a_reg_@-",	$return 4++$ibase\f(1, 1)*/3
+	$do	$t("f(1, 1)")=$a_reg_@,	$return	2++f(1, 1)*/3		;	$ibase\f(1, 1)*/3
+	$do	$t("f(1, 1)")="$a_reg_@+",	$return 3++f(1, 1)*/3	;	$ibase\f(1, 1)*/3
+	$do	$t("f(1, 1)")="$a_reg_@-",	$return 4++"f(1, 1)"*/3	;	$ibase\f(1, 1)*/3
 	$do	$inside\f(1, 1)=2,	$do     $type2\f(1, 1:1)=$special_reg,	|
 					$do	$id2\f(1, 1)=pc,	$return 7++2*/3
 	$do	$inside\f(1, 1)=2,	$return	5++$base_a\f(1, 1)*/3
@@ -220,8 +220,8 @@ $iform*	$name
 	$do	$inside\f(1, 1)=3,	$return	6++$base_a\f(1, 1)*/3
 "$O"	$equ	f(1, 1)
 "$X"	$equ	f(1, 2)
-	$trace	$O
-	$trace	$X
+	$do	$o('V'),	$trace	$O
+	$do	$o('V'),	$trace	$X
 	$do	$X=pc,							$return	7++2*/3
 	$do	$X^=0,			$return	5++$X*/3
 
@@ -481,7 +481,7 @@ fdiv*	$name	fdiv.d
 "$MO"	$set	$FO**7
 "$RO"	$set	$FO/*3
 
-	$trace	$FO
+	$do	$o('V'),	$trace	$FO
 
 	$if	$MO=0
 	$i_fp	15, 1, 0, 0, p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0)

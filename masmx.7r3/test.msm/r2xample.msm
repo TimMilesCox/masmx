@@ -53,8 +53,9 @@
 	$include	ieee754.def
 
 f	$func	*
-"$ieee64"* $name
-	$return	$azlit(ieee754_64 f(1))
+"$ieee64"* $name 111
+"$UP"*	$equf	$azlit(ieee754_64 f(1))
+	$return	$UP
 	$end
 
 $(4:16384,a5/$literal)
@@ -74,11 +75,12 @@ $(1:131072,pc/$azlit)
 
 fp_routine
 	lea		$a(one), a5
-	$xqt_fp,$ieee64	one*1.75*+1200000*two/3.0*-625000-three
+	$xqt_fp,$ieee64		one*1.75*+1200000*two/3.0*-625000-three
 
 	$xqt_fp		d5+fp6+a2@+"-(a4)"+"a3@+"*(*rapointer)/rastore
 
 	$plist	3
 	$xqt_fp		(westward w)+(ho w)*(*rapointer s)
 	$plist
+
 	rts
