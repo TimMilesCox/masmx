@@ -51,7 +51,9 @@ The cumulative linker constructs each program section as absolute or as a new re
 Integers and floating numbers are any format and size up to 192 bits.<br>
 192 bits are not excessive because systems already compute and exchange 128-bit numbers
 
-<p>
+<div	style="color:A0A0A0">
+<blockquote>
+
 Maximum memory space depends on target architecture. The highest address where masmx
 can assemble and load code is
 
@@ -67,6 +69,9 @@ Memories this large are not immediately expected, but masmx
 calculates and labels numbers of this size.<br>
 There is no reason why an assembler for all targets should have
 less maximum address range than maximum number size
+</blockquote>
+</div>
+
 
 <p>
 Segmented memory, base-displacement addressing, preprogrammed physical
@@ -513,30 +518,30 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 		in Giant Address Space					9.2.3.10
 
 
-10. Describing Target Architecture in Text				11
+10. Describing Target Architecture in Text				10
 
-    1.  Establishing Your Syntax					11.1
-    2.	Describing the Target Architecture				11.2
-	1.  $WORD, $BYTE, $QUANTUM, $AWIDTH				11.2.1
-	2.  $FORM, $PROC, $NAME, $END					11.2.2
-	    1.	The $FORM Template					11.2.2.1
-	    2.	The $PROC Header					11.2.2.2
-	    3.	The $NAME Entry Point					11.2.2.3
-	    4.	The $END Macro Footer					11.2.2.4
-	    5.  Minimal Instruction Macro Example			11.2.2.5
-	    6.	The Two-pass $PROC					11.2.2.6
-	    7.	The Out of Line $PROC					11.2.2.7
-	    8.	Nested Macro Descriptions				11.2.2.8
-    3.  Synthesising Legacy Automatic Macros				11.3
-	1.  Synthesising Legacy Functional Macros			11.3.1
-	2.  Synthesising Legacy Command Macros				11.3.2
+    1.  Establishing Your Syntax					10.1
+    2.	Describing the Target Architecture				10.2
+	1.  $WORD, $BYTE, $QUANTUM, $AWIDTH				10.2.1
+	2.  $FORM, $PROC, $NAME, $END					10.2.2
+	    1.	The $FORM Template					10.2.2.1
+	    2.	The $PROC Header					10.2.2.2
+	    3.	The $NAME Entry Point					10.2.2.3
+	    4.	The $END Macro Footer					10.2.2.4
+	    5.  Minimal Instruction Macro Example			10.2.2.5
+	    6.	The Two-pass $PROC					10.2.2.6
+	    7.	The Out of Line $PROC					10.2.2.7
+	    8.	Nested Macro Descriptions				10.2.2.8
+    3.  Synthesising Legacy Automatic Macros				10.3
+	1.  Synthesising Legacy Functional Macros			10.3.1
+	2.  Synthesising Legacy Command Macros				10.3.2
 
-11. masmx Internal Floating Format and Alternative Floating Formats	10
-    1.	masmx Floating Format						10.1
-    2.	IEEE754 Floating Values						10.2
+11. masmx Internal Floating Format and Alternative Floating Formats	11
+    1.	masmx Floating Format						11.1
+    2.	IEEE754 Floating Values						11.2
 	1.  Differences between masmx FLoating Format and IEEE754 Floating Formats
-									10.2.1
-	2.  Macro Language Generation of IEEE754 Floating Constants	10.2.2
+									11.2.1
+	2.  Macro Language Generation of IEEE754 Floating Constants	11.2.2
 
 
 
@@ -554,6 +559,7 @@ Appendix E: Tuning Macro Language and Fixing Problems
 	 E.5:	Aliasing masmx Internal Functions
 	 E.6:	Diagnostic about a Label Address
 	 E.7:	Label fails to be Exported
+	 E.8:	Literal Table overlaps Trailing Edge of Code
 
 Appendix F: Target Descriptions
 	 F.1:	8051
@@ -851,6 +857,9 @@ A definition file included at the head of the assembly defines:
 	integer encoding and floating point formats<br><br>
 
 	</blockquote>
+
+
+See 10.1: Establishing Syntax, 10.2: Describing Target Architecture
 
 <h1>4: The Assembly Language Source Line</h1>
 
@@ -1267,7 +1276,7 @@ MASMX 7r3
 Characters in apostrophe are right justified value strings
 
 <p>
-Each character produces its value in the current $data_code and
+Each character produces its value in the current data code and
 $byte size, default 8 bits
 <pre>
 
@@ -1473,8 +1482,8 @@ containing word
 <p>
 If $quote has been changed to ' apostrophe, labels in ' will not be detected in expressions.
 The character values between ' are right justified<br>
-as values juxtaposed at current $byte size and translated from input to current $data_code,
-default 8-bit ASCII.<br>
+as values juxtaposed at current $byte size and translated from input to current data code,
+default 8-bits and ASCII.<br>
 See also 8.8 $DATA_CODE directive and 8.5 $BYTE directive
 <pre>
 
@@ -1908,7 +1917,7 @@ MASMX 7r3
 	$quantum 8     
 $(12:65536)
 	'abc'
-	$data_code	97:65	. generate A for a
+	$data_code	97,65	. generate A for a
 	'abc'
 	$byte	12
 	'abc'
@@ -1921,7 +1930,7 @@ $(12:65536)
   :                            2  $quantum 8     
   :                            3 $(12:65536)
 0C:10000 00616263              +4  'abc'
-  :                            5  $data_code 97:65 . generate A for a
+  :                            5  $data_code 97,65 . generate A for a
 0C:10004 00416263              +6  'abc'
   :                            7  $byte 12
 0C:10008 41062063              +8  'abc'
@@ -2446,16 +2455,14 @@ are effectively
 	"string of text":10:"another line of text and more of that line"
 
 </pre>
-byte size, quote symbol and substring symbol may each be set to a different
-value from their defaults of 8, " and : with directives $BYTE $QUOTE $STERM
+byte size, quote symbol and substring symbol may be set to different values
+from defaults [ 8-bits " : ] with directives $byte $quote $sterm
 
 <p>
-Generated string data values may be altered from ASCII to a to a data code
-assembled and switched with the $DATA_CODE directive
+Text string contents are read in source code as octets of Latin-1, Roman-8 or UTF-8.
+256 code points including 128 ASCII code points may be translated to values set with
+directive $data_code
 
-<p>
-Text string contents are read from source code as Latin-1, Roman-8 or UTF-8
-according to text-editor
 <pre>
 
 
@@ -2466,11 +2473,11 @@ MASMX 7r3
 	$quantum 8     
 $(12:65536)
 	"abc"
-	$data_code	97:65	. generate A for a
+	$data_code	97,65	. generate A for a
 	"abc"
 	$byte   12
 	"abc"
-	$ascii			. switch back to plain ASCII
+	$ascii			. switch to unchanged input
 	"abc"
 	$byte	8
 	"abc"
@@ -2479,11 +2486,11 @@ $(12:65536)
   :                            2  $quantum 8     
   :                            3 $(12:65536)
 0C:10000 61626320              +4  "abc"
-  :                            5  $data_code 97:65 . generate A for a
+  :                            5  $data_code 97,65 . generate A for a
 0C:10004 41626320              +6  "abc"
   :                            7  $byte 12
 0C:10008 041062063020          +8  "abc"
-  :                            9  $ascii   . switch back to plain ASCII
+  :                            9  $ascii   . switch to unchanged input
 0C:1000E 061062063020          +10  "abc"
   :                            11  $byte 8
 0C:10014 61626320              +12  "abc"
@@ -2542,12 +2549,12 @@ $ masmx -lnkyx
 MASMX 7r3
 0/-INPUT>>
 	$word	16
-	$data_code      'a':1*/23++'a',1*/23++'b',1*/23++'c'
+	$data_code      'a', 1*/23++'a',1*/23++'b',1*/23++'c'
 	$byte	24
 	"abc"
 	$end
   :                            1  $word 16
-  :                            2  $data_code      'a':1*/23++'a',1*/23++'b',1*/23++'c'
+  :                            2  $data_code      'a', 1*/23++'a',1*/23++'b',1*/23++'c'
   :                            3  $byte 24
 00:0000 80006180006280006300  +4  "abc"
   :                            5  $end
@@ -2649,6 +2656,7 @@ p       $proc
 
 
 	p returns a count of all the fields on the calling line
+	including command field and if present label field
 
 	p() returns a count of fields in the actual arguments
 
@@ -2745,8 +2753,24 @@ MASMX 7r3
 </pre>
 
 
+<div	style="color:a0a0a0">
+<blockquote>
+Paraform <i>macro_label</i> without parenthesis sends all the text of the calling line to another macro.<br>
+The fields forwarded as arguments include the command plus any label on the call line to the forwarding macro.<br>
+Therefore in the newly called macro, if all the call-line text is forwarded as arguments
 
-<p>
+	<blockquote>
+	<i>macro_label</i> minus <i>macro_label()</i> = 2 indicates <i>macro_label(1,1)</i>
+	is the label on the call line to the forwarding macro<br><br>
+	
+ 	<i>macro_label</i> minus <i>macro_label()</i> = 1 indicates <i>macro_label(1,1)</i>
+	is the command on the call line to the forwarding macro
+	</blockquote>
+</blockquote>
+
+</div>
+<br>
+<br>
 Actual parameters forwarded individually to a nested macro
 plus any new tokens may be re-ordered for the nested macro:
 <pre>
@@ -4152,20 +4176,19 @@ the current location value. That would render "." an unusable function
 
 <h4>4.7.10.8: Label Type $PROC</h4>
 
-
-The label on column 1 of the $PROC card is the name of the
-macro. Its meaning is all the images from $PROC to $END, and
-it has the label type of $PROC.
-
-<p>
-If a $PROC name is encountered on the command field of a
-line, the macro is expanded, if the label is made visible*
-outside the $PROC with a trailing asterisk.
+The label on column 1 of the $proc directive line has the label type of $proc.<br>
+The following images until a mirroring $end are a $proc command macro.<br>
+Embedded $procs mat be nested inside a $proc description. 
 
 <p>
-If the name of the macro currently being expanded
-is encountered when evaluating an operand expression, 
-then a parameter reference is resolved:
+A $proc macro may be identified in the command position of an assembly<br>
+source line by its $proc label or by a $name label, whichever is exported
+with trailing asterisk
+
+<p>
+Inside a $proc an reference to its own label is a parameter reference or
+paraform
+
 <pre>
 
 this_macro*      $proc
@@ -4178,121 +4201,33 @@ this_macro*      $proc
 has the effect "jump away"
 
 <p>
-this_macro* has to be unique to the subassembly calling it.
-$PROC labels often aren't unique, and aren't exported with
-the trailing asterisk* Then the macro must contain an exported
-$NAME which has a asterisked_label*
+Example <i>this_macro</i>* must be unique in the subassembly calling it.
+$proc labels often are not unique, and then may not be exported with<br>
+the trailing asterisk* These $procs contain one or more  exported
+$names which may also have a latent value
 
 <p>
-$PROC macros also have a unique numeric identity attached
-to their name, if their name is unique*
-
-<p>
-That identity is returned if the $PROC name is referenced
-functionally
-<pre>
-
-$ masmx -ln
-MASMX 7r2
-0/-INPUT>>
-
-	$word	16
-
-var*    $proc   $(1)
-*       $res    var(1,1)
-        $end
-
-	.
-	.
-
-align*	$proc
-	$if	($t(align(1,1))=$proc)**(align(1,1)=var)
-granule	$set	align(1, 2)
-	var	granule-($(1)**granule-1)
-	$else
-granule	$set	align(1, 1)
-	$do	granule-($**granule-1),	-	1
-	$endif
-	$end
-
-$(1:1024)	.	variables
-$(0:256)	.	invariables
-	
-	$do	5,      -	4
-
-firstly	var	21
-	align	var, 8
-secondly var	4
-
-	align	8
-	+	99
-	+	firstly
-	+	secondly
-
-
-	$end
-
-  :                            1 
-  :                            2  $word 16
-  :                            3 
-  :                            4 var*    $proc   $(1)
-  :                            5 *       $res    var(1,1)
-  :                            6         $end
-  :                            7 
-  :                            8  .
-  :                            9  .
-  :                            10 
-  :                            11 align* $proc
-  :                            12  $if ($t(align(1,1))=$proc)**(align(1,1)=var)
-  :                            13 granule $set align(1, 2)
-  :                            14  var granule-($(1)**granule-1)
-  :                            15  $else
-  :                            16 granule $set align(1, 1)
-  :                            17  $do granule-($**granule-1), - 1
-  :                            18  $endif
-  :                            19  $end
-  :                            20 
-  :                            21 $(1:1024) .	variables
-  :                            22 $(0:256) .	invariables
-  :                            23  
-00:0100 FFFC                  +24  $do 5,      - 4
-00:0101 FFFC                  +24 
-00:0102 FFFC                  +24 
-00:0103 FFFC                  +24 
-00:0104 FFFC                  +24 
-  :                            25 
-  :                            26 firstly var 21
-  :                            27  align var, 8
-  :                            28 secondly var 4
-  :                            29 
-00:0105 FFFF                  +30  align 8
-00:0106 FFFF                  +30 
-00:0107 FFFF                  +30 
-00:0108 0063                  +31  + 99
-00:0109 0400                  +32  + firstly
-00:010A 0418                  +33  + secondly
-  :                            34 
-  :                            35 
-  :                            36  $end
-:$(00):0100:010B :$(01):0400:041C 
--INPUT>>: object code 113 bytes: 0 errors: 0 undefined labels
-
+An exported $proc label may be referenced in an expression and has an
+identify value unique in the calling subassembly
 
 </pre>
 <h4>4.7.10.9: Label Type $NAME</h4>
 
 
-$NAME is used within macro text $PROC..$END or $FUNC..$END
+$name is used within macro text $proc..$end or $func..$end
 to give alternative call names with latent values
-to the macro. $NAME labels return a type of $NAME.
+to the macro
 
 <p>
-Macro labels do not need to be unique, so long as they have
-unique $NAME entry points.
+$name labels have the type $name
+
+<p>
+$func and $proc macro labels need only be unique if they are exported.<br>
+They are otherwise made callable by having unique $name labels
 	
 <p>
-Therefore it's possible to have similar or identical cryptic
-labels for all $PROC declarations. For example:
+It is therefore possible to have identical and cryptic
+labels for many macros, for example p
 <pre>
 
 instruction_form $form 8, 8, 16
@@ -4303,66 +4238,49 @@ dropit* $name   2
 	instruction_form   $n, p(1, 1), p(1, 2)
 	$end
 
+
+        grabit  r12, input_port
+        dropit  r12, output_port
+
 </pre>
 The developer may have many procedural macros p. This makes the
 argument reference paraforms p(1, 1) p(1, 2) similar in syntax
-and easy to read in many different macros. p is not used as a
-call name, but the $NAME names are. p with no asterisk is only
+and easy to read in many different macros.<br>p is not used as a
+call name, but the $name labels are.<br>p with no asterisk is only
 a visible name within macro p, and this is why multiple macros
 may have the same name
-<pre>
-
-	grabit  r12, input_port
-	dropit  r12, output_port
-
-</pre>
 
 <p>
-If the macro is instead called "pqrpqr" then its parameters are
-referenced by macro code within pqrpqr as pqrpqr(1, 1), pqrpqr(1, 2) etc.
+If the label on the $proc or $func line  is instead <i>pqrpqr</i> then<br>
+actual parameters are referenced <i>pqrpqr(1, 1) pqrpqr(1, 2)</i>...
 
 <p>
-Whether you want to call a macro by its $PROC label or a $NAME label,
-that label must be exported by having a trailing asterisk* Any label
-so exported from a $PROC must be unique to the next subassembly level
-upwards.
+A macro is callable by its $proc or $func label or or by a  $name label,
+whichever is exported with trailing asterisk*<br>Labels exported from macros
+must be unique in the containing subassembly
 
 
 <h4>4.7.10.10: Label Type $FUNC</h4> 
 
 
-Developer-written function labels return a type of $FUNC.
-Developer-written functions are all functions which are 
-not internal to masmx, including functions in header files 
-supplied with this package. They are macros which return
-values which may be referenced in expressions.
-
 <p>
-A $FUNC type label is the label on column 1 of a $FUNC 
-line. This is a user written value-generating macro and 
-its meaning is the expression on the first $RETURN line 
-actioned in the macro text $FUNC..$END
+A $func label is the label on column 1 of a $func line.<br> 
+$func..$end contains a user written value-generating macro and 
+its value is the expression on the first $return line to be actioned 
 
-<p>
-$FUNC macros are expanded when encountered during evaluation
-of an operand expression, for example
 <pre>
 
-$(1:START_OF_VARIABLES)
+	$word	8
 
-
-@*      $func
-	$return $(1)
+hi*	$func
+	$return	hi(1, 1)/*8
 	$end
 
-length_of_variables     $set    @-START_OF_VARIABLES
+	+	value, hi(value):L	; 16-bits little-endian
+
 
 </pre>
-The developer uses location counter $(1)
-to map external RAM and wishes $(1) to be known as @. 
 	
-<p>
-@ returns the next available address in variable space.
 
 
 <h4>4.7.10.11: Label Type $FORM</h4>
@@ -4376,9 +4294,10 @@ bit-structure.
 When a $FORM label is encountered in the command position
 the corresponding storage structure is generated inline.
 
-<p>
-powerpc_load_store_instruction  $form   6, 5, 5, 16
 <pre>
+
+powerpc_load_store_instruction  $form   6, 5, 5, 16
+
 
 p       $proc
 lwz*    $name   LWZ
@@ -5354,10 +5273,480 @@ complex.msm: object code 2976 bytes: 0 errors: 0 undefined labels
 
 <h1>6: Run-Time Algorithm Plotter</h1>
 
-<h2>6.1: Run-Time Integer Algorithm Plotter</h2>
+<p>
+Assemblers mostly resolve expressions whose tokens are all known at assembly time
+
+<p>
+<b>$xqt_fp</b> and <b>$xqt_i</b> directives code an instruction plan in a<br>
+compiler-like fashion however, to solve expressions involving run-time variables<br>
+first resolving subexpressions whose tokens are known at assembly time
+
+<p>
+These instruction steps are planned with the support of target-specific macros with<br>
+fixed call-names known to masmx 
+
+
+<h2>6.1: Run-Time Integer Algorithm Plotter $xqt_i</h2>
+
+<b>$xqt_i</b> processes integers and can resolve all expression steps
+between constants at assembly time,<br> planning the fewest possible instructions
+for run time calculation
+
+<p>
+In this example the subexpression right of the OR operator <b>++</b> has been
+resolved at assembly time, but left of <b>++</b> a multiply, two adds and a
+shift must take place at runtime
+
+<p>
+The running accumulation is maintained in 48 bits, but it is judged to contain
+only 24 significands until a double load, an add, a negative add, a multiply, or
+a boolean operation on 48 bits has taken place. The first operation <b>one,,w0*4</b>
+could be executed in one multiply step because it was known that the multiplicand
+had 24 or less significands. These rules are in the target-specific macro code and
+not in masmx
+
+<pre>
+
+$ masmx boolean -lnk
+MASMX 7r3
+3/boolean.msm
+  :                            1 	$path		../
+  :                            2: 	$include	def/rta.def
+  :                            3: 	$include	language/fpxpress.def
+  :                            4: 	$include	language/i_xpress.def
+  :                            5 	$path
+  :                            6 
+  :                            7 $(3:03000)
+03:003000 000001              +8 one	1
+03:003001 000000000002        +9 two	2d
+03:003003 000000000003        +10 three	3d
+  :                            11 $(0:64)
+00:000040 603000              +12 	$xqt_i	two+one,,w0*4+three*/16++12*/40
+00:000041 960018              +12 
+00:000042 E00100              +12 
+00:000043 D73001              +12 
+00:000044 D73003              +12 
+00:000045 360010              +12 
+00:000046 900101              +12 
+00:000047 980102              +12 
+  :                            13 	$do	$<256,$(0:256)
+  :                            14 	$end
+00:000100+000004
+00:000101+0C0000000000
+:$(00):000040:000103 :$(03):003000:003005 
+
+
+</pre>
+
+Target specific macros required for $xqt_i have these names and this outline scheme
+
+<pre>
+
+p	$proc
+$i_load*	$name
+	LOAD	p(1)
+	$end
+
+p	$proc
+$i_load_negative*	$name
+	LOAD_NEGATIVE	p(1)
+	$end
+
+$i_testequal*	$name
+	TEST_EQUAL	p(1)
+	$end
+
+p	$proc
+$i_testunequal*	$name
+	TEST_NE	p(1)
+	$end
+
+p	$proc
+$i_testgreater*	$name
+	TEST_GREATER	p(1)
+	$end
+
+p	$proc
+$i_testless*	$name
+	TEST_LESS	p(1)
+	$end
+
+p	$proc
+$i_shift*	$name
+	SHIFT	p(1)
+	$end
+
+p	$proc
+$i_shift_right*	$name
+	SHIFT_RIGHT	p(1)
+	$end
+
+p	$proc
+$i_or*	$name
+	OR	p(1)
+	$end
+
+p	$proc
+$i_and*	$name
+	AND	p(1)
+	$end
+
+p	$proc
+$i_xor*	$name
+	XOR	p(1)
+	$end
+
+p	$proc
+$i_add*	$name
+	ADD	p(1)
+	$end
+
+p	$proc
+$i_subtract*	$name
+	SUBTRACT	p(1)
+	$end
+
+p	$proc
+$i_multiply*	$name
+	MULTIPLY	p(1)
+	$end
+
+p	$proc
+$i_divide*	$name
+	DIVIDE	p(1)
+	$end
+
+p	$proc
+$i_covered_quotient*	$name
+	DIVIDE_ROUNDED	p(1)
+	$end
+
+p	$proc
+$i_remainder*	$name
+	MODULO	p(1)
+	$end
+
+p	$proc
+$i_reserve*	$proc
+	PUSH
+$end
+
+$i_retrieve_testequal*	$proc
+	TEST_EQUAL	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_testunequal*	$proc
+	TEST_NE	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_testgreater*	$proc
+	TEST_GREATER	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_testless*	$proc
+	TEST_LESS	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_shift*	$proc
+	SHIFT	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_shift_right*	$proc
+	SHIFT_RIGHT	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_or*	$proc
+	OR	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_and*	$proc
+	AND	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_xor*	$proc
+	XOR	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_add*	$proc
+	ADD	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_subtract*	$proc
+	SUBTRACT	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_multiply*	$proc
+	MULTIPLY	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_divide*	$proc
+	DIVIDE	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_covered_quotient*	$proc
+	DIVIDE_ROUNDED	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_remainder*	$proc
+	MODULO	STACK_TOP
+	POP
+	$end
+
+</pre>
+
+<p>
+This outline scheme can be included directly in conjunction with simple $proc macros which populate these names
+with instruction code which updates a designated result register
+<pre>
+
+	LOAD		LOAD_NEGATIVE	TEST_EQUAL	TEST_NE		TEST_GREATER	TEST_LESS
+	SHIFT		SHIFT_RIGHT	OR		AND		XOR
+	ADD		SUBTRACT	MULTIPY		DIVIDE		DIVIDE_ROUNDED	MODULO
+
+</pre>
+These macros apply an argument p(1) to a result register. Instructions in the four TEST_ macros have<br>
+a runtime result of one for true and zero for untrue
+
+<p>
+The macro
+<pre>
+
+	PUSH
+
+</pre>
+saves the result register either in a real stack or in a list of registers<br>
+managed at assembly time with macro text
+
+<p>
+The function
+<pre>
+
+	STACK_TOP
+
+</pre>
+is the most recent stored value in the stack or save register list
+
+<p>
+The macro
+<pre>
+
+	POP
+
+</pre>
+is shown separately as a point where the stacked value is cleared after use,<br>
+because function macros in masmx may not generate code. This allows the case where the<br>
+save area is really a stack and a separate instruction moreover must clear the saved item
+
+<p>
+Interim results may be in detail saved, retrieved and cleared a number of ways according
+to target architecture, for example
+<pre>
+
+;		In ColdFire saves/retrieves only PUSH macro generates an instruction
+;		LOAD and arithmetic macros must distinguish register / storage / immediate argument
+
+PUSH*		$proc			; ColdFire
+		move.l		d0, -(a7)
+		$end
+
+STACK_TOP*	$equf		(a7)+	; ColdFire
+POP		$equ,$directive	$nop	; ColdFire
+
+.		____________________________________
+
+#		in PowerPC saves/retrieves, only PUSH macro generates an instruction
+#		LOAD and arithmetic macros must distinguish register / storage / immediate argument
+#		arithmetic macros must load storage arguments to a GPR designated as threshold
+
+LISTP		$set	1		# PPC32
+SAVE(1)		$equ	r20
+SAVE(2)		$equ	r21
+SAVE(3)		$equ	r22
+
+PUSH*		$proc			# PPC32
+		$do	LISTP>3,	$flag	assign more save registers
+		mr	r0,SAVE(LISTP)
+LISTP*		$set	LISTP+1
+		$end
+
+STACK_TOP*	$func
+		$return	SAVE(LISTP-1)	# PPC32
+		$end
+
+POP*		$proc			# PPC32
+LISTP**		$set	LISTP-1
+		$end	
+
+
+</pre>
 
 <h2>6:2: Run-Time Floating Algorithm Plotter</h2>
 
+<p>
+<b>$xqt_fp</b> includes constants as well as variables in expressions,
+but does not attempt assembly-time calculation of expression steps between floating
+constants
+
+<p>
+<b>$xqt_fp</b> concerns four-function arithmetic only
+
+<p>
+Here a simple algorithm with five inputs is executed in five instructions, including
+operand acquisition from storage
+<pre>
+
+
+$ masmx -ln r2xample.msm
+MASMX 7r3
+3/r2xample.msm
+*EOF*
+  :                            1 	$path		../def
+  :                            2: 	$include	rta.def
+  :                            3 	$path		../language
+  :                            4: 	$include	stack.def
+  :                            5: 	$include	fpxpress.def
+  :                            6 	$path
+  :                            7 $(0:0)
+  :                            8 
+00:000000 B60040              +9 floating_algorithm*  $vector fp_routine
+  :                            10 
+  :                            11 $(0:64)
+  :                            12 
+  :                            13 fp_routine 
+                                	$head_far	 params(one,	float		;
+                                				two,	float		;
+  :                            16 				three,	float)
+  :                            17 
+00:000040 4FF003              +18 	$xqt_fp		one*1.75*+1200000*two/3.0*-625000-three
+00:000041 770100              +18 
+00:000042 77F007              +18 
+00:000043 7F0104              +18 
+00:000044 6FF00B              +18 
+  :                            19 
+  :                            20 
+00:000045 3D0000              +21 	fret		0
+  :                            22 
+  :                            23 	$do		$<256,$(0:256)
+  :                            24 	
+*EOF*
+00:000100+7CD38BB7B396D7AA20B6E083
+00:000104+2051D5B8447B77478A23F5F7
+:$(00):000000:000108 
+r2xample.msm: object code 190 bytes: 0 errors: 0 undefined labels
+
+
+</pre>
+masmx has taken an expression with five operands and four operators, and
+turned it into a sequence of five instructions which deliver the four-word
+floating result of the operations in the result registers <b>a:b:mantissa2:mantissa3</b>
+
+<p>
+Three of these tokens are identifiers whose content is only known at runtime
+
+<p>
+<b>$xqt_fp</b> directive scans an expression and calls macro code to write an
+instruction plan. The tokens which are constants appear as literals at the foot
+of the program
+
+<p>
+A <b>#define</b> preprocess and masmx <b>$text</b> substitution are both usually
+absent in assembly for RTA1, but would not conflict
+
+<p>
+masmx decides whether a token is a self-evident value or a variable reference
+by these rules
+
+	<blockquote>
+	a field of digits is a value<br><br>
+	a label on a line where a storage value is, is a location<br><br>
+	a label equated or set to digits is a value<br><br>
+	a label equated or set to a storage label or to a location counter is a location<br><br>
+	a label equated or set to another label is what that label is<br><br>
+	a <b>$equf</b> label is a location
+	</blockquote>
+
+Therefore a construction
+<pre>
+
+bucket	$equ	4096
+
+</pre>
+would not cause a storage reference, but an immediate value.
+
+<p>
+The construction
+<pre>
+
+bucket	$equf	4096
+
+</pre>
+would cause a storage reference
+
+<p>
+In RTA1 the supporting macro language in <b>fpxpress.def</b> and <b>i_xpress.def</b> potentially
+uses all of <b>[r k x y a b mantissa2 mantissa3 8 9 10 11 d$save d$save1 d$save2 d$ave3]</b>
+
+<p>
+Register variables in in macro constructs <b>params() scalars()</b> and external stack names in
+<b> xframe()</b> are <b>$equf</b> labels and therefore referenced as variables
+
+<p>
+In this assembly <b>FACTOR</b> has been generated as a constant (visible at
+the foot of the program) because <b>$equ</b> connected <b>FACTOR</b> to a
+number value and not a stored location
+<pre>
+
+$ ~/masmx mammoth -lnk
+MASMX 7r3
+3/mammoth.msm
+*EOF*
+  :                            1 	$path		../
+  :                            2: 	$include	def/rta.def
+  :                            3: 	$include	language/stack.def
+  :                            4: 	$include	language/fpxpress.def
+  :                            5 $(0)
+00:000000 B60040              +6 mammoth* $vector	sum
+  :                            7 $(3:03000)
+03:003000 40000F800000000000000000
+                              +8 left	16384*+0
+03:003004 7CD38AFBEEFAC15E58C049D8
+                              +9 right	1.2*+1200000
+  :                            10 
+  :                            11 $(0:64)
+  :                            12 
+  :                            13 FACTOR	$equ	1.875
+  :                            14 
+                                sum	$head_far	 params(first,	float	;
+  :                            16 				second,	float	)
+  :                            17 
+00:000040 4FF007              +18 	$xqt_fp		-left-right+first+second*FACTOR
+00:000041 770100              +18 
+00:000042 6F3000              +18 
+00:000043 6F3004              +18 
+00:000044 67F003              +18 
+00:000045 3D0000              +19 	$ret
+  :                            20 	$do	$<256,$(0:256)
+  :                            21 
+*EOF*
+00:000100+400001F00000000000000000
+:$(00):000000:000104 :$(03):003000:003008 
+
+
+</pre>
 
 
 <h1>7: Constructing Program Sections</h1>
@@ -6398,13 +6787,20 @@ See also Section 9:	Output File Formats, Relocation and Linking,
 
 
 <p>
-$ASCII sets the generated character code for text constants bound by
-the quote symbol to ASCII. $DATA_CODE defines and/or selects an alternate 
-generated character code for text constants.
+$ascii switches string contents and values in apostrophes to source input
+values unchanged
 
 <p>
-Input is always in ASCII. The initial selection for encoding is $ASCII.
+Directives $ascii and $data_code switch text strings between unchanged input
+(ASCII / Roman-8 / Latin-1) and tabled byte translation values stored by $data_code
+for code points 0..255
 
+<p>
+Source input is is octets with ASCII in code points 0..127. Language elements
+outside of strings are assembled from ASCII simple
+
+<p>
+Assembly initial setting is $ascii
 
 
 <h2>8.2:  $AWIDTH            Output File Load Address Width</h2>
@@ -6605,13 +7001,11 @@ Receiving Field         |_______|_______|_______|_______|_______|_______|
 
 </pre>
 <p>
-The $DATA_CODE directive may be used to organise a completely different
-data code translation.
+$data_code directive tables and activates byte translate values for strings
 
 <p>
-There are special considerations where $WORD size is not an exact 
-multiple of the $BYTE size. Here is an example of 7-bit character
-data generated for a 30-bit architecture.
+If $word is not a  multiple of the $byte, bytes in strings straddle words.
+New strings start at a word, expect in bit-aligned $record structures
 <pre>
 
 $ ../masmx qzuli -ln
@@ -7062,16 +7456,13 @@ CONT_CHAR=\
 <h2>8.8:  $DATA_CODE             Set Alternative Character Set</h2>
 
 <p>
-$DATA_CODE is used to declare an alternate data code for quoted
-text strings and to select it.
+$data_code tables and activates byte translate values for quoted
+text strings and value strings in apostrophe
 
 <p>
-masmx reads ASCII input, but $DATA_CODE directive lets "text strings"
-and +'number constants' be generated in another target data code.
-
-<p>
-The initial alternate data code is the same as ASCII, but $DATA_CODE
-can change all or part of it. For example:
+masmx input is octets containing ASCII values in code points 0..127.
+$data_code directive allows "text strings" and +'character value constants'
+to be composed in another character code
 <pre>
 
 MASMX/-240 1r1X
@@ -7081,8 +7472,8 @@ code.msm 5
   :                        3:         $byte   8
   :                        4:         $awidth 32
 00:00000000 41424320      +5         "ABC"
-  :                        6:         $data_code  'A':0c1, 0c2, 0c3, 0c4, 0c5, 0c6, 0c7, 0c8, 0c9
-  :                        7:         $data_code  32:64
+  :                        6:         $data_code  'A', 0c1, 0c2, 0c3, 0c4, 0c5, 0c6, 0c7, 0c8, 0c9
+  :                        7:         $data_code  32, 64
 00:00000004 C1C2C3C4C5C64040+8         "ABCDEF"
   :                        9:         $ascii
 00:0000000C 4142434445462020+10         "ABCDEF"
@@ -7093,20 +7484,25 @@ Object Code 73 Bytes: 0 Errors: 0 Undefined Labels
 
 </pre>
 <p>
-Here the $DATA_CODE directive has been used to generate alternative 
+Here the $data_code has generated alternative 
 values for the first nine letters of the alphabet, and for the 
 space character.
 
 <p>
-$DATA_CODE also switches to the alternative data code as it constructs it.
+$data_code also switches to the alternative data code as it constructs it.
 
 <p>
-$ASCII switches back to ASCII text generation,
-but leaves the alternate code available.
+$ascii directive switches to the assembly initial setting of unchanged
+input values (ASCII / Roman-8 / Latin-1 / UTF-8) for strings, but leaves
+the tabled translate values available
 
 <p>
-$DATA_CODE without any operands switches to the previously constructed data
-code again. Both assembly passes begin in ASCII character mode.
+$data_code with or without arguments switches to byte translate. The initial
+translate table has all code points unchanged. $data_code may table translate
+values for code points 0..255
+
+<p>
+Both assembly passes begin in $ascii mode
 
 
 <h2>8.9: $DO                Generate Repeated Code</h2>     
@@ -11542,23 +11938,22 @@ numbers, and these commands can be reproduced as macros:
 <pre>
 
 
-MASMX/24592 1r1X
-dl.msm 5
-*EOF*  :                        1:         $word   8
-  :                        2:         $awidth 32
-  :                        3:         
-  :                        4: dl      $proc
-  :                        5: x       $do     dl(1)
-  :                        6: v       $set    dl(1, x)
-  :                        7:         +       v, v/*8, v/*16, v/*24:q
-  :                        8:         $endo
-  :                        9:         $end
-  :                        10: 
-00:00000000 010000AA      +11         dl      0AA000001, 0BB000002, 0CC000003 
-00:00000004 020000BB      +11 
-00:00000008 030000CC      +11 
-*EOF*:$(00):00000000:0000000C 
-Object Code 75 Bytes: 0 Errors: 0 Undefined Labels
+$ masmx -lnky dl
+MASMX 7r3
+3/dl.msm
+*EOF*
+  :                            1         $word   8
+  :                            2         $awidth 32
+  :                            3         
+  :                            4 dl*	$proc
+  :                            5 x       $do     dl(1),	+	dl(1,x), dl(1,x)/*8, dl(1,x)/*16, dl(1,x)/*24:q
+  :                            6         $end
+  :                            7 
+00:00000000 010000AA          +8         dl      0AA000001, 0BB000002, 0CC000003 
+00:00000004 020000BB          +8 
+00:00000008 030000CC          +8 
+*EOF*
+:$(00):00000000:0000000C 
 
 
 </pre>
@@ -11591,6 +11986,7 @@ A suitable parameter set for 8-bit microcontrollers is
 	$word   8
 	$awidth 16
 
+</pre>
 
 <h2>8.57: $xqt_i		run-time integer algorithm plotter</h2>
 <h2>8.58: $xqt_fp		run-time floating algorithm plotter</h2>
@@ -11598,8 +11994,6 @@ A suitable parameter set for 8-bit microcontrollers is
 
 
 
-
-</pre>
 <h1>9: Output File Formats, Relocation, Linking, Giant Address Spaces
    Interfacing with GNU Tools</h1>
 
@@ -16640,6 +17034,34 @@ location_after*
 </pre>
 <p>
 See also 8.28: <b>$LIST 0</b>, masking names from list and export
+
+<h2>11.8: Literal Table overlaps Trailing Edge of Code</h2>
+
+A literal table may originate some words back over the last code words
+if literals are generated from within a second pass only function
+<pre>
+
+f	$func	*
+constant* $name
+	$do	f(1, 1:2)=s,	$return	literal(ieee754_32 f(1, 1))
+	$return	literal(iee754_64 f(1, 1))
+	$end
+
+</pre>
+
+If it is necessary to do this (see runtime algorithms for ColdFire), the
+function must be a two-pass function and then the literal table originates
+after the code
+<pre>
+
+f	$func
+constant* $name
+	$do	f(1, 1:2)=s,	$return	literal(ieee754_32 f(1, 1))
+	$return	literal(iee754_64 f(1, 1))
+	$end
+
+</pre> 
+
 
 
 <h1>Appendix F: Target Descriptions</h1>

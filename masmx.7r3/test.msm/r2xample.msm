@@ -52,9 +52,21 @@
 	$include	espresso.def
 	$include	ieee754.def
 
-f	$func	*
-"$ieee64"* $name 111
+f	$func
+"$ieee64"* $name
+	$if	$t(f(2, 1))=$special_reg
+	$if	f(2, 1)=l
+"$UP"* 	$equf	$azlit(f(1)d)
+	$elseif	f(2, 1)=w
+"$UP"*	$equf	$azlit(f(1)s)
+	$elseif	f(2, 1)=b
+"$UP"*	$equf	$azlit(f(1)*/8s)
+	$elseif	f(2, 1)=s
+"$UP"*	$equf	$azlit(ieee754_32 f(1))
+	$endif
+	$else
 "$UP"*	$equf	$azlit(ieee754_64 f(1))
+	$endif
 	$return	$UP
 	$end
 
@@ -75,12 +87,11 @@ $(1:131072,pc/$azlit)
 
 fp_routine
 	lea		$a(one), a5
-	$xqt_fp,$ieee64	one*1.75*+1200000*two/3.0*-625000-three
+	$xqt_fp,$ieee64	one*1.75*+307*two/3.0*-307-three
 
 	$xqt_fp		d5+fp6+a2@+"-(a4)"+"a3@+"*(*rapointer)/rastore
 
-	$plist	3
-	$xqt_fp		(westward w)+(ho w)*(*rapointer s)
-	$plist
+	$xqt_fp		westward w+ho w*(*rapointer s)
+	$xqt_fp,$ieee64	(westward w)+(1.5 s)*(*rapointer s)
 
 	rts

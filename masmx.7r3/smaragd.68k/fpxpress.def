@@ -34,7 +34,7 @@ FOP*	$name
 	$elseif	$t(p(1, 1))=$equf
 "$FOP"*	$equf	p(1, 1), p(1, 2)
 	$else
-"$UP"*	$equf	p(1)
+"$UP"*	$equf	p()
 "$FOP"*	$equf	$UP
 	$do	$o('V'),	$trace	$FOP
 	$do	$o('V'),	$trace	$FOP\2
