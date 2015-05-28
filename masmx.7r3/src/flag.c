@@ -9,6 +9,14 @@ static void flagp1(char *k)
    ecount++;
 }
 
+static void flagz()
+{
+   if (!pass) return;
+
+   ecount++;
+   printf("Error: %s Line %d: ", file_label[0]->l.name, ll[0]);
+}
+
 static void flag(char *k)
 {
    if (!pass) return;

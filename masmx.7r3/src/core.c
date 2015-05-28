@@ -3367,20 +3367,6 @@ static long expression(char *s, char *e, char *param)
 
 #else
 
-#ifdef EFLAG
-
-static void eflag()
-{
-   printf("Error: %s Line %d: "
-          "external value %s may not be used in this context\n",
-           file_label[depth]->l.name,
-           ll[depth],
-           name);
-   ecount++;
-}
-
-#endif
-
 #ifdef DOS
 #error you need VERY_STACKED_XPRESSION
 #endif
@@ -3868,7 +3854,8 @@ static long expression(char *s, char *e, char *param)
 
    #ifdef EFLAG
 
-   eflag();
+   flag_either_pass(name,
+                   "external value may not be used in this context");
 
    #else
 
@@ -8466,6 +8453,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	 #ifdef PROCLOC
 	 if ((sr->l.r.l.y) && (uploc != downloc))
 	 {
+            #if 0	/* this is now checked at the end */
+
             if (actual->litlocator ^ actual->lroot)
             {
                if (loc < actual->litlocator)
@@ -8476,6 +8465,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                   flag("2nd pass code overlaps literal table");
                }
             }
+
+            #endif
 
             actual->loc = loc;
 
@@ -8767,9 +8758,7 @@ main(int argc, char *_argv[])
 
                if ((q->litlocator ^ v) && (q->loc ^ v))
                {
-                  ecount++;
-
-                  printf("Error: %s Line %d: ", file_label[0]->l.name, ll[0]);
+                  flagz();
                   printf("code longer on 2nd assembly pass");
 
                   if (octal)
@@ -8975,7 +8964,7 @@ main(int argc, char *_argv[])
             {
                if (q->breakpoint > 1)
                {
-                  ecount++;
+                  flagz();
                   printf("error exporting %s "
                          "in multi-breakpoint giant segment\n"
                          "base+displacement tuple cannot be "

@@ -288,10 +288,14 @@ static long literal(char *arg, char *gparam, int tlocator)
 
    v = tloc->litlocator;
 
+   #if 0	/* this is now checked at the end */
+
    if (tloc->loc > v)
    {
       flag("literal table overlaps 2nd pass code");
    }
+
+   #endif
    
    #ifdef RELOCATION
    if (tloc->relocatable)
