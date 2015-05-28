@@ -52,24 +52,6 @@
 	$include	espresso.def
 	$include	ieee754.def
 
-f	$func
-"$ieee64"* $name
-	$if	$t(f(2, 1))=$special_reg
-	$if	f(2, 1)=l
-"$UP"* 	$equf	$azlit(f(1)d)
-	$elseif	f(2, 1)=w
-"$UP"*	$equf	$azlit(f(1)s)
-	$elseif	f(2, 1)=b
-"$UP"*	$equf	$azlit(f(1)*/8s)
-	$elseif	f(2, 1)=s
-"$UP"*	$equf	$azlit(ieee754_32 f(1))
-	$endif
-	$else
-"$UP"*	$equf	$azlit(ieee754_64 f(1))
-	$endif
-	$return	$UP
-	$end
-
 $(4:16384,a5/$literal)
 
 one	$res	8

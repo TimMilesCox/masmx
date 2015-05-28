@@ -681,6 +681,10 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx nodcodl ..\test.o3\nodcodl -lyok > ..\text.o3\nodcodl.txt
 ..\masmx afar ..\test.o3\afar -lyok > ..\text.o3\afar.txt
 ..\masmx meringue ..\test.o3\meringue -lyok > ..\text.o3\meringue.txt
+..\masmx r2xample ..\test.o3\r2xample -lyok > ..\text.o3\r2xample.txt
+..\masmx boolean ..\test.o3\boolean -lyok > ..\text.o3\boolean.txt
+..\masmx brin ..\test.o3\brin -lyok > ..\text.o3\brin.txt
+..\masmx s2double ..\test.o3\s2double -lyok > ..\text.o3\s2double.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

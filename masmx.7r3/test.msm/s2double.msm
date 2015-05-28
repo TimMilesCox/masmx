@@ -1,0 +1,142 @@
+	$path		../smaragd.68k
+	$include	coldfire.def
+	$path
+	$include	ieee754.def
+
+scale_10 $equ,$d_reg	d1
+
+$(0:262144,pc/$literal)
+
+s2double
+	fmove.w		$literal(0), fp0
+	moveq		#0, d0
+	move.b		(a0)+, d0
+	addi		#-'+', d0
+	beq.b		read_1st_digit
+	addi		#'+'-'-', d0
+	beq.b		s2dnegative
+	addi		#'-'-'0'-10, d0
+	bra.b		check_1st_digit
+
+s2dnegative
+	bsr.b		read_1st_digit
+	fmul.w		$literal(-1), fp0
+	rts
+
+read_1st_digit
+	moveq		#0, d0
+	move.b		(a0)+, d0
+	addi		#-'0'-10, d0
+
+check_1st_digit
+	bcs.b		high
+	addi		#10, d0
+	bcc.b		low
+integer	fadd.b		d0, fp0
+	moveq.l		#0, d0
+	move.b		(a0)+, d0
+	addi		 #-'0'-10, d0
+	bcs.b		high
+	addi		#10, d0
+	bcc.b		low
+	fmul.w		$literal(10), fp0
+	bra		integer
+
+	$if	'.'<'0'		; data code independent
+low	addi		#'0'-'.', d0
+	$else
+high	addi		#'0'+10-'.', d0
+	$endif
+	
+	beq.b		fraction
+	addi		#'.'-'e', d0
+	bra.b		estring?
+
+fraction
+	moveq.l		#0, d0
+	move.b		(a0)+, d0
+	addi		#-'0'-10, d0
+	bcs.b		eofraction
+	addi		#10, d0
+	bcc.b		eofraction
+
+	sub		#-1, scale_10
+	fmul.w		$literal(10), fp0
+	fadd.b		d0, fp0
+	bra		fraction	
+
+	
+	$if	'.'<'0'
+high				; byte was higher than a digit
+eofraction
+	addi		#'0'+10-'e', d0
+	$else
+low				; byte was lower than a digit
+eofraction
+	addi		#'0'-'e', d0
+	$endif
+
+estring?
+	$if	'e'^='E'
+	beq.b		estring!
+	addi		#'e'-'E', d0
+	$endif
+
+	bne.b		eostring
+estring!
+	move.l		scale_10, -(a7)
+	bsr.b		string2i
+	add		(a7)+, scale_10
+
+eostring			; use the decimal scale
+	lea		table_u+307*8, a0
+	lea		(0, a0, scale_10.l*8), a0
+	pea		table_u		; force position independent
+	cmpa		(a7)+, a0	; at the range check
+	bmi.b		outrange
+	pea		table_u+615*8	; because this routine is otherwise
+	cmpa		(a7)+, a0	; accidentally position independent
+	bpl.b		outrange
+	fmul.d		(a0), fp0
+	rts
+outrange
+	fmove.d		$literal(-1q), fp0
+	rts
+
+string2i
+	moveq		#0, d1
+	moveq		#0, d0
+	move.b		(a0)+, d0
+	addi		#-'+', d0
+	beq.b		istring_next
+	addi		#'+'-'-', d0
+	beq.b		istring_minus
+	addi		#'-'-'0'-10, d0
+	bra.b		istring_digit?
+
+istring_minus
+	bsr.b		istring_next
+	neg		d1
+	rts
+
+istring_next
+	moveq		#0, d0
+	move.b		(a0)+, d0
+	addi		#-'0'-10, d0
+istring_digit?
+	bcs.b		istring_end
+	addi		#10, d0
+	bcc.b		istring_end
+	lsl		#1, d1
+	add		d1, d0
+	lsl		#2, d1
+	add		d0, d1
+	bra		istring_next
+
+istring_end
+	rts
+
+table_u
+	$list	0
+?	$do	615,	ieee754_64	1.0e?-308
+	$list

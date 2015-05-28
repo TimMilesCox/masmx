@@ -44,36 +44,24 @@ LOAD*	$name
 
 p	$proc
 OR*	$name
-"$type"	$set	$t(p(1,1))
-	$if	($type=127)++($type=$equf)++($type**128)
-	$do	$o('V'-'A'),	$note	or not quite immediately
 	or	p(1), d0
-	$else
-	or	#p(1), d0
-	$endif
 	$end
 
 p	$proc
 ADD*	$name
-"$type" $set    $t(p(1, 1))
-        $if     ($type=127)++($type=$equf)++($type**128)
-	$do	$o('V'-'A'),	$note	not quite immediately
 	add	p(1), d0
-	$else
-	add	#p(1), d0
-	$endif
+	$end
+
+p	$proc
+SUBTRACT* $name
+	sub	p(1), d0
 	$end
 
 p	$proc
 MULTIPLY* $name
-"$type"	$set	$t(p(1, 1))
 	$if	p(1, 1:2)=l
 	$else
-	$if	($type=127)++($type=$equf)++($type**128)
 	muls.w	p(1), d0
-	$else
-	muls.w	#p(1), d0
-	$endif
 	$endif
 	$end
 
@@ -81,11 +69,18 @@ p	$proc
 DIVIDE*	$name
 	$if	($t(p(2, 1))=$special_reg)**(p(2, 1)=l)
 	$else
-	$if	$t(p(1, 1))=0
 	divs.w	p(1), d0
-	$else
-	divs.w	p(1), d0
-	$endif
 	$endif
 	$end
 
+p	$proc
+REVERSE* $name
+	move.l	d0, -(a7)
+	LOAD_NEGATIVE (a7)+
+	$end
+
+p	$proc
+LOAD_NEGATIVE* $name
+	moveq	#0, d0
+	SUBTRACT p()
+	$end

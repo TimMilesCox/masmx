@@ -41,6 +41,24 @@ FOP*	$name
 	$endif
 	$end
 
+f	$func
+"$ieee64"* $name
+	$if	$t(f(2, 1))=$special_reg
+	$if	f(2, 1)=l
+"$UP"* 	$equf	$azlit(f(1)d)
+	$elseif	f(2, 1)=w
+"$UP"*	$equf	$azlit(f(1)s)
+	$elseif	f(2, 1)=b
+"$UP"*	$equf	$azlit(f(1)*/8s)
+	$elseif	f(2, 1)=s
+"$UP"*	$equf	$azlit(ieee754_32 f(1))
+	$endif
+	$else
+"$UP"*	$equf	$azlit(ieee754_64 f(1))
+	$endif
+	$return	$UP
+	$end
+
 p	$proc
 FP_LOAD* $name
 	FOP	p()
@@ -143,7 +161,8 @@ FP_DIVIDE* $name
 
 p	$proc
 FP_LOAD_NEGATIVE* $name
-	FP_LOAD 0.0, fp0
+	moveq	#0, d0
+	FP_LOAD d0 l
 	FP_SUBTRACT	p()
 	$end
 

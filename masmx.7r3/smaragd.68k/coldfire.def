@@ -142,6 +142,7 @@ d	$equ,$special_reg	4*/2
 "$i_rx"	$form	4, 3, 3, 3, 3, 4, 3, 1, 8
 "$i_fp"	$form	4, 3, 3, 3, 3, 3, 3, 3, 7
 "$i_fm"	$form	4, 3, 3, 3, 3, 3, 3, 3, 7, 16
+"$i_mq"	$form	4, 3, 1, 8
 
 "$b_cs"	$form	8, 8
 "$b_cl"	$form	8, 8, 16
@@ -307,6 +308,12 @@ ble.b*    $name   0x6F
 	$b_cs	p(0, 0), $target
 	$end
 
+p	$proc
+moveq.l* $name	7
+moveq*	$name	moveq.l
+	$do	p(1, #1)=0,	$note	#immediate value assumed
+	$i_mq	p(0, 0), p(1, 2), 0, p(1, 1)
+	$end
 
 
 p	$proc	;	treat [l|w] as radically different instructions
@@ -371,6 +378,40 @@ eor*	$name	11	; eor is only in store mode
 			; can use eori ->d_reg
 
 	$if	($t(p(1, 2))="$d_reg")**(p(0, 0)^=eor)
+
+	  $if 1
+
+"$FO"	$set	$iform(p(1, 1))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+
+	$if	($MO=0)++($MO=1)++($MO=2)++($MO=3)++($MO=4)
+	$i_rr	p(0,0), p(1, 2), 2, $MO, $RO
+	$elseif	$MO=5
+	$i_rm	p(0,0), p(1, 2), 2, 5, $RO, p(1, 1)
+	$elseif	$MO=6
+	$i_rx p(0, 0), p(1, 2), 2, 6, $RO,		|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,	|
+		$displacement8\p(1, 1:1)
+	$elseif	$FO=7
+	$i_rm	p(0,0), p(1, 2), 2, 7, 0, p(1, 1)
+	$elseif	$FO=7++1*/3
+	$i_rl	p(0,0), p(1, 2), 2, 7, 1, p(1, 1)
+	$elseif	$FO=7++4*/3
+	$i_rl	p(0,0), p(1, 2), 2, 7, 4, p(1, 1)
+	$elseif	$FO=7++2*/3
+	$i_rm	p(0,0), p(1, 2), 2, 7, 2, p(1, 1)-$-2
+	$elseif	$FO=7++3*/3
+	$i_rx	p(0,0), p(1, 2), 2, 7, 3,		|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,	|
+		$displacement8\p(1, 1:1)-$-2
+	$else
+	$flag	style of addend operand not resolved
+	$endif
+
+
+	  $else
+
 	  $if	$t(p(1, 1))**128
 	  $i_rr	p(0, 0), p(1, 2), 2, $t("p(1, 1)")**7, p(1, 1)
 	  $elseif ($t("p(1, 1)")="$a_reg_@")|
@@ -398,6 +439,10 @@ eor*	$name	11	; eor is only in store mode
           $else
 	  $do	$o('V'-'A'),	$note	SO
 	  $i_rm p(0, 0), p(1, 2), 2, 7, 0, p(1, 1)
+	  $endif
+
+
+
 	  $endif
 
 	$elseif	$t(p(1, 1))="$d_reg"
@@ -623,8 +668,16 @@ fdiv*	$name	fdiv.d
 
 	$if	1	
 
+
+p	$proc
+pea*	$name
+	$PEA	p(1), a1
+	$end
+
+
 p	$proc
 lea*	$name	7*/4++4
+"$PEA"*	$name	1*/4++4
 
 	$if	$t(p(1, 2))=$a_reg
 
@@ -656,7 +709,7 @@ lea*	$name	7*/4++4
 	$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, p(1, 1)-$-2	
 	$elseif	$FO=7++3*/3
 	$i_rx   p(0, 0), p(1, 2), p(0, 0)/*4, 7, 3,	|
-		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0, $displacement8\p(1, 1:1) 
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0, $displacement8\p(1, 1:1)-$-2 
 	$endif
 
 	$else
@@ -776,6 +829,43 @@ cmpa*	$name	cmpa.l
 
 p	$proc
 jmp*	$name	7*/7++3*/4++4
+jsr*	$name	4++7*/7++2*/4
+
+	$if	1
+
+"$FO"	$set	$iform(p(1, 1))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+
+	$if	$MO=0
+	$flag	d0..d7 are not jump targets
+	$elseif	$MO=1
+	$flag	a0..a7 are not jump targets
+	$elseif	($MO=2)++($MO=3)++($MO=4)
+	$i_rr	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, $MO, $RO, p(1, 1)
+	$elseif	$MO=5
+	$i_rm	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 5, $RO, p(1, 1)
+	$elseif	$MO=6
+	$i_rx	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 6, $RO,|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,	|
+		$displacement8\p(1, 1:1)
+	$elseif	$FO=7
+	$i_rm	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 0, p(1, 1)
+	$elseif	$FO=7++1*/3
+	$i_rl	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 1, p(1, 1)
+	$elseif	 $FO=7++4*/3
+	$flag	effective address is already immediate
+	$elseif	$FO=7++2*/3
+	$i_rm	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 2, p(1, 1)-$-2
+	$elseif	$FO=7++3*/3
+	$i_rx	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 3,	|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,	|
+		$displacement8\p(1, 1:1)-$-2
+	$else
+	$flag	style of effective address not fixed
+	$endif
+
+	$else
 
 	  $elseif	$t(p(1, 1))=$a_reg_@
 	    $i_rr	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 2, p(1, 1)
@@ -796,6 +886,8 @@ jmp*	$name	7*/7++3*/4++4
 	  $else
 	    $i_rl	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 1, p(1, 1)
 	  $endif
+
+	$endif
 
 	$end
 
@@ -1081,6 +1173,8 @@ mask	$set	((1*/f(1, 1:1))-1)--((512*/f(1, 1:2))-1)
 
 p	$proc
 swap*	$name		4++4*/4++1*/8++0*/12
-	$do	$t(p(1, 1))^="$d_reg",	$flag	swap argument must be d0..d7
+neg.l*	$name		4++2*/4++2*/8++0*/12
+neg*	$name		neg.l
+	$do	$t(p(1, 1))^="$d_reg",	$flag	 argument must be d0..d7
 	$i_rr		p(0, 0), p(0, 0)/*4, p(0, 0)/*8, p(0, 0)/*12, p(1, 1)
 	$end
