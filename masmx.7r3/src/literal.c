@@ -362,7 +362,7 @@ static long literal(char *arg, char *gparam, int tlocator)
    lr = (object *) p;
    #endif
 
-   #ifdef LROOT
+   #if	0	/*	def LROOT	*/
    if (tloc->loc >= tloc->lroot)    
    {
       tloc->loc = tloc->litlocator;

@@ -8756,7 +8756,33 @@ main(int argc, char *_argv[])
          }
          #endif
 
-	 if (pass) break;
+
+	 if (pass)
+         {
+            q = locator;
+
+            for (i = 0; i < LOCATORS; i++)
+            {
+               v = q->lroot;
+
+               if ((q->litlocator ^ v) && (q->loc ^ v))
+               {
+                  ecount++;
+
+                  printf("Error: %s Line %d: ", file_label[0]->l.name, ll[0]);
+                  printf("code longer on 2nd assembly pass");
+
+                  if (octal)
+                  printf(": $(%o) :%0*lo:%0*lo\n", i, apw, q->lroot, apw, q->loc);
+                  else
+                  printf(": $(%2.2X) :%0*lX:%0*lX\n", i, apw, q->lroot, apw, q->loc);
+               }
+
+               q++;
+            }
+
+            break;
+         }
 
          #ifdef RELOCATION
          mapx = mapinfo;
