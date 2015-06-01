@@ -1,15 +1,29 @@
+<div    style="color:00FF60;font-family:optima;font-size:88pt;position:absolute;top:84pt">
+<center>
+The Next Revolution is Efficient Code
+</center>
+</div>
+
+
+
+<div style=font-family:Times;position:absolute;top:0">
+
 <center>
 
-<div style=font-family:Times">
 <h1>MASMX.7r3</h1>
 
+<div	style="color:C0C0FF;font-family:optima;font-size:24">
+The Watchmaker's Craft of Programming
+<br>
+<br>
+</div>
 
 <i>
 Copyright Tim Cox, 2015<br>
 
 This document describes the masmx.7r3 target-independent meta-assembler
 <br>
-The masmx.7r2 meta-assembler is free software licensed with the GNU General Public Licence Version 3
+The masmx.7r3 meta-assembler is free software licensed with the GNU General Public Licence Version 3
 <br>
 The same licence encompasses all accompanying software and documentation <br>
 The full licence text is included with these materials<br>
@@ -118,10 +132,14 @@ masmx gives minute control of the construction and location of code and data.
 Typical masmx targets are low-power targets where as few instructions
 as possible are executed.
 
-<p>
-masmx saves electronics and energy. masmx may be used as the substance
-of thin-layer compilers.<br>It makes the miniature more possible, and has the
-potential to multiply the performance of giant servers by ten- and twentyfold
+<div    style="color:A0A0A0">
+<blockquote>
+
+masmx saves electronics and energy, and may be used as the substance of thin-layer compilers.<br>
+masmx makes the miniature more possible, and can multiply the performance of giant servers by ten- and twentyfold.<br>
+Language compilers can be reinvented to generate a common macro-assembly language for all targets
+</blockquote>
+</div>
 
 <p>
 Complex EPROM and Flash structures may be described in a few cryptic lines of source code.
@@ -746,7 +764,7 @@ Structured Data
 <h3>1.6.2: Bit-Aligned Structured Data</h3>
 
 masmx can construct and label complex hierarchical data which does not map to the target architecture<br>
-and can only be described as bit-fields of arbitrarily large size. See Section 5.2.2: Bit-Aligned Structures
+but instead groups and overlays bit-fields of arbitrarily large size. See Section 5.2.2: Bit-Aligned Structures
 
 
 <h3>1.6.3: Accessing Bit-Aligned Structured Data</h3>
@@ -891,7 +909,7 @@ See 4.2.2.2.2.5: Macro Parameters
 
 <h2>4.1: Labels</h2>
 
-A label starts in column 1 and ends in whitespace. A label may contain
+A label starts in column one and ends in whitespace. A label may contain
 <pre>
 
 	letters digits $ _ ? ! @ :
@@ -928,8 +946,14 @@ A label may also start with $ and is then declared in quotes
 "$mylabel"
 
 </pre>
-$ in column one is a program section control called a location counter with syntax <b>$(number[:attributes])</b><br>
+
+<div    style="color:A0A0A0">
+<blockquote>
+$ in column one is a location counter switch.<br>
+A location counter switch is a program section control with syntax <b>$(number[:attributes])</b><br>
 See section 7: Constructing Program Sections
+</blockquote>
+</div>
 
 <p>
 A label declared in quotes starts with anything and contains anything
@@ -948,12 +972,11 @@ Each subscripted instance is a different label
 
 <p>
 Reference to a subscripted label which does not exist
-counts instances of labels identical except for one more
-subscript
+retrieves the count of similar labels with one subscript more 
 
 <p>
-A label <i>label_stem(<b>4,1,20</b>)</i> is the count of labels
-<i>label_stem(<b>4,1,20</b>,&xi;)</i>
+A label <i>label_stem(<b>4,1,20</b>)</i> is for example the
+count of labels <i>label_stem(<b>4,1,20</b>,&xi;)</i>
 
 <pre>
         <i>
@@ -1548,7 +1571,7 @@ Internal functions are in summary:
 
 	$n		macro call name
 			retrieves low-order 32 bits of
-			macro_name(0, 0) value
+			<i>macro_label</i>(0, 0) value
 
 	$net(..)	unrelocated value of expression
 
@@ -1647,7 +1670,7 @@ add*    $name   1
 	$end
 
 </pre>
-Actual arguments map to these reference paraforms when the $proc name is, for example, p 
+Actual arguments map to these reference paraforms when the $proc label is, for example, p 
 <pre>
 
 
@@ -1658,20 +1681,21 @@ Actual arguments map to these reference paraforms when the $proc name is, for ex
 
 </pre>
 The command is the first call-line word after any whitespace.
-It is subfield zero of field 0, macro_name(0, 0)
+It is subfield zero of field 0, <i>macro_label</i>(0, 0)
+
 
 <p>
-A subcommand on the command is macro_name(0, 2)
+A subcommand on the command is <i>macro_label</i>(0, 2)
 
 <p>
 Argument field numbers and their subfield numbers ascend from 1
 
 <p>
-The first subfield of the second argument field is referenced macro_name(2, 1)
+The first subfield of the second argument field is referenced <i>macro_label</i>(2, 1)
 
 <p>
 Fields are separated by spaces. Subfields in a field are 
-separated by a comma [and spaces]
+separated by a comma,[ and spaces]
 
 <p>
 There may also be substrings of subfields, separated by the 
@@ -2627,7 +2651,7 @@ xor*	$name	4
 	$end
 
 </pre>
-Then the lines in assembly language files are macro calls like these:
+The lines of application code mostly are macro calls like these:
 <pre>
 
 	add     This, That
@@ -2648,8 +2672,8 @@ addend	$do	p(),	add	p(addend, 1), That
 	sum,There	This The_Next The_Third Another
 
 </pre>	
-The $proc name may be any name and it is the handle for reference 
-to actual arguments. For the $proc name p the referencing rules are
+The <b>$proc</b> label may be any label and it is the handle for reference 
+to actual arguments. Inside a <b>$proc</b> with label <i>p</i> the referencing rules are
 <pre>
 
 p       $proc
@@ -3106,22 +3130,25 @@ This is next example does not generate a nested literal. It contains an
 expression within a literal:
 <pre>
 
-$ masmx -ln
-MASMX 7r2
+$ masmx -lnk
+MASMX 7r3
 0/-INPUT>>
-	$word	32
-	$set_option	"a"
+	$word	        32
+	$set_option	"a"   
 
+$(4:16384)
 	+	((99)+2)
+$(0:65536)
 	$end
-  :                            1  $word       32
-  :                            2  $set_option "a"
+  :                            1  $word         32
+  :                            2  $set_option "a"   
   :                            3 
-00:00000000 00000001          +4  + ((99)+2)
-  :                            5  $end
-00:00000001+00000065
-:$(00):00000000:00000002 
--INPUT>>: object code 77 bytes: 0 errors: 0 undefined labels
+  :                            4 $(4:16384)
+04:00004000 00010000          +5  + ((99)+2)
+  :                            6 $(0:65536)
+  :                            7  $end
+00:00010000+00000065
+:$(00):00010000:00010001 :$(04):00004000:00004001 
 
 
 </pre>
@@ -3189,6 +3216,12 @@ value is not required on the first pass.<br> Another reason
 may be that two passes of the same function have a
 cumulative effect which is undesirable 
 
+<p>
+It may to the contrary be necessary to expand a function macro on both
+assembly passes, because the function has determining effect how much
+code is generated. See 4.6.2.1.3: Functions affecting Program Displacements
+
+
 <h4>4.6.2.1.2: Non-Idempotent Functions</h4>
 <p>
 Second-pass-only functions are used to generate a data item
@@ -3233,6 +3266,17 @@ f*      $func	*
 
 
 </pre>
+
+<h4>4.6.2.1.3: Functions affecting Program Displacements</h4>
+
+If a function macro returns a value which determines the length
+of code generated, it must be called on both assembly passes,
+unless there are no labels and no literal table subsequent to
+the point where the function macro has its effect
+
+
+
+
 <h4>4.6.2.2: $NAME -entry point and invocation tag</h4>
 
 It's easier to code functions (like $PROCs) if
@@ -3307,16 +3351,15 @@ f       $func
 
 <h3>4.6.3: Code Generated During Function Evaluation</h3> 
 
-Code can't be generated inline to the current
-location counter during a $FUNC. That's treated
-as an error.
+Code may not be generated inline to the current
+location counter during a <b>$func</b>. That is treated
+as an error, although the functional result may determine
+more or less code generated inline
 
 <p>
-Here "f" calls a macro "generate" to build a 
-data item out of line (In locator 42), and  
-attach the label to it, and then
-return to whatever the old location counter
-was:
+Here function <i>f</i> calls a macro <i>generate</i>
+to construct a data item out of line (in locator 42), and  
+attach a label to it
 <pre>
 
 f*      $func	*
@@ -3708,7 +3751,8 @@ callname* entryP callroutine
 $n has the latent value of a $name macro entry point
 
 <p>
-$n is the same value as the paraform macro_name(0, 0), but truncated to 32 bits instead of 192 bits
+$n is the same value as the paraform <i>macro_label</i>(0, 0),
+but truncated to 32 bits instead of 192 bits
 
 <p>
 $n may be used in both procedural and functional macros
@@ -8581,9 +8625,10 @@ sjmp*    $name   080
 
 </pre>
 <p>
+
 In the following 8051 assembly, two jump instructions which
 both use the rel2 function entry cannot be generated without error
-because they are too far from their target:
+because they are too far from their target
 <pre>
 
 
@@ -10471,7 +10516,7 @@ descriptor $form        16, 48
 
 </pre>
 <p>
-If quote character appears in column 1, or in an expression, it bounds a
+If quote character appears in column one, or in an expression, it bounds a
 label. This allows labels beginning $ to be declared.
 <pre>
 
@@ -15951,10 +15996,10 @@ the macro.
 All the macros shown are called "p". They don't have to be.
 
 <p>
-Parameters referenced forms start with the macro name:
+Argument reference paraforms start with the label on the <b>$proc</b> or <b>$func</b> line:
 <pre>
 
-	macro_name(x,y)
+	<i>macro_label</i>(x,y)
 
 </pre>
 for example in the macros shown
@@ -15963,7 +16008,7 @@ for example in the macros shown
 	p(1,1)
 
 </pre>
-Giving many macros the same $PROC or $FUNC label means that blocks of
+Giving many macros the same <b>$proc</b> or <b>$func</b> label means that blocks of
 macro language can be cut-and-pasted between different macros.
 
 <p>
@@ -15978,14 +16023,14 @@ those names visible as macros. They're the labels on the $name lines
 An asterisk on the label of the $proc line would make that label visible:
 <pre>
 
-unique_macro_name*	$proc
+unique_macro_label*	$proc
 
 </pre>
-Then unique_macro_name must be unique. See Section 6.2.2.2: The $PROC 
-Header
+Then unique_macro_label must be unique. See Section 6.2.2.2:
+The <b>$proc</b> Header
 
 <p>
-Macros with non-unique labels are called by the labels on the $NAME lines,
+Macros with non-unique labels are called by the labels on the <b>$name</b> lines,
 and these names are visible* and unique*.
 
 <p>
