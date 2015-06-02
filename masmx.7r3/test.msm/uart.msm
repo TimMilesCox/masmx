@@ -47,7 +47,7 @@ DEVICES equ     128
 DATA    equ     1024
 TOTAL   equ     4
 RTVARS  equ     64
-Full    equ     32
+FULL    equ     32
 
 $(3:RTVARS)
 device  $do     TOTAL,write_cursor(device)      $res    1
