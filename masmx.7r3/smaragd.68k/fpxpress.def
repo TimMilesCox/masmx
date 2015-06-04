@@ -7,10 +7,17 @@ FPUSH*	$name
 FP_STACK_TOP	$equ,"$a_reg_@+"	7
 FPOP		$equ,$directive		$nop
 
+IEEE754_64_ACQUIRE$ $equ 1111
+
 p	$proc
 FOP*	$name
 "$TYPE"	$set	$t(p(1, 1))
-	$if	$t(p(1, 1))=$fp_reg
+"$RING"	$set	0
+	$do	p()>1,	$do	$t(p(2, 1))=$name,"$RING"	$set	p(2, 1)
+	$if	$RING=IEEE754_64_ACQUIRE$
+	p(2,1)	p(1)
+"$FOP"*	$equ,$fp_reg	fp1
+	$elseif	$t(p(1, 1))=$fp_reg
 "$FOP"*	$equ,$fp_reg	p(1, 1)
 	$elseif	$t(p(1, 1))=$d_reg
 "$FOP"*	$equ,$d_reg	p(1, 1)
@@ -39,6 +46,17 @@ FOP*	$name
 	$do	$o('V'),	$trace	$FOP
 	$do	$o('V'),	$trace	$FOP\2
 	$endif
+	$end
+
+p	$proc
+floating_string* $name	IEEE754_64_ACQUIRE$
+	$do	$o('V'),	$note	call s2double
+	$if	p(1, *1)
+	movea	p(1, 1), a0
+	$else
+	lea	p(1, 1), a0
+	$endif
+	jsr	(s2double).l
 	$end
 
 f	$func
