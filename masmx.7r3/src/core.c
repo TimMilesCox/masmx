@@ -5230,6 +5230,7 @@ static int iterate(char *arg, char *param, object *tag, txo *image)
       tag->l.valued = SET;
       tag->l.value = zero_o;
       tag->l.r.l.y = 0;
+      tag->l.r.l.rel = 0;
       tag->l.r.l.xref = masm_level;
    }
    
@@ -6470,8 +6471,12 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             {
                if (bits ^ transient_floating_bits)
                {
-                  note("floating number words given tag may follow the fraction");
-	          note("+1234.567[[:]{sdltqpho}][*+exponent]");
+                  if (bits > RADIX) note("floating number is maximum words");
+                  else
+                  {
+                     note("floating number words given tag may follow the fraction");
+	             note("+1234.567[[:]{sdltqpho}][*+exponent]");
+                  }
                }
             }
 

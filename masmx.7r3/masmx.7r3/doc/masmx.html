@@ -4864,84 +4864,70 @@ ast.msm: object code 76 bytes: 0 errors: 0 undefined labels
 Pointer-based structures may be branched in the same way:
 <pre>
 
-MASMX 7r2
+$ masmx -lnkx transport
+MASMX 7r3
 3/transport.msm
 *EOF*
-  :                            1        $word   16
-  :                            2        $quantum        8
-  :                            3        $awidth 32
+  :                            1 	$word	16
+  :                            2 	$quantum	8
+  :                            3 	$awidth	32
   :                            4 
-  :                            5 p      $proc
+  :                            5 p	$proc
   :                            6 udp_datagram* $name
-  :                            7 sourcep        +       p(1,1)
+  :                            7 sourcep	+	p(1,1)
   :                            8 destp   +       p(1,2)
   :                            9 length  +       p(1,3)
   :                            10 checksum +      p(1,4)
   :                            11 data
-  :                            12       $end
+  :                            12 	$end
   :                            13 
-  :                            14 p     $proc
-  :                            15 tcp_segment*  $name
-  :                            16 sourcep       +       p(1,1)
-  :                            17 destp +       p(1,2)
-  :                            18 sequence +    0:d
-  :                            19 ack   +       0:d
-  :                            20 hl_code       +       0
-  :                            21 window        +       0
-  :                            22 checksum +    0
-  :                            23 urgent        +       0
+  :                            14 p	$proc
+  :                            15 tcp_segment*	$name
+  :                            16 sourcep	+	p(1,1)
+  :                            17 destp	+	p(1,2)
+  :                            18 sequence +	0:d
+  :                            19 ack	+	0:d
+  :                            20 hl_code	+	0
+  :                            21 window	+	0
+  :                            22 checksum +	0
+  :                            23 urgent	+	0
   :                            24 data
-  :                            25       $end
+  :                            25 	$end
   :                            26 
-  :                            27 pointer_register $equ 15
+  :                            27 pointer_register $equ	15
   :                            28 
   :                            29 $(67:,pointer_register)
   :                            30 
-  :                            31 user_datagram $branch
-43:00000000                   +32               udp_datagram
-43:00000002                   +32 
-43:00000004                   +32 
-43:00000006                   +32 
-  :                            33               $root
+  :                            31 user_datagram	$branch
+  :                            32 		udp_datagram
+  :                            33 		$root
   :                            34 
-  :                            35 tcp_part      $branch
-43:00000000                   +36               tcp_segment
-43:00000002                   +36 
-43:00000004                   +36 
-43:00000008                   +36 
-43:0000000C                   +36 
-43:0000000E                   +36 
-43:00000010                   +36 
-43:00000012                   +36 
-  :                            37               $root
+  :                            35 tcp_segmentP	$branch
+  :                            36 		tcp_segment
+  :                            37 		$root
   :                            38 
-  :                            39 
 *EOF*
-
-...
-
-POINTER_REGISTER=000F
-TCP_PART=00000000,0000000F
-TCP_PART:SOURCEP=00000000,0000000F
-TCP_PART:DESTP=00000002,0000000F
-TCP_PART:SEQUENCE=00000004,0000000F
-TCP_PART:ACK=00000008,0000000F
-TCP_PART:HL_CODE=0000000C,0000000F
-TCP_PART:WINDOW=0000000E,0000000F
-TCP_PART:CHECKSUM=00000010,0000000F
-TCP_PART:URGENT=00000012,0000000F
-TCP_PART:DATA=00000014,0000000F
-TCP_SEGMENT=:N1:P:0:0000
-UDP_DATAGRAM=:N1:P:0:0000
-USER_DATAGRAM=00000000,0000000F
-USER_DATAGRAM:SOURCEP=00000000,0000000F
-USER_DATAGRAM:DESTP=00000002,0000000F
-USER_DATAGRAM:LENGTH=00000004,0000000F
-USER_DATAGRAM:CHECKSUM=00000006,0000000F
-USER_DATAGRAM:DATA=00000008,0000000F
+udp_datagram=:N129:P:0:0000
+tcp_segment=:N129:P:0:0000
+pointer_register=000F
+user_datagram=$43:00000000,0000000F
+user_datagram:sourcep=$43:00000000,0000000F
+user_datagram:destp=$43:00000002,0000000F
+user_datagram:length=$43:00000004,0000000F
+user_datagram:checksum=$43:00000006,0000000F
+user_datagram:data=$43:00000008,0000000F
+tcp_segmentP=$43:00000000,0000000F
+tcp_segmentP:sourcep=$43:00000000,0000000F
+tcp_segmentP:destp=$43:00000002,0000000F
+tcp_segmentP:sequence=$43:00000004,0000000F
+tcp_segmentP:ack=$43:00000008,0000000F
+tcp_segmentP:hl_code=$43:0000000C,0000000F
+tcp_segmentP:window=$43:0000000E,0000000F
+tcp_segmentP:checksum=$43:00000010,0000000F
+tcp_segmentP:urgent=$43:00000012,0000000F
+tcp_segmentP:data=$43:00000014,0000000F
 transport.msm=0<00000003
 :$(43):00000000:00000014 
-transport.msm: object code 32 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
@@ -7444,25 +7430,29 @@ items three or more words in size. The default for a single floating-point
 word is 8 bits and for a double 12:
 <pre>
 
-MASMX/-240 1r1X
-hflo.msm 5
-*EOF*  :                        1:         $word   32
-  :                        2:         $quantum 8
-  :                        3:         $awidth 32
-  :                        4:         $floating_point 32
-00:00000000 41C00000      +5         1.5
-00:00000004 401C000000000000+6         1.5d
-00:0000000C 400001C00000000000000000+7         1.5t
+$ masmx hflo -lnky
+MASMX 7r3
+3/hflo.msm
+*EOF*
+  :                            1         $word   32
+  :                            2         $quantum 8
+  :                            3         $awidth 32
+  :                            4         $floating_point 32
+00:00000000 41C00000          +5         +1.5
+00:00000004 401C000000000000  +6         +1.5d
+00:0000000C 400001C00000000000000000
+                              +7         +0.15t*+1
 00:00000018 400001C0000000000000000000000000
-			 +8         1.5q
+                              +8         +15:q*-1
 00:00000028 400001C000000000000000000000000000000000
-			 +9         1.5p
-00:0000003C 400001C00000000000000000000000000000000000000000
-			 +10         1.5h
+                              +9         +1.5p
+00:0000003C BFFFFE3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                              +10         -1.5h
+Note: hflo.msm Line 11: floating number is maximum words
 00:00000054 400001C00000000000000000000000000000000000000000
-			 +11         1.5o
-*EOF*:$(00):0000006C 
-Object Code 246 Bytes: 0 Errors: 0 Undefined Labels
+                              +11         +1.5o
+*EOF*
+:$(00):00000000:0000006C 
 
 </pre>
 <p>
@@ -7474,9 +7464,11 @@ Octawords may be generated when $WORD is 24 or less.
 Floating point items are not auto-sized like integers.
 
 <p>
-Floating point items are the default $FLOATING_POINT size, 
-or the size selected with the trailing letter: 
+Floating point items are the default <b>$floating_point§</b> size, 
+or a words-size after the mantissa and before any scale
 <pre>
+
+	+(MANTISSA)[s d l t q p h o][{*+|*-}SCALE]
 
 	S for single (one word)
 	D or L for double 
@@ -7489,27 +7481,25 @@ or the size selected with the trailing letter:
 </pre>
 <p>
 These trailing letters may be upper or lower case and may have a
-colon before them:
+colon before them or parenthesis or quote
 <pre>
 
-	67.5:t
+	67.5t
+
+	+MANTISSA:q*+1200000
+
+	+(MANTISSA)p*+800
+
+	+	20*"MANTISSA"d*+307
 
 </pre>
-<p>
-Because only decimal digits, signs, a period and a characteristic
-operator (*+ *- e e+ e- E E+ E-) may appear in an input string
-for floating point, and neither hex nor labels may appear there, 
-it is safe to use the trailing D without a colon for a two-word 
-floating point item:
-<pre>
+Period may only appear in a decimal digit string. Where period
+appears the scale notation [ e e+ e- E E+ E- ] can be typed in
+place of the masmx scale operator <b>*+</b> or <b>*-</b>
 
-	1.75*+200d
-
-</pre>
 <p>
-The period is optional, but if it is absent, only the *+ or *-
-operator (and not the E E+ E-) will inform the assembler that
-the item is floating point.
+Where period does not appear, only <b>*+</b> or <b>*-</b> scale
+operator and not [ e e+ e- E E+ E- ] indicates a floating point number.
 
 <p>
 To generate floating values using every type of expression token,
@@ -8456,58 +8446,59 @@ item (command code + - ^) has a decimal point or a scale operator
 <pre>
 
 	+	1.9
-	-	20*+1200000
-	+	1.37*-800000
+	-	MANTISSA*+1200000
+	+	1.37*-SCALE
 
 </pre>
 <p>
-Automatic floating-point numbers have an all-fractional mantissa with no
-integral part whether hidden or represented.
+masmx internal floating-point numbers have an all-fractional mantissa with no
+integral part whether hidden or represented. The value can be converted to
+constants in other formats
 
 <p>
 Exponent is midpointed.
 
 <p>
 Negative polarity is represented by the entire item in 1-s complement.
-
-<p>
-Sign-bit indicates that all bits are inverted.
+Sign-bit 1 indicates that all bits are inverted.
 
 <p>
 This is not IEEE 754 format. That is supported with macros.
-See Section 1.5: Any floating-point format.
+See Section 1.5: Any floating-point format, Section 10: ieee754
+
 
 <p>
-Word size is 32 bits in the following assembly.
+Octaword on line 11 with 32-bit <b>$word</b> generates 192 bits the same as hexaword.
+Numbers in masmx are not larger than 192 bits.
 
 <p>
-Octaword at 32 bits generates 192 bits the same as hexaword. Numbers
-aren't larger than 192 bits.
-
-<p>
-Exponent syntax e E e+ E+ e- E- is only detected if a
-decimal point has been encountered in a digit string
+Scale expression beginning [ e E e+ E+ e- E- ] is only detected in
+an all-decimal string containing a decimal point
 <pre>
 
-MASMX/-240 1r1X
-hflo.msm 5
-*EOF*  :                        1:         $word   32
-  :                        2:         $quantum 8
-  :                        3:         $awidth 32
-  :                        4:         $floating_point 32
-00:00000000 41C00000      +5         +1.5
-00:00000004 401C000000000000+6         +1.5d
-00:0000000C 400001C00000000000000000+7         +0.15*+1t
+$ masmx hflo -lnky
+MASMX 7r3
+3/hflo.msm
+*EOF*
+  :                            1         $word   32
+  :                            2         $quantum 8
+  :                            3         $awidth 32
+  :                            4         $floating_point 32
+00:00000000 41C00000          +5         +1.5
+00:00000004 401C000000000000  +6         +1.5d
+00:0000000C 400001C00000000000000000
+                              +7         +0.15t*+1
 00:00000018 400001C0000000000000000000000000
-			 +8         +15*-1q
+                              +8         +15:q*-1
 00:00000028 400001C000000000000000000000000000000000
-			 +9         +1.5p
+                              +9         +1.5p
 00:0000003C BFFFFE3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-			 +10         -1.5h
+                              +10         -1.5h
+Note: hflo.msm Line 11: floating number is maximum words
 00:00000054 400001C00000000000000000000000000000000000000000
-			 +11         +1.5o
-*EOF*:$(00):00000000:0000006C 
-Object Code 275 Bytes: 0 Errors: 0 Undefined Labels
+                              +11         +1.5o
+*EOF*
+:$(00):00000000:0000006C 
 
 </pre>
 <p>

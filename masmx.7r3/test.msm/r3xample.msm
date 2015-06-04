@@ -1,4 +1,3 @@
-
 	$path		../smaragd.68k
 	$include	coldfire.def
 	$include	express.def
@@ -22,12 +21,5 @@ rapointer $res	4
 
 $(1:131072,pc/$azlit)
 
-fp_routine
-	lea		$a(one), a5
-	$xqt_fp,$ieee64	one*1.75*+307*two/3.0*-307-three
+	$xqt_fp	one*rapointer floating_string+two-three
 
-	$xqt_fp		d5+fp6+a2@+"-(a4)"+"a3@+"*(*rapointer)/rastore
-
-	$xqt_fp		westward w+ho w*(*rapointer s)
-	$xqt_fp,$ieee64	(westward w)+(1.5 s)*(*rapointer s)
-	rts

@@ -7,8 +7,8 @@ scale_10 $equ,$d_reg	d1
 
 $(0:262144,pc/$literal)
 
-s2double
-	fmove.w		$literal(0), fp0
+s2double*
+	fmove.w		$literal(0), fp1
 	moveq		#0, d0
 	move.b		(a0)+, d0
 	addi		#-'+', d0
@@ -20,7 +20,7 @@ s2double
 
 s2dnegative
 	bsr.b		read_1st_digit
-	fmul.w		$literal(-1), fp0
+	fmul.w		$literal(-1), fp1
 	rts
 
 read_1st_digit
@@ -32,14 +32,14 @@ check_1st_digit
 	bcs.b		high
 	addi		#10, d0
 	bcc.b		low
-integer	fadd.b		d0, fp0
+integer	fadd.b		d0, fp1
 	moveq.l		#0, d0
 	move.b		(a0)+, d0
 	addi		 #-'0'-10, d0
 	bcs.b		high
 	addi		#10, d0
 	bcc.b		low
-	fmul.w		$literal(10), fp0
+	fmul.w		$literal(10), fp1
 	bra		integer
 
 	$if	'.'<'0'		; data code independent
@@ -61,8 +61,8 @@ fraction
 	bcc.b		eofraction
 
 	sub		#-1, scale_10
-	fmul.w		$literal(10), fp0
-	fadd.b		d0, fp0
+	fmul.w		$literal(10), fp1
+	fadd.b		d0, fp1
 	bra		fraction	
 
 	
@@ -97,10 +97,10 @@ eostring			; use the decimal scale
 	pea		table_u+615*8	; because this routine is otherwise
 	cmpa		(a7)+, a0	; accidentally position independent
 	bpl.b		outrange
-	fmul.d		(a0), fp0
+	fmul.d		(a0), fp1
 	rts
 outrange
-	fmove.d		$literal(-1q), fp0
+	fmove.d		$literal(-1q), fp1
 	rts
 
 string2i

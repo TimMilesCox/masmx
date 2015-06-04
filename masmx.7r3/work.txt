@@ -4864,84 +4864,70 @@ ast.msm: object code 76 bytes: 0 errors: 0 undefined labels
 Pointer-based structures may be branched in the same way:
 <pre>
 
-MASMX 7r2
+$ masmx -lnkx transport
+MASMX 7r3
 3/transport.msm
 *EOF*
-  :                            1        $word   16
-  :                            2        $quantum        8
-  :                            3        $awidth 32
+  :                            1 	$word	16
+  :                            2 	$quantum	8
+  :                            3 	$awidth	32
   :                            4 
-  :                            5 p      $proc
+  :                            5 p	$proc
   :                            6 udp_datagram* $name
-  :                            7 sourcep        +       p(1,1)
+  :                            7 sourcep	+	p(1,1)
   :                            8 destp   +       p(1,2)
   :                            9 length  +       p(1,3)
   :                            10 checksum +      p(1,4)
   :                            11 data
-  :                            12       $end
+  :                            12 	$end
   :                            13 
-  :                            14 p     $proc
-  :                            15 tcp_segment*  $name
-  :                            16 sourcep       +       p(1,1)
-  :                            17 destp +       p(1,2)
-  :                            18 sequence +    0:d
-  :                            19 ack   +       0:d
-  :                            20 hl_code       +       0
-  :                            21 window        +       0
-  :                            22 checksum +    0
-  :                            23 urgent        +       0
+  :                            14 p	$proc
+  :                            15 tcp_segment*	$name
+  :                            16 sourcep	+	p(1,1)
+  :                            17 destp	+	p(1,2)
+  :                            18 sequence +	0:d
+  :                            19 ack	+	0:d
+  :                            20 hl_code	+	0
+  :                            21 window	+	0
+  :                            22 checksum +	0
+  :                            23 urgent	+	0
   :                            24 data
-  :                            25       $end
+  :                            25 	$end
   :                            26 
-  :                            27 pointer_register $equ 15
+  :                            27 pointer_register $equ	15
   :                            28 
   :                            29 $(67:,pointer_register)
   :                            30 
-  :                            31 user_datagram $branch
-43:00000000                   +32               udp_datagram
-43:00000002                   +32 
-43:00000004                   +32 
-43:00000006                   +32 
-  :                            33               $root
+  :                            31 user_datagram	$branch
+  :                            32 		udp_datagram
+  :                            33 		$root
   :                            34 
-  :                            35 tcp_part      $branch
-43:00000000                   +36               tcp_segment
-43:00000002                   +36 
-43:00000004                   +36 
-43:00000008                   +36 
-43:0000000C                   +36 
-43:0000000E                   +36 
-43:00000010                   +36 
-43:00000012                   +36 
-  :                            37               $root
+  :                            35 tcp_segmentP	$branch
+  :                            36 		tcp_segment
+  :                            37 		$root
   :                            38 
-  :                            39 
 *EOF*
-
-...
-
-POINTER_REGISTER=000F
-TCP_PART=00000000,0000000F
-TCP_PART:SOURCEP=00000000,0000000F
-TCP_PART:DESTP=00000002,0000000F
-TCP_PART:SEQUENCE=00000004,0000000F
-TCP_PART:ACK=00000008,0000000F
-TCP_PART:HL_CODE=0000000C,0000000F
-TCP_PART:WINDOW=0000000E,0000000F
-TCP_PART:CHECKSUM=00000010,0000000F
-TCP_PART:URGENT=00000012,0000000F
-TCP_PART:DATA=00000014,0000000F
-TCP_SEGMENT=:N1:P:0:0000
-UDP_DATAGRAM=:N1:P:0:0000
-USER_DATAGRAM=00000000,0000000F
-USER_DATAGRAM:SOURCEP=00000000,0000000F
-USER_DATAGRAM:DESTP=00000002,0000000F
-USER_DATAGRAM:LENGTH=00000004,0000000F
-USER_DATAGRAM:CHECKSUM=00000006,0000000F
-USER_DATAGRAM:DATA=00000008,0000000F
+udp_datagram=:N129:P:0:0000
+tcp_segment=:N129:P:0:0000
+pointer_register=000F
+user_datagram=$43:00000000,0000000F
+user_datagram:sourcep=$43:00000000,0000000F
+user_datagram:destp=$43:00000002,0000000F
+user_datagram:length=$43:00000004,0000000F
+user_datagram:checksum=$43:00000006,0000000F
+user_datagram:data=$43:00000008,0000000F
+tcp_segmentP=$43:00000000,0000000F
+tcp_segmentP:sourcep=$43:00000000,0000000F
+tcp_segmentP:destp=$43:00000002,0000000F
+tcp_segmentP:sequence=$43:00000004,0000000F
+tcp_segmentP:ack=$43:00000008,0000000F
+tcp_segmentP:hl_code=$43:0000000C,0000000F
+tcp_segmentP:window=$43:0000000E,0000000F
+tcp_segmentP:checksum=$43:00000010,0000000F
+tcp_segmentP:urgent=$43:00000012,0000000F
+tcp_segmentP:data=$43:00000014,0000000F
 transport.msm=0<00000003
 :$(43):00000000:00000014 
-transport.msm: object code 32 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
@@ -5751,68 +5737,12 @@ LISTP**		$set	LISTP-1
 
 </pre>
 
-<h2>6:2: Run-Time Floating Algorithm Plotter</h2>
+<h2>6.2: Run-Time Floating Algorithm Plotter</h2>
 
 <p>
 <b>$xqt_fp</b> includes constants as well as variables in expressions,
-but does not attempt assembly-time calculation of expression steps between floating
-constants
-
-<p>
-<b>$xqt_fp</b> concerns four-function arithmetic only
-
-<p>
-Here a simple algorithm with five inputs is executed in five instructions, including
-operand acquisition from storage
-<pre>
-
-
-$ masmx -ln r2xample.msm
-MASMX 7r3
-3/r2xample.msm
-*EOF*
-  :                            1 	$path		../def
-  :                            2: 	$include	rta.def
-  :                            3 	$path		../language
-  :                            4: 	$include	stack.def
-  :                            5: 	$include	fpxpress.def
-  :                            6 	$path
-  :                            7 $(0:0)
-  :                            8 
-00:000000 B60040              +9 floating_algorithm*  $vector fp_routine
-  :                            10 
-  :                            11 $(0:64)
-  :                            12 
-  :                            13 fp_routine 
-                                	$head_far	 params(one,	float		;
-                                				two,	float		;
-  :                            16 				three,	float)
-  :                            17 
-00:000040 4FF003              +18 	$xqt_fp		one*1.75*+1200000*two/3.0*-625000-three
-00:000041 770100              +18 
-00:000042 77F007              +18 
-00:000043 7F0104              +18 
-00:000044 6FF00B              +18 
-  :                            19 
-  :                            20 
-00:000045 3D0000              +21 	fret		0
-  :                            22 
-  :                            23 	$do		$<256,$(0:256)
-  :                            24 	
-*EOF*
-00:000100+7CD38BB7B396D7AA20B6E083
-00:000104+2051D5B8447B77478A23F5F7
-:$(00):000000:000108 
-r2xample.msm: object code 190 bytes: 0 errors: 0 undefined labels
-
-
-</pre>
-masmx has taken an expression with five operands and four operators, and
-turned it into a sequence of five instructions which deliver the four-word
-floating result of the operations in the result registers <b>a:b:mantissa2:mantissa3</b>
-
-<p>
-Three of these tokens are identifiers whose content is only known at runtime
+but does not currently attempt assembly-time calculation of expression
+steps between floating constants
 
 <p>
 <b>$xqt_fp</b> directive scans an expression and calls macro code to write an
@@ -5820,8 +5750,140 @@ instruction plan. The tokens which are constants appear as literals at the foot
 of the program
 
 <p>
-A <b>#define</b> preprocess and masmx <b>$text</b> substitution are both usually
-absent in assembly for RTA1, but would not conflict
+<b>$xqt_fp</b> concerns four-function arithmetic only
+
+<p>
+<b>$xqt_fp</b> is demonstrated here with ColdFire architecture
+
+<p>
+The first simple algorithm has five inputs and is executed in five instructions, including
+operand acquisition from storage. Instructions follow masmx precedence order. Three of the
+five tokens are identifiers whose content is only known at runtime
+
+<p>
+The second algorith has a mixture of register, storage and pointer inputs
+<pre>
+
+$ ~/masmx -lnky r2xample.msm 
+MASMX 7r3
+3/r2xample.msm
+CONT_CHAR=|
+LTERM=;
+STERM=.
+*EOF*
+  :                            1 
+  :                            2 	$path		../smaragd.68k
+  :                            3: 	$include	coldfire.def
+  :                            4: 	$include	express.def
+  :                            5: 	$include	fpxpress.def
+  :                            6 	$path
+  :                            7: 	$include	espresso.def
+  :                            8: 	$include	ieee754.def
+  :                            9 
+  :                            10 $(4:16384,a5/$literal)
+  :                            11 
+  :                            12 one	$res	8
+  :                            13 two	$res	8
+  :                            14 three	$res	8
+  :                            15 
+  :                            16 westward $res	2
+  :                            17 ho	$res	2
+  :                            18 
+  :                            19 $(5:16384+1024)
+  :                            20 rastore	$res	8
+  :                            21 rapointer $res	4
+  :                            22 
+  :                            23 $(1:131072,pc/$azlit)
+  :                            24 
+  :                            25 fp_routine
+01:00000000 4BF84000          +26 	lea		$a(one), a5
+01:00000004 F22D54000000      +27 	$xqt_fp,$ieee64	one*1.75*+307*two/3.0*-307-three
+01:0000000A F23A54230064      +27 
+01:00000010 F22D54230008      +27 
+01:00000016 F23A54200060      +27 
+01:0000001C F22D54280010      +27 
+  :                            28 
+01:00000022 F21B5400          +29 	$xqt_fp		d5+fp6+a2@+"-(a4)"+"a3@+"*(*rapointer)/rastore
+01:00000026 20784408          +29 
+01:0000002A F2105423          +29 
+01:0000002E 41F84400          +29 
+01:00000032 F2105420          +29 
+01:00000036 F2055422          +29 
+01:0000003A F2001822          +29 
+01:0000003E F2125422          +29 
+01:00000042 F2245422          +29 
+  :                            30 
+01:00000046 F22D5000001A      +31 	$xqt_fp		westward w+ho w*(*rapointer s)
+01:0000004C 20784408          +31 
+01:00000050 F2104423          +31 
+01:00000054 F22D50220018      +31 
+01:0000005A F23A54000024      +32 	$xqt_fp,$ieee64	(westward w)+(1.5 s)*(*rapointer s)
+01:00000060 20784408          +32 
+01:00000064 F2104423          +32 
+01:00000068 F22D50220018      +32 
+01:0000006E 4E75              +33 	rts
+*EOF*
+01:00000070+7FB8EBBB5516E5AD
+01:00000078+004AF72442612915
+01:00000080+3FC00000
+:$(01):00020000:00020084 :$(04):00004000:0000401C :$(05):00004400:0000440C 
+
+
+</pre>
+
+The third algorithm at line 31 has ColdFire syntax flags indicating that the inputs
+are respectively ColdFire word (16-bit integer) and and single (32-bit float). ColdFire
+floating instructions operate 64-bit float and carry out conversions on operand acquisition.
+
+<p>
+masmx expression syntax allows attribute text to follow a token before the next operator.
+The token is identified up to space or comma
+
+<p>
+Macro language has been written to recognise a pointer by unary *
+
+<p>
+To avoid confusion with multiply operator, the pointer reference is shielded in parentheses
+
+<p>
+The fourth algorithm at line 34 has any tokens with attribute [ b w l s d ] in parentheses,
+because this may be easier to read
+
+<p>
+A function name $ieee64 will be prepended to any constants on line 32. ColdFire floating
+instructions have neither immediate operands, nor operands in directly addressed storage
+
+<p>
+Floating operands are possible at an address offset from a0..a7 or from the program counter
+at (instruction + 2)
+
+<p>
+Two 64-bit ieee754 floating numbers can be seen at address (fp_routine + 0x0070).
+They are the constants 1.75*+307 and 3.0*-307 in the algorithm at line 27, where
+they are referenced aa (instruction @ 0x000A + 2 + 0x0064) and
+(instruction @ 0x0016 + 2 + 0x0060)
+
+<p>
+A 32-bit ieee754 floating number can be seen at address (fp_routine + 0x0080).
+That is the constant 1.5 in the algorithm at line 32, where it is referenced as
+(instruction @ 0x005A + 2 + 0x0024)
+
+<p>
+ColdFire integer/floating conversions carried out within the floating instruction
+are clearly there to be used and much faster than any conversion routines in software
+
+<p>
+masmx and <b>$xqt_fp</b> support all architectures. The inclusion of conversion
+routine calls in floating algorithms is supported in the same way as the indicative
+flags like [ b w l s d ] 
+
+<p>
+It is not easy to have an integer longer that 32 bits on ColdFire, and even harder
+to convert it to ieee754 64-bit. This may be one reason why ColdFire can add 8-bit
+integers to 64-bit floating numbers. The ASCII string can be converted to floating
+without an interim conversion to long long integer. That does not of course have
+a direct hardware assist. This is how <b>$xqt_fp</b> organises the call
+
 
 <p>
 masmx decides whether a token is a self-evident value or a variable reference
@@ -5852,14 +5914,6 @@ bucket	$equf	4096
 
 </pre>
 would cause a storage reference
-
-<p>
-In RTA1 the supporting macro language in <b>fpxpress.def</b> and <b>i_xpress.def</b> potentially
-uses all of <b>[r k x y a b mantissa2 mantissa3 8 9 10 11 d$save d$save1 d$save2 d$ave3]</b>
-
-<p>
-Register variables in in macro constructs <b>params() scalars()</b> and external stack names in
-<b> xframe()</b> are <b>$equf</b> labels and therefore referenced as variables
 
 <p>
 In this assembly <b>FACTOR</b> has been generated as a constant (visible at
@@ -7444,25 +7498,29 @@ items three or more words in size. The default for a single floating-point
 word is 8 bits and for a double 12:
 <pre>
 
-MASMX/-240 1r1X
-hflo.msm 5
-*EOF*  :                        1:         $word   32
-  :                        2:         $quantum 8
-  :                        3:         $awidth 32
-  :                        4:         $floating_point 32
-00:00000000 41C00000      +5         1.5
-00:00000004 401C000000000000+6         1.5d
-00:0000000C 400001C00000000000000000+7         1.5t
+$ masmx hflo -lnky
+MASMX 7r3
+3/hflo.msm
+*EOF*
+  :                            1         $word   32
+  :                            2         $quantum 8
+  :                            3         $awidth 32
+  :                            4         $floating_point 32
+00:00000000 41C00000          +5         +1.5
+00:00000004 401C000000000000  +6         +1.5d
+00:0000000C 400001C00000000000000000
+                              +7         +0.15t*+1
 00:00000018 400001C0000000000000000000000000
-			 +8         1.5q
+                              +8         +15:q*-1
 00:00000028 400001C000000000000000000000000000000000
-			 +9         1.5p
-00:0000003C 400001C00000000000000000000000000000000000000000
-			 +10         1.5h
+                              +9         +1.5p
+00:0000003C BFFFFE3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                              +10         -1.5h
+Note: hflo.msm Line 11: floating number is maximum words
 00:00000054 400001C00000000000000000000000000000000000000000
-			 +11         1.5o
-*EOF*:$(00):0000006C 
-Object Code 246 Bytes: 0 Errors: 0 Undefined Labels
+                              +11         +1.5o
+*EOF*
+:$(00):00000000:0000006C 
 
 </pre>
 <p>
@@ -7474,9 +7532,11 @@ Octawords may be generated when $WORD is 24 or less.
 Floating point items are not auto-sized like integers.
 
 <p>
-Floating point items are the default $FLOATING_POINT size, 
-or the size selected with the trailing letter: 
+Floating point items are the default <b>$floating_point§</b> size, 
+or a words-size after the mantissa and before any scale
 <pre>
+
+	+(MANTISSA)[s d l t q p h o][{*+|*-}SCALE]
 
 	S for single (one word)
 	D or L for double 
@@ -7489,27 +7549,25 @@ or the size selected with the trailing letter:
 </pre>
 <p>
 These trailing letters may be upper or lower case and may have a
-colon before them:
+colon before them or parenthesis or quote
 <pre>
 
-	67.5:t
+	67.5t
+
+	+MANTISSA:q*+1200000
+
+	+(MANTISSA)p*+800
+
+	+	20*"MANTISSA"d*+307
 
 </pre>
-<p>
-Because only decimal digits, signs, a period and a characteristic
-operator (*+ *- e e+ e- E E+ E-) may appear in an input string
-for floating point, and neither hex nor labels may appear there, 
-it is safe to use the trailing D without a colon for a two-word 
-floating point item:
-<pre>
+Period may only appear in a decimal digit string. Where period
+appears the scale notation [ e e+ e- E E+ E- ] can be typed in
+place of the masmx scale operator <b>*+</b> or <b>*-</b>
 
-	1.75*+200d
-
-</pre>
 <p>
-The period is optional, but if it is absent, only the *+ or *-
-operator (and not the E E+ E-) will inform the assembler that
-the item is floating point.
+Where period does not appear, only <b>*+</b> or <b>*-</b> scale
+operator and not [ e e+ e- E E+ E- ] indicates a floating point number.
 
 <p>
 To generate floating values using every type of expression token,
@@ -8456,58 +8514,59 @@ item (command code + - ^) has a decimal point or a scale operator
 <pre>
 
 	+	1.9
-	-	20*+1200000
-	+	1.37*-800000
+	-	MANTISSA*+1200000
+	+	1.37*-SCALE
 
 </pre>
 <p>
-Automatic floating-point numbers have an all-fractional mantissa with no
-integral part whether hidden or represented.
+masmx internal floating-point numbers have an all-fractional mantissa with no
+integral part whether hidden or represented. The value can be converted to
+constants in other formats
 
 <p>
 Exponent is midpointed.
 
 <p>
 Negative polarity is represented by the entire item in 1-s complement.
-
-<p>
-Sign-bit indicates that all bits are inverted.
+Sign-bit 1 indicates that all bits are inverted.
 
 <p>
 This is not IEEE 754 format. That is supported with macros.
-See Section 1.5: Any floating-point format.
+See Section 1.5: Any floating-point format, Section 10: ieee754
+
 
 <p>
-Word size is 32 bits in the following assembly.
+Octaword on line 11 with 32-bit <b>$word</b> generates 192 bits the same as hexaword.
+Numbers in masmx are not larger than 192 bits.
 
 <p>
-Octaword at 32 bits generates 192 bits the same as hexaword. Numbers
-aren't larger than 192 bits.
-
-<p>
-Exponent syntax e E e+ E+ e- E- is only detected if a
-decimal point has been encountered in a digit string
+Scale expression beginning [ e E e+ E+ e- E- ] is only detected in
+an all-decimal string containing a decimal point
 <pre>
 
-MASMX/-240 1r1X
-hflo.msm 5
-*EOF*  :                        1:         $word   32
-  :                        2:         $quantum 8
-  :                        3:         $awidth 32
-  :                        4:         $floating_point 32
-00:00000000 41C00000      +5         +1.5
-00:00000004 401C000000000000+6         +1.5d
-00:0000000C 400001C00000000000000000+7         +0.15*+1t
+$ masmx hflo -lnky
+MASMX 7r3
+3/hflo.msm
+*EOF*
+  :                            1         $word   32
+  :                            2         $quantum 8
+  :                            3         $awidth 32
+  :                            4         $floating_point 32
+00:00000000 41C00000          +5         +1.5
+00:00000004 401C000000000000  +6         +1.5d
+00:0000000C 400001C00000000000000000
+                              +7         +0.15t*+1
 00:00000018 400001C0000000000000000000000000
-			 +8         +15*-1q
+                              +8         +15:q*-1
 00:00000028 400001C000000000000000000000000000000000
-			 +9         +1.5p
+                              +9         +1.5p
 00:0000003C BFFFFE3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-			 +10         -1.5h
+                              +10         -1.5h
+Note: hflo.msm Line 11: floating number is maximum words
 00:00000054 400001C00000000000000000000000000000000000000000
-			 +11         +1.5o
-*EOF*:$(00):00000000:0000006C 
-Object Code 275 Bytes: 0 Errors: 0 Undefined Labels
+                              +11         +1.5o
+*EOF*
+:$(00):00000000:0000006C 
 
 </pre>
 <p>
