@@ -2,8 +2,10 @@
 as at WE 5 June 2015
 ____________________
 
-$do tag is now re-separated from location counter, checked in an
+$do tag is now re-separated from location counter, checked in and
 on 20150601.bku. All tests passed on plaform osx.x86
+
+Not built for other platforms or in zipped binaries
 
 noticed or remembered
 
@@ -33,7 +35,7 @@ noticed or remembered
 		$endif
 	$endif
 
-	It's not noticed my masmx and all subsequent conditions behave as if they were
+	It's not noticed by masmx and all subsequent conditions behave as if they were
 	all true at once (you take every yes in a row of $elseif)
 
 	It's not easy to see what you've done and maybe should be fixed
