@@ -1,0 +1,42 @@
+
+as at WE 5 June 2015
+____________________
+
+$do tag is now re-separated from location counter, checked in an
+on 20150601.bku. All tests passed on plaform osx.x86
+
+noticed or remembered
+
+1	If you place a macro parameter in the command position to execute or expand it
+
+		p(2, 1)
+
+	You can't have spaces in it like that, because masmx assemble isn't clever
+	about parentheses at that point. You must do
+
+		p(2,1)
+
+	or you get a error which is hard to understand as it tries to swallow space
+	as a subfunction
+
+	might be worth the change
+
+
+2	if you are dumb and do
+
+	$if
+
+	$else
+
+		$elseif	. this should be $if
+
+		$endif
+	$endif
+
+	It's not noticed my masmx and all subsequent conditions behave as if they were
+	all true at once (you take every yes in a row of $elseif)
+
+	It's not easy to see what you've done and maybe should be fixed
+
+	It's already fixed if you don't have enough $endif
+	
