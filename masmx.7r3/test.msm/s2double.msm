@@ -9,8 +9,13 @@ $(0:262144,pc/$literal)
 
 s2double*
 	fmove.w		$literal(0), fp1
+s2dscanforit
 	moveq		#0, d0
 	move.b		(a0)+, d0
+	beq		(eostringx).w
+	cmp.w		#' ', d0
+	beq		s2dscanforit
+
 	addi		#-'+', d0
 	beq.b		read_1st_digit
 	addi		#'+'-'-', d0
@@ -60,7 +65,7 @@ fraction
 	addi		#10, d0
 	bcc.b		eofraction
 
-	sub		#-1, scale_10
+	add		#-1, scale_10
 	fmul.w		$literal(10), fp1
 	fadd.b		d0, fp1
 	bra		fraction	
@@ -98,6 +103,7 @@ eostring			; use the decimal scale
 	cmpa		(a7)+, a0	; accidentally position independent
 	bpl.b		outrange
 	fmul.d		(a0), fp1
+eostringx
 	rts
 outrange
 	fmove.d		$literal(-1q), fp1

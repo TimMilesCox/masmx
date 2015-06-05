@@ -5737,68 +5737,12 @@ LISTP**		$set	LISTP-1
 
 </pre>
 
-<h2>6:2: Run-Time Floating Algorithm Plotter</h2>
+<h2>6.2: Run-Time Floating Algorithm Plotter</h2>
 
 <p>
 <b>$xqt_fp</b> includes constants as well as variables in expressions,
-but does not attempt assembly-time calculation of expression steps between floating
-constants
-
-<p>
-<b>$xqt_fp</b> concerns four-function arithmetic only
-
-<p>
-Here a simple algorithm with five inputs is executed in five instructions, including
-operand acquisition from storage
-<pre>
-
-
-$ masmx -ln r2xample.msm
-MASMX 7r3
-3/r2xample.msm
-*EOF*
-  :                            1 	$path		../def
-  :                            2: 	$include	rta.def
-  :                            3 	$path		../language
-  :                            4: 	$include	stack.def
-  :                            5: 	$include	fpxpress.def
-  :                            6 	$path
-  :                            7 $(0:0)
-  :                            8 
-00:000000 B60040              +9 floating_algorithm*  $vector fp_routine
-  :                            10 
-  :                            11 $(0:64)
-  :                            12 
-  :                            13 fp_routine 
-                                	$head_far	 params(one,	float		;
-                                				two,	float		;
-  :                            16 				three,	float)
-  :                            17 
-00:000040 4FF003              +18 	$xqt_fp		one*1.75*+1200000*two/3.0*-625000-three
-00:000041 770100              +18 
-00:000042 77F007              +18 
-00:000043 7F0104              +18 
-00:000044 6FF00B              +18 
-  :                            19 
-  :                            20 
-00:000045 3D0000              +21 	fret		0
-  :                            22 
-  :                            23 	$do		$<256,$(0:256)
-  :                            24 	
-*EOF*
-00:000100+7CD38BB7B396D7AA20B6E083
-00:000104+2051D5B8447B77478A23F5F7
-:$(00):000000:000108 
-r2xample.msm: object code 190 bytes: 0 errors: 0 undefined labels
-
-
-</pre>
-masmx has taken an expression with five operands and four operators, and
-turned it into a sequence of five instructions which deliver the four-word
-floating result of the operations in the result registers <b>a:b:mantissa2:mantissa3</b>
-
-<p>
-Three of these tokens are identifiers whose content is only known at runtime
+but does not currently attempt assembly-time calculation of expression
+steps between floating constants
 
 <p>
 <b>$xqt_fp</b> directive scans an expression and calls macro code to write an
@@ -5806,20 +5750,303 @@ instruction plan. The tokens which are constants appear as literals at the foot
 of the program
 
 <p>
-A <b>#define</b> preprocess and masmx <b>$text</b> substitution are both usually
-absent in assembly for RTA1, but would not conflict
+<b>$xqt_fp</b> concerns four-function arithmetic only
 
 <p>
-masmx decides whether a token is a self-evident value or a variable reference
+<b>$xqt_fp</b> is demonstrated here with ColdFire architecture
+
+<p>
+The first simple algorithm has five inputs and is executed in five instructions, including
+operand acquisition from storage. Instructions follow masmx precedence order. Three of the
+five tokens are identifiers whose content is only known at runtime
+
+<p>
+The second algorith has a mixture of register, storage and pointer inputs
+<pre>
+
+$ ~/masmx -lnky r2xample.msm 
+MASMX 7r3
+3/r2xample.msm
+CONT_CHAR=|
+LTERM=;
+STERM=.
+*EOF*
+  :                            1 
+  :                            2 	$path		../smaragd.68k
+  :                            3: 	$include	coldfire.def
+  :                            4: 	$include	express.def
+  :                            5: 	$include	fpxpress.def
+  :                            6 	$path
+  :                            7: 	$include	espresso.def
+  :                            8: 	$include	ieee754.def
+  :                            9 
+  :                            10 $(4:16384,a5/$literal)
+  :                            11 
+  :                            12 one	$res	8
+  :                            13 two	$res	8
+  :                            14 three	$res	8
+  :                            15 
+  :                            16 westward $res	2
+  :                            17 ho	$res	2
+  :                            18 
+  :                            19 $(5:16384+1024)
+  :                            20 rastore	$res	8
+  :                            21 rapointer $res	4
+  :                            22 
+  :                            23 $(1:131072,pc/$azlit)
+  :                            24 
+  :                            25 fp_routine
+01:00000000 4BF84000          +26 	lea		$a(one), a5
+01:00000004 F22D54000000      +27 	$xqt_fp,$ieee64	one*1.75*+307*two/3.0*-307-three
+01:0000000A F23A54230064      +27 
+01:00000010 F22D54230008      +27 
+01:00000016 F23A54200060      +27 
+01:0000001C F22D54280010      +27 
+  :                            28 
+01:00000022 F21B5400          +29 	$xqt_fp		d5+fp6+a2@+"-(a4)"+"a3@+"*(*rapointer)/rastore
+01:00000026 20784408          +29 
+01:0000002A F2105423          +29 
+01:0000002E 41F84400          +29 
+01:00000032 F2105420          +29 
+01:00000036 F2055422          +29 
+01:0000003A F2001822          +29 
+01:0000003E F2125422          +29 
+01:00000042 F2245422          +29 
+  :                            30 
+01:00000046 F22D5000001A      +31 	$xqt_fp		westward w+ho w*(*rapointer s)
+01:0000004C 20784408          +31 
+01:00000050 F2104423          +31 
+01:00000054 F22D50220018      +31 
+01:0000005A F23A54000024      +32 	$xqt_fp,$ieee64	(westward w)+(1.5 s)*(*rapointer s)
+01:00000060 20784408          +32 
+01:00000064 F2104423          +32 
+01:00000068 F22D50220018      +32 
+01:0000006E 4E75              +33 	rts
+*EOF*
+01:00000070+7FB8EBBB5516E5AD
+01:00000078+004AF72442612915
+01:00000080+3FC00000
+:$(01):00020000:00020084 :$(04):00004000:0000401C :$(05):00004400:0000440C 
+
+
+</pre>
+
+The third algorithm at line 31 has ColdFire syntax flags indicating that the inputs
+are respectively ColdFire word (16-bit integer) and and single (32-bit float). ColdFire
+floating instructions operate 64-bit float and carry out conversions on operand acquisition.
+
+<p>
+masmx expression syntax allows attribute text to follow a token before the next operator.
+The token name or value is scanned until space or comma
+
+<p>
+Macro language has been written to recognise a pointer by unary *
+
+<p>
+To avoid confusion with multiply operator, the pointer reference is shielded in parentheses
+
+<p>
+The fourth algorithm at line 34 has any tokens with attribute [ b w l s d ] in parentheses,
+because this may be easier to read
+
+<p>
+<b>xqt_fp</b> has already placed all constants in the expression within parentheses.
+Some target definitions use the parenthesised arguments directly as automatic literals,
+but this is not appropriate for ColdFire, because accepted assembly syntax has many
+operands which are not literals in parentheses. Automatic literals are not opted for
+ColdFire, but <b>xqt_fp</b> prepends a literal pool tag or a function macro name from
+its subfunction field to constants
+
+<p>
+A function name $ieee64 will be prepended to any constants on line 32. ColdFire floating
+instructions have neither immediate operands, nor operands in directly addressed storage
+
+<p>
+Floating operands are possible at an address offset from a0..a7 or from the program counter
+at (instruction + 2)
+
+<p>
+Two 64-bit ieee754 floating numbers can be seen at address (fp_routine + 0x0070).
+They are the constants 1.75*+307 and 3.0*-307 in the algorithm at line 27, where
+they are referenced aa (instruction @ 0x000A + 2 + 0x0064) and
+(instruction @ 0x0016 + 2 + 0x0060)
+
+<p>
+A 32-bit ieee754 floating number can be seen at address (fp_routine + 0x0080).
+That is the constant 1.5 in the algorithm at line 32, where it is referenced as
+(instruction @ 0x005A + 2 + 0x0024)
+
+<p>
+ColdFire integer/floating conversions carried out within the floating instruction
+are clearly there to be used and much faster than any conversion routines in software
+
+<p>
+masmx and <b>$xqt_fp</b> support all architectures. The inclusion of conversion
+routine calls in floating algorithms is supported in the same way as the indicative
+flags like [ b w l s d ] 
+
+<p>
+It is not easy to have an integer longer that 32 bits on ColdFire, and even harder
+to convert it to ieee754 64-bit. This may be one reason why ColdFire can add 8-bit
+integers to 64-bit floating numbers. The ASCII string can be converted to floating
+without an interim conversion to long long integer. That does not of course have
+a direct hardware assist
+<pre>
+
+$ masmx -lnky r3xample.msm
+MASMX 7r3
+3/r3xample.msm
+CONT_CHAR=|
+LTERM=;
+STERM=.
+*EOF*
+  :                            1 	$path		../smaragd.68k
+  :                            2: 	$include	coldfire.def
+  :                            3: 	$include	express.def
+  :                            4: 	$include	fpxpress.def
+  :                            5 	$path
+  :                            6: 	$include	espresso.def
+  :                            7: 	$include	ieee754.def
+  :                            8 
+  :                            9 $(4:16384,a5/$literal)
+  :                            10 
+  :                            11 one	$res	8
+  :                            12 two	$res	8
+  :                            13 three	$res	8
+  :                            14 
+  :                            15 westward $res	2
+  :                            16 ho	$res	2
+  :                            17 
+  :                            18 $(5:16384+1024)
+  :                            19 rastore	$res	8
+  :                            20 rapointer $res	4
+  :                            21 
+  :                            22 $(1:131072,pc/$azlit)
+01:00000000 3A7C4000          +23 	movea.w	#$a(one), a5
+  :                            24 
+01:00000004 F22D54000010      +25 	$xqt_fp	one-two+three*(*rapointer floating_string)
+01:0000000A 20784408          +25 
+[+0000]20
+01:0000000E 4EB900000000      +25 
+01:00000014 F2000423          +25 
+01:00000018 F22D54220000      +25 
+01:0000001E F22D54280008      +25 
+  :                            26 
+*EOF*
+:$(01):00020000:00020024 :$(04):00004000:0000401C :$(05):00004400:0000440C 
+
+
+</pre>
+A string pointer is associated with a macro floating_string, which will call a
+subroutine conversion and presents the resulting 64-bit floating value to the
+algorithm instruction stream. This is how most conversions are carried out on
+architectures with fewer hardware assists than ColdFire
+
+<p>
+The external subroutine call is seen at location 0x000E of the instruction stream
+and has this appearance in text-encoded binary output
+<pre>
+
+$01:00020000
+3A7C4000 F22D54000010 20784408 [0000]20:4EB900000000 F2000423
+F22D54220000 F22D54280008
+-s2double:[0000]
+:$01*00000000:00020000:00020024
+:$04*00000000:00004000:0000401C
+:$05*00000000:00004400:0000440C
+
+</pre>
+The fourth instruction calls external routine s2double. A link
+request tuple awaits its address for addition to the instruction
+address field bits 31..0
+
+<b>$xqt_fp</b> and ColdFire-specific macro code organise the call with these
+two macros
+
+<pre>
+
+IEEE754_64_ACQUIRE$ $equ 1111
+
+p       $proc
+FOP*    $name
+"$TYPE" $set    $t(p(1, 1))
+"$RING" $set    0
+        $do     p()>1,  $do     $t(p(2, 1))=$name,"$RING"       $set    p(2, 1)
+        $if     $RING=IEEE754_64_ACQUIRE$
+        p(2,1)  p(1)
+"$FOP"* $equ,$fp_reg    fp1
+        $elseif $t(p(1, 1))=$fp_reg
+"$FOP"* $equ,$fp_reg    p(1, 1)
+        $elseif $t(p(1, 1))=$d_reg
+"$FOP"* $equ,$d_reg     p(1, 1)
+        $elseif $t(p(1, 1))=$a_reg
+        $flag   sending register may not be a0..a7
+        $elseif ($t(p(1, 1))=$a_reg_@)++|
+                ($t(p(1, 1))="$a_reg_@+")++|
+                ($t(p(1, 1))="$a_reg_@-")
+"$FOP"* $equ,$TYPE      p(1, 1)
+        $elseif $t(p(1, 1))=127
+        $if     p(1, *1)
+        move    p(1, 1), a0
+        $else
+        lea     p(1, 1), a0
+        $endif
+"$FOP"* $equ,$a_reg_@   a0
+        $elseif $inside\p(1, 1)=2
+"$FOP"* $equf   $inside\p(1, 1), $base_a\p(1, 1)
+        $elseif $itype\p(1, 1)="$a_reg"
+"$FOP"* $equf   p(1, 1), $ibase\p(1, 1)
+        $elseif $t(p(1, 1))=$equf
+"$FOP"* $equf   p(1, 1), p(1, 2)
+        $else
+"$UP"*  $equf   p()
+"$FOP"* $equf   $UP
+        $do     $o('V'),        $trace  $FOP
+        $do     $o('V'),        $trace  $FOP\2
+        $endif
+        $end
+
+p       $proc
+floating_string* $name  IEEE754_64_ACQUIRE$
+        $do     $o('V'),        $note   call s2double
+        $if     p(1, *1)
+        movea   p(1, 1), a0
+        $else
+        lea     p(1, 1), a0
+        $endif
+        jsr     (s2double).l
+        $end
+
+</pre>
+
+The first part of the first macro examines
+
+	<blockquote>
+	is the attribute label a $name as macros export them?<br><br>
+
+	is the latent value of that name a ring number arbitrarily designated for subroutine conversions?<br><br>
+
+	if so, assemble the macro and expect the 64-bit floating value to return in floating register fp1
+	</blockquote>
+
+The macro floating_string places the string pointer in a0 and calls s2double
+
+<p>
+s2double is shown among examples of masmx macro-language for ColdFire instruction code at Appendix F.3
+
+
+<p>
+masmx decides whether a token is a self-evident value or a storage reference
 by these rules
 
 	<blockquote>
 	a field of digits is a value<br><br>
-	a label on a line where a storage value is, is a location<br><br>
+	a label on a line describing storage is a location<br><br>
 	a label equated or set to digits is a value<br><br>
 	a label equated or set to a storage label or to a location counter is a location<br><br>
 	a label equated or set to another label is what that label is<br><br>
-	a <b>$equf</b> label is a location
+	a <b>$equf</b> label is a location<br><br>
+	a label with a category 128..255 assigned by the developer is a location, typically a register
 	</blockquote>
 
 Therefore a construction
@@ -5838,14 +6065,6 @@ bucket	$equf	4096
 
 </pre>
 would cause a storage reference
-
-<p>
-In RTA1 the supporting macro language in <b>fpxpress.def</b> and <b>i_xpress.def</b> potentially
-uses all of <b>[r k x y a b mantissa2 mantissa3 8 9 10 11 d$save d$save1 d$save2 d$ave3]</b>
-
-<p>
-Register variables in in macro constructs <b>params() scalars()</b> and external stack names in
-<b> xframe()</b> are <b>$equf</b> labels and therefore referenced as variables
 
 <p>
 In this assembly <b>FACTOR</b> has been generated as a constant (visible at
@@ -17271,7 +17490,134 @@ do not wish to build it from this manual, contact masmx@gmx.ch
   
 <h2>F.3.1: ColdFire and 68000</h2>
 
-The next switches on listing at a few places in a kernel assembly
+ColdFire instruction encoding appears formidably intricate, but operand
+space may be viewed simply as a set of spaces tagged by the instruction
+mode field. Although this  outline is intended as conceptual, it coincides
+partly with instruction layout
+<pre>
+
+	 15				 5		 3		
+	_________________________________________________________________ _ _ _ _ _ _ _ _ _ _ _ _               _ _ _ _ _ _ _ _ _ _ _ _ _
+	|  instruction code / register	|      mode	|    register	|		address offset 16 or 32 bits or none		|
+	|_______________________________|_______________|_______________| _ _ _ _ _ _ _ _ _ _ _ _		_ _ _ _ _ _ _ _ _ _ _ _ |
+									|		16-bit encoding of double-index + 8-bit offset	|
+									| _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ |
+
+
+</pre>
+
+Instructions are one, two or three 16-bit words. masmx instruction macros call this function macro in common
+in order to determine operand space and address attributes like pointer register and presence or absence of
+an offset field. Registers have identifiable categories attached to their name
+
+<pre>
+
+f       $func
+$iform* $name
+        $do     $t(f(1, 1))=$d_reg,     $return 0++f(1, 1)*/3
+        $do     $t(f(1, 1))=$a_reg,     $return 1++f(1, 1)*/3
+        $do     $t("f(1, 1)")=$a_reg_@, $return 2++f(1, 1)*/3           ;       $ibase\f(1, 1)*/3
+        $do     $t("f(1, 1)")="$a_reg_@+",      $return 3++f(1, 1)*/3   ;       $ibase\f(1, 1)*/3
+        $do     $t("f(1, 1)")="$a_reg_@-",      $return 4++"f(1, 1)"*/3 ;       $ibase\f(1, 1)*/3
+        $do     $inside\f(1, 1)=2,      $do     $type2\f(1, 1:1)=$special_reg,  |
+                                        $do     $id2\f(1, 1)=pc,        $return 7++2*/3
+        $do     $inside\f(1, 1)=2,      $return 5++$base_a\f(1, 1)*/3
+        $do     $itype\f(1, 1)=$a_reg,  $return 5++$ibase\f(1, 1)*/3
+        $do     $inside\f(1, 1)=3,      $do     $type2\f(1, 1:1)=$special_reg,  |
+                                        $do     $id2\p(1, 1:1)=pc,      $return 7++3*/3
+        $do     $inside\f(1, 1)=3,      $return 6++$base_a\f(1, 1)*/3
+"$O"    $equ    f(1, 1)
+"$X"    $equ    f(1, 2)
+        $do     $o('V'),        $trace  $O
+        $do     $o('V'),        $trace  $X
+        $do     $X=pc,                                                  $return 7++2*/3
+        $do     $X^=0,                  $return 5++$X*/3
+
+        $do     f(1, #1),                                               $return 7++4*/3
+
+        $do     ($t(f(1, 1:2))=$special_reg)**(f(1, 1:2)=l)++|
+                ($net($O)<-32768)++|
+                ($net($O)>32767),                                       $return 7++1*/3
+
+                                                                        $return 7
+        $end
+
+
+</pre>
+
+Instructions which do not correspond to all operand types mark the assembly in error
+for any inappropriate operand
+
+<p>
+An instruction example which uses every possible operand type is <b>cmp</b> which this macro assembles
+<pre>
+
+p       $proc
+cmp.b*  $name   0
+cmp.w*  $name   1
+cmp.l*  $name   2
+cmp*    $name   cmp.w
+
+        $if     $t(p(1, 2))=$d_reg
+"$FO"   $set    $iform(p(1, 1))
+"$MO"   $set    $FO**7
+"$RO"   $set    $FO/*3
+
+        $if     ($MO=0)++($MO=1)++($MO=2)++($MO=3)++($MO=4)
+        $i_rr   11, p(1, 2), p(0, 0), $MO, $RO
+        $elseif $MO=5
+        $i_rm   11, p(1, 2), p(0, 0), 5, $RO, p(1, 1)
+        $elseif $MO=6
+        $i_rx   11, p(1, 2), p(0, 0), 6, $RO,           |
+                $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,  |
+                $displacement8\p(1, 1:1)
+        $elseif $FO=7
+        $i_rm   11, p(1, 2), p(0, 0), 7, 0, p(1, 1)
+        $elseif $FO=7++1*/3
+        $i_rl   11, p(1, 2), p(0, 0), 7, 1, p(1, 1)
+        $elseif $FO=7++4*/3
+          $if   p(0, 0)=cmp.l
+          $i_rl 11, p(1, 2), p(0, 0), 7, 4, p(1, 1)
+          $else
+          $i_rm 11, p(1, 2), p(0, 0), 7, 4, p(1, 1)
+          $endif
+        $elseif $FO=7++2*/3
+        $i_rm   11, p(1, 2), p(0, 0), 7, 2, p(1, 1)-$-2
+        $elseif $FO=7++3*/3
+        $i_rx   11, p(1, 2), p(0, 0), 7, 3,             |
+                $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,  |
+                $displacement8\p(1, 1:1)-$-2
+        $else
+        $flag   anomaly no operand style selected
+        $endif
+
+        $else
+        $flag   must be comparand,d0..d7
+        $endif
+        $end
+
+
+</pre>
+
+There are some commands <b>$i_rr $i_rm $i_rx $i_rl</b> and these are instruction layout <b>$form</b>  templates
+
+<pre>
+
+"$i_rr" $form   4, 3, 3, 3, 3
+"$i_rm" $form   4, 3, 3, 3, 3, 16
+"$i_rl" $form   4, 3, 3, 3, 3, 32
+"$i_rx" $form   4, 3, 3, 3, 3, 4, 3, 1, 8
+"$i_fp" $form   4, 3, 3, 3, 3, 3, 3, 3, 7
+"$i_fm" $form   4, 3, 3, 3, 3, 3, 3, 3, 7, 16
+"$i_mq" $form   4, 3, 1, 8
+
+"$b_cs" $form   8, 8
+"$b_cl" $form   8, 8, 16
+
+</pre>
+
+
+The following example switches on listing at a few places in a kernel assembly
 for ColdFire. It illustrates
 
 	<blockquote>

@@ -22,5 +22,5 @@ rapointer $res	4
 $(1:131072,pc/$azlit)
 	movea.w	#$a(one), a5
 
-	$xqt_fp	one*(*rapointer floating_string)+two-three
+	$xqt_fp	one-two+three*(*rapointer floating_string)
 
