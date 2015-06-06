@@ -160,7 +160,7 @@ next	move	a1, a0
 	move	a2, tcb.h.next(a0)
 
 	tst	tcb.h.state(a2)
-	bpl	not_last
+	bpl	not_last	$8_bits
 	move	a0, tcb.h.base(a2)
 not_last
 	$list	1

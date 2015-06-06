@@ -5115,7 +5115,11 @@ static void newdecide(char *arg, char *param)
    int				 mask, unmask;
    
    
-   if (!ifdepth) return;
+   if (!ifdepth)
+   {
+      flag("$elseif not in scope of $if");
+      return;
+   }
    
    mask = 1 << ifdepth;
 
@@ -5152,6 +5156,7 @@ static void swap()
 
    if (!ifdepth)
    {
+     flag("$else not in scope of $if");
      skipping = 0;
      return;
    }
@@ -5174,6 +5179,7 @@ static void resume()
 {
    if (ifdepth < 0) ifdepth = 0;
    if (ifdepth)     ifdepth--;
+   else note("$endif not in scope of $if");
 
    if (ifdepth) skipping = (skipstate >> ifdepth) & 1;
    else         
