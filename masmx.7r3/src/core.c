@@ -843,17 +843,23 @@ static long rfunction(int v,
 static int meaning(char *directive)
 {
    object		*sr;
+   int			 symbol = *directive;
    
-   if ((*directive == '+')
-   ||  (*directive == '-')
-   ||  (*directive == '^')
-   ||  (*directive == qchar)) return -1;
-   
+   if ((symbol == '+')
+   ||  (symbol == '-')
+   ||  (symbol == '^')
+   ||  (symbol == qchar)) return -1;
+
    sr = findlabel(directive, NULL);
    
-   if ((sr) && (  (sr->l.valued == DIRECTIVE)
-	       || (sr->l.valued == EQU)  
-	       || (sr->l.valued == SET))) return sr->l.value.b[RADIX/8-1];
+   if (sr)
+   {
+      symbol = sr->l.valued;
+
+      if ((symbol == DIRECTIVE)
+      ||  (symbol == EQU)  
+      ||  (symbol == SET)) return sr->l.value.b[RADIX/8-1];
+   }
 
    return -1;
 }
@@ -4939,9 +4945,7 @@ static void embed_procedure(int type, char *line, char *argument)
          
       directive = getop(slipline);
       j = TEXT_IMAGE;
-         
       if (directive) j = meaning(directive);
-         
       if (j ==     PROC) nest++;
       if (j == FUNCTION) nest++;
       if (j ==      END) nest--;
