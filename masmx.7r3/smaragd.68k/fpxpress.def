@@ -9,13 +9,15 @@ FPOP		$equ,$directive		$nop
 
 IEEE754_64_ACQUIRE$ $equ 1111
 
+	$plist	3
+
 p	$proc
 FOP*	$name
 "$TYPE"	$set	$t(p(1, 1))
 "$RING"	$set	0
 	$do	p()>1,	$do	$t(p(2, 1))=$name,"$RING"	$set	p(2, 1)
 	$if	$RING=IEEE754_64_ACQUIRE$
-	p(2,1)	p(1)
+	p(2, 1)	p(1)
 "$FOP"*	$equ,$fp_reg	fp1
 	$elseif	$t(p(1, 1))=$fp_reg
 "$FOP"*	$equ,$fp_reg	p(1, 1)
@@ -47,6 +49,8 @@ FOP*	$name
 	$do	$o('V'),	$trace	$FOP\2
 	$endif
 	$end
+
+	$plist
 
 p	$proc
 floating_string* $name	IEEE754_64_ACQUIRE$

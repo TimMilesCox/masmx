@@ -519,7 +519,6 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz tally4 ..\test.zo3\tally4.txo -lo> ..\text.zo3\tally4.txt
 ..\masmz tarsub ..\test.zo3\tarsub.txo -lo> ..\text.zo3\tarsub.txt
 ..\masmz tcp_in ..\test.zo3\tcp_in.txo -lo> ..\text.zo3\tcp_in.txt
-..\masmz temp ..\test.zo3\temp.txo -lo> ..\text.zo3\temp.txt
 ..\masmz temper ..\test.zo3\temper.txo -lo> ..\text.zo3\temper.txt
 ..\masmz tempo ..\test.zo3\tempo.txo -lo> ..\text.zo3\tempo.txt
 ..\masmz term ..\test.zo3\term.txo -lo> ..\text.zo3\term.txt
@@ -674,4 +673,5 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz afar ..\test.zo3\afar -lok > ..\text.zo3\afar.txt
 ..\masmz meringue ..\test.zo3\meringue -lok > ..\text.zo3\meringue.txt
 ..\masmz s2double ..\test.zo3\s2double -lok > ..\text.zo3\s2double.txt
+..\masmz babble ..\test.zo3\babble -lok > ..\text.zo3\babble.txt
 

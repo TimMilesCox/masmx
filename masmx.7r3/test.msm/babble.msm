@@ -1,0 +1,17 @@
+p(2,1)	$equ,$directive	$exit
+p(,,,)	$equ	p(2, 1)
+p( 2, 2) $equ	3
+p(2, 3 ) $equ	6
+
+p	$proc
+ramjam*	$name
+	p(2, 1)	p(1, 1)
+	$end
+
+p	$proc
+prapsiple* $name
+	"p(1, 1)"
+	$end
+	
+	ramjam	whizzbang	prapsiple
+

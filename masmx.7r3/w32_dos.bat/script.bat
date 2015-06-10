@@ -524,7 +524,6 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx tally4 ..\test.o3\tally4.txo -loy > ..\text.o3\tally4.txt
 ..\masmx tarsub ..\test.o3\tarsub.txo -loy > ..\text.o3\tarsub.txt
 ..\masmx tcp_in ..\test.o3\tcp_in.txo -loy > ..\text.o3\tcp_in.txt
-..\masmx temp ..\test.o3\temp.txo -loy > ..\text.o3\temp.txt
 ..\masmx temper ..\test.o3\temper.txo -loy > ..\text.o3\temper.txt
 ..\masmx tempo ..\test.o3\tempo.txo -loy > ..\text.o3\tempo.txt
 ..\masmx term ..\test.o3\term.txo -loy > ..\text.o3\term.txt
@@ -685,6 +684,8 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx boolean ..\test.o3\boolean -lyok > ..\text.o3\boolean.txt
 ..\masmx brin ..\test.o3\brin -lyok > ..\text.o3\brin.txt
 ..\masmx s2double ..\test.o3\s2double -lyok > ..\text.o3\s2double.txt
+..\masmx r3xample ..\test.o3\r3xample -lyok > ..\text.o3\r3xample.txt
+..\masmx babble ..\test.o3\babble -lyok > ..\text.o3\babble.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

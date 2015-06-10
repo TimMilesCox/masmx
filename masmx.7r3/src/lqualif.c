@@ -21,6 +21,7 @@ static int load_qualifier()
 
       limit = first_at(s, ",)");
       
+      while (*s == ' ') s++;
       x = expression(s, limit, NULL);
       v = x;
 
