@@ -23,6 +23,22 @@ noticed or remembered
 
 	might be worth the change
 
+	Fixed 10.06.2015
+	________________
+
+	it wasn't a subfunction issue
+
+	on the 2nd pass it was scanning macro text for a 2nd time
+	and needed to keep track of nested depth
+	and so had to detect $proc / $func ... $end
+	and so had to scan for a directive label in the command position
+	and so had to look up for a label
+	and scanned the parameter paraform as it were a label with 2 subscripts
+	(because it was scanning source a second time, not encoded source)
+	and the fix was to allow space after comma in label subscripts
+	as in paraforms
+	
+
 
 2	if you are dumb and do
 
@@ -41,4 +57,15 @@ noticed or remembered
 	It's not easy to see what you've done and maybe should be fixed
 
 	It's already fixed if you don't have enough $endif
+
+
+	Fixed 08.06.2015
+	________________
+
+
+	with a remark if you $endif without any $if in force
+	and an error flag if you $elseif or $else without any $if in force
+
+	This makes it easier to see where the source doesn't quite make sense
+
 	
