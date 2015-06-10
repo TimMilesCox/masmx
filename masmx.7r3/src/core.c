@@ -854,11 +854,7 @@ static int meaning(char *directive)
    
    if (sr)
    {
-      symbol = sr->l.valued;
-
-      if ((symbol == DIRECTIVE)
-      ||  (symbol == EQU)  
-      ||  (symbol == SET)) return sr->l.value.b[RADIX/8-1];
+      if (sr->l.valued == DIRECTIVE) return sr->l.value.b[RADIX/8-1];
    }
 
    return -1;
