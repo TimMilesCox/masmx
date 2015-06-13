@@ -4953,462 +4953,566 @@ In this example stem(*):left and stem(*):right are pictures of the same
 storage:
 <pre>
 
-MASMX 7r2
+$ masmx -lnkx complex
+MASMX 7r3
 3/complex.msm
 *EOF*
-  :                            1        $word   32
+  :                            1 	$word	32
   :                            2 
-  :                            3 p      $proc
-  :                            4 one*   $name
-  :                            5 *      $tree
-  :                            6 left   two1
-  :                            7 index  $do     6,spray(index)  two2
-  :                            8        $root
-  :                            9        $end
+  :                            3 p	$proc
+  :                            4 one*	$name
+  :                            5 *	$tree
+  :                            6 left	two1
+  :                            7 index	$do	6,spray(index)	two2
+  :                            8 	$root
+  :                            9 	$end
   :                            10 
-  :                            11 p     $proc
-  :                            12 two1* $name
-  :                            13 *     $branch
-  :                            14 index $do     4,bud(index)    three1
+  :                            11 p	$proc
+  :                            12 two1*	$name
+  :                            13 *	$branch
+  :                            14 index	$do	4,bud(index)	three1
   :                            15         $root
-  :                            16 right $branch
-  :                            17 cusp  three2
-  :                            18       $root
-  :                            19       $end
+  :                            16 right	$branch
+  :                            17 cusp	three2
+  :                            18 	$root
+  :                            19 	$end
   :                            20 
-  :                            21 two2* $proc
-  :                            22 *     $tree
-  :                            23 index $do     12,tendril(index)       +      24-index
-  :                            24       $root
-  :                            25       $end
+  :                            21 two2*	$proc
+  :                            22 *	$tree
+  :                            23 index	$do	12,tendril(index)	+	24-index
+  :                            24 	$root
+  :                            25 	$end
   :                            26 
-  :                            27 three1*       $proc
-  :                            28 *     $tree
-  :                            29 index $do     4,shoot(index)  +       100
-  :                            30       $root
-  :                            31       $end
+  :                            27 three1*	$proc
+  :                            28 *	$tree
+  :                            29 index	$do	4,shoot(index)	+	100
+  :                            30 	$root
+  :                            31 	$end
   :                            32 
-  :                            33 three2*       $proc
-  :                            34 *     $tree
-  :                            35 index $do     8,blossom(index)        -      100
-  :                            36       $root
-  :                            37       $end
+  :                            33 three2*	$proc
+  :                            34 *	$tree
+  :                            35 index	$do	8,blossom(index)	-	100
+  :                            36 	$root
+  :                            37 	$end
   :                            38 
   :                            39 $(2:02000)
-02:00002000 00000064          +40 index $do     3,stem(index)   one
+02:00002000 00000064          +40 index	$do	3,stem(index)	one
 02:00002001 00000064          +40 
 02:00002002 00000064          +40 
 
-........
+
+   . . . .   . . .
 
 02:00002106 0000000D          +40 
 02:00002107 0000000C          +40 
   :                            41 $(3:03000)
-03:00003000 00000003          +42       +       stem()
-  :                            43 first_high_index $set stem()
-03:00003001 00000003          +44       +       first_high_index
-03:00003002 000020B0          +45       +       stem(first_high_index)
-03:00003003 00000004          +46       +       stem(first_high_index):left:bud()
+03:00003000 00000003          +42 	+	stem()
+  :                            43 first_high_index $set	stem()
+03:00003001 00000003          +44 	+	first_high_index
+03:00003002 000020B0          +45 	+	stem(first_high_index)
+03:00003003 00000004          +46 	+	stem(first_high_index):left:bud()
   :                            47 second_high_index $set stem(first_high_index):left:bud()
-03:00003004 00000004          +48       +       second_high_index
-03:00003005 000020BC          +49       +       stem(first_high_index):left:bud(second_high_index)
+03:00003004 00000004          +48 	+	second_high_index
+03:00003005 000020BC          +49 	+	stem(first_high_index):left:bud(second_high_index)
   :                            50 
-03:00003006 00000004          +52       +       stem(first_high_index):left:bud(second_high_index):;
-                shoot()
+                                	+	stem(first_high_index):left:bud(second_high_index):;
+03:00003006 00000004          +52 		shoot()
   :                            53 
-  :                            56 third_high_index $set ;
-                stem(first_high_index):left:bud(second_high_index):;
-                shoot()
+                                third_high_index $set	;
+                                		stem(first_high_index):left:bud(second_high_index):;
+  :                            56 		shoot()
   :                            57 
-03:00003007 00000004          +58       +       third_high_index
+03:00003007 00000004          +58 	+	third_high_index
   :                            59 
-03:00003008 000020BF          +61       +       stem(first_high_index):left:bud(second_high_index):;
-                shoot(third_high_index)
+                                	+	stem(first_high_index):left:bud(second_high_index):;
+03:00003008 000020BF          +61 		shoot(third_high_index)
   :                            62 
-03:00003009 00000006          +63       +       stem(first_high_index):spray()
+03:00003009 00000006          +63 	+	stem(first_high_index):spray()
   :                            64 second_high_index $set stem(first_high_index):spray()
-03:0000300A 00000006          +65       +       second_high_index
-03:0000300B 000020FC          +66       +       stem(first_high_index):spray(second_high_index)
+03:0000300A 00000006          +65 	+	second_high_index
+03:0000300B 000020FC          +66 	+	stem(first_high_index):spray(second_high_index)
   :                            67 
-03:0000300C 0000000C          +68       +       stem(first_high_index):spray(second_high_index):tendril()
+03:0000300C 0000000C          +68 	+	stem(first_high_index):spray(second_high_index):tendril()
   :                            69 
-  :                            71 third_high_index $set ;
-                stem(first_high_index):spray(second_high_index):tendril()
+                                third_high_index $set	;
+  :                            71 		stem(first_high_index):spray(second_high_index):tendril()
   :                            72 
-03:0000300D 0000000C          +73       +       third_high_index
-03:0000300E 00002107          +75       +       ;
- stem(first_high_index):spray(second_high_index):tendril(third_high_index)
+03:0000300D 0000000C          +73 	+	third_high_index
+                                	+	;
+03:0000300E 00002107          +75  stem(first_high_index):spray(second_high_index):tendril(third_high_index)
   :                            76 
-03:0000300F 00000006          +77       +       stem(first_high_index):spray()
+03:0000300F 00000006          +77 	+	stem(first_high_index):spray()
   :                            78 second_high_index $set stem(first_high_index):spray()
-03:00003010 00000006          +79       +       second_high_index
+03:00003010 00000006          +79 	+	second_high_index
   :                            80 
-03:00003011 000020FC          +81       +       stem(first_high_index):spray(second_high_index)
-03:00003012 0000000C          +82       +       stem(first_high_index):spray(second_high_index):tendril()
+03:00003011 000020FC          +81 	+	stem(first_high_index):spray(second_high_index)
+03:00003012 0000000C          +82 	+	stem(first_high_index):spray(second_high_index):tendril()
   :                            83 
-  :                            85 third_high_index $set ;
-                stem(first_high_index):spray(second_high_index):tendril()
+                                third_high_index $set	;
+  :                            85 		stem(first_high_index):spray(second_high_index):tendril()
   :                            86 
-03:00003013 0000000C          +87       +       third_high_index
+03:00003013 0000000C          +87 	+	third_high_index
   :                            88 
 03:00003014 00002107          +89  + stem(first_high_index):spray(second_high_index):tendril(third_high_index)
   :                            90 
-03:00003015 00000008          +91       +       stem(first_high_index):right:cusp:blossom()
+03:00003015 00000008          +91 	+	stem(first_high_index):right:cusp:blossom()
   :                            92 second_high_index $set stem(first_high_index):right:cusp:blossom()
-03:00003016 00000008          +93       +       second_high_index
-03:00003017 000020B7          +94       + stem(first_high_index):right:cusp:blossom(second_high_index)
+03:00003016 00000008          +93 	+	second_high_index
+03:00003017 000020B7          +94 	+ stem(first_high_index):right:cusp:blossom(second_high_index)
 *EOF*
+one=:N129:P:0:00000000
+two1=:N129:P:0:00000000
+two2=:P1:0:00000002
+three1=:P1:0:00000003
+three2=:P1:0:00000004
+index=00000003
+stem(1)=$02:00002000
+stem(1):left=$02:00002000
+stem(1):left:bud(1)=$02:00002000
+stem(1):left:bud(1):shoot(1)=$02:00002000
+<div	style="font-size:5pt">
 
-.....
+stem(1):left:bud(1):shoot(2)=$02:00002001
+stem(1):left:bud(1):shoot(3)=$02:00002002
+stem(1):left:bud(1):shoot(4)=$02:00002003
+stem(1):left:bud(2)=$02:00002004
+stem(1):left:bud(2):shoot(1)=$02:00002004
+stem(1):left:bud(2):shoot(2)=$02:00002005
+stem(1):left:bud(2):shoot(3)=$02:00002006
+stem(1):left:bud(2):shoot(4)=$02:00002007
+stem(1):left:bud(3)=$02:00002008
+stem(1):left:bud(3):shoot(1)=$02:00002008
+stem(1):left:bud(3):shoot(2)=$02:00002009
+stem(1):left:bud(3):shoot(3)=$02:0000200A
+stem(1):left:bud(3):shoot(4)=$02:0000200B
+stem(1):left:bud(4)=$02:0000200C
+stem(1):left:bud(4):shoot(1)=$02:0000200C
+stem(1):left:bud(4):shoot(2)=$02:0000200D
+</div>
+stem(1):left:bud(4):shoot(3)=$02:0000200E
+stem(1):left:bud(4):shoot(4)=$02:0000200F
+stem(1):right=$02:00002000
+stem(1):right:cusp=$02:00002000
+stem(1):right:cusp:blossom(1)=$02:00002000
+stem(1):right:cusp:blossom(2)=$02:00002001
+stem(1):right:cusp:blossom(3)=$02:00002002
+stem(1):right:cusp:blossom(4)=$02:00002003
+stem(1):right:cusp:blossom(5)=$02:00002004
+stem(1):right:cusp:blossom(6)=$02:00002005
+stem(1):right:cusp:blossom(7)=$02:00002006
+stem(1):right:cusp:blossom(8)=$02:00002007
+stem(1):spray(1)=$02:00002010
+stem(1):spray(1):tendril(1)=$02:00002010
+stem(1):spray(1):tendril(2)=$02:00002011
+<div	style="font-size:5pt">
+stem(1):spray(1):tendril(3)=$02:00002012
+stem(1):spray(1):tendril(4)=$02:00002013
+stem(1):spray(1):tendril(5)=$02:00002014
+stem(1):spray(1):tendril(6)=$02:00002015
+stem(1):spray(1):tendril(7)=$02:00002016
+stem(1):spray(1):tendril(8)=$02:00002017
+stem(1):spray(1):tendril(9)=$02:00002018
+stem(1):spray(1):tendril(10)=$02:00002019
+stem(1):spray(1):tendril(11)=$02:0000201A
+stem(1):spray(1):tendril(12)=$02:0000201B
+stem(1):spray(2)=$02:0000201C
+stem(1):spray(2):tendril(1)=$02:0000201C
+stem(1):spray(2):tendril(2)=$02:0000201D
+stem(1):spray(2):tendril(3)=$02:0000201E
+stem(1):spray(2):tendril(4)=$02:0000201F
+stem(1):spray(2):tendril(5)=$02:00002020
+stem(1):spray(2):tendril(6)=$02:00002021
+stem(1):spray(2):tendril(7)=$02:00002022
+stem(1):spray(2):tendril(8)=$02:00002023
+stem(1):spray(2):tendril(9)=$02:00002024
+stem(1):spray(2):tendril(10)=$02:00002025
+stem(1):spray(2):tendril(11)=$02:00002026
+stem(1):spray(2):tendril(12)=$02:00002027
+stem(1):spray(3)=$02:00002028
+stem(1):spray(3):tendril(1)=$02:00002028
+stem(1):spray(3):tendril(2)=$02:00002029
+stem(1):spray(3):tendril(3)=$02:0000202A
+stem(1):spray(3):tendril(4)=$02:0000202B
+stem(1):spray(3):tendril(5)=$02:0000202C
+stem(1):spray(3):tendril(6)=$02:0000202D
+stem(1):spray(3):tendril(7)=$02:0000202E
+stem(1):spray(3):tendril(8)=$02:0000202F
+stem(1):spray(3):tendril(9)=$02:00002030
+stem(1):spray(3):tendril(10)=$02:00002031
+stem(1):spray(3):tendril(11)=$02:00002032
+stem(1):spray(3):tendril(12)=$02:00002033
+stem(1):spray(4)=$02:00002034
+stem(1):spray(4):tendril(1)=$02:00002034
+stem(1):spray(4):tendril(2)=$02:00002035
+stem(1):spray(4):tendril(3)=$02:00002036
+stem(1):spray(4):tendril(4)=$02:00002037
+stem(1):spray(4):tendril(5)=$02:00002038
+stem(1):spray(4):tendril(6)=$02:00002039
+stem(1):spray(4):tendril(7)=$02:0000203A
+stem(1):spray(4):tendril(8)=$02:0000203B
+stem(1):spray(4):tendril(9)=$02:0000203C
+stem(1):spray(4):tendril(10)=$02:0000203D
+stem(1):spray(4):tendril(11)=$02:0000203E
+stem(1):spray(4):tendril(12)=$02:0000203F
+stem(1):spray(5)=$02:00002040
+stem(1):spray(5):tendril(1)=$02:00002040
+stem(1):spray(5):tendril(2)=$02:00002041
+stem(1):spray(5):tendril(3)=$02:00002042
+stem(1):spray(5):tendril(4)=$02:00002043
+stem(1):spray(5):tendril(5)=$02:00002044
+stem(1):spray(5):tendril(6)=$02:00002045
+stem(1):spray(5):tendril(7)=$02:00002046
+stem(1):spray(5):tendril(8)=$02:00002047
+stem(1):spray(5):tendril(9)=$02:00002048
+stem(1):spray(5):tendril(10)=$02:00002049
+stem(1):spray(5):tendril(11)=$02:0000204A
+stem(1):spray(5):tendril(12)=$02:0000204B
+stem(1):spray(6)=$02:0000204C
+stem(1):spray(6):tendril(1)=$02:0000204C
+stem(1):spray(6):tendril(2)=$02:0000204D
+stem(1):spray(6):tendril(3)=$02:0000204E
+stem(1):spray(6):tendril(4)=$02:0000204F
+stem(1):spray(6):tendril(5)=$02:00002050
+stem(1):spray(6):tendril(6)=$02:00002051
+stem(1):spray(6):tendril(7)=$02:00002052
+stem(1):spray(6):tendril(8)=$02:00002053
+stem(1):spray(6):tendril(9)=$02:00002054
+stem(1):spray(6):tendril(10)=$02:00002055
+</div>
+stem(1):spray(6):tendril(11)=$02:00002056
+stem(1):spray(6):tendril(12)=$02:00002057
+stem(2)=$02:00002058
+stem(2):left=$02:00002058
+stem(2):left:bud(1)=$02:00002058
+stem(2):left:bud(1):shoot(1)=$02:00002058
+stem(2):left:bud(1):shoot(2)=$02:00002059
+<div	style="font-size:5pt">
 
-FIRST_HIGH_INDEX=00000003
-INDEX=00000003
-ONE=:N1:P:0:00000000
-SECOND_HIGH_INDEX=00000008
-STEM(1)=$02:00002000
-STEM(1):LEFT=$02:00002000
-STEM(1):LEFT:BUD(1)=$02:00002000
-STEM(1):LEFT:BUD(1):SHOOT(1)=$02:00002000
-STEM(1):LEFT:BUD(1):SHOOT(2)=$02:00002001
-STEM(1):LEFT:BUD(1):SHOOT(3)=$02:00002002
-STEM(1):LEFT:BUD(1):SHOOT(4)=$02:00002003
-STEM(1):LEFT:BUD(2)=$02:00002004
-STEM(1):LEFT:BUD(2):SHOOT(1)=$02:00002004
-STEM(1):LEFT:BUD(2):SHOOT(2)=$02:00002005
-STEM(1):LEFT:BUD(2):SHOOT(3)=$02:00002006
-STEM(1):LEFT:BUD(2):SHOOT(4)=$02:00002007
-STEM(1):LEFT:BUD(3)=$02:00002008
-STEM(1):LEFT:BUD(3):SHOOT(1)=$02:00002008
-STEM(1):LEFT:BUD(3):SHOOT(2)=$02:00002009
-STEM(1):LEFT:BUD(3):SHOOT(3)=$02:0000200A
-STEM(1):LEFT:BUD(3):SHOOT(4)=$02:0000200B
-STEM(1):LEFT:BUD(4)=$02:0000200C
-STEM(1):LEFT:BUD(4):SHOOT(1)=$02:0000200C
-STEM(1):LEFT:BUD(4):SHOOT(2)=$02:0000200D
-STEM(1):LEFT:BUD(4):SHOOT(3)=$02:0000200E
-STEM(1):LEFT:BUD(4):SHOOT(4)=$02:0000200F
-STEM(1):RIGHT=$02:00002000
-STEM(1):RIGHT:CUSP=$02:00002000
-STEM(1):RIGHT:CUSP:BLOSSOM(1)=$02:00002000
-STEM(1):RIGHT:CUSP:BLOSSOM(2)=$02:00002001
-STEM(1):RIGHT:CUSP:BLOSSOM(3)=$02:00002002
-STEM(1):RIGHT:CUSP:BLOSSOM(4)=$02:00002003
-STEM(1):RIGHT:CUSP:BLOSSOM(5)=$02:00002004
-STEM(1):RIGHT:CUSP:BLOSSOM(6)=$02:00002005
-STEM(1):RIGHT:CUSP:BLOSSOM(7)=$02:00002006
-STEM(1):RIGHT:CUSP:BLOSSOM(8)=$02:00002007
-STEM(1):SPRAY(1)=$02:00002010
-STEM(1):SPRAY(1):TENDRIL(1)=$02:00002010
-STEM(1):SPRAY(1):TENDRIL(2)=$02:00002011
-STEM(1):SPRAY(1):TENDRIL(3)=$02:00002012
-STEM(1):SPRAY(1):TENDRIL(4)=$02:00002013
-STEM(1):SPRAY(1):TENDRIL(5)=$02:00002014
-STEM(1):SPRAY(1):TENDRIL(6)=$02:00002015
-STEM(1):SPRAY(1):TENDRIL(7)=$02:00002016
-STEM(1):SPRAY(1):TENDRIL(8)=$02:00002017
-STEM(1):SPRAY(1):TENDRIL(9)=$02:00002018
-STEM(1):SPRAY(1):TENDRIL(10)=$02:00002019
-STEM(1):SPRAY(1):TENDRIL(11)=$02:0000201A
-STEM(1):SPRAY(1):TENDRIL(12)=$02:0000201B
-STEM(1):SPRAY(2)=$02:0000201C
-STEM(1):SPRAY(2):TENDRIL(1)=$02:0000201C
-STEM(1):SPRAY(2):TENDRIL(2)=$02:0000201D
-STEM(1):SPRAY(2):TENDRIL(3)=$02:0000201E
-STEM(1):SPRAY(2):TENDRIL(4)=$02:0000201F
-STEM(1):SPRAY(2):TENDRIL(5)=$02:00002020
-STEM(1):SPRAY(2):TENDRIL(6)=$02:00002021
-STEM(1):SPRAY(2):TENDRIL(7)=$02:00002022
-STEM(1):SPRAY(2):TENDRIL(8)=$02:00002023
-STEM(1):SPRAY(2):TENDRIL(9)=$02:00002024
-STEM(1):SPRAY(2):TENDRIL(10)=$02:00002025
-STEM(1):SPRAY(2):TENDRIL(11)=$02:00002026
-STEM(1):SPRAY(2):TENDRIL(12)=$02:00002027
-STEM(1):SPRAY(3)=$02:00002028
-STEM(1):SPRAY(3):TENDRIL(1)=$02:00002028
-STEM(1):SPRAY(3):TENDRIL(2)=$02:00002029
-STEM(1):SPRAY(3):TENDRIL(3)=$02:0000202A
-STEM(1):SPRAY(3):TENDRIL(4)=$02:0000202B
-STEM(1):SPRAY(3):TENDRIL(5)=$02:0000202C
-STEM(1):SPRAY(3):TENDRIL(6)=$02:0000202D
-STEM(1):SPRAY(3):TENDRIL(7)=$02:0000202E
-STEM(1):SPRAY(3):TENDRIL(8)=$02:0000202F
-STEM(1):SPRAY(3):TENDRIL(9)=$02:00002030
-STEM(1):SPRAY(3):TENDRIL(10)=$02:00002031
-STEM(1):SPRAY(3):TENDRIL(11)=$02:00002032
-STEM(1):SPRAY(3):TENDRIL(12)=$02:00002033
-STEM(1):SPRAY(4)=$02:00002034
-STEM(1):SPRAY(4):TENDRIL(1)=$02:00002034
-STEM(1):SPRAY(4):TENDRIL(2)=$02:00002035
-STEM(1):SPRAY(4):TENDRIL(3)=$02:00002036
-STEM(1):SPRAY(4):TENDRIL(4)=$02:00002037
-STEM(1):SPRAY(4):TENDRIL(5)=$02:00002038
-STEM(1):SPRAY(4):TENDRIL(6)=$02:00002039
-STEM(1):SPRAY(4):TENDRIL(7)=$02:0000203A
-STEM(1):SPRAY(4):TENDRIL(8)=$02:0000203B
-STEM(1):SPRAY(4):TENDRIL(9)=$02:0000203C
-STEM(1):SPRAY(4):TENDRIL(10)=$02:0000203D
-STEM(1):SPRAY(4):TENDRIL(11)=$02:0000203E
-STEM(1):SPRAY(4):TENDRIL(12)=$02:0000203F
-STEM(1):SPRAY(5)=$02:00002040
-STEM(1):SPRAY(5):TENDRIL(1)=$02:00002040
-STEM(1):SPRAY(5):TENDRIL(2)=$02:00002041
-STEM(1):SPRAY(5):TENDRIL(3)=$02:00002042
-STEM(1):SPRAY(5):TENDRIL(4)=$02:00002043
-STEM(1):SPRAY(5):TENDRIL(5)=$02:00002044
-STEM(1):SPRAY(5):TENDRIL(6)=$02:00002045
-STEM(1):SPRAY(5):TENDRIL(7)=$02:00002046
-STEM(1):SPRAY(5):TENDRIL(8)=$02:00002047
-STEM(1):SPRAY(5):TENDRIL(9)=$02:00002048
-STEM(1):SPRAY(5):TENDRIL(10)=$02:00002049
-STEM(1):SPRAY(5):TENDRIL(11)=$02:0000204A
-STEM(1):SPRAY(5):TENDRIL(12)=$02:0000204B
-STEM(1):SPRAY(6)=$02:0000204C
-STEM(1):SPRAY(6):TENDRIL(1)=$02:0000204C
-STEM(1):SPRAY(6):TENDRIL(2)=$02:0000204D
-STEM(1):SPRAY(6):TENDRIL(3)=$02:0000204E
-STEM(1):SPRAY(6):TENDRIL(4)=$02:0000204F
-STEM(1):SPRAY(6):TENDRIL(5)=$02:00002050
-STEM(1):SPRAY(6):TENDRIL(6)=$02:00002051
-STEM(1):SPRAY(6):TENDRIL(7)=$02:00002052
-STEM(1):SPRAY(6):TENDRIL(8)=$02:00002053
-STEM(1):SPRAY(6):TENDRIL(9)=$02:00002054
-STEM(1):SPRAY(6):TENDRIL(10)=$02:00002055
-STEM(1):SPRAY(6):TENDRIL(11)=$02:00002056
-STEM(1):SPRAY(6):TENDRIL(12)=$02:00002057
-STEM(2)=$02:00002058
-STEM(2):LEFT=$02:00002058
-STEM(2):LEFT:BUD(1)=$02:00002058
-STEM(2):LEFT:BUD(1):SHOOT(1)=$02:00002058
-STEM(2):LEFT:BUD(1):SHOOT(2)=$02:00002059
-STEM(2):LEFT:BUD(1):SHOOT(3)=$02:0000205A
-STEM(2):LEFT:BUD(1):SHOOT(4)=$02:0000205B
-STEM(2):LEFT:BUD(2)=$02:0000205C
-STEM(2):LEFT:BUD(2):SHOOT(1)=$02:0000205C
-STEM(2):LEFT:BUD(2):SHOOT(2)=$02:0000205D
-STEM(2):LEFT:BUD(2):SHOOT(3)=$02:0000205E
-STEM(2):LEFT:BUD(2):SHOOT(4)=$02:0000205F
-STEM(2):LEFT:BUD(3)=$02:00002060
-STEM(2):LEFT:BUD(3):SHOOT(1)=$02:00002060
-STEM(2):LEFT:BUD(3):SHOOT(2)=$02:00002061
-STEM(2):LEFT:BUD(3):SHOOT(3)=$02:00002062
-STEM(2):LEFT:BUD(3):SHOOT(4)=$02:00002063
-STEM(2):LEFT:BUD(4)=$02:00002064
-STEM(2):LEFT:BUD(4):SHOOT(1)=$02:00002064
-STEM(2):LEFT:BUD(4):SHOOT(2)=$02:00002065
-STEM(2):LEFT:BUD(4):SHOOT(3)=$02:00002066
-STEM(2):LEFT:BUD(4):SHOOT(4)=$02:00002067
-STEM(2):RIGHT=$02:00002058
-STEM(2):RIGHT:CUSP=$02:00002058
-STEM(2):RIGHT:CUSP:BLOSSOM(1)=$02:00002058
-STEM(2):RIGHT:CUSP:BLOSSOM(2)=$02:00002059
-STEM(2):RIGHT:CUSP:BLOSSOM(3)=$02:0000205A
-STEM(2):RIGHT:CUSP:BLOSSOM(4)=$02:0000205B
-STEM(2):RIGHT:CUSP:BLOSSOM(5)=$02:0000205C
-STEM(2):RIGHT:CUSP:BLOSSOM(6)=$02:0000205D
-STEM(2):RIGHT:CUSP:BLOSSOM(7)=$02:0000205E
-STEM(2):RIGHT:CUSP:BLOSSOM(8)=$02:0000205F
-STEM(2):SPRAY(1)=$02:00002068
-STEM(2):SPRAY(1):TENDRIL(1)=$02:00002068
-STEM(2):SPRAY(1):TENDRIL(2)=$02:00002069
-STEM(2):SPRAY(1):TENDRIL(3)=$02:0000206A
-STEM(2):SPRAY(1):TENDRIL(4)=$02:0000206B
-STEM(2):SPRAY(1):TENDRIL(5)=$02:0000206C
-STEM(2):SPRAY(1):TENDRIL(6)=$02:0000206D
-STEM(2):SPRAY(1):TENDRIL(7)=$02:0000206E
-STEM(2):SPRAY(1):TENDRIL(8)=$02:0000206F
-STEM(2):SPRAY(1):TENDRIL(9)=$02:00002070
-STEM(2):SPRAY(1):TENDRIL(10)=$02:00002071
-STEM(2):SPRAY(1):TENDRIL(11)=$02:00002072
-STEM(2):SPRAY(1):TENDRIL(12)=$02:00002073
-STEM(2):SPRAY(2)=$02:00002074
-STEM(2):SPRAY(2):TENDRIL(1)=$02:00002074
-STEM(2):SPRAY(2):TENDRIL(2)=$02:00002075
-STEM(2):SPRAY(2):TENDRIL(3)=$02:00002076
-STEM(2):SPRAY(2):TENDRIL(4)=$02:00002077
-STEM(2):SPRAY(2):TENDRIL(5)=$02:00002078
-STEM(2):SPRAY(2):TENDRIL(6)=$02:00002079
-STEM(2):SPRAY(2):TENDRIL(7)=$02:0000207A
-STEM(2):SPRAY(2):TENDRIL(8)=$02:0000207B
-STEM(2):SPRAY(2):TENDRIL(9)=$02:0000207C
-STEM(2):SPRAY(2):TENDRIL(10)=$02:0000207D
-STEM(2):SPRAY(2):TENDRIL(11)=$02:0000207E
-STEM(2):SPRAY(2):TENDRIL(12)=$02:0000207F
-STEM(2):SPRAY(3)=$02:00002080
-STEM(2):SPRAY(3):TENDRIL(1)=$02:00002080
-STEM(2):SPRAY(3):TENDRIL(2)=$02:00002081
-STEM(2):SPRAY(3):TENDRIL(3)=$02:00002082
-STEM(2):SPRAY(3):TENDRIL(4)=$02:00002083
-STEM(2):SPRAY(3):TENDRIL(5)=$02:00002084
-STEM(2):SPRAY(3):TENDRIL(6)=$02:00002085
-STEM(2):SPRAY(3):TENDRIL(7)=$02:00002086
-STEM(2):SPRAY(3):TENDRIL(8)=$02:00002087
-STEM(2):SPRAY(3):TENDRIL(9)=$02:00002088
-STEM(2):SPRAY(3):TENDRIL(10)=$02:00002089
-STEM(2):SPRAY(3):TENDRIL(11)=$02:0000208A
-STEM(2):SPRAY(3):TENDRIL(12)=$02:0000208B
-STEM(2):SPRAY(4)=$02:0000208C
-STEM(2):SPRAY(4):TENDRIL(1)=$02:0000208C
-STEM(2):SPRAY(4):TENDRIL(2)=$02:0000208D
-STEM(2):SPRAY(4):TENDRIL(3)=$02:0000208E
-STEM(2):SPRAY(4):TENDRIL(4)=$02:0000208F
-STEM(2):SPRAY(4):TENDRIL(5)=$02:00002090
-STEM(2):SPRAY(4):TENDRIL(6)=$02:00002091
-STEM(2):SPRAY(4):TENDRIL(7)=$02:00002092
-STEM(2):SPRAY(4):TENDRIL(8)=$02:00002093
-STEM(2):SPRAY(4):TENDRIL(9)=$02:00002094
-STEM(2):SPRAY(4):TENDRIL(10)=$02:00002095
-STEM(2):SPRAY(4):TENDRIL(11)=$02:00002096
-STEM(2):SPRAY(4):TENDRIL(12)=$02:00002097
-STEM(2):SPRAY(5)=$02:00002098
-STEM(2):SPRAY(5):TENDRIL(1)=$02:00002098
-STEM(2):SPRAY(5):TENDRIL(2)=$02:00002099
-STEM(2):SPRAY(5):TENDRIL(3)=$02:0000209A
-STEM(2):SPRAY(5):TENDRIL(4)=$02:0000209B
-STEM(2):SPRAY(5):TENDRIL(5)=$02:0000209C
-STEM(2):SPRAY(5):TENDRIL(6)=$02:0000209D
-STEM(2):SPRAY(5):TENDRIL(7)=$02:0000209E
-STEM(2):SPRAY(5):TENDRIL(8)=$02:0000209F
-STEM(2):SPRAY(5):TENDRIL(9)=$02:000020A0
-STEM(2):SPRAY(5):TENDRIL(10)=$02:000020A1
-STEM(2):SPRAY(5):TENDRIL(11)=$02:000020A2
-STEM(2):SPRAY(5):TENDRIL(12)=$02:000020A3
-STEM(2):SPRAY(6)=$02:000020A4
-STEM(2):SPRAY(6):TENDRIL(1)=$02:000020A4
-STEM(2):SPRAY(6):TENDRIL(2)=$02:000020A5
-STEM(2):SPRAY(6):TENDRIL(3)=$02:000020A6
-STEM(2):SPRAY(6):TENDRIL(4)=$02:000020A7
-STEM(2):SPRAY(6):TENDRIL(5)=$02:000020A8
-STEM(2):SPRAY(6):TENDRIL(6)=$02:000020A9
-STEM(2):SPRAY(6):TENDRIL(7)=$02:000020AA
-STEM(2):SPRAY(6):TENDRIL(8)=$02:000020AB
-STEM(2):SPRAY(6):TENDRIL(9)=$02:000020AC
-STEM(2):SPRAY(6):TENDRIL(10)=$02:000020AD
-STEM(2):SPRAY(6):TENDRIL(11)=$02:000020AE
-STEM(2):SPRAY(6):TENDRIL(12)=$02:000020AF
-STEM(3)=$02:000020B0
-STEM(3):LEFT=$02:000020B0
-STEM(3):LEFT:BUD(1)=$02:000020B0
-STEM(3):LEFT:BUD(1):SHOOT(1)=$02:000020B0
-STEM(3):LEFT:BUD(1):SHOOT(2)=$02:000020B1
-STEM(3):LEFT:BUD(1):SHOOT(3)=$02:000020B2
-STEM(3):LEFT:BUD(1):SHOOT(4)=$02:000020B3
-STEM(3):LEFT:BUD(2)=$02:000020B4
-STEM(3):LEFT:BUD(2):SHOOT(1)=$02:000020B4
-STEM(3):LEFT:BUD(2):SHOOT(2)=$02:000020B5
-STEM(3):LEFT:BUD(2):SHOOT(3)=$02:000020B6
-STEM(3):LEFT:BUD(2):SHOOT(4)=$02:000020B7
-STEM(3):LEFT:BUD(3)=$02:000020B8
-STEM(3):LEFT:BUD(3):SHOOT(1)=$02:000020B8
-STEM(3):LEFT:BUD(3):SHOOT(2)=$02:000020B9
-STEM(3):LEFT:BUD(3):SHOOT(3)=$02:000020BA
-STEM(3):LEFT:BUD(3):SHOOT(4)=$02:000020BB
-STEM(3):LEFT:BUD(4)=$02:000020BC
-STEM(3):LEFT:BUD(4):SHOOT(1)=$02:000020BC
-STEM(3):LEFT:BUD(4):SHOOT(2)=$02:000020BD
-STEM(3):LEFT:BUD(4):SHOOT(3)=$02:000020BE
-STEM(3):LEFT:BUD(4):SHOOT(4)=$02:000020BF
-STEM(3):RIGHT=$02:000020B0
-STEM(3):RIGHT:CUSP=$02:000020B0
-STEM(3):RIGHT:CUSP:BLOSSOM(1)=$02:000020B0
-STEM(3):RIGHT:CUSP:BLOSSOM(2)=$02:000020B1
-STEM(3):RIGHT:CUSP:BLOSSOM(3)=$02:000020B2
-STEM(3):RIGHT:CUSP:BLOSSOM(4)=$02:000020B3
-STEM(3):RIGHT:CUSP:BLOSSOM(5)=$02:000020B4
-STEM(3):RIGHT:CUSP:BLOSSOM(6)=$02:000020B5
-STEM(3):RIGHT:CUSP:BLOSSOM(7)=$02:000020B6
-STEM(3):RIGHT:CUSP:BLOSSOM(8)=$02:000020B7
-STEM(3):SPRAY(1)=$02:000020C0
-STEM(3):SPRAY(1):TENDRIL(1)=$02:000020C0
-STEM(3):SPRAY(1):TENDRIL(2)=$02:000020C1
-STEM(3):SPRAY(1):TENDRIL(3)=$02:000020C2
-STEM(3):SPRAY(1):TENDRIL(4)=$02:000020C3
-STEM(3):SPRAY(1):TENDRIL(5)=$02:000020C4
-STEM(3):SPRAY(1):TENDRIL(6)=$02:000020C5
-STEM(3):SPRAY(1):TENDRIL(7)=$02:000020C6
-STEM(3):SPRAY(1):TENDRIL(8)=$02:000020C7
-STEM(3):SPRAY(1):TENDRIL(9)=$02:000020C8
-STEM(3):SPRAY(1):TENDRIL(10)=$02:000020C9
-STEM(3):SPRAY(1):TENDRIL(11)=$02:000020CA
-STEM(3):SPRAY(1):TENDRIL(12)=$02:000020CB
-STEM(3):SPRAY(2)=$02:000020CC
-STEM(3):SPRAY(2):TENDRIL(1)=$02:000020CC
-STEM(3):SPRAY(2):TENDRIL(2)=$02:000020CD
-STEM(3):SPRAY(2):TENDRIL(3)=$02:000020CE
-STEM(3):SPRAY(2):TENDRIL(4)=$02:000020CF
-STEM(3):SPRAY(2):TENDRIL(5)=$02:000020D0
-STEM(3):SPRAY(2):TENDRIL(6)=$02:000020D1
-STEM(3):SPRAY(2):TENDRIL(7)=$02:000020D2
-STEM(3):SPRAY(2):TENDRIL(8)=$02:000020D3
-STEM(3):SPRAY(2):TENDRIL(9)=$02:000020D4
-STEM(3):SPRAY(2):TENDRIL(10)=$02:000020D5
-STEM(3):SPRAY(2):TENDRIL(11)=$02:000020D6
-STEM(3):SPRAY(2):TENDRIL(12)=$02:000020D7
-STEM(3):SPRAY(3)=$02:000020D8
-STEM(3):SPRAY(3):TENDRIL(1)=$02:000020D8
-STEM(3):SPRAY(3):TENDRIL(2)=$02:000020D9
-STEM(3):SPRAY(3):TENDRIL(3)=$02:000020DA
-STEM(3):SPRAY(3):TENDRIL(4)=$02:000020DB
-STEM(3):SPRAY(3):TENDRIL(5)=$02:000020DC
-STEM(3):SPRAY(3):TENDRIL(6)=$02:000020DD
-STEM(3):SPRAY(3):TENDRIL(7)=$02:000020DE
-STEM(3):SPRAY(3):TENDRIL(8)=$02:000020DF
-STEM(3):SPRAY(3):TENDRIL(9)=$02:000020E0
-STEM(3):SPRAY(3):TENDRIL(10)=$02:000020E1
-STEM(3):SPRAY(3):TENDRIL(11)=$02:000020E2
-STEM(3):SPRAY(3):TENDRIL(12)=$02:000020E3
-STEM(3):SPRAY(4)=$02:000020E4
-STEM(3):SPRAY(4):TENDRIL(1)=$02:000020E4
-STEM(3):SPRAY(4):TENDRIL(2)=$02:000020E5
-STEM(3):SPRAY(4):TENDRIL(3)=$02:000020E6
-STEM(3):SPRAY(4):TENDRIL(4)=$02:000020E7
-STEM(3):SPRAY(4):TENDRIL(5)=$02:000020E8
-STEM(3):SPRAY(4):TENDRIL(6)=$02:000020E9
-STEM(3):SPRAY(4):TENDRIL(7)=$02:000020EA
-STEM(3):SPRAY(4):TENDRIL(8)=$02:000020EB
-STEM(3):SPRAY(4):TENDRIL(9)=$02:000020EC
-STEM(3):SPRAY(4):TENDRIL(10)=$02:000020ED
-STEM(3):SPRAY(4):TENDRIL(11)=$02:000020EE
-STEM(3):SPRAY(4):TENDRIL(12)=$02:000020EF
-STEM(3):SPRAY(5)=$02:000020F0
-STEM(3):SPRAY(5):TENDRIL(1)=$02:000020F0
-STEM(3):SPRAY(5):TENDRIL(2)=$02:000020F1
-STEM(3):SPRAY(5):TENDRIL(3)=$02:000020F2
-STEM(3):SPRAY(5):TENDRIL(4)=$02:000020F3
-STEM(3):SPRAY(5):TENDRIL(5)=$02:000020F4
-STEM(3):SPRAY(5):TENDRIL(6)=$02:000020F5
-STEM(3):SPRAY(5):TENDRIL(7)=$02:000020F6
-STEM(3):SPRAY(5):TENDRIL(8)=$02:000020F7
-STEM(3):SPRAY(5):TENDRIL(9)=$02:000020F8
-STEM(3):SPRAY(5):TENDRIL(10)=$02:000020F9
-STEM(3):SPRAY(5):TENDRIL(11)=$02:000020FA
-STEM(3):SPRAY(5):TENDRIL(12)=$02:000020FB
-STEM(3):SPRAY(6)=$02:000020FC
-STEM(3):SPRAY(6):TENDRIL(1)=$02:000020FC
-STEM(3):SPRAY(6):TENDRIL(2)=$02:000020FD
-STEM(3):SPRAY(6):TENDRIL(3)=$02:000020FE
-STEM(3):SPRAY(6):TENDRIL(4)=$02:000020FF
-STEM(3):SPRAY(6):TENDRIL(5)=$02:00002100
-STEM(3):SPRAY(6):TENDRIL(6)=$02:00002101
-STEM(3):SPRAY(6):TENDRIL(7)=$02:00002102
-STEM(3):SPRAY(6):TENDRIL(8)=$02:00002103
-STEM(3):SPRAY(6):TENDRIL(9)=$02:00002104
-STEM(3):SPRAY(6):TENDRIL(10)=$02:00002105
-STEM(3):SPRAY(6):TENDRIL(11)=$02:00002106
-STEM(3):SPRAY(6):TENDRIL(12)=$02:00002107
-THIRD_HIGH_INDEX=0000000C
-THREE1=:P1:0:00000003
-THREE2=:P1:0:00000004
-TWO1=:N1:P:0:00000000
-TWO2=:P1:0:00000002
+stem(2):left:bud(1):shoot(3)=$02:0000205A
+stem(2):left:bud(1):shoot(4)=$02:0000205B
+stem(2):left:bud(2)=$02:0000205C
+stem(2):left:bud(2):shoot(1)=$02:0000205C
+stem(2):left:bud(2):shoot(2)=$02:0000205D
+stem(2):left:bud(2):shoot(3)=$02:0000205E
+stem(2):left:bud(2):shoot(4)=$02:0000205F
+stem(2):left:bud(3)=$02:00002060
+stem(2):left:bud(3):shoot(1)=$02:00002060
+stem(2):left:bud(3):shoot(2)=$02:00002061
+stem(2):left:bud(3):shoot(3)=$02:00002062
+stem(2):left:bud(3):shoot(4)=$02:00002063
+stem(2):left:bud(4)=$02:00002064
+stem(2):left:bud(4):shoot(1)=$02:00002064
+stem(2):left:bud(4):shoot(2)=$02:00002065
+stem(2):left:bud(4):shoot(3)=$02:00002066
+</div>
+stem(2):left:bud(4):shoot(4)=$02:00002067
+stem(2):right=$02:00002058
+stem(2):right:cusp=$02:00002058
+stem(2):right:cusp:blossom(1)=$02:00002058
+stem(2):right:cusp:blossom(2)=$02:00002059
+stem(2):right:cusp:blossom(3)=$02:0000205A
+<div	style="font-size:5pt">
+
+stem(2):right:cusp:blossom(4)=$02:0000205B
+stem(2):right:cusp:blossom(5)=$02:0000205C
+stem(2):right:cusp:blossom(6)=$02:0000205D
+stem(2):right:cusp:blossom(7)=$02:0000205E
+stem(2):right:cusp:blossom(8)=$02:0000205F
+stem(2):spray(1)=$02:00002068
+stem(2):spray(1):tendril(1)=$02:00002068
+stem(2):spray(1):tendril(2)=$02:00002069
+stem(2):spray(1):tendril(3)=$02:0000206A
+stem(2):spray(1):tendril(4)=$02:0000206B
+stem(2):spray(1):tendril(5)=$02:0000206C
+stem(2):spray(1):tendril(6)=$02:0000206D
+stem(2):spray(1):tendril(7)=$02:0000206E
+stem(2):spray(1):tendril(8)=$02:0000206F
+stem(2):spray(1):tendril(9)=$02:00002070
+stem(2):spray(1):tendril(10)=$02:00002071
+stem(2):spray(1):tendril(11)=$02:00002072
+stem(2):spray(1):tendril(12)=$02:00002073
+stem(2):spray(2)=$02:00002074
+stem(2):spray(2):tendril(1)=$02:00002074
+stem(2):spray(2):tendril(2)=$02:00002075
+stem(2):spray(2):tendril(3)=$02:00002076
+stem(2):spray(2):tendril(4)=$02:00002077
+stem(2):spray(2):tendril(5)=$02:00002078
+stem(2):spray(2):tendril(6)=$02:00002079
+stem(2):spray(2):tendril(7)=$02:0000207A
+stem(2):spray(2):tendril(8)=$02:0000207B
+stem(2):spray(2):tendril(9)=$02:0000207C
+stem(2):spray(2):tendril(10)=$02:0000207D
+stem(2):spray(2):tendril(11)=$02:0000207E
+stem(2):spray(2):tendril(12)=$02:0000207F
+stem(2):spray(3)=$02:00002080
+stem(2):spray(3):tendril(1)=$02:00002080
+stem(2):spray(3):tendril(2)=$02:00002081
+stem(2):spray(3):tendril(3)=$02:00002082
+stem(2):spray(3):tendril(4)=$02:00002083
+stem(2):spray(3):tendril(5)=$02:00002084
+stem(2):spray(3):tendril(6)=$02:00002085
+stem(2):spray(3):tendril(7)=$02:00002086
+stem(2):spray(3):tendril(8)=$02:00002087
+stem(2):spray(3):tendril(9)=$02:00002088
+stem(2):spray(3):tendril(10)=$02:00002089
+stem(2):spray(3):tendril(11)=$02:0000208A
+stem(2):spray(3):tendril(12)=$02:0000208B
+stem(2):spray(4)=$02:0000208C
+stem(2):spray(4):tendril(1)=$02:0000208C
+stem(2):spray(4):tendril(2)=$02:0000208D
+stem(2):spray(4):tendril(3)=$02:0000208E
+stem(2):spray(4):tendril(4)=$02:0000208F
+stem(2):spray(4):tendril(5)=$02:00002090
+stem(2):spray(4):tendril(6)=$02:00002091
+stem(2):spray(4):tendril(7)=$02:00002092
+stem(2):spray(4):tendril(8)=$02:00002093
+stem(2):spray(4):tendril(9)=$02:00002094
+stem(2):spray(4):tendril(10)=$02:00002095
+stem(2):spray(4):tendril(11)=$02:00002096
+stem(2):spray(4):tendril(12)=$02:00002097
+stem(2):spray(5)=$02:00002098
+stem(2):spray(5):tendril(1)=$02:00002098
+stem(2):spray(5):tendril(2)=$02:00002099
+stem(2):spray(5):tendril(3)=$02:0000209A
+stem(2):spray(5):tendril(4)=$02:0000209B
+stem(2):spray(5):tendril(5)=$02:0000209C
+stem(2):spray(5):tendril(6)=$02:0000209D
+stem(2):spray(5):tendril(7)=$02:0000209E
+stem(2):spray(5):tendril(8)=$02:0000209F
+stem(2):spray(5):tendril(9)=$02:000020A0
+stem(2):spray(5):tendril(10)=$02:000020A1
+stem(2):spray(5):tendril(11)=$02:000020A2
+stem(2):spray(5):tendril(12)=$02:000020A3
+stem(2):spray(6)=$02:000020A4
+stem(2):spray(6):tendril(1)=$02:000020A4
+stem(2):spray(6):tendril(2)=$02:000020A5
+stem(2):spray(6):tendril(3)=$02:000020A6
+stem(2):spray(6):tendril(4)=$02:000020A7
+stem(2):spray(6):tendril(5)=$02:000020A8
+stem(2):spray(6):tendril(6)=$02:000020A9
+stem(2):spray(6):tendril(7)=$02:000020AA
+stem(2):spray(6):tendril(8)=$02:000020AB
+stem(2):spray(6):tendril(9)=$02:000020AC
+stem(2):spray(6):tendril(10)=$02:000020AD
+stem(2):spray(6):tendril(11)=$02:000020AE
+stem(2):spray(6):tendril(12)=$02:000020AF
+</div>
+stem(3)=$02:000020B0
+stem(3):left=$02:000020B0
+stem(3):left:bud(1)=$02:000020B0
+stem(3):left:bud(1):shoot(1)=$02:000020B0
+stem(3):left:bud(1):shoot(2)=$02:000020B1
+stem(3):left:bud(1):shoot(3)=$02:000020B2
+<div	style="font-size:5pt">
+stem(3):left:bud(1):shoot(4)=$02:000020B3
+stem(3):left:bud(2)=$02:000020B4
+stem(3):left:bud(2):shoot(1)=$02:000020B4
+stem(3):left:bud(2):shoot(2)=$02:000020B5
+stem(3):left:bud(2):shoot(3)=$02:000020B6
+stem(3):left:bud(2):shoot(4)=$02:000020B7
+stem(3):left:bud(3)=$02:000020B8
+stem(3):left:bud(3):shoot(1)=$02:000020B8
+stem(3):left:bud(3):shoot(2)=$02:000020B9
+stem(3):left:bud(3):shoot(3)=$02:000020BA
+stem(3):left:bud(3):shoot(4)=$02:000020BB
+stem(3):left:bud(4)=$02:000020BC
+stem(3):left:bud(4):shoot(1)=$02:000020BC
+stem(3):left:bud(4):shoot(2)=$02:000020BD
+stem(3):left:bud(4):shoot(3)=$02:000020BE
+</div.
+stem(3):left:bud(4):shoot(4)=$02:000020BF
+stem(3):right=$02:000020B0
+stem(3):right:cusp=$02:000020B0
+stem(3):right:cusp:blossom(1)=$02:000020B0
+stem(3):right:cusp:blossom(2)=$02:000020B1
+stem(3):right:cusp:blossom(3)=$02:000020B2
+<div	style="font-size:5pt">
+
+stem(3):right:cusp:blossom(4)=$02:000020B3
+stem(3):right:cusp:blossom(5)=$02:000020B4
+stem(3):right:cusp:blossom(6)=$02:000020B5
+stem(3):right:cusp:blossom(7)=$02:000020B6
+stem(3):right:cusp:blossom(8)=$02:000020B7
+stem(3):spray(1)=$02:000020C0
+stem(3):spray(1):tendril(1)=$02:000020C0
+stem(3):spray(1):tendril(2)=$02:000020C1
+stem(3):spray(1):tendril(3)=$02:000020C2
+stem(3):spray(1):tendril(4)=$02:000020C3
+stem(3):spray(1):tendril(5)=$02:000020C4
+stem(3):spray(1):tendril(6)=$02:000020C5
+stem(3):spray(1):tendril(7)=$02:000020C6
+stem(3):spray(1):tendril(8)=$02:000020C7
+stem(3):spray(1):tendril(9)=$02:000020C8
+stem(3):spray(1):tendril(10)=$02:000020C9
+stem(3):spray(1):tendril(11)=$02:000020CA
+stem(3):spray(1):tendril(12)=$02:000020CB
+stem(3):spray(2)=$02:000020CC
+stem(3):spray(2):tendril(1)=$02:000020CC
+stem(3):spray(2):tendril(2)=$02:000020CD
+stem(3):spray(2):tendril(3)=$02:000020CE
+stem(3):spray(2):tendril(4)=$02:000020CF
+stem(3):spray(2):tendril(5)=$02:000020D0
+stem(3):spray(2):tendril(6)=$02:000020D1
+stem(3):spray(2):tendril(7)=$02:000020D2
+stem(3):spray(2):tendril(8)=$02:000020D3
+stem(3):spray(2):tendril(9)=$02:000020D4
+stem(3):spray(2):tendril(10)=$02:000020D5
+stem(3):spray(2):tendril(11)=$02:000020D6
+stem(3):spray(2):tendril(12)=$02:000020D7
+stem(3):spray(3)=$02:000020D8
+stem(3):spray(3):tendril(1)=$02:000020D8
+stem(3):spray(3):tendril(2)=$02:000020D9
+stem(3):spray(3):tendril(3)=$02:000020DA
+stem(3):spray(3):tendril(4)=$02:000020DB
+stem(3):spray(3):tendril(5)=$02:000020DC
+stem(3):spray(3):tendril(6)=$02:000020DD
+stem(3):spray(3):tendril(7)=$02:000020DE
+stem(3):spray(3):tendril(8)=$02:000020DF
+stem(3):spray(3):tendril(9)=$02:000020E0
+stem(3):spray(3):tendril(10)=$02:000020E1
+stem(3):spray(3):tendril(11)=$02:000020E2
+stem(3):spray(3):tendril(12)=$02:000020E3
+stem(3):spray(4)=$02:000020E4
+stem(3):spray(4):tendril(1)=$02:000020E4
+stem(3):spray(4):tendril(2)=$02:000020E5
+stem(3):spray(4):tendril(3)=$02:000020E6
+stem(3):spray(4):tendril(4)=$02:000020E7
+stem(3):spray(4):tendril(5)=$02:000020E8
+stem(3):spray(4):tendril(6)=$02:000020E9
+stem(3):spray(4):tendril(7)=$02:000020EA
+stem(3):spray(4):tendril(8)=$02:000020EB
+stem(3):spray(4):tendril(9)=$02:000020EC
+stem(3):spray(4):tendril(10)=$02:000020ED
+stem(3):spray(4):tendril(11)=$02:000020EE
+stem(3):spray(4):tendril(12)=$02:000020EF
+stem(3):spray(5)=$02:000020F0
+stem(3):spray(5):tendril(1)=$02:000020F0
+stem(3):spray(5):tendril(2)=$02:000020F1
+stem(3):spray(5):tendril(3)=$02:000020F2
+stem(3):spray(5):tendril(4)=$02:000020F3
+stem(3):spray(5):tendril(5)=$02:000020F4
+stem(3):spray(5):tendril(6)=$02:000020F5
+stem(3):spray(5):tendril(7)=$02:000020F6
+stem(3):spray(5):tendril(8)=$02:000020F7
+stem(3):spray(5):tendril(9)=$02:000020F8
+stem(3):spray(5):tendril(10)=$02:000020F9
+stem(3):spray(5):tendril(11)=$02:000020FA
+stem(3):spray(5):tendril(12)=$02:000020FB
+stem(3):spray(6)=$02:000020FC
+stem(3):spray(6):tendril(1)=$02:000020FC
+stem(3):spray(6):tendril(2)=$02:000020FD
+stem(3):spray(6):tendril(3)=$02:000020FE
+stem(3):spray(6):tendril(4)=$02:000020FF
+stem(3):spray(6):tendril(5)=$02:00002100
+stem(3):spray(6):tendril(6)=$02:00002101
+stem(3):spray(6):tendril(7)=$02:00002102
+stem(3):spray(6):tendril(8)=$02:00002103
+stem(3):spray(6):tendril(9)=$02:00002104
+</div>
+
+stem(3):spray(6):tendril(10)=$02:00002105
+stem(3):spray(6):tendril(11)=$02:00002106
+stem(3):spray(6):tendril(12)=$02:00002107
+first_high_index=00000003
+second_high_index=00000008
+third_high_index=0000000C
 complex.msm=0<00000003
 :$(02):00002000:00002108 :$(03):00003000:00003018 
-complex.msm: object code 2976 bytes: 0 errors: 0 undefined labels
 
 </pre>
 
 <h4>5.2.1.4: Structured Code Name Spaces</h4>
 
 <h3>5.2.2: Bit-Aligned Structures $RECORD..$ROOT</h3>
+
+<b>$record</b>..<b>$root</b> structures are bit aligned
+
+<p>
+Bit-aligned structures may be simple or overlaid in memory to any extent
+and may be nested
+
+<p>
+masmx labels each field with address, bit offset, bit size and signed attribute
+plus optionally base-displacement pointer register. The attributes of each field
+are held in one label of type <b>$equf</b>
+
+<p>
+masmx labelling allows macro language specific to the target to read and
+write bit-aligned fields
+
+<p>
+Here ColdFire-specific macro language retrieves fields from an irregularly-structured
+inventory
+<pre>
+
+$ masmx -lnk betaille
+MASMX 7r3
+3/betaille.msm
+CONT_CHAR=|
+LTERM=;
+STERM=.
+*EOF*
+  :                            1 	$path		../smaragd.68k
+  :                            2: 	$include	coldfire.def
+  :                            3: 	$include	record_x.def
+  :                            4 	$path
+  :                            5 
+  :                            6 p	$proc
+  :                            7 hameau*	$name
+  :                            8 *	$record	p(1, 2), p(1, 3) p(1, 4)
+  :                            9 oies	18
+  :                            10 anes	12
+  :                            11 moutons	16
+  :                            12 	$root
+  :                            13 	$end
+  :                            14 
+  :                            15 p	$proc
+  :                            16 commune* $name
+  :                            17 *	$record
+  :                            18 ?	$do	p(),"p(?, 1)"	hameau	p(?)
+  :                            19  	$root
+  :                            20 	$end
+  :                            21 
+  :                            22 
+  :                            23 $(5:050000)
+  :                            24 communes $record
+                                Vaux_les_Pres	commune	les_Cotards, 80, 5, 248	|
+                                			le_Charmelot, 660, 24, 79 |
+  :                            27 			village, 28, 2, 5
+  :                            28 
+                                Villers_Buzon	commune	centre, 10, 1, 30	|
+05:00005000 0014001403E00294018004F000700080014000A001001E00
+                              +30 			Combe_au_Loup, 15,,315
+05:00005018 03C00004EC00      +31 	$root
+  :                            32 
+  :                            33 $(0:16384)
+  :                            34 
+00:00004000 2038501A          +35 	retrieve	communes.Villers_Buzon.Combe_au_Loup.moutons
+00:00004004 E088              +35 
+00:00004006 E488              +35 
+00:00004008 32385008          +36 	retrieves	communes.Vaux_les_Pres.le_Charmelot.anes	d1
+00:0000400C 4841              +36 
+00:0000400E 323C00000014      +36 
+00:00004014 E2A1              +36 
+  :                            37 
+00:00004016 24385016          +38 	lretrieve	communes.Villers_Buzon.Combe_au_Loup.oies	d2
+00:0000401A E18A              +38 
+00:0000401C E08A              +38 
+00:0000401E EC8A              +38 
+00:00004020 26385010          +39 	lretrieve	communes.Villers_Buzon.centre.oies	d3
+00:00004024 E18B              +39 
+00:00004026 E58B              +39 
+00:00004028 E08B              +39 
+00:0000402A EC8B              +39 
+*EOF*
+:$(00):00004000:0000402C :$(05):00005000:0000501E 
+betaille.msm: object code 256 bytes: 0 errors: 0 undefined labels
+
+
+</pre>
+
+<h4>5.2.2.3: Macro Code Access to Bit-Aligned Structures</h4>
+
 
 <h4>5.2.2.1: Simple Structures $RECORD..$ROOT</h4>
 <h4>5.2.2.2: Overlaid Structures $RECORD,$BRANCH..$ROOT</h4>
@@ -17084,14 +17188,16 @@ All requests to masmx@gmx.ch
 
 <h1>Appendix D: masmx's Potential for High Level Languages</h1>
 
+<h2>D.1: A Target-Independent Macro-Assembly language</h2>
+
 <p>
 masmx is independent of target architecture. It is possible for
 compilers to generate a single macro language for masmx assembly
 for any target.
 
 <p>
-Compilers can therefore be concentrated entirely on functionality
-and need have no knowledge of architecture.
+Compilers therefore need no knowledge of target architecture and
+may themselves be target-independent
 
 <p>
 Tuning, efficiency, and architectural innovation then become matters
@@ -17099,7 +17205,7 @@ for the implementation of the single macro language per individual target.
 
 <p>
 The development of macro language for masmx requires no builds,
-compilations or links. New macro definition is source and remains source:
+compilations or links. Macro Definition is text
 <pre>
 
 
@@ -17137,9 +17243,44 @@ compilations or links. New macro definition is source and remains source:
 
 </pre>
 <p>
+
+
+<h2>D.2: Bit-Aligned Data Structures</h2>
+
 Developers using masmx can assign complex typing to identifiers
-with the $EQUF directive. This is intended to assist high-level-language
-implementation
+with the <b>$equf</b> directive
+
+<p>
+Labels of type <b>$equf</b> are generated in bit-aligned structures <b>$record</b>..<b>$root</b>
+
+Each bit-aligned field is labelled with address, bit offset, bit size, signed attribute
+and optionally base-displacement pointer with a single label
+
+<p>
+This allows macro language specific to the target to read and
+write bit-aligned fields with consistent certainty. In this way masmx solves
+a problem which has produced noticeable difficulty for compiler writers
+
+<p>
+In addition to compiler support, bit-aligned structuring is intended 
+for data which is compressed or formatted in ways which do not map
+to the target architecture
+
+<p>
+Bit-Aligned structuring can redefine and overlay storage without limit
+
+<p>
+Word-aligned structuring <b>$tree></b>..<b>$root</b> is completely analogous to bit-aligned
+structuring, but generates all fields at word boundaries
+
+<h2>D.3: RunTime Algorithm Plotting</h2>
+
+Directives <b>$xqt_i</b> and <b>$xqt_fp</b> generate with the help of
+target-specific macro text an instruction plan to execute algorithmic
+expressions at runtime from variable inputs. Constant sequences within an
+integer expression are resolved at assembly time. The compiler need neither
+understand the target architecture nor order the expression sequence
+
 
 
 <h1>Appendix E: Tuning Macro Language and Fixing Problems</h1>
