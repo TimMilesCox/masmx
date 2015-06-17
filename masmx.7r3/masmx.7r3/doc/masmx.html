@@ -5428,12 +5428,78 @@ complex.msm=0<00000003
 <b>$record</b>..<b>$root</b> structures are bit aligned
 
 <p>
+<b>$record</b> structures may be more or less complex. Fields which are not accessed
+do not need a label. All fields need a length. <b>$record</b> requires a label
+
+<p>
+<b>$record</b> shares the structured name plan with <b>$tree</b> and <b>$branch</b>,
+and likewise ends with </b>$root
+
+<p>
+Outermost <b>$record</b> starts at a word boundary and nested <b>$record</b>s
+start at the bit location which has been reached
+
+<p>
+Any initial values are spaced arguments of the <b>$record</b> lines
+
+<p>
+An argument on a <b>$record</b> line is not a bit length but a data value for a contained field
+
+<p>
+<b>$record</b> labels acquire a group length attribute as seen below
+
+<p>
+Nested <b>$record</b>s have their own arguments. Containing <b>$record</b>s place
+initial values in their own fields and not in the fields of nested <b>$records</b>
+
+<p>
+It is seen here that initial value 10 is assembled after embedded <b>inner $record</b> 
+
+<pre>
+
+$ masmx record.msm -lnkx
+MASMX 7r3
+3/record.msm
+*EOF*
+  :                            1 $(3:03000)
+  :                            2 
+  :                            3 	$word		16
+  :                            4 
+  :                            5 outermost $record			'o' 1 1 1 10
+  :                            6 first_field	9
+  :                            7 ?	$do	3,field(?)	9
+  :                            8 inner	$record				6 4 6 4
+  :                            9 ?	$do	4,field(?)	3
+  :                            10 	$root
+  :                            11 trailing 12
+03:3000 378040201D3400A0      +12 	$root
+  :                            13 
+*EOF*
+outermost=$03:3000,,,,003C
+outermost:first_field=$03:3000,,,,0009
+outermost:field(1)=$03:3000,,,0009,0009
+outermost:field(2)=$03:3001,,,0002,0009
+outermost:field(3)=$03:3001,,,000B,0009
+outermost:inner=$03:3002,,,0004,000C
+outermost:inner:field(1)=$03:3002,,,0004,0003
+outermost:inner:field(2)=$03:3002,,,0007,0003
+outermost:inner:field(3)=$03:3002,,,000A,0003
+outermost:inner:field(4)=$03:3002,,,000D,0003
+outermost:trailing=$03:3003,,,,000C
+?=$03:0004
+record.msm=0<0003
+:$(03):3000:3004 
+
+
+</pre>
+
+<p>
 Bit-aligned structures may be simple or overlaid in memory to any extent
 and may be nested
 
 <p>
 masmx labels each field with address, bit offset, bit size and signed attribute
-plus optionally base-displacement pointer register. The attributes of each field
+plus optionally base-displacement pointer register.<br>The attributes of each field
 are held in one label of type <b>$equf</b>
 
 <p>
@@ -5441,8 +5507,7 @@ masmx labelling allows macro language specific to the target to read and
 write bit-aligned fields
 
 <p>
-Here ColdFire-specific macro language retrieves fields from an irregularly-structured
-inventory
+Here ColdFire-specific macro language retrieves fields from an inventory
 <pre>
 
 $ masmx -lnk betaille
@@ -5511,6 +5576,18 @@ betaille.msm: object code 256 bytes: 0 errors: 0 undefined labels
 
 </pre>
 
+$record does not have separate template and instance steps. Describing a $record layout is also describing an instance
+
+<p>
+For this reason $record may be found within a $proc macro
+
+<p>
+$proc macros can assign actual arguments to any nested $record in their scope
+
+Repeating field groups to any nesting depth are constructed with records inside $proc macros
+
+
+
 <h4>5.2.2.3: Macro Code Access to Bit-Aligned Structures</h4>
 
 
@@ -5554,203 +5631,301 @@ not in masmx
 
 <pre>
 
-$ masmx boolean -lnk
+$ masmx -lnk boolean
 MASMX 7r3
 3/boolean.msm
+CONT_CHAR=|
+LTERM=;
+STERM=.
   :                            1 	$path		../
-  :                            2: 	$include	def/rta.def
-  :                            3: 	$include	language/fpxpress.def
-  :                            4: 	$include	language/i_xpress.def
-  :                            5 	$path
+  :                            2: 	$include	smaragd.68k/coldfire.def
+  :                            3: 	$include	smaragd.68k/express.def
+  :                            4 	$path
+  :                            5: 	$include	espresso.def
   :                            6 
   :                            7 $(3:03000)
-03:003000 000001              +8 one	1
-03:003001 000000000002        +9 two	2d
-03:003003 000000000003        +10 three	3d
-  :                            11 $(0:64)
-00:000040 603000              +12 	$xqt_i	two+one,,w0*4+three*/16++12*/40
-00:000041 960018              +12 
-00:000042 E00100              +12 
-00:000043 D73001              +12 
-00:000044 D73003              +12 
-00:000045 360010              +12 
-00:000046 900101              +12 
-00:000047 980102              +12 
-  :                            13 	$do	$<256,$(0:256)
-  :                            14 	$end
-00:000100+000004
-00:000101+0C0000000000
-:$(00):000040:000103 :$(03):003000:003005 
+03:00000600 0001              +8 one	1
+03:00000602 00000002          +9 two	2d
+03:00000606 00000003          +10 three	3d
+  :                            11 $(0:32768)
+00:00008000 30380600          +12 	$xqt_i,#	two+one w*4+three*/16++12*/20
+00:00008004 C1FC0004          +12 
+00:00008008 D0B80602          +12 
+00:0000800C D0B80606          +12 
+00:00008010 E188              +12 
+00:00008012 E188              +12 
+00:00008014 80BC00C00000      +12 
+00:0000801A 3002              +13 	$xqt_i		d2 w+d3+d4
+00:0000801C D083              +13 
+00:0000801E D084              +13 
+  :                            14 	$do	$<256,$(0:256)
+  :                            15 	$end
+:$(00):00008000:00008020 :$(03):00000600:0000060A 
 
 
 </pre>
 
-Target specific macros required for $xqt_i have these names and this outline scheme
+Some of the identifiers in this these expressions are followed with space then <b>w</b><br>
+This informs macro language that the variable input to the algorithm is a ColdFire word
+of 16 bits where inputs are otherwise 32 bits
+
+<p>
+One of the <b>$xqt_i</b> directives is followed with a subcommand <b>,#</b>
+
+<p>
+This floats the symbol <b>#</b> onto the front of the constant sequences <b>16</b> and <b>12*/20</b>
+
+<p>
+Directive <b>$xqt_i</b> surrounds constant sequences with parentheses, so that target definitions<br>
+which use automatic literals would generate the literals (16) and (12*/20)
+
+<p>
+Automatic literals are not opted in <b>coldfire.def</b> because this would disrupt the many parenthesised
+operand expressions in accepted source syntax. For ColdFire integer arithmetic furthermore, literals
+are unnecessary because integer immediate operands indicated with prefix <b>#</b> are available
+
+<p>
+The floated <b>#</b> yields in the two illustrated cases these two immediate operand clauses
+<pre>
+
+	#(16)
+	#(12*/20)
+
+</pre>
+Target specific macros required for $xqt_i and $xqt_fp have the names called from this target-independent
+ouline scheme
 
 <pre>
 
+$ cat espresso.def
+
 p	$proc
-$i_load*	$name
-	LOAD	p(1)
+"$i_load"*	$name
+	LOAD	p()
 	$end
 
 p	$proc
-$i_load_negative*	$name
-	LOAD_NEGATIVE	p(1)
-	$end
-
-$i_testequal*	$name
-	TEST_EQUAL	p(1)
+"$i_load_negative"*	$name
+	LOAD_NEGATIVE	p()
 	$end
 
 p	$proc
-$i_testunequal*	$name
-	TEST_NE	p(1)
+"$i_testequal"*	$name
+	TEST_EQUAL	p()
 	$end
 
 p	$proc
-$i_testgreater*	$name
-	TEST_GREATER	p(1)
+"$i_testunequal"*	$name
+	TEST_NE	p()
 	$end
 
 p	$proc
-$i_testless*	$name
-	TEST_LESS	p(1)
+"$i_testgreater"*	$name
+	TEST_GREATER	p()
 	$end
 
 p	$proc
-$i_shift*	$name
-	SHIFT	p(1)
+"$i_testless"*	$name
+	TEST_LESS	p()
 	$end
 
 p	$proc
-$i_shift_right*	$name
-	SHIFT_RIGHT	p(1)
+"$i_shift"*	$name
+	SHIFT	p()
 	$end
 
 p	$proc
-$i_or*	$name
-	OR	p(1)
+"$i_shift_right"*	$name
+	SHIFT_RIGHT	p()
 	$end
 
 p	$proc
-$i_and*	$name
-	AND	p(1)
+"$i_or"*	$name
+	OR	p()
 	$end
 
 p	$proc
-$i_xor*	$name
-	XOR	p(1)
+"$i_and"*	$name
+	AND	p()
 	$end
 
 p	$proc
-$i_add*	$name
-	ADD	p(1)
+"$i_xor"*	$name
+	XOR	p()
 	$end
 
 p	$proc
-$i_subtract*	$name
-	SUBTRACT	p(1)
+"$i_add"*	$name
+	ADD	p()
 	$end
 
 p	$proc
-$i_multiply*	$name
-	MULTIPLY	p(1)
+"$i_subtract"*	$name
+	SUBTRACT	p()
 	$end
 
 p	$proc
-$i_divide*	$name
-	DIVIDE	p(1)
+"$i_multiply"*	$name
+	MULTIPLY	p()
 	$end
 
 p	$proc
-$i_covered_quotient*	$name
-	DIVIDE_ROUNDED	p(1)
+"$i_divide"*	$name
+	DIVIDE	p()
 	$end
 
 p	$proc
-$i_remainder*	$name
-	MODULO	p(1)
+"$i_covered_quotient"*	$name
+	DIVIDE_ROUNDED	p()
 	$end
 
 p	$proc
-$i_reserve*	$proc
+"$i_remainder"*	$name
+	MODULO	p()
+	$end
+
+p	$proc
+"$i_reserve"*	$name
 	PUSH
-$end
+	$end
 
-$i_retrieve_testequal*	$proc
+p	$proc
+"$i_reverse"*	$name
+	REVERSE
+	$end
+
+"$i_retrieve_testequal"*	$proc
 	TEST_EQUAL	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_testunequal*	$proc
+"$i_retrieve_testunequal"*	$proc
 	TEST_NE	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_testgreater*	$proc
+"$i_retrieve_testgreater"*	$proc
 	TEST_GREATER	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_testless*	$proc
+"$i_retrieve_testless"*	$proc
 	TEST_LESS	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_shift*	$proc
+"$i_retrieve_shift"*	$proc
 	SHIFT	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_shift_right*	$proc
+"$i_retrieve_shift_right"*	$proc
 	SHIFT_RIGHT	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_or*	$proc
+"$i_retrieve_or"*	$proc
 	OR	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_and*	$proc
+"$i_retrieve_and"*	$proc
 	AND	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_xor*	$proc
+"$i_retrieve_xor"*	$proc
 	XOR	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_add*	$proc
+"$i_retrieve_add"*	$proc
 	ADD	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_subtract*	$proc
+"$i_retrieve_subtract"*	$proc
 	SUBTRACT	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_multiply*	$proc
+"$i_retrieve_multiply"*	$proc
 	MULTIPLY	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_divide*	$proc
+"$i_retrieve_divide"*	$proc
 	DIVIDE	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_covered_quotient*	$proc
+"$i_retrieve_covered_quotient"*	$proc
 	DIVIDE_ROUNDED	STACK_TOP
 	POP
 	$end
 
-$i_retrieve_remainder*	$proc
+"$i_retrieve_remainder"*	$proc
 	MODULO	STACK_TOP
 	POP
+	$end
+
+p       $proc
+"$x_load"* $name
+	FP_LOAD		p()
+	$end
+
+p       $proc
+"$x_load_negative"* $name
+	FP_LOAD_NEGATIVE p()
+	$end
+
+p	$proc
+"$x_add"*	$name
+	FP_ADD		p()
+	$end
+
+p       $proc
+"$x_subtract"* $name
+	FP_SUBTRACT	p()
+	$end
+
+p       $proc
+"$x_multiply"* $name
+	FP_MULTIPLY	p()
+	$end
+
+p       $proc
+"$x_divide"* $name
+	FP_DIVIDE	p()
+	$end
+
+"$x_reserve"* $proc
+	FPUSH
+	$end
+
+p	$proc
+"$x_reverse"* $name
+	FP_REVERSE
+	$end
+
+"$x_retrieve_add"* $proc
+        FP_ADD		FP_STACK_TOP
+        FPOP
+        $end
+
+"$x_retrieve_subtract"* $proc
+        FP_SUBTRACT	FP_STACK_TOP
+        FPOP
+        $end
+
+"$x_retrieve_multiply"* $proc
+        FP_MULTIPLY	FP_STACK_TOP
+        FPOP
+        $end
+
+"$x_retrieve_divide"* $proc
+	FP_DIVIDE	FP_STACK_TOP
+	FPOP
 	$end
 
 </pre>
@@ -5765,9 +5940,23 @@ with instruction code which updates a designated result register
 	ADD		SUBTRACT	MULTIPY		DIVIDE		DIVIDE_ROUNDED	MODULO
 
 </pre>
-These macros apply an argument p(1) to a result register. Instructions in the four TEST_ macros have<br>
+These macros apply the given argument to a designated result register. Instructions in the four TEST_ macros have<br>
 a runtime result of one for true and zero for untrue
 
+<p>
+The macro
+<pre>
+
+	REVERSE
+
+</pre>
+negates a accumulation in the result register to cover cases like
+<pre>
+
+	-(X*Y-Z)
+
+</pre>
+which may derive advantage from a different instruction sequence from the simple LOAD_NEGATIVE
 <p>
 The macro
 <pre>
@@ -5794,9 +5983,9 @@ The macro
 	POP
 
 </pre>
-is shown separately as a point where the stacked value is cleared after use,<br>
-because function macros in masmx may not generate code. This allows the case where the<br>
-save area is really a stack and a separate instruction moreover must clear the saved item
+for some targets needs no separate instructions and is void. POP is however
+separated in case the stacked value must be cleared,<br>
+because STACK_TOP may be  a function, and function macros in masmx may not generate code.
 
 <p>
 Interim results may be in detail saved, retrieved and cleared a number of ways according
@@ -5994,7 +6183,8 @@ It is not easy to have an integer longer that 32 bits on ColdFire, and even hard
 to convert it to ieee754 64-bit. This may be one reason why ColdFire can add 8-bit
 integers to 64-bit floating numbers. The ASCII string can be converted to floating
 without an interim conversion to long long integer. That does not of course have
-a direct hardware assist
+a direct hardware assist, but masmx can insert a conversion subroutine call into the stream
+of algorithm imstructions
 <pre>
 
 $ masmx -lnky r3xample.msm
@@ -6064,6 +6254,7 @@ The fourth instruction calls external routine s2double. A link
 request tuple awaits its address for addition to the instruction
 address field bits 31..0
 
+<p>
 <b>$xqt_fp</b> and ColdFire-specific macro code organise the call with these
 two macros
 

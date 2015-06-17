@@ -15,10 +15,10 @@ REG	$set,"$d_reg"	d0
 	$if	($t(p(1, 1))="$d_reg")++($t(p(1, 1))=127)++$t(p(1, 1))=$equf)++($t(p(1, 1))="$a_reg")
 	  $if	($t(p(1, 1))="$d_reg")**(p(1, 1)=d1)
 	  $else
-	  $if	p(1, 1:2)=w
-	  move.w	p(1, 1:1), d1
+	  $if	$t(p(2, 1))=$special_reg)**(p(2, 1)=w)
+	  move.w	p(1, 1), d1
 	  $else
-	  move.l	p(1, 1:1), d1
+	  move.l	p(1, 1), d1
 	  $endif
 	  $endif
 	  lsl	d1, REG
@@ -33,9 +33,9 @@ REG	$set,"$d_reg"	d0
 
 p	$proc
 LOAD*	$name
-	$if	($t(p(1, 1:2))=$special_reg)**(p(1, 1:2)=w)
+	$if	($t(p(2, 1))=$special_reg)**(p(2, 1)=w)
 	$do	$o('V'-'A'),	$note	shorty
-	move.w	p(1, 1:1),	d0
+	move.w	p(1, 1),	d0
 	$else
 	move.l	p(1),	d0
 	$endif
@@ -59,7 +59,7 @@ SUBTRACT* $name
 
 p	$proc
 MULTIPLY* $name
-	$if	p(1, 1:2)=l
+	$if	($t(p(2, 1))=$special_reg)**(p(2, 1)=l)
 	$else
 	muls.w	p(1), d0
 	$endif

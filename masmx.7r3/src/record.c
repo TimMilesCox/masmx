@@ -179,6 +179,8 @@ static int precord(object *l, char *line, char **data, int nest)
          {
             k = insert_qltable(line, 0, SET);
             k->l.valued = SET;
+            k->l.r.i = 0;
+            k->l.r.l.xref = masm_level;
          }
 
          if (argument)

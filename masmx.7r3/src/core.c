@@ -5235,8 +5235,7 @@ static int iterate(char *arg, char *param, object *tag, txo *image)
    {
       tag->l.valued = SET;
       tag->l.value = zero_o;
-      tag->l.r.l.y = 0;
-      tag->l.r.l.rel = 0;
+      tag->l.r.i = 0;
       tag->l.r.l.xref = masm_level;
    }
    
