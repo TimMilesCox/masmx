@@ -306,10 +306,10 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    4.  Structured Code Name Spaces				5.2.1.4
 		    
 
-	2.  Bit-Aligned Structures $RECORD..$ROOT			5.2.2
-	    1.	Simple Structures $RECORD..$ROOT			5.2.2.1
-	    2.	Overlaid Structures $RECORD,$BRANCH..$ROOT		5.2.2.2
-	    3.  Macro Code Access to Bit-Aligned Structures		5.2.2.3
+	2.  Bit-Aligned Structures					5.2.2
+	    1.	Bit-Aligned Data $record..$root				5.2.2.1
+	    3.  Macro Code Access to Bit-Aligned Fields and Groups	5.2.2.2
+	    2.	Overlaid Structures $record,$branch			5.2.2.3
 
 6.  Run-Time Algorithm Plotter						6
 
@@ -4622,181 +4622,39 @@ A label on a $do line is a counter incrementing from 1
 
 <h4>5.2.1.1: Simple Structures $TREE..$ROOT</h4>
 
+<p>
+$TREE is used to structure a name space containing data or code.
 
 <p>
-The input side of an 8-bit application scans four serial channels as quickly
-as possible.<br> A dozen instructions sample each channel in unrolled sequence. 
-
-<p>
-$TREE and $ROOT directives are used to 
-build a structured label space for each channel's
-registers
+The structure is ended with $ROOT. The tree must 
+have a label:
 <pre>
 
-MASMX 7r2
-3/uart.msm
-CONT_CHAR=
-LTERM=;
-QDELIM='
-STERM=.
-*EOF*
-  :                            1:         $include   "8051_7r2.def"
-  :                            2 
-  :                            3 LSR_RDR EQU     0       ; Data In Receive FIFO
-  :                            4 
-  :                            5 serial*  $proc     
-  :                            6         $res    (($+15)**-16)-$
-  :                            7 *       $tree          
-  :                            8 rhr
-  :                            9 thr     $res    1
-  :                            10 ier     $res    1
-  :                            11 isr     $res    1
-  :                            12 lcr     $res    1
-  :                            13 mcr     $res    1
-  :                            14 lsr     $res    1
-  :                            15 msr     $res    1
-  :                            16 spr     $res    1
-  :                            17         $root
-  :                            18         $end
-  :                            19 
-  :                            20 '$bit'*       $func
-  :                            21       $if     $bit(1,1:1)<128
-  :                            22       $return (($bit(1,1:1)**31)*/3)++$bit(1,1:2)
-  :                            23       $else
-  :                            24       $return $bit(1,1:1)++$bit(1,1:2)
-  :                            25       $end
-  :                            26 
-  :                            27 generate* $proc *
-  :                            28 Sample:
-  :                            29         jb      $bit(FULL.device),leave ; Is there any buffer space?
-  :                            30         mov     dptr,#uart(device).lsr  ; Is there data on COM1 input FIFO?
-  :                            31         movx    a,@dptr
-  :                            32         jnb     $bit(acc.LSR_RDR), Leave; No more so Next UART
-  :                            33         mov     dptr,#uart(device).rhr  ; Yes
-  :                            34         movx    a,@dptr                 ; Read
-  :                            35         mov     dptr,#buffer(device)    ; Find Place in Circular Input Buffer
-  :                            36         mov     dpl,write_cursor(device); By Means of the Running Cursor
-  :                            37         movx    @dptr,a                 ; Write the Data to XRAM
-  :                            38         inc     write_cursor(device)    ; Advance the Input Cursor
-  :                            39         mov     a,read_cursor(device)   ; If write starts to equal read
-  :                            40         cjne    a,write_cursor(device),Sample ; Is there any more? 
-  :                            41         setB    $bit(FULL.device)       ; Stop reading from FIFO to XRAM
-  :                            42 leave:       
-  :                            43         $end
-  :                            44 
-  :                            45 
-  :                            46 DEVICES equ     128
-  :                            47 DATA    equ     1024
-  :                            48 TOTAL   equ     4
-  :                            49 RTVARS  equ     64
-  :                            50 Full    equ     32
-  :                            51 
-  :                            52 $(3:RTVARS)
-  :                            53 device  $do     TOTAL,write_cursor(device)      $res    1
-  :                            54 device  $do     TOTAL,read_cursor(device)       $res    1
-  :                            55 $(2:DEVICES)
-  :                            56 device  $do     TOTAL,uart(device)              serial
-  :                            57 $(1:DATA)
-  :                            58 device  $do     TOTAL,buffer(device)            VAR    256
-  :                            59 
-  :                            60 
-  :                            61 $(0:64)
-00:0040 20011B                +62 device        $do     TOTAL,  generate
-00:0043 900085                +62 
-00:0046 E0                    +62 
-00:0047 30E014                +62 
-00:004A 900080                +62 
-00:004D E0                    +62 
-00:004E 900400                +62 
-00:0051 854082                +62 
-00:0054 F0                    +62 
-00:0055 0540                  +62 
-00:0057 E544                  +62 
-00:0059 B540E4                +62 
-00:005C D201                  +62 
-00:005E 20021B                +62 
-00:0061 900095                +62 
-00:0064 E0                    +62 
-00:0065 30E014                +62 
-00:0068 900090                +62 
-00:006B E0                    +62 
-00:006C 900500                +62 
-00:006F 854182                +62 
-00:0072 F0                    +62 
-00:0073 0541                  +62 
-00:0075 E545                  +62 
-00:0077 B541E4                +62 
-00:007A D202                  +62 
-00:007C 20031B                +62 
-00:007F 9000A5                +62 
-00:0082 E0                    +62 
-00:0083 30E014                +62 
-00:0086 9000A0                +62 
-00:0089 E0                    +62 
-00:008A 900600                +62 
-00:008D 854282                +62 
-00:0090 F0                    +62 
-00:0091 0542                  +62 
-00:0093 E546                  +62 
-00:0095 B542E4                +62 
-00:0098 D203                  +62 
-00:009A 20041B                +62 
-00:009D 9000B5                +62 
-00:00A0 E0                    +62 
-00:00A1 30E014                +62 
-00:00A4 9000B0                +62 
-00:00A7 E0                    +62 
-00:00A8 900700                +62 
-00:00AB 854382                +62 
-00:00AE F0                    +62 
-00:00AF 0543                  +62 
-00:00B1 E547                  +62 
-00:00B3 B543E4                +62 
-00:00B6 D204                  +62 
-  :                            63 
-*EOF*
+name    $TREE
+datum1	.
+datum2	.
+	$ROOT
 
-....
+</pre>
+<p>
+$TREE may be inside a $PROC macro or not. If a $TREE is inside a
+$PROC, the label of the $TREE may be the inherited label from
+the macro call line, for example
+<pre>
 
-UART(2):SPR=$02:0097
-UART(3)=$02:00A0
-UART(3):RHR=$02:00A0
-UART(3):THR=$02:00A0
-UART(3):IER=$02:00A1
-UART(3):ISR=$02:00A2
-UART(3):LCR=$02:00A3
-UART(3):MCR=$02:00A4
-UART(3):LSR=$02:00A5
-UART(3):MSR=$02:00A6
-UART(3):SPR=$02:00A7
-UART(4)=$02:00B0
-UART(4):RHR=$02:00B0
-UART(4):THR=$02:00B0
-UART(4):IER=$02:00B1
-UART(4):ISR=$02:00B2
-UART(4):LCR=$02:00B3
-UART(4):MCR=$02:00B4
-UART(4):LSR=$02:00B5
-UART(4):MSR=$02:00B6
-UART(4):SPR=$02:00B7
-VAR=:P1:(1)0:07
-WRITE_CURSOR(1)=$03:40
-WRITE_CURSOR(2)=$03:41
-WRITE_CURSOR(3)=$03:42
-WRITE_CURSOR(4)=$03:43
-XCH=:N1:P:0:0C
-XCHD=:P1:0:1C
-XRL=:N1:P:0:06
-8051_7r2.def=1<0005
-uart.msm=0<0003
-:$(00):0000:00B8 :$(01):0400:0800 :$(02):0080:00B8 :$(03):0040:0048 
-uart.msm: object code 381 bytes: 0 errors: 0 undefined labels
+p       $proc
+species $name
+*       $tree
+many    $do     p(),branch(many)   $res    4
+	$root
+	$end
 
 </pre>
 
+
 <p>
 $TREE..$ROOT structures may be nested to depth 8.
-More complex examples can be found in Section
+Other examples can be found in Section
 8.54: $TREE Directive.
 
 
@@ -4931,499 +4789,76 @@ transport.msm=0<00000003
 
 
 </pre>
-<h4>5.2.1.3: Complex Structures</h4>
-
-
-<p>
-Simple and branch structures can be combined hierarchically.
-<pre>
-
-Simple Structure			Branch of a Branched Structure
-________________			______________________________
-
-name	$TREE				name	$BRANCH
-	.					.
-	.					.
-	.					.
-	$ROOT					$ROOT
-
-</pre>
-<p>
-In this example stem(*):left and stem(*):right are pictures of the same
-storage:
-<pre>
-
-$ masmx -lnkx complex
-MASMX 7r3
-3/complex.msm
-*EOF*
-  :                            1 	$word	32
-  :                            2 
-  :                            3 p	$proc
-  :                            4 one*	$name
-  :                            5 *	$tree
-  :                            6 left	two1
-  :                            7 index	$do	6,spray(index)	two2
-  :                            8 	$root
-  :                            9 	$end
-  :                            10 
-  :                            11 p	$proc
-  :                            12 two1*	$name
-  :                            13 *	$branch
-  :                            14 index	$do	4,bud(index)	three1
-  :                            15         $root
-  :                            16 right	$branch
-  :                            17 cusp	three2
-  :                            18 	$root
-  :                            19 	$end
-  :                            20 
-  :                            21 two2*	$proc
-  :                            22 *	$tree
-  :                            23 index	$do	12,tendril(index)	+	24-index
-  :                            24 	$root
-  :                            25 	$end
-  :                            26 
-  :                            27 three1*	$proc
-  :                            28 *	$tree
-  :                            29 index	$do	4,shoot(index)	+	100
-  :                            30 	$root
-  :                            31 	$end
-  :                            32 
-  :                            33 three2*	$proc
-  :                            34 *	$tree
-  :                            35 index	$do	8,blossom(index)	-	100
-  :                            36 	$root
-  :                            37 	$end
-  :                            38 
-  :                            39 $(2:02000)
-02:00002000 00000064          +40 index	$do	3,stem(index)	one
-02:00002001 00000064          +40 
-02:00002002 00000064          +40 
-
-
-   . . . .   . . .
-
-02:00002106 0000000D          +40 
-02:00002107 0000000C          +40 
-  :                            41 $(3:03000)
-03:00003000 00000003          +42 	+	stem()
-  :                            43 first_high_index $set	stem()
-03:00003001 00000003          +44 	+	first_high_index
-03:00003002 000020B0          +45 	+	stem(first_high_index)
-03:00003003 00000004          +46 	+	stem(first_high_index):left:bud()
-  :                            47 second_high_index $set stem(first_high_index):left:bud()
-03:00003004 00000004          +48 	+	second_high_index
-03:00003005 000020BC          +49 	+	stem(first_high_index):left:bud(second_high_index)
-  :                            50 
-                                	+	stem(first_high_index):left:bud(second_high_index):;
-03:00003006 00000004          +52 		shoot()
-  :                            53 
-                                third_high_index $set	;
-                                		stem(first_high_index):left:bud(second_high_index):;
-  :                            56 		shoot()
-  :                            57 
-03:00003007 00000004          +58 	+	third_high_index
-  :                            59 
-                                	+	stem(first_high_index):left:bud(second_high_index):;
-03:00003008 000020BF          +61 		shoot(third_high_index)
-  :                            62 
-03:00003009 00000006          +63 	+	stem(first_high_index):spray()
-  :                            64 second_high_index $set stem(first_high_index):spray()
-03:0000300A 00000006          +65 	+	second_high_index
-03:0000300B 000020FC          +66 	+	stem(first_high_index):spray(second_high_index)
-  :                            67 
-03:0000300C 0000000C          +68 	+	stem(first_high_index):spray(second_high_index):tendril()
-  :                            69 
-                                third_high_index $set	;
-  :                            71 		stem(first_high_index):spray(second_high_index):tendril()
-  :                            72 
-03:0000300D 0000000C          +73 	+	third_high_index
-                                	+	;
-03:0000300E 00002107          +75  stem(first_high_index):spray(second_high_index):tendril(third_high_index)
-  :                            76 
-03:0000300F 00000006          +77 	+	stem(first_high_index):spray()
-  :                            78 second_high_index $set stem(first_high_index):spray()
-03:00003010 00000006          +79 	+	second_high_index
-  :                            80 
-03:00003011 000020FC          +81 	+	stem(first_high_index):spray(second_high_index)
-03:00003012 0000000C          +82 	+	stem(first_high_index):spray(second_high_index):tendril()
-  :                            83 
-                                third_high_index $set	;
-  :                            85 		stem(first_high_index):spray(second_high_index):tendril()
-  :                            86 
-03:00003013 0000000C          +87 	+	third_high_index
-  :                            88 
-03:00003014 00002107          +89  + stem(first_high_index):spray(second_high_index):tendril(third_high_index)
-  :                            90 
-03:00003015 00000008          +91 	+	stem(first_high_index):right:cusp:blossom()
-  :                            92 second_high_index $set stem(first_high_index):right:cusp:blossom()
-03:00003016 00000008          +93 	+	second_high_index
-03:00003017 000020B7          +94 	+ stem(first_high_index):right:cusp:blossom(second_high_index)
-*EOF*
-one=:N129:P:0:00000000
-two1=:N129:P:0:00000000
-two2=:P1:0:00000002
-three1=:P1:0:00000003
-three2=:P1:0:00000004
-index=00000003
-stem(1)=$02:00002000
-stem(1):left=$02:00002000
-stem(1):left:bud(1)=$02:00002000
-stem(1):left:bud(1):shoot(1)=$02:00002000
-<div	style="font-size:5pt">
-
-stem(1):left:bud(1):shoot(2)=$02:00002001
-stem(1):left:bud(1):shoot(3)=$02:00002002
-stem(1):left:bud(1):shoot(4)=$02:00002003
-stem(1):left:bud(2)=$02:00002004
-stem(1):left:bud(2):shoot(1)=$02:00002004
-stem(1):left:bud(2):shoot(2)=$02:00002005
-stem(1):left:bud(2):shoot(3)=$02:00002006
-stem(1):left:bud(2):shoot(4)=$02:00002007
-stem(1):left:bud(3)=$02:00002008
-stem(1):left:bud(3):shoot(1)=$02:00002008
-stem(1):left:bud(3):shoot(2)=$02:00002009
-stem(1):left:bud(3):shoot(3)=$02:0000200A
-stem(1):left:bud(3):shoot(4)=$02:0000200B
-stem(1):left:bud(4)=$02:0000200C
-stem(1):left:bud(4):shoot(1)=$02:0000200C
-stem(1):left:bud(4):shoot(2)=$02:0000200D
-</div>
-stem(1):left:bud(4):shoot(3)=$02:0000200E
-stem(1):left:bud(4):shoot(4)=$02:0000200F
-stem(1):right=$02:00002000
-stem(1):right:cusp=$02:00002000
-stem(1):right:cusp:blossom(1)=$02:00002000
-stem(1):right:cusp:blossom(2)=$02:00002001
-stem(1):right:cusp:blossom(3)=$02:00002002
-stem(1):right:cusp:blossom(4)=$02:00002003
-stem(1):right:cusp:blossom(5)=$02:00002004
-stem(1):right:cusp:blossom(6)=$02:00002005
-stem(1):right:cusp:blossom(7)=$02:00002006
-stem(1):right:cusp:blossom(8)=$02:00002007
-stem(1):spray(1)=$02:00002010
-stem(1):spray(1):tendril(1)=$02:00002010
-stem(1):spray(1):tendril(2)=$02:00002011
-<div	style="font-size:5pt">
-stem(1):spray(1):tendril(3)=$02:00002012
-stem(1):spray(1):tendril(4)=$02:00002013
-stem(1):spray(1):tendril(5)=$02:00002014
-stem(1):spray(1):tendril(6)=$02:00002015
-stem(1):spray(1):tendril(7)=$02:00002016
-stem(1):spray(1):tendril(8)=$02:00002017
-stem(1):spray(1):tendril(9)=$02:00002018
-stem(1):spray(1):tendril(10)=$02:00002019
-stem(1):spray(1):tendril(11)=$02:0000201A
-stem(1):spray(1):tendril(12)=$02:0000201B
-stem(1):spray(2)=$02:0000201C
-stem(1):spray(2):tendril(1)=$02:0000201C
-stem(1):spray(2):tendril(2)=$02:0000201D
-stem(1):spray(2):tendril(3)=$02:0000201E
-stem(1):spray(2):tendril(4)=$02:0000201F
-stem(1):spray(2):tendril(5)=$02:00002020
-stem(1):spray(2):tendril(6)=$02:00002021
-stem(1):spray(2):tendril(7)=$02:00002022
-stem(1):spray(2):tendril(8)=$02:00002023
-stem(1):spray(2):tendril(9)=$02:00002024
-stem(1):spray(2):tendril(10)=$02:00002025
-stem(1):spray(2):tendril(11)=$02:00002026
-stem(1):spray(2):tendril(12)=$02:00002027
-stem(1):spray(3)=$02:00002028
-stem(1):spray(3):tendril(1)=$02:00002028
-stem(1):spray(3):tendril(2)=$02:00002029
-stem(1):spray(3):tendril(3)=$02:0000202A
-stem(1):spray(3):tendril(4)=$02:0000202B
-stem(1):spray(3):tendril(5)=$02:0000202C
-stem(1):spray(3):tendril(6)=$02:0000202D
-stem(1):spray(3):tendril(7)=$02:0000202E
-stem(1):spray(3):tendril(8)=$02:0000202F
-stem(1):spray(3):tendril(9)=$02:00002030
-stem(1):spray(3):tendril(10)=$02:00002031
-stem(1):spray(3):tendril(11)=$02:00002032
-stem(1):spray(3):tendril(12)=$02:00002033
-stem(1):spray(4)=$02:00002034
-stem(1):spray(4):tendril(1)=$02:00002034
-stem(1):spray(4):tendril(2)=$02:00002035
-stem(1):spray(4):tendril(3)=$02:00002036
-stem(1):spray(4):tendril(4)=$02:00002037
-stem(1):spray(4):tendril(5)=$02:00002038
-stem(1):spray(4):tendril(6)=$02:00002039
-stem(1):spray(4):tendril(7)=$02:0000203A
-stem(1):spray(4):tendril(8)=$02:0000203B
-stem(1):spray(4):tendril(9)=$02:0000203C
-stem(1):spray(4):tendril(10)=$02:0000203D
-stem(1):spray(4):tendril(11)=$02:0000203E
-stem(1):spray(4):tendril(12)=$02:0000203F
-stem(1):spray(5)=$02:00002040
-stem(1):spray(5):tendril(1)=$02:00002040
-stem(1):spray(5):tendril(2)=$02:00002041
-stem(1):spray(5):tendril(3)=$02:00002042
-stem(1):spray(5):tendril(4)=$02:00002043
-stem(1):spray(5):tendril(5)=$02:00002044
-stem(1):spray(5):tendril(6)=$02:00002045
-stem(1):spray(5):tendril(7)=$02:00002046
-stem(1):spray(5):tendril(8)=$02:00002047
-stem(1):spray(5):tendril(9)=$02:00002048
-stem(1):spray(5):tendril(10)=$02:00002049
-stem(1):spray(5):tendril(11)=$02:0000204A
-stem(1):spray(5):tendril(12)=$02:0000204B
-stem(1):spray(6)=$02:0000204C
-stem(1):spray(6):tendril(1)=$02:0000204C
-stem(1):spray(6):tendril(2)=$02:0000204D
-stem(1):spray(6):tendril(3)=$02:0000204E
-stem(1):spray(6):tendril(4)=$02:0000204F
-stem(1):spray(6):tendril(5)=$02:00002050
-stem(1):spray(6):tendril(6)=$02:00002051
-stem(1):spray(6):tendril(7)=$02:00002052
-stem(1):spray(6):tendril(8)=$02:00002053
-stem(1):spray(6):tendril(9)=$02:00002054
-stem(1):spray(6):tendril(10)=$02:00002055
-</div>
-stem(1):spray(6):tendril(11)=$02:00002056
-stem(1):spray(6):tendril(12)=$02:00002057
-stem(2)=$02:00002058
-stem(2):left=$02:00002058
-stem(2):left:bud(1)=$02:00002058
-stem(2):left:bud(1):shoot(1)=$02:00002058
-stem(2):left:bud(1):shoot(2)=$02:00002059
-<div	style="font-size:5pt">
-
-stem(2):left:bud(1):shoot(3)=$02:0000205A
-stem(2):left:bud(1):shoot(4)=$02:0000205B
-stem(2):left:bud(2)=$02:0000205C
-stem(2):left:bud(2):shoot(1)=$02:0000205C
-stem(2):left:bud(2):shoot(2)=$02:0000205D
-stem(2):left:bud(2):shoot(3)=$02:0000205E
-stem(2):left:bud(2):shoot(4)=$02:0000205F
-stem(2):left:bud(3)=$02:00002060
-stem(2):left:bud(3):shoot(1)=$02:00002060
-stem(2):left:bud(3):shoot(2)=$02:00002061
-stem(2):left:bud(3):shoot(3)=$02:00002062
-stem(2):left:bud(3):shoot(4)=$02:00002063
-stem(2):left:bud(4)=$02:00002064
-stem(2):left:bud(4):shoot(1)=$02:00002064
-stem(2):left:bud(4):shoot(2)=$02:00002065
-stem(2):left:bud(4):shoot(3)=$02:00002066
-</div>
-stem(2):left:bud(4):shoot(4)=$02:00002067
-stem(2):right=$02:00002058
-stem(2):right:cusp=$02:00002058
-stem(2):right:cusp:blossom(1)=$02:00002058
-stem(2):right:cusp:blossom(2)=$02:00002059
-stem(2):right:cusp:blossom(3)=$02:0000205A
-<div	style="font-size:5pt">
-
-stem(2):right:cusp:blossom(4)=$02:0000205B
-stem(2):right:cusp:blossom(5)=$02:0000205C
-stem(2):right:cusp:blossom(6)=$02:0000205D
-stem(2):right:cusp:blossom(7)=$02:0000205E
-stem(2):right:cusp:blossom(8)=$02:0000205F
-stem(2):spray(1)=$02:00002068
-stem(2):spray(1):tendril(1)=$02:00002068
-stem(2):spray(1):tendril(2)=$02:00002069
-stem(2):spray(1):tendril(3)=$02:0000206A
-stem(2):spray(1):tendril(4)=$02:0000206B
-stem(2):spray(1):tendril(5)=$02:0000206C
-stem(2):spray(1):tendril(6)=$02:0000206D
-stem(2):spray(1):tendril(7)=$02:0000206E
-stem(2):spray(1):tendril(8)=$02:0000206F
-stem(2):spray(1):tendril(9)=$02:00002070
-stem(2):spray(1):tendril(10)=$02:00002071
-stem(2):spray(1):tendril(11)=$02:00002072
-stem(2):spray(1):tendril(12)=$02:00002073
-stem(2):spray(2)=$02:00002074
-stem(2):spray(2):tendril(1)=$02:00002074
-stem(2):spray(2):tendril(2)=$02:00002075
-stem(2):spray(2):tendril(3)=$02:00002076
-stem(2):spray(2):tendril(4)=$02:00002077
-stem(2):spray(2):tendril(5)=$02:00002078
-stem(2):spray(2):tendril(6)=$02:00002079
-stem(2):spray(2):tendril(7)=$02:0000207A
-stem(2):spray(2):tendril(8)=$02:0000207B
-stem(2):spray(2):tendril(9)=$02:0000207C
-stem(2):spray(2):tendril(10)=$02:0000207D
-stem(2):spray(2):tendril(11)=$02:0000207E
-stem(2):spray(2):tendril(12)=$02:0000207F
-stem(2):spray(3)=$02:00002080
-stem(2):spray(3):tendril(1)=$02:00002080
-stem(2):spray(3):tendril(2)=$02:00002081
-stem(2):spray(3):tendril(3)=$02:00002082
-stem(2):spray(3):tendril(4)=$02:00002083
-stem(2):spray(3):tendril(5)=$02:00002084
-stem(2):spray(3):tendril(6)=$02:00002085
-stem(2):spray(3):tendril(7)=$02:00002086
-stem(2):spray(3):tendril(8)=$02:00002087
-stem(2):spray(3):tendril(9)=$02:00002088
-stem(2):spray(3):tendril(10)=$02:00002089
-stem(2):spray(3):tendril(11)=$02:0000208A
-stem(2):spray(3):tendril(12)=$02:0000208B
-stem(2):spray(4)=$02:0000208C
-stem(2):spray(4):tendril(1)=$02:0000208C
-stem(2):spray(4):tendril(2)=$02:0000208D
-stem(2):spray(4):tendril(3)=$02:0000208E
-stem(2):spray(4):tendril(4)=$02:0000208F
-stem(2):spray(4):tendril(5)=$02:00002090
-stem(2):spray(4):tendril(6)=$02:00002091
-stem(2):spray(4):tendril(7)=$02:00002092
-stem(2):spray(4):tendril(8)=$02:00002093
-stem(2):spray(4):tendril(9)=$02:00002094
-stem(2):spray(4):tendril(10)=$02:00002095
-stem(2):spray(4):tendril(11)=$02:00002096
-stem(2):spray(4):tendril(12)=$02:00002097
-stem(2):spray(5)=$02:00002098
-stem(2):spray(5):tendril(1)=$02:00002098
-stem(2):spray(5):tendril(2)=$02:00002099
-stem(2):spray(5):tendril(3)=$02:0000209A
-stem(2):spray(5):tendril(4)=$02:0000209B
-stem(2):spray(5):tendril(5)=$02:0000209C
-stem(2):spray(5):tendril(6)=$02:0000209D
-stem(2):spray(5):tendril(7)=$02:0000209E
-stem(2):spray(5):tendril(8)=$02:0000209F
-stem(2):spray(5):tendril(9)=$02:000020A0
-stem(2):spray(5):tendril(10)=$02:000020A1
-stem(2):spray(5):tendril(11)=$02:000020A2
-stem(2):spray(5):tendril(12)=$02:000020A3
-stem(2):spray(6)=$02:000020A4
-stem(2):spray(6):tendril(1)=$02:000020A4
-stem(2):spray(6):tendril(2)=$02:000020A5
-stem(2):spray(6):tendril(3)=$02:000020A6
-stem(2):spray(6):tendril(4)=$02:000020A7
-stem(2):spray(6):tendril(5)=$02:000020A8
-stem(2):spray(6):tendril(6)=$02:000020A9
-stem(2):spray(6):tendril(7)=$02:000020AA
-stem(2):spray(6):tendril(8)=$02:000020AB
-stem(2):spray(6):tendril(9)=$02:000020AC
-stem(2):spray(6):tendril(10)=$02:000020AD
-stem(2):spray(6):tendril(11)=$02:000020AE
-stem(2):spray(6):tendril(12)=$02:000020AF
-</div>
-stem(3)=$02:000020B0
-stem(3):left=$02:000020B0
-stem(3):left:bud(1)=$02:000020B0
-stem(3):left:bud(1):shoot(1)=$02:000020B0
-stem(3):left:bud(1):shoot(2)=$02:000020B1
-stem(3):left:bud(1):shoot(3)=$02:000020B2
-<div	style="font-size:5pt">
-stem(3):left:bud(1):shoot(4)=$02:000020B3
-stem(3):left:bud(2)=$02:000020B4
-stem(3):left:bud(2):shoot(1)=$02:000020B4
-stem(3):left:bud(2):shoot(2)=$02:000020B5
-stem(3):left:bud(2):shoot(3)=$02:000020B6
-stem(3):left:bud(2):shoot(4)=$02:000020B7
-stem(3):left:bud(3)=$02:000020B8
-stem(3):left:bud(3):shoot(1)=$02:000020B8
-stem(3):left:bud(3):shoot(2)=$02:000020B9
-stem(3):left:bud(3):shoot(3)=$02:000020BA
-stem(3):left:bud(3):shoot(4)=$02:000020BB
-stem(3):left:bud(4)=$02:000020BC
-stem(3):left:bud(4):shoot(1)=$02:000020BC
-stem(3):left:bud(4):shoot(2)=$02:000020BD
-stem(3):left:bud(4):shoot(3)=$02:000020BE
-</div.
-stem(3):left:bud(4):shoot(4)=$02:000020BF
-stem(3):right=$02:000020B0
-stem(3):right:cusp=$02:000020B0
-stem(3):right:cusp:blossom(1)=$02:000020B0
-stem(3):right:cusp:blossom(2)=$02:000020B1
-stem(3):right:cusp:blossom(3)=$02:000020B2
-<div	style="font-size:5pt">
-
-stem(3):right:cusp:blossom(4)=$02:000020B3
-stem(3):right:cusp:blossom(5)=$02:000020B4
-stem(3):right:cusp:blossom(6)=$02:000020B5
-stem(3):right:cusp:blossom(7)=$02:000020B6
-stem(3):right:cusp:blossom(8)=$02:000020B7
-stem(3):spray(1)=$02:000020C0
-stem(3):spray(1):tendril(1)=$02:000020C0
-stem(3):spray(1):tendril(2)=$02:000020C1
-stem(3):spray(1):tendril(3)=$02:000020C2
-stem(3):spray(1):tendril(4)=$02:000020C3
-stem(3):spray(1):tendril(5)=$02:000020C4
-stem(3):spray(1):tendril(6)=$02:000020C5
-stem(3):spray(1):tendril(7)=$02:000020C6
-stem(3):spray(1):tendril(8)=$02:000020C7
-stem(3):spray(1):tendril(9)=$02:000020C8
-stem(3):spray(1):tendril(10)=$02:000020C9
-stem(3):spray(1):tendril(11)=$02:000020CA
-stem(3):spray(1):tendril(12)=$02:000020CB
-stem(3):spray(2)=$02:000020CC
-stem(3):spray(2):tendril(1)=$02:000020CC
-stem(3):spray(2):tendril(2)=$02:000020CD
-stem(3):spray(2):tendril(3)=$02:000020CE
-stem(3):spray(2):tendril(4)=$02:000020CF
-stem(3):spray(2):tendril(5)=$02:000020D0
-stem(3):spray(2):tendril(6)=$02:000020D1
-stem(3):spray(2):tendril(7)=$02:000020D2
-stem(3):spray(2):tendril(8)=$02:000020D3
-stem(3):spray(2):tendril(9)=$02:000020D4
-stem(3):spray(2):tendril(10)=$02:000020D5
-stem(3):spray(2):tendril(11)=$02:000020D6
-stem(3):spray(2):tendril(12)=$02:000020D7
-stem(3):spray(3)=$02:000020D8
-stem(3):spray(3):tendril(1)=$02:000020D8
-stem(3):spray(3):tendril(2)=$02:000020D9
-stem(3):spray(3):tendril(3)=$02:000020DA
-stem(3):spray(3):tendril(4)=$02:000020DB
-stem(3):spray(3):tendril(5)=$02:000020DC
-stem(3):spray(3):tendril(6)=$02:000020DD
-stem(3):spray(3):tendril(7)=$02:000020DE
-stem(3):spray(3):tendril(8)=$02:000020DF
-stem(3):spray(3):tendril(9)=$02:000020E0
-stem(3):spray(3):tendril(10)=$02:000020E1
-stem(3):spray(3):tendril(11)=$02:000020E2
-stem(3):spray(3):tendril(12)=$02:000020E3
-stem(3):spray(4)=$02:000020E4
-stem(3):spray(4):tendril(1)=$02:000020E4
-stem(3):spray(4):tendril(2)=$02:000020E5
-stem(3):spray(4):tendril(3)=$02:000020E6
-stem(3):spray(4):tendril(4)=$02:000020E7
-stem(3):spray(4):tendril(5)=$02:000020E8
-stem(3):spray(4):tendril(6)=$02:000020E9
-stem(3):spray(4):tendril(7)=$02:000020EA
-stem(3):spray(4):tendril(8)=$02:000020EB
-stem(3):spray(4):tendril(9)=$02:000020EC
-stem(3):spray(4):tendril(10)=$02:000020ED
-stem(3):spray(4):tendril(11)=$02:000020EE
-stem(3):spray(4):tendril(12)=$02:000020EF
-stem(3):spray(5)=$02:000020F0
-stem(3):spray(5):tendril(1)=$02:000020F0
-stem(3):spray(5):tendril(2)=$02:000020F1
-stem(3):spray(5):tendril(3)=$02:000020F2
-stem(3):spray(5):tendril(4)=$02:000020F3
-stem(3):spray(5):tendril(5)=$02:000020F4
-stem(3):spray(5):tendril(6)=$02:000020F5
-stem(3):spray(5):tendril(7)=$02:000020F6
-stem(3):spray(5):tendril(8)=$02:000020F7
-stem(3):spray(5):tendril(9)=$02:000020F8
-stem(3):spray(5):tendril(10)=$02:000020F9
-stem(3):spray(5):tendril(11)=$02:000020FA
-stem(3):spray(5):tendril(12)=$02:000020FB
-stem(3):spray(6)=$02:000020FC
-stem(3):spray(6):tendril(1)=$02:000020FC
-stem(3):spray(6):tendril(2)=$02:000020FD
-stem(3):spray(6):tendril(3)=$02:000020FE
-stem(3):spray(6):tendril(4)=$02:000020FF
-stem(3):spray(6):tendril(5)=$02:00002100
-stem(3):spray(6):tendril(6)=$02:00002101
-stem(3):spray(6):tendril(7)=$02:00002102
-stem(3):spray(6):tendril(8)=$02:00002103
-stem(3):spray(6):tendril(9)=$02:00002104
-</div>
-
-stem(3):spray(6):tendril(10)=$02:00002105
-stem(3):spray(6):tendril(11)=$02:00002106
-stem(3):spray(6):tendril(12)=$02:00002107
-first_high_index=00000003
-second_high_index=00000008
-third_high_index=0000000C
-complex.msm=0<00000003
-:$(02):00002000:00002108 :$(03):00003000:00003018 
-
-</pre>
 
 <h4>5.2.1.4: Structured Code Name Spaces</h4>
 
-<h3>5.2.2: Bit-Aligned Structures $RECORD..$ROOT</h3>
+<b>$tree..$root</b> construct may be used to compartment the local names
+of code routines in the manner of block-structured languages
+<pre>
+
+Tim-Coxs-MacBook:test.msm timcox$ masmx -lnkx routines
+MASMX 7r3
+3/routines.msm
+CONT_CHAR=|
+LTERM=;
+STERM=.
+*EOF*
+  :                            1 	$path		../smaragd.68k
+  :                            4 	$list
+  :                            5 	$path
+  :                            6 
+  :                            7 .data	$equ	5
+  :                            8 .text	$equ	0
+  :                            9 
+  :                            10 $(.data:0x5000)
+  :                            11 $(.text:16384)
+  :                            12 
+  :                            13 routineA	$tree
+  :                            14 $(.data)
+05:00005000 001E              +15 counter	+	30
+05:00005002 0000A000          +16 pointer	+	0x0a000L
+  :                            17 $(.text)
+00:00004000 30385000          +18 	move.w	counter, d0
+00:00004004 20785002          +19 	movea	pointer, a0
+  :                            20 
+  :                            21 	;
+  :                            22 	;
+00:00004008 4E75              +23 	rts
+  :                            24 	$root
+  :                            25 
+  :                            26 routineB	$tree
+  :                            27 $(.data)
+05:00005006 003C              +28 counter	+	60
+05:00005008 0000B000          +29 pointer	+	0x0b000L
+  :                            30 $(.text)
+00:0000400A 30385006          +31 	move.w	counter, d0
+00:0000400E 20785008          +32 	movea	pointer, a0
+  :                            33 
+  :                            34 	;
+  :                            35 	;
+00:00004012 4E75              +36 	rts
+  :                            37 	$root
+  :                            38 
+*EOF*
+.data=0005
+.text=0000
+routineA=$00:4000
+routineA:counter=$05:5000
+routineA:pointer=$05:5002
+routineB=$00:400A
+routineB:counter=$05:5006
+routineB:pointer=$05:5008
+../smaragd.68k/coldfire.def=1<00000005
+routines.msm=0<00000003
+:$(00):00004000:00004014 :$(05):00005000:0000500C 
+
+
+
+</pre>
+
+<h3>5.2.2: Bit-Aligned Structures</h3>
+
+<h4>5.2.2.1: Bit-Aligned Data $record..$root</h4>
 
 <b>$record</b>..<b>$root</b> structures are bit aligned
 
@@ -5503,6 +4938,20 @@ plus optionally base-displacement pointer register.<br>The attributes of each fi
 are held in one label of type <b>$equf</b>
 
 <p>
+$record does not have separate template and instance steps. Describing a $record layout is also describing an instance
+
+<p>
+For this reason $record may be found within a $proc macro
+
+<p>
+$proc macros can assign actual arguments to any nested $record in their scope
+
+
+
+<h4>5.2.2.2: Macro Code Access to Bit-Aligned Fields and Groups</h4>
+
+
+<p>
 masmx labelling allows macro language specific to the target to read and
 write bit-aligned fields
 
@@ -5576,24 +5025,131 @@ betaille.msm: object code 256 bytes: 0 errors: 0 undefined labels
 
 </pre>
 
-$record does not have separate template and instance steps. Describing a $record layout is also describing an instance
+
+<h4>5.2.2.3: Bit-Aligned Structure Overlay and Overload: $RECORD,$BRANCH</h4>
+
+<b>$record</b> structures can may be overlaid or redifined with the addition of
+<b>,$branch</b> subfunction. The resulting unions are at bit-position precision.
 
 <p>
-For this reason $record may be found within a $proc macro
+Initial values may be overloaded. However masmx load code is in words. Overloads
+on a storage word are not merged
 
-<p>
-$proc macros can assign actual arguments to any nested $record in their scope
+<pre>
 
-Repeating field groups to any nesting depth are constructed with records inside $proc macros
+$ masmx -lnkx moreover.msm 
+MASMX 7r3
+3/moreover.msm
+CONT_CHAR=|
+LTERM=;
+STERM=.
+*EOF*
+  :                            1 	$path		../smaragd.68k
+  :                            5 	$list
+  :                            6 	$path
+  :                            7 
+  :                            8 
+  :                            9 $(3:03000)
+  :                            10 first	$record,$branch	1 2 3
+  :                            11 one	4
+  :                            12 two	4
+  :                            13 three	4
+  :                            14 "O'Leary" 20
+03:00000600 12300000          +15 	$root
+  :                            16 second	$record,$branch
+  :                            17 fill	4
+  :                            18 second1	$record,$branch	4 5 6
+  :                            19 one	4s
+  :                            20 two	4
+  :                            21 three	4
+03:00000600 0456              +22 	$root
+  :                            23 second2	$record,$branch	7 8
+  :                            24 one	4
+  :                            25 two	4
+03:00000600 0780              +26 	$root
+  :                            27 	$root
+  :                            28 third	$record,$branch	63
+  :                            29 longways 18
+03:00000600 000FC000          +30 	$root
+  :                            31 
+  :                            32 new	$record	10 6
+  :                            33 discriminator 4
+  :                            34 first	$record,$branch	"carpets"
+  :                            35 text	48
+03:00000604 A636172706574000  +36 	$root
+  :                            37 second	$record,$branch	10 11 12 13 14 15
+  :                            38 ?	$do	9,quartet(?)	4
+03:00000604 0ABCDEF00000      +39 	$root
+  :                            40 marker	4
+03:0000060A 0600              +41 	$root
+  :                            42 
+03:0000060C 400001E00000000000000000
+                              +43 sum	1.75
+  :                            44 	
+  :                            45 $(0:64)
+00:00000040 10380601          +46 	retrieve	first.three
+00:00000044 E888              +46 
+00:00000046 02800000000F      +46 
+00:0000004C 12380600          +47 	retrieve	second.fill		d1
+00:00000050 E889              +47 
+00:00000052 02810000000F      +47 
+00:00000058 34380600          +48 	retrieve	second.second1.one	d2
+00:0000005C 4842              +48 
+00:0000005E E98A              +48 
+00:00000060 343C001C          +48 
+00:00000064 E4A2              +48 
+00:00000066 16380601          +49 	retrieve	second.second1.three	d3
+00:0000006A 02830000000F      +49 
+00:00000070 38380600          +50 	retrieve	second.second2		d4
+00:00000074 E88C              +50 
+00:00000076 0284000000FF      +50 
+00:0000007C 3A380606          +51 	retrieves	new.second.quartet(5)	d5
+00:00000080 4845              +51 
+00:00000082 E98D              +51 
+00:00000084 3A3C001C          +51 
+00:00000088 EAA5              +51 
+  :                            52 
+*EOF*
+first=$03:00000600,,,,00000020
+first:one=$03:00000600,,,,00000004
+first:two=$03:00000600,,,00000004,00000004
+first:three=$03:00000600,,,00000008,00000004
+first:O'Leary=$03:00000600,,,0000000C,00000014
+second=$03:00000600,,,,00000010
+second:fill=$03:00000600,,,,00000004
+second:second1=$03:00000600,,,00000004,0000000C
+second:second1:one=$03:00000600,,,00000004,80000004
+second:second1:two=$03:00000600,,,00000008,00000004
+second:second1:three=$03:00000600,,,0000000C,00000004
+second:second2=$03:00000600,,,00000004,00000008
+second:second2:one=$03:00000600,,,00000004,00000004
+second:second2:two=$03:00000600,,,00000008,00000004
+third=$03:00000600,,,,00000012
+third:longways=$03:00000600,,,,00000012
+new=$03:00000604,,,,00000038
+new:discriminator=$03:00000604,,,,00000004
+new:first=$03:00000604,,,00000004,00000030
+new:first:text=$03:00000604,,,00000004,00000030
+new:second=$03:00000604,,,00000004,00000024
+new:second:quartet(1)=$03:00000604,,,00000004,00000004
+new:second:quartet(2)=$03:00000604,,,00000008,00000004
+new:second:quartet(3)=$03:00000604,,,0000000C,00000004
+new:second:quartet(4)=$03:00000606,,,,00000004
+new:second:quartet(5)=$03:00000606,,,00000004,00000004
+new:second:quartet(6)=$03:00000606,,,00000008,00000004
+new:second:quartet(7)=$03:00000606,,,0000000C,00000004
+new:second:quartet(8)=$03:00000608,,,,00000004
+new:second:quartet(9)=$03:00000608,,,00000004,00000004
+new:marker=$03:0000060A,,,00000004,00000004
+?=0009
+sum=$03:060C
+../smaragd.68k/record_x.def=1<00000005
+../smaragd.68k/coldfire.def=1<00000005
+moreover.msm=0<00000003
+:$(00):00000040:0000008A :$(03):00000600:00000618 
 
 
-
-<h4>5.2.2.3: Macro Code Access to Bit-Aligned Structures</h4>
-
-
-<h4>5.2.2.1: Simple Structures $RECORD..$ROOT</h4>
-<h4>5.2.2.2: Overlaid Structures $RECORD,$BRANCH..$ROOT</h4>
-<h4>5.2.2.3: Macro Code Access to Bit-Aligned Structures</h4>
+</pre>
 
 <h1>6: Run-Time Algorithm Plotter</h1>
 
@@ -5620,14 +5176,6 @@ for run time calculation
 In this example the subexpression right of the OR operator <b>++</b> has been
 resolved at assembly time, but left of <b>++</b> a multiply, two adds and a
 shift must take place at runtime
-
-<p>
-The running accumulation is maintained in 48 bits, but it is judged to contain
-only 24 significands until a double load, an add, a negative add, a multiply, or
-a boolean operation on 48 bits has taken place. The first operation <b>one,,w0*4</b>
-could be executed in one multiply step because it was known that the multiplicand
-had 24 or less significands. These rules are in the target-specific macro code and
-not in masmx
 
 <pre>
 
@@ -5693,7 +5241,7 @@ The floated <b>#</b> yields in the two illustrated cases these two immediate ope
 
 </pre>
 Target specific macros required for $xqt_i and $xqt_fp have the names called from this target-independent
-ouline scheme
+outline scheme
 
 <pre>
 
@@ -9114,417 +8662,45 @@ The supplied definition "ppc_603.def" processes either syntax.
 
 
 <h2>8.21: $FUNC              Macro to Produce Operand Value</h2>      
+
+<b>$func</b> is the directive at the head of a function macro, which
+returns a value to be used as a token in an assembly-time expression
 <pre>
 
-fname   $func
-	.
-ename*   $name   ; entry point $NAME doesn't have to be used
-ename2*  $name   ; unless label on $FUNC is not unique or not visible*
-ename3*  $name   ; or multiple $NAME values ar needed 
+functio* $func	[*]
 	.
 	.
-	$return ...
-	$end
-
-</pre>
-<p>
-Is a macro which returns a value which may be used in
-expressions. An example is in the definition "8051.def"
-
-<p>
-The XRAM (variables) location counter is referenced as @.
-
-<p>
-@ is given the functional meaning location counter one. That
-is where the variables are assembled.
-<pre>
-
-@*      $func
-	$return $(1)
-	$end
-
-</pre>
-<p>
-A function can be used to extract parenthesised qualifiers on an
-operand subfield. If the contents of parentheses are intricate,
-having comma or space separators they can only be given to the
-function macro as a SUBSTRING
-<pre>
-
-	add.l   offset(a0, d0.w), d1
-
-p       $proc
-add.l*  $name   ADD.L
-	.
-	.
-subparams $set  howmany\p(1,1:1)
-a_reg   $set    sub_param1\p(1,1:1)
-index_reg $set  sub_param2\p(1,1:1)
-index_lwb $set  sub_param3\p(1,1:1)
-	.
-	.
-	$if     subparams>1
-	instruction_form_x p(1, 2), a_reg, index_reg, index_lwb, p(1, 1) 
-	$elseif
-	.
-	.
+	$return	<i>VALUE</i>
 	$end
 
 
-m68k_A_REG	$equ	128
-m68k_D_REG	$equ	129
-m68k_W_TAG	$equ	130
 
-
-a0	$equ,m68k_A_REG		0
+f	$func	[*]
+fname1*	$name	<i>LATENT_VALUE1</i>
+fname2*	$name	<i>LATENT_VALUE2</i>
 	.
 	.
-d0	$equ,m68k_D_REG		0
-	.
-	.
-w	$equ,m68k_W_TAG		1
-
-f       $func
-howmany* $name
-	$return f(1)
-sub_param1* $name
-	$do     $t(f(1, 1))^=m68k_A_REG, $note Should be Address Register
-	$return f(1, 1)
-sub_param2* $name 
-	$do     $t(f(1, 2:1))^=m68k_D_REG, $note Should be Data Register
-	$return f(1, 2)
-sub_param3* $name
-	$do     $t(f(1, 2:2))^=m68k_W_TAG, $note Should be Width Tag
-	$return f(1, 3)
+	$return	<i>VALUE</i>
 	$end
 
-</pre>
-<p>
-The complex parenthesised text was sent to the function macro
-as a substring, but the function macro then sees fields or subfields.
-See also Section 6.3.3.1: ColdFire and 68000.
-
-<p>
-A function can be used to carry out range or type checks: 
-<pre>
-
-f       $func
-rel2*    $name   2
-rel3*    $name   3
-v       $set    f(1,1)-$-$n
-	$if     v<-128
-	$flag   can only jump back -128 from instruction trailing edge
-	$endif
-	$if     v>127
-	$flag   can only jump forward 127 from instruction trailing edge
-	$endif
-	$return v
-	$end
-
-</pre>
-<p>
-This function returns an 8-bit displacement relative to the 
-trailing edge of an instruction which may be either two or 
-three bytes long.
-
-<p>
-This is an 8051 $PROC or procedural macro
-which calls entry rel2 of this $FUNC or functional macro
-<pre>
-
-p       $proc
-jc*      $name   040
-jnc*     $name   050
-jz*      $name   060
-jnz*     $name   070
-sjmp*    $name   080        
-	i$mova_direct $n, rel2(p(1,1))
-	$end
 
 </pre>
 <p>
 
-In the following 8051 assembly, two jump instructions which
-both use the rel2 function entry cannot be generated without error
-because they are too far from their target
-<pre>
-
-
-MASMX 7r2
-3/relj.msm
-CONT_CHAR=
-LTERM=;
-QDELIM='
-STERM=.
-*EOF*
-  :                            1:         $include        "8051_7r2.def"
-Error: relj.msm Line 2: You may only jump -128..+127 from $+2
-Error: relj.msm Line 2: can only forward 127 from instruction trailing edge
-00:0000 8080                  +2 down    sjmp    up
-  :                            3 
-  :                            4 that_lot* $proc    
-  :                            5         $do     index=2,        $list   0
-  :                            6         +       5
-  :                            7         $do     index=125,      $list   1
-  :                            8        $end
-00:0002 05                    +9 index   $do    128,    that_lot
-00:007F 05                    +9 
-00:0080 05                    +9 
-00:0081 05                    +9 
-  :                            10 
-Error: relj.msm Line 11: You may only jump -128..+127 from $+2
-Error: relj.msm Line 11: can only jump back -128 from instruction trailing edge
-00:0082 407C                  +11 up      jc      down
-*EOF*
-:$(00):0000:0084 :$(01):0400:0400 
-relj.msm: object code 443 bytes: 4 errors: 0 undefined labels
-
-
-</pre>
-<p>
-Here a similar fragment assembles because the
-distance between the jump instructions and their targets is smaller:
-<pre>
-
-
-MASMX 7r2
-3/relja.msm
-CONT_CHAR=
-LTERM=;
-QDELIM='
-STERM=.
-*EOF*
-  :                            1:         $include        "8051_7r2.def"
-  :                            2 
-00:0000 807C                  +3 down    sjmp    up
-00:0002 05                    +4         $do     124,        +  5
-00:0003 05                    +4 
-
-................
-
-00:007B 05                    +4 
-00:007C 05                    +4 
-00:007D 05                    +4 
-00:007E 4080                  +5 up      jc      down
-*EOF*
-:$(00):0000:0080 :$(01):0400:0400 
-relja.msm: object code 431 bytes: 0 errors: 0 undefined labels
-
-
-</pre>
-<h3>8.21.1 Functions which Generate Code and Second Pass Only Functions</h3>
+See Section <b>4.6: Function Macros</b> for examples
 
 <p>
-$FUNC macros primarily generate values which on $RETURN from
-macro expansion are used in expressions. Functions are not
-allowed to generate code inline to the current location counter.
+The optional argument of asterisk on <b>$FUNC</b> directive suppresses
+expansion of the <b>$func</b> macro on the first assembly pass
 
 <p>
-Functions may incidentally generate code in out-of-line 
-location counters before returning a value. Their
-functional value may be the address of an item which they
-have generated.
+This is to inhibit a preliminary expansion of a non-idempotent <b>$FUNC</b> macro
 
 <p>
-This function generates address constant and its
-functional value is the address of the constant.
+However second-pass-only expansion may cause an anomaly between the first
+and second assembly passes, and then the asterisk must be omitted and the
+<b>$FUNC</b> macro expands on both assembly passes
 
-<p>
-The indirect jump instruction assembled under locator 0
-accesses the constant assembled under locator 2:
-<pre>
-
-v*      $func
-$(2)
-constant +      v(1, 1)
-$(0)
-	$return constant
-	$end
-	.
-	.
-	ijump    v(external_routine)
-
-</pre>
-<p>
-Macro language can accidentally call this function multiple times for one
-actual parameter, although that's avoidable.
-
-<p>
-A macro may need to range check an operand.
-
-<p>
-Macro language does not know if an actual parameter contains a function
-call, but should ideally be written to scan each actual parameter only once, by setting a local label to it if multiple references are needed.
-
-<p>
-The safe way of generating code out-of-line in a function is where the
-function which creates a global label for its data item, and tests if
-it exists already:
-<pre>
-
-v*       $func
-	$if	$t("constant_v(1,1)")=0
-$(2)
-"constant_v(1,1)"** +      v(1, 1)
-$(0)
-	$return "constant_v(1,1)"
-	$end
-
-</pre>
-<p>
-and this still won't work, because the label is generated on the
-first pass, and so the data is not generated on the second pass.
-
-<p>
-The function macro can be set to expand only on the second pass with
-a flag argument of * on the $FUNC line. Then it works:
-<pre>
-
-v*       $func	*
-	$if	$t("constant_v(1,1)")=0
-$(2)
-"constant_v(1,1)"** +      v(1, 1)
-$(0)
-	$return "constant_v(1,1)"
-	$end
-
-</pre>
-<p>
-Functions like this should not generate code in a segment which
-has literals in it.
-
-<p>
-If a simple pointer constant is required, literals are a better way
-of getting it, either with a tagged literal pool:
-<pre>
-
-$(2:BASE_ADDRESS_2/LiteralPoolNameInLocator2)
-$(0:BASE_ADDRESS_0)
-	.
-	.
-	ijump    LiteralPoolNameInLocator2(external_routine)
-
-</pre>
-<p>
-or by having automatic literals:
-<pre>
-
-	$set_option("a")        . allow automatic literals
-	$lit    2               . put them in locator 2
-	.
-	.
-	ijump   (external_routine)
-
-
-</pre>
-<p>
-However a function may be needed to produce some table more complex than
-a list of pointers.
-
-<p>
-The vector entries might be encoded items and not completely
-plain pointers, so macro processing becomes necesssary.
-
-<p>
-Here is an assembly where a function calls for the address of an entry point vector.
-
-<p>
-If the vector does not exist it is generated.
-
-<p>
-The vector in turn pointer is an encoded one-word structure,
-and not a simple pointer.
-
-<p>
-The macro which generates the vector pointer calls for the
-generation of a descriptor for a target segment if
-that does not exist.
-
-<p>
-The descriptor imports the address of the target segment and
-and also contains a text label for it.
-
-<p>
-Vectors and descriptors are not one to one. The segments have
-multiple entries.
-<pre>
-
-MASMX 7r2
-3/v.msm
-*EOF*
-  :                            1         $word   32
-  :                            2 i       $form   8, 24
-  :                            3 descriptor $form  32, 32, 64
-  :                            4 
-  :                            5 p       $proc
-  :                            6 call*   $name   10
-  :                            7         i       $n, p(1, 1)
-  :                            8         $end
-  :                            9 
-  :                            10       $plist  7
-  :                            11 
-  :                            12 v*      $func *
-  :                            13         $if     $t(v(1,1))=0
-  :                            14 "v(1,1)"** vector v(1, 1)
-  :                            15         $endif
-  :                            16         $return v(1,1)
-  :                            17         $end
-  :                            18 
-  :                            19 vector* $proc   $(2)
-  :                            20         $if     $t(vector(1,1:1))=0
-  :                            21 "vector(1,1:1)"*** segment vector(1,1:1)
-  :                            22         $endif
-  :                            23 *       +       vector(1,1:1)*/4++vector(1,1:2)
-  :                            24         $end
-  :                            25 
-  :                            26 segment* $proc   $(62)
-  :                            27 *       descriptor +"load$:segment(1,1)", 0, "segment(1,1)"
-  :                            28         $end
-  :                            29 
-  :                            30 $(2:020000)
-  :                            31 $(62:03e0000)
-  :                            32 $(0:64)
-  :                            33 
-3E:003E0000 00000000000000006C65667420202020
-                              +34         call    v(left:1)
-02:00020000 03E00001          +34 
-00:00000040 0A020000          +34 
-3E:003E0004 00000000000000007269676874202020
-                              +35         call    v(right:1)
-02:00020001 03E00041          +35 
-00:00000041 0A020001          +35 
-00:00000042 0A020000          +36         call    v(left:1)
-02:00020002 03E00002          +37         call    v(left:2)
-00:00000043 0A020002          +37 
-3E:003E0008 000000000000000063656E7472652020
-                              +38         call    v(centre:7)
-02:00020003 03E00087          +38 
-00:00000044 0A020003          +38 
-  :                            39 
-*EOF*
-
-.......
-
-LEFT:1=$02:00020000
-LEFT=$3e:003E0000
-LOAD$:LEFT
-RIGHT:1=$02:00020001
-RIGHT=$3e:003E0004
-LOAD$:RIGHT
-LEFT:2=$02:00020002
-CENTRE:7=$02:00020003
-CENTRE=$3e:003E0008
-LOAD$:CENTRE
-:$(00):00000040:00000045 :$(02):00020000:00020004 :$(3E):003E0000:003E000C 
-v.msm: object code 518 bytes: 0 errors: 3 undefined labels
-
-</pre>
-<p>
-Four vector table entries and three segment descriptors have been
-generated for five jump instructions. The output file
-contains import requests for unresolved labels values "load$:left",
-"load$:right", and "load$:centre" to be added the first word of
-each descriptor.
 
 
 <h2>8.22: $HEX               Set Binary Notation to Hex</h2>
@@ -12090,8 +11266,8 @@ name    $TREE
 
 </pre>
 <p>
-$TREEs may be nested for a hierarchy of structures. $TREEs
-may be inside a $PROC macro or not. If a $TREE is inside a
+$TREE may be nested to a depth of 8 for a hierarchy of structures.
+$TREE may be inside a $PROC macro or not. If a $TREE is inside a
 $PROC, the label of the $TREE may be the inherited label from
 the macro call line, for example
 <pre>
@@ -12099,37 +11275,14 @@ the macro call line, for example
 p       $proc
 species $name
 *       $tree
-branches +      p(1,1)
-many    $do     p(1,1),branch(many)   $res    4
+many    $do     p(),branch(many)   $res    4
 	$root
 	$end
 
 </pre>
 <p>
-For reference the components of the resulting structured
-labels are separated with the $STERM symbol, default : colon.
-Therefore if the above macro is expanded with label "aspen":
-
-aspen   species 3
-
-<p>
-labels exist called
-<ul>
-		     	aspen:branches, 
-<pre></pre>
-			aspen:branch(1), 
-<pre></pre>
-			aspen:branch(2), 
-<pre></pre>
-			aspen:branch(3)
-
-</ul>
-<p>
-and ASPEN:BRANCHES has 3 assembled into it. 
-
-<p>
 In the following assembly, an 8051 system has four UARTs each
-with their eight register files locationed nearly adjacent at
+with their eight register files located nearly adjacent at
 XRAM addresses 128..135, 144..151, 160..167, 176..191:
 
 <p>
@@ -12142,38 +11295,37 @@ of structured names:
 <pre>
 
 
-MASMX 7r2
+$ masmx uart -lnx
+MASMX 7r3
 3/uart.msm
 CONT_CHAR=
 LTERM=;
 QDELIM='
 STERM=.
 *EOF*
-  :                            1:         $include   "8051_7r2.def"
-  :                            2 
-  :                            3 LSR_RDR EQU     0       ; Data In Receive FIFO
+  :                            3 	$list
   :                            4 
-  :                            5 serial*  $proc     
-  :                            6         $res    (($+15)**-16)-$
-  :                            7 *       $tree          
-  :                            8 rhr
-  :                            9 thr     $res    1
-  :                            10 ier     $res    1
-  :                            11 isr     $res    1
-  :                            12 lcr     $res    1
-  :                            13 mcr     $res    1
-  :                            14 lsr     $res    1
-  :                            15 msr     $res    1
-  :                            16 spr     $res    1
-  :                            17         $root
-  :                            18         $end
-  :                            19 
-  :                            20 '$bit'*       $func
-  :                            21       $if     $bit(1,1:1)<128
-  :                            22       $return (($bit(1,1:1)**31)*/3)++$bit(1,1:2)
-  :                            23       $else
-  :                            24       $return $bit(1,1:1)++$bit(1,1:2)
-  :                            25       $end
+  :                            5 LSR_RDR EQU     0       ; Data In Receive FIFO
+  :                            6 
+  :                            7 serial*  $proc  	$(2)
+  :                            8         $res    (($+15)**-16)-$
+  :                            9 *       $tree          
+  :                            10 rhr
+  :                            11 thr     $res    1
+  :                            12 ier     $res    1
+  :                            13 isr     $res    1
+  :                            14 lcr     $res    1
+  :                            15 mcr     $res    1
+  :                            16 lsr     $res    1
+  :                            17 msr     $res    1
+  :                            18 spr     $res    1
+  :                            19         $root
+  :                            20         $end
+  :                            21 
+  :                            22 '$bit'*	$func
+  :                            23 	$do	$bit(1,1:1)<128,	$return (($bit(1,1:1)**31)*/3)++$bit(1,1:2)
+  :                            24 	$return	$bit(1,1:1)++$bit(1,1:2)
+  :                            25 	$end
   :                            26 
   :                            27 generate* $proc *
   :                            28 Sample:
@@ -12198,7 +11350,7 @@ STERM=.
   :                            47 DATA    equ     1024
   :                            48 TOTAL   equ     4
   :                            49 RTVARS  equ     64
-  :                            50 Full    equ     32
+  :                            50 FULL    equ     32
   :                            51 
   :                            52 $(3:RTVARS)
   :                            53 device  $do     TOTAL,write_cursor(device)      $res    1
@@ -12210,7 +11362,7 @@ STERM=.
   :                            59 
   :                            60 
   :                            61 $(0:64)
-00:0040 20011B                +62 device        $do     TOTAL,  generate
+00:0040 20011B                +62 device	$do	TOTAL,	generate
 00:0043 900085                +62 
 00:0046 E0                    +62 
 00:0047 30E014                +62 
@@ -12264,26 +11416,24 @@ STERM=.
 00:00B6 D204                  +62 
   :                            63 
 *EOF*
-
-....
-
-BUFFER(1)=$01:0400
-BUFFER(2)=$01:0500
-BUFFER(3)=$01:0600
-BUFFER(4)=$01:0700
-
-....
-
+LSR_RDR=00
+SERIAL=:P1:(2)0:22
+$BIT=:F1:23
+GENERATE=:P3:0:24
+DEVICES=0080
+DATA=0400
+TOTAL=04
+RTVARS=40
+FULL=20
+DEVICE=04
+WRITE_CURSOR(1)=$03:40
+WRITE_CURSOR(2)=$03:41
+WRITE_CURSOR(3)=$03:42
+WRITE_CURSOR(4)=$03:43
 READ_CURSOR(1)=$03:44
 READ_CURSOR(2)=$03:45
 READ_CURSOR(3)=$03:46
 READ_CURSOR(4)=$03:47
-
-....
-
-TCON=0088
-TMOD=0089
-TOTAL=04
 UART(1)=$02:0080
 UART(1):RHR=$02:0080
 UART(1):THR=$02:0080
@@ -12324,18 +11474,13 @@ UART(4):MCR=$02:00B4
 UART(4):LSR=$02:00B5
 UART(4):MSR=$02:00B6
 UART(4):SPR=$02:00B7
-VAR=:P1:(1)0:07
-WRITE_CURSOR(1)=$03:40
-WRITE_CURSOR(2)=$03:41
-WRITE_CURSOR(3)=$03:42
-WRITE_CURSOR(4)=$03:43
-XCH=:N1:P:0:0C
-XCHD=:P1:0:1C
-XRL=:N1:P:0:06
-8051_7r2.def=1<0005
+BUFFER(1)=$01:0400
+BUFFER(2)=$01:0500
+BUFFER(3)=$01:0600
+BUFFER(4)=$01:0700
+8051.def=1<0005
 uart.msm=0<0003
 :$(00):0000:00B8 :$(01):0400:0800 :$(02):0080:00B8 :$(03):0040:0048 
-uart.msm: object code 381 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
@@ -12344,9 +11489,8 @@ In the following assembly, a structure is
 constructed at address 0x00037300 in PowerPC system memory. 
 
 <p>
-Components of the structure are accessed with labels containing 
-period . which is conventionally the value given to $STERM in 
-PowerPC definition header files.
+PowerPC definition header has <b>$sterm '.'</b>, so the structure
+joins are period on reference
 
 <p>
 Some of the components are repeated and subscripted. The
@@ -18523,183 +17667,7 @@ coldfir@.msm: object code 1441 bytes: 0 errors: 1 undefined labels
 
 </pre>
 
-<h3>F.3.2: MIPS</h3
 
-The reference syntax taken for MIPS appears like gcc compiler output
-and has no special problems.
-
-<p>
-The 32 registers have 64 names.
-
-<p>
-Therefore the sample definition "mips.def" does not text-translate
-the base-displacement syntax
-<pre>
-
-	LDW	displacement(base_register)
-	STB	displacement(base_register)
-
-</pre>
-to masmx plain syntax
-<pre>
-
-	STW	displacement, base_register
-	LDB	displacement, base_register
-
-</pre>
-because of the 64 translation tuples that would require.
-Instead the function method gets the base register id
-out of the parentheses.
-
-<p>
-Definition "mips.def" asserts option flag -c
-
-<p>
--c Flag enables C-Language style \escape sequences
-in quote strings, and hex expressions beginning 0x..
-
-<p>
-MIPS architecture is the model taken for the discussion on alignment
-at section 10: Byte-Addressing Machines with 32 and 64 Bit Bus, Managing
-the Alignments.
-
-<p>
-The right-shift handling of absolute jump addresses to aligned target
-locations is shown here.
-
-<p>
-MIPS also has relative branches. These are discussed comprehensively
-in the Section 9: Linking, which takes PowerPC for a model.
-
-<p>
-MIPS is shown here as big-endian. Alignment implications of canonical
-and reverse byte order are discussed at Section 10.
-<pre>
-
-
-MASMX 7r2
-3/prelude.msm
-CONT_CHAR=|
-LTERM=#
-STERM=.
-  :                            1:       $include        "mips.def"
-  :                            46               $list   2
-  :                            47 
-  :                            48 "$27" $equ,$register          27
-  :                            49 "$28" $equ,$register          28
-  :                            50 "$29" $equ,$register          29
-  :                            51 "$30" $equ,$register          30
-  :                            52 "$31" $equ,$register          31
-  :                            53 
-  :                            56               $list   2
-  :                            57 
-  :                            58 "$at" $equ,$register          $1
-  :                            59 "$v0" $equ,$register          $2
-  :                            60 "$v1" $equ,$register          $3
-  :                            61 
-  :                            62 "$a0" $equ,$register          $4
-  :                            63 
-  :                            101              $list   2
-  :                            102 
-  :                            103 "$irri"              $form   6, 5, 5, 16
-  :                            104 
-  :                            186              $list   2
-  :                            187 
-  :                            188 p            $proc
-  :                            189 sw*          $name   43
-  :                            190 sb*          $name   40
-  :                            191 lw*          $name   35
-  :                            192 lb*          $name   32
-  :                            193 
-  :                            194              $irri   p(0, 0), $index\p(1, 2), p(1, 1), p(1, 2)
-  :                            195              $end
-  :                            196 
-  :                            197 "$index"*    $func
-  :                            198 tag          $set    $index(1, 1)
-  :                            199 type         $set    $t($index(1, 1))
-  :                            200 
-  :                            202              $do     type^=$register,       |
-                        $note   index register tag is untyped
-  :                            204              $do     tag>31,                |
-                        $flag   index register tag value too high
-  :                            206              $do     tag<0,                 |
-                        $flag   index register tag value too low
-  :                            207 
-  :                            208              $return tag
-  :                            209              $end
-  :                            210 
-  :                            211 
-  :                            212 p            $proc
-  :                            213 j*           $name   2
-  :                            214 jal*         $name   3
-  :                            215 
-  :                            216 target               $set    p(1, 1)
-  :                            218              $do     ($net(target)**3)^=0,  |
-                        $flag   you can't jump there
-  :                            219 
-  :                            220              $ij     p(0, 0), target/*2
-  :                            221              $end
-  :                            222 
-  :                            2 $(__data:0x3000)
-  :                            3 $(__text:0x1000)
-  :                            4 
-  :                            5        .data
-03:00003000 2247727565737365220A6175730A5361616E656E4C616E64
-                              +6        .asciiz """Gruesse""\naus\nSaanenLand\"Pays\777\666d\'enHaut\r\n"
-03:00003018 2250617973FFB66427656E486175740D0A00
-                              +6 
-03:0000302A 4A756C6907080C0B0900
-                              +7        .asciiz "Juli\a\b\f\v\t"
-Note: prelude.msm Line 8: exactly 3 octal symbols expected here
-03:00003034 626973313453657074656D6265720A6C736F206B6F6D6D74
-                              +8        .asciiz "bis\61\064September\x0also kommt\xc"
-Note: prelude.msm Line 8: exactly 2 hexadecimal symbols expected here
-03:0000304C 0C00              +8 
-  :                            9 
-03:0000304E 596568756469      +10       .ascii  "Yehudi"
-03:00003054 20                +11       .byte   32
-03:00003055 4D656E7568696E    +12       .ascii  "Menuhin"
-03:0000305C 0A                +13       .byte   10
-03:0000305D 466F7220657665720A+14       .ascii  "For ever\n"
-  :                            15 
-03:00003066 456D696C696100    +16         .asciiz "Emilia", "Kopatchinskaja"
-03:0000306D 4B6F7061746368696E736B616A6100
-                              +16 
-03:0000307C 4C65696600        +17         .asciiz "Leif", "Ove", "Andsnes"
-03:00003081 4F766500          +17 
-03:00003085 416E64736E657300  +17 
-03:0000308D 536F6C00          +18         .asciiz "Sol", "Gabetta"
-03:00003091 4761626574746100  +18 
-03:00003099 43687269737469616E00
-                              +19         .asciiz "Christian", "Tetzlaff"
-03:000030A3 5465747A6C61666600+19 
-03:000030AC 5665726F6E69636100+20         .asciiz "Veronica", "Eberle"
-03:000030B5 456265726C6500    +20 
-  :                            21 
-  :                            22       .align  1
-03:000030BC 01F4              +23       .half   500
-  :                            24 
-  :                            25       .align  2
-03:000030C0 00000063          +26       .word   99, 100, 101
-03:000030C4 00000064          +26 
-03:000030C8 00000065          +26 
-  :                            27 
-  :                            28       .text
-  :                            29 
-  :                            30 usefully      $equ    0x18C
-  :                            31 upward        $equ    65536
-  :                            32 
-01:00001000 8D250040          +33       lw      $5, 64($9)
-01:00001004 0085001A          +34       div     $4, $5
-01:00001008 0C000063          +35       jal     usefully
-01:0000100C 08004000          +36       j       upward
-  :                            37 
-  :                            38       $end
-:$(01):00001000:00001010 :$(03):00003000:000030CC 
-prelude.msm: object code 581 bytes: 0 errors: 0 undefined labels
-
-
-</pre>
 <h1>F.4: Byte-Addressing Machines with 32 and 64 Bit Bus:
 Managing Alignments</h1>
 
@@ -18721,7 +17689,7 @@ can generate. A line may generate no code, a word or some words.
 
 <p>
 Targets which can fetch instructions from any byte address and can have
-instructions one byte long have to be described as having the geometry
+instructions one byte long must be described as having the geometry
 <pre>
 
 	$cont_char	'|'
@@ -18752,7 +17720,7 @@ long_long* $name
 
 </pre>
 <p>
-An integer longer than than an octoword can be described with $FORM
+An integer longer than than an octaword can be described with $FORM
 <pre>
 
 i128	$form	8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8
@@ -18774,357 +17742,33 @@ This does not in any way affect the target's ability to make full use
 of its 32-bit or 64-bit data path.
 
 <p>
-Cache memory can make alignments less important, because the actual
-burst from memory is some 16 or 32 bytes containing operands somewhere
-within it.
+Some architectures are critical about the alignment of instructions and
+integers
 
 <p>
-Architectures like MIPS, ARM and PowerPC always fetch 32-bit aligned
-instructions, and cannot jump to a location which is not 32-bit
-aligned.
-
-<p>
-However data may be unaligned. The address quantum for these architectures
-is 8 bits, and directives with names like .byte .half .ascii .asciiz .space
+Commands with names .byte .half .ascii .asciiz .space
 may leave the next available location xxxxxx01 or xxxxxx10 or xxxxxx11.
-
+ 
 <p>
-The load/store instructions however need xxxxxx00 alignment for 32-bit
+load/store instructions may however need xxxxxx00 alignment for 32-bit
 loads and stores and xxxxxxx0 alignment for 16-bit loads and stores.
 
 <p>
-ARM carries out a compensatory manipulation if the subject of a 32-bit
-load is not aligned, but the target integer is not completely retrieved.
+It may be necessary or advantageous to follow up .byte or .space with
+a command often called .align which usually has a power-2 argument
 
 <p>
-A directive usually called .align and usually having a power-2 argument
-is mostly placed in front of items which need to be aligned. .align is
-macro-implemented in definitions "mips.def" "arm.def" "ppc_603.def"
-
-<p>
-The $WORD directive can be used to set an alignment policy for data.
-
-<p>
-The following three assemblies take MIPS for a model. In the first
-assembly, the geometry in definition "mips.def" is
+This is how .align looks as implemented with a masmx macro. .align
+is coded here for PowerPC. The expression token . is location counter
+which is otherwise $
 <pre>
 
-	$word	8
-	$awidth	32
+.align* $proc
+granule $set    1*/.align(1,1)
+        $res    ((.+granule-1)**-granule)-.
+        $end
 
 </pre>
-<p>
-The commands .ascii .asciiz .byte and .half do not restore alignment.
-
-<p>
-The <b>-c</b> flag enables C-Language style \escape sequences in strings.
-<pre>
-
-MASMX 7r2
-3/prelude.msm
-CONT_CHAR=|
-LTERM=#
-STERM=.
-  :                            1:       $include        "mips.def"
-  :                            1        $list           2
-  :                            2        $word           8
-  :                            3        $awidth         32
-  :                            4 
-  :                            5        $cont_char       '|'
-  :                            6        $lterm          '#'
-  :                            7        $sterm          '.'
-  :                            8 
-  :                            9        $set_option     "c"
-  :                            10 
-  :                            11       $do     $t(__LITTLE_END)=0,__LITTLE_END	$set     0
-  :                            12 
-  :                            202              $list   2
-  :                            203 
-  :                            204 p            $proc
-  :                            205 j*           $name   2
-  :                            206 jal*         $name   3
-  :                            207 
-  :                            208 target               $set    p(1, 1)
-  :                            210              $do     ($net(target)**3)^=0,  |
-                        $flag   you can't jump there
-  :                            211 
-  :                            212              $ij     p(0, 0), target/*2
-  :                            213              $end
-  :                            214 
-Note: mips.def Line 228: end of header file include
-  :                            2 $(__data:0x3000)
-  :                            3 $(__text:0x1000)
-  :                            4 
-  :                            5        .data
-03:00003000 2247727565737365220A6175730A5361616E656E4C616E64
-                              +6        .asciiz """Gruesse""\naus\nSaanenLand\"Pays\777\666d\'enHaut\r\n"
-03:00003018 2250617973FFB66427656E486175740D0A00
-                              +6 
-03:0000302A 4A756C6907080C0B0900
-                              +7        .asciiz "Juli\a\b\f\v\t"
-Note: prelude.msm Line 8: exactly 3 octal symbols expected here
-03:00003034 626973313453657074656D6265720A6C736F206B6F6D6D74
-                              +8        .asciiz "bis\61\064September\x0also kommt\xc"
-Note: prelude.msm Line 8: exactly 2 hexadecimal symbols expected here
-03:0000304C 0C00              +8 
-  :                            9 
-03:0000304E 596568756469      +10       .ascii  "Yehudi"
-03:00003054 20                +11       .byte   32
-03:00003055 4D656E7568696E    +12       .ascii  "Menuhin"
-03:0000305C 0A                +13       .byte   10
-03:0000305D 466F7220657665720A+14       .ascii  "For ever\n"
-  :                            15 
-03:00003066 456D696C696100    +16         .asciiz "Emilia", "Kopatchinskaja"
-03:0000306D 4B6F7061746368696E736B616A6100
-                              +16 
-03:0000307C 4C65696600        +17         .asciiz "Leif", "Ove", "Andsnes"
-03:00003081 4F766500          +17 
-03:00003085 416E64736E657300  +17 
-03:0000308D 536F6C00          +18         .asciiz "Sol", "Gabetta"
-03:00003091 4761626574746100  +18 
-03:00003099 43687269737469616E00
-                              +19         .asciiz "Christian", "Tetzlaff"
-03:000030A3 5465747A6C61666600+19 
-03:000030AC 5665726F6E69636100+20         .asciiz "Veronica", "Eberle"
-03:000030B5 456265726C6500    +20 
-  :                            21 
-  :                            22       .align  1
-03:000030BC 01F4              +23       .half   500
-  :                            24 
-  :                            25       .align  2
-03:000030C0 00000063          +26       .word   99, 100, 101
-03:000030C4 00000064          +26 
-03:000030C8 00000065          +26 
-  :                            27 
-  :                            28       .text
-  :                            29 
-  :                            30 usefully      $equ    0x18C
-  :                            31 upward        $equ    65536
-  :                            32 
-01:00001000 8D250040          +33       lw      $5, 64($9)
-01:00001004 0085001A          +34       div     $4, $5
-01:00001008 0C000063          +35       jal     usefully
-01:0000100C 08004000          +36       j       upward
-  :                            37 
-  :                            38       $end
-:$(01):00001000:00001010 :$(03):00003000:000030CC 
-prelude.msm: object code 581 bytes: 0 errors: 0 undefined labels
-
-</pre>
-<p>
-The second assembly shows a stern alignment forced by 32-bit word size.
-Strings are padded to word. Because <b>-c</b> flag is on, the padding is zero.
-
-<p>
-Without <b>-c</b> flag the padding is space.
-
-<p>
-Setting is big-endian in this assembly.
-<p>
-.half and .byte are at the left of their containing word. Otherwise
-the labels byte1 byte2 and half1 would not point at the generated items.
-<pre>
-
-MASMX 7r2
-3/interlud.msm
-CONT_CHAR=|
-LTERM=#
-STERM=.
-  :                            1:       $include        "mips32.def"
-  :                            1        $list   2
-  :                            2        $word           32
-  :                            3        $quantum        8
-  :                            4 
-  :                            5        $cont_char       '|'
-  :                            6        $lterm          '#'
-  :                            7        $sterm          '.'
-  :                            8 
-  :                            9        $set_option     "c"
-  :                            10 
-  :                            11       $do     $t(__LITTLE_END)=0,__LITTLE_END	$set     0
-  :                            12 
-  :                            131      $list   2
-  :                            132 
-  :                            133 .byte*               $proc
-  :                            134 ?    $do     .byte(1),       +       .byte(1, ?), 0, 0, 0
-  :                            135              $note   8-bit value in 32-bit word
-  :                            136              $end
-  :                            137 
-  :                            138 .half*               $proc
-  :                            139 ?    $do     .half(1),       +       .half(1, ?), 0
-  :                            140              $note   16-bit value in 32-bit word
-  :                            141              $end
-  :                            142 
-  :                            2 $(__data:0x3000)
-  :                            3 $(__text:0x1000)
-  :                            4 
-  :                            5        .data
-03:00003000 2247727565737365220A6175730A5361616E656E4C616E64
-                              +6        .asciiz """Gruesse""\naus\nSaanenLand\"Pays\777\666d\'enHaut\r\n"
-03:00003018 2250617973FFB66427656E486175740D0A000000
-                              +6 
-03:0000302C 4A756C6907080C0B09000000
-                              +7        .asciiz "Juli\a\b\f\v\t"
-Note: interlud.msm Line 8: exactly 3 octal symbols expected here
-03:00003038 626973313453657074656D6265720A6C736F206B6F6D6D74
-                              +8         .asciiz "bis\61\064September\x0also kommt\xc"
-Note: interlud.msm Line 8: exactly 2 hexadecimal symbols expected here
-03:00003050 0C000000          +8 
-  :                            9 
-03:00003054 5965687564690000  +10       .ascii  "Yehudi"
-03:0000305C 20000000          +11 byte1 .byte   32
-Note: interlud.msm Line 11: 8-bit value in 32-bit word
-03:00003060 4D656E7568696E00  +12       .ascii  "Menuhin"
-03:00003068 0A000000          +13 byte2 .byte   10
-Note: interlud.msm Line 13: 8-bit value in 32-bit word
-03:0000306C 466F7220657665720A000000
-                              +14       .ascii  "For ever\n"
-  :                            15 
-03:00003078 456D696C69610000  +16       .asciiz "Emilia", "Kopatchinskaja"
-03:00003080 4B6F7061746368696E736B616A610000
-                              +16 
-03:00003090 4C65696600000000  +17       .asciiz "Leif", "Ove", "Andsnes"
-03:00003098 4F766500          +17 
-03:0000309C 416E64736E657300  +17 
-03:000030A4 536F6C00          +18       .asciiz "Sol", "Gabetta"
-03:000030A8 4761626574746100  +18 
-03:000030B0 43687269737469616E000000
-                              +19       .asciiz "Christian", "Tetzlaff"
-03:000030BC 5465747A6C61666600000000
-                              +19 
-03:000030C8 5665726F6E69636100000000
-                              +20       .asciiz "Veronica", "Eberle"
-03:000030D4 456265726C650000  +20 
-  :                            21 
-03:000030DC 01F40000          +22 half1 .half   500
-Note: interlud.msm Line 22: 16-bit value in 32-bit word
-  :                            23 
-03:000030E0 00000063          +24       .word   99, 100, 101
-03:000030E4 00000064          +24 
-03:000030E8 00000065          +24 
-  :                            25 
-  :                            26       .text
-  :                            27 
-  :                            28 usefully      $equ    0x18C
-  :                            29 upward  	$equ    65536
-  :                            30 
-01:00001000 8D250040          +31       lw      $5, 64($9)
-01:00001004 0085001A          +32       div     $4, $5
-01:00001008 0C000063          +33       jal     usefully
-01:0000100C 08004000          +34       j       upward
-  :                            35 
-  :                            36       $end
-:$(01):00001000:00001010 :$(03):00003000:000030EC 
-interlud.msm: object code 623 bytes: 0 errors: 0 undefined labels
-
-</pre>
-<p>
-The assembly is repeated here for reverse-byte-order. Macro language takes
-a slightly different path:
-<pre>
-
-MASMX 7r2
-3/interlud.msm
-CONT_CHAR=|
-LTERM=#
-STERM=.
-  :                            1 __LITTLE_END   $set    1
-  :                            2:       $include        "mips32.def"
-  :                            1        $list   2
-  :                            2        $word           32
-  :                            3        $quantum        8
-  :                            4 
-  :                            5        $cont_char       '|'
-  :                            6        $lterm          '#'
-  :                            7        $sterm          '.'
-  :                            8 
-  :                            9        $set_option     "c"
-  :                            10 
-  :                            11       $do     $t(__LITTLE_END)=0,__LITTLE_END	$set     0
-  :                            12 
-  :                            111              $list   2
-  :                            112 
-  :                            113              $if     __LITTLE_END
-  :                            114 
-  :                            115 .byte*               $proc
-  :                            116 ?    $do     .byte(1),       +       .byte(1, ?), 0, 0, 0
-  :                            117              $note   8-bit value in 32-bit word
-  :                            118              $end
-  :                            119 
-  :                            120 .half*               $proc
-  :                            121 ?    $do     .half(1),       +       .half(1, ?), .half(1, ?)/*8, 0, 0
-  :                            122              $note   16-bit value in 32-bit word
-  :                            123              $end
-  :                            124 
-  :                            125 .word*               $proc
-  :                            127 ?    $do     .word(1),       +       .word(1, ?),    .word(1, ?)/*8, |
-                                        .word(1, ?)/*16,.word(1, ?)/*24
-  :                            128              $end
-  :                            129 
-  :                            3 $(__data:0x3000)
-  :                            4 $(__text:0x1000)
-  :                            5 
-  :                            6        .data
-03:00003000 2247727565737365220A6175730A5361616E656E4C616E64
-                              +7        .asciiz """Gruesse""\naus\nSaanenLand\"Pays\777\666d\'enHaut\r\n"
-03:00003018 2250617973FFB66427656E486175740D0A000000
-                              +7 
-03:0000302C 4A756C6907080C0B09000000
-                              +8        .asciiz "Juli\a\b\f\v\t"
-Note: interlud.msm Line 9: exactly 3 octal symbols expected here
-03:00003038 626973313453657074656D6265720A6C736F206B6F6D6D74
-                              +9         .asciiz "bis\61\064September\x0also kommt\xc"
-Note: interlud.msm Line 9: exactly 2 hexadecimal symbols expected here
-03:00003050 0C000000          +9 
-  :                            10 
-03:00003054 5965687564690000  +11       .ascii  "Yehudi"
-03:0000305C 20000000          +12 byte1 .byte   32
-Note: interlud.msm Line 12: 8-bit value in 32-bit word
-03:00003060 4D656E7568696E00  +13       .ascii  "Menuhin"
-03:00003068 0A000000          +14 byte2 .byte   10
-Note: interlud.msm Line 14: 8-bit value in 32-bit word
-03:0000306C 466F7220657665720A000000
-                              +15       .ascii  "For ever\n"
-  :                            16 
-03:00003078 456D696C69610000  +17       .asciiz "Emilia", "Kopatchinskaja"
-03:00003080 4B6F7061746368696E736B616A610000
-                              +17 
-03:00003090 4C65696600000000  +18       .asciiz "Leif", "Ove", "Andsnes"
-03:00003098 4F766500          +18 
-03:0000309C 416E64736E657300  +18 
-03:000030A4 536F6C00          +19       .asciiz "Sol", "Gabetta"
-03:000030A8 4761626574746100  +19 
-03:000030B0 43687269737469616E000000
-                              +20       .asciiz "Christian", "Tetzlaff"
-03:000030BC 5465747A6C61666600000000
-                              +20 
-03:000030C8 5665726F6E69636100000000
-                              +21       .asciiz "Veronica", "Eberle"
-03:000030D4 456265726C650000  +21 
-  :                            22 
-03:000030DC F4010000          +23 half1 .half   500
-Note: interlud.msm Line 23: 16-bit value in 32-bit word
-  :                            24 
-03:000030E0 63000000          +25       .word   99, 100, 101
-03:000030E4 64000000          +25 
-03:000030E8 65000000          +25 
-  :                            26 
-  :                            27       .text
-  :                            28 
-  :                            29 usefully        $equ    0x18C
-  :                            30 upward  $equ    65536
-  :                            31 
-01:00001000 8D250040          +32       lw      $5, 64($9)
-01:00001004 0085001A          +33       div     $4, $5
-01:00001008 0C000063          +34       jal     usefully
-01:0000100C 08004000          +35       j       upward
-  :                            36 
-  :                            37       $end
-:$(01):00001000:00001010 :$(03):00003000:000030EC 
-interlud.msm: object code 623 bytes: 0 errors: 0 undefined labels
-
-</pre>
-<p>
 
 <h1>Appendix G: Disclaimer and Contact</h1>
 

@@ -1085,7 +1085,11 @@ move*	$name	move.l
 
 	  $if		p(1, #1)
 
+	    $if		p(0, 0)=move.l
 	    $i_rl	p(0, 0), $tor, $tom, 7, 4, p(1, 1)
+	    $else
+	    $i_rm	p(0, 0), $tor, $tom, 7, 4, p(1, 1)
+	    $endif
 
 	  $elseif	$itype\p(1, 1)=$a_reg
 

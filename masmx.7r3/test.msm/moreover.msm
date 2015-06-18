@@ -44,9 +44,9 @@ sum	1.75
 	
 $(0:64)
 	retrieve	first.three
-	retrieve	second.fill
-	retrieve	second.second1.one
-	retrieve	second.second1.three
-	retrieve	second.second2
-	retrieves	new.second.quartet(5)
+	retrieve	second.fill		d1
+	retrieve	second.second1.one	d2
+	retrieve	second.second1.three	d3
+	retrieve	second.second2		d4
+	retrieves	new.second.quartet(5)	d5
 

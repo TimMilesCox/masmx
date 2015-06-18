@@ -1,4 +1,6 @@
+	$list	0
         $include   "8051.def"
+	$list
 
 LSR_RDR EQU     0       ; Data In Receive FIFO
 
@@ -18,9 +20,7 @@ spr     $res    1
         $end
 
 '$bit'*	$func
-	$if	$bit(1,1:1)<128
-	$return (($bit(1,1:1)**31)*/3)++$bit(1,1:2)
-	$else
+	$do	$bit(1,1:1)<128,	$return (($bit(1,1:1)**31)*/3)++$bit(1,1:2)
 	$return	$bit(1,1:1)++$bit(1,1:2)
 	$end
 
