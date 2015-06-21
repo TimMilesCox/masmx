@@ -687,6 +687,9 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx r3xample ..\test.o3\r3xample -lyok > ..\text.o3\r3xample.txt
 ..\masmx babble ..\test.o3\babble -lyok > ..\text.o3\babble.txt
 ..\masmx record ..\test.o3\record -lyok > ..\text.o3\record.txt
+..\masmx but ..\test.o3\but -lyok > ..\text.o3\but.txt
+..\masmx moreover ..\test.o3\moreover -lyok > ..\text.o3\moreover.txt
+..\masmx routines ..\test.o3\routines -lyok > ..\text.o3\routines.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

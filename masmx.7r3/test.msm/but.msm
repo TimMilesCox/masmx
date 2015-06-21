@@ -1,0 +1,10 @@
+	$if	1
+	$else
+		$elseif	1
+		$endif
+	$elseif	1
+	$note	one
+	$elseif	1
+	$note	two
+	$endif
+

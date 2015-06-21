@@ -4959,7 +4959,7 @@ write bit-aligned fields
 Here ColdFire-specific macro language retrieves fields from an inventory
 <pre>
 
-$ masmx -lnk betaille
+$ masmx betaille -lnk
 MASMX 7r3
 3/betaille.msm
 CONT_CHAR=|
@@ -5006,21 +5006,20 @@ STERM=.
 00:00004006 E488              +35 
 00:00004008 32385008          +36 	retrieves	communes.Vaux_les_Pres.le_Charmelot.anes	d1
 00:0000400C 4841              +36 
-00:0000400E 323C00000014      +36 
-00:00004014 E2A1              +36 
+00:0000400E 323C0014          +36 
+00:00004012 E2A1              +36 
   :                            37 
-00:00004016 24385016          +38 	lretrieve	communes.Villers_Buzon.Combe_au_Loup.oies	d2
-00:0000401A E18A              +38 
-00:0000401C E08A              +38 
-00:0000401E EC8A              +38 
-00:00004020 26385010          +39 	lretrieve	communes.Villers_Buzon.centre.oies	d3
-00:00004024 E18B              +39 
-00:00004026 E58B              +39 
-00:00004028 E08B              +39 
-00:0000402A EC8B              +39 
+00:00004014 24385016          +38 	lretrieve	communes.Villers_Buzon.Combe_au_Loup.oies	d2
+00:00004018 E18A              +38 
+00:0000401A E08A              +38 
+00:0000401C EC8A              +38 
+00:0000401E 26385010          +39 	lretrieve	communes.Villers_Buzon.centre.oies	d3
+00:00004022 E18B              +39 
+00:00004024 E58B              +39 
+00:00004026 E08B              +39 
+00:00004028 EC8B              +39 
 *EOF*
-:$(00):00004000:0000402C :$(05):00005000:0000501E 
-betaille.msm: object code 256 bytes: 0 errors: 0 undefined labels
+:$(00):00004000:0000402A :$(05):00005000:0000501E 
 
 
 </pre>
@@ -5028,12 +5027,51 @@ betaille.msm: object code 256 bytes: 0 errors: 0 undefined labels
 
 <h4>5.2.2.3: Bit-Aligned Structure Overlay and Overload: $RECORD,$BRANCH</h4>
 
-<b>$record</b> structures can may be overlaid or redifined with the addition of
+<b>$record</b> structures can may be overlaid or redefined with the addition of
 <b>,$branch</b> subfunction. The resulting unions are at bit-position precision.
+<pre>
 
-<p>
-Initial values may be overloaded. However masmx load code is in words. Overloads
-on a storage word are not merged
+$ masmx mfeuille -lnk
+MASMX 7r3
+3/mfeuille.msm
+CONT_CHAR=|
+LTERM=;
+STERM=.
+*EOF*
+  :                            1 	$path		../smaragd.68k
+  :                            2: 	$include	coldfire.def
+  :                            3: 	$include	record_x.def
+  :                            4 	$path
+  :                            5 
+  :                            6 $(5:050000)
+  :                            7 
+  :                            8 layer4  $record,$branch         10 11 12 13 14 15
+05:00005000 ABCDEF000000000000000000000000000000000000000000
+                              +9 ?       $do     60,quartet(?)   4
+  :                            10         $root
+  :                            11 layer5  $record,$branch
+  :                            12 ?       $do     80,quintet(?)   5s
+  :                            13         $root
+  :                            14 layer6  $record,$branch
+  :                            15 ?       $do     40,sextet(?)    6
+  :                            16 	$root
+  :                            17 
+  :                            18 $(64:65536)
+  :                            19 
+40:00010000 30385000          +20 	retrieve	layer5.quintet(2)	; substring is .
+40:00010004 4840              +20 
+40:00010006 EB88              +20 
+40:00010008 303C001B          +20 
+40:0001000C E0A0              +20 
+40:0001000E 1438501D          +21 	retrieve	layer6.sextet(40)	d2
+40:00010012 02820000003F      +21 
+*EOF*
+:$(05):00005000:00005032 :$(40):00010000:00010018 
+
+
+</pre>
+Initial values in overlaid locations may be overloaded. However masmx load code
+is in words. Overloads on a storage word are not merged
 
 <pre>
 

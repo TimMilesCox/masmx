@@ -674,4 +674,5 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz meringue ..\test.zo3\meringue -lok > ..\text.zo3\meringue.txt
 ..\masmz s2double ..\test.zo3\s2double -lok > ..\text.zo3\s2double.txt
 ..\masmz babble ..\test.zo3\babble -lok > ..\text.zo3\babble.txt
+..\masmx but ..\test.zo3\but -lyo > ..\text.zo3\but.txt
 
