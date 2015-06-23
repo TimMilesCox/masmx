@@ -9,8 +9,7 @@ PRIORITIES	$set	8
 IDLE_STACK	$set	64
 
 
-        $do     $o('i')=0,      |
-        $list   -1
+        $do     $o('i')=0,	$list   -1
 
 	$do     $o('l'),        $note	listing off
 	$do     $o('l'),        $note	after all, the kernel structures aren't interesting
