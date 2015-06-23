@@ -1,6 +1,5 @@
 	$include	"coldfire.def"
 
-;	$plist	8
 
 __LINK_POINTER	$equ,"$a_reg"	6
 __TCB_LOCATION	$equ		0
@@ -119,10 +118,7 @@ $(0:1024)
 	move	a0, -(a7)
 	bsr	p_tcb
 
-	$plist	10
 	movem	d0-a6, (tcb.genregs, a0)
-	$plist
-
 
 	move	a0, a1
 	move	(a7)+, a0

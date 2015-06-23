@@ -117,19 +117,14 @@ $(0:1024)
 	move	a0, a7@-
 	bsr	p_tcb
 
-	$plist	10
 	movem	d0-a6, [tcb.genregs, a0]
-	$plist
 
 	move	a0, a1
 	move	a7@+, a0
 	move	a0, [tcb.a_reg_0, a1]
 	move	a7, [tcb.a_reg_7, a1]
 
-;	$plist	10
-
 	move	[tcb.h.priority, a1], d0
-;	$plist
 
 	bmi	qaside	$8_bits
 	cmpi	#PRIORITIES-1, d0

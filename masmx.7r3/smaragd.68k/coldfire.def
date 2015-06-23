@@ -184,7 +184,7 @@ d	$equ,$special_reg	4*/2
 	$end
 
 	$do	$o('V'),	$list	2
-	$do	$o('V'),	$note	snapshot analysis in coldfire.def
+	$do	$o('V'),	$note	operand attribute scan in coldfire.def
 
 f	$func
 ;

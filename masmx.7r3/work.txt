@@ -584,10 +584,8 @@ Appendix F: Target Descriptions
 	 F.1:	8051
 	 F.2:	PowerPC
 
-	 F.3:	Fragment Samples - ColdFire/68000, MIPS, ARM
-	 F.3.1:	68000 and ColdFire
-	 F.3.2:	MIPS
-	 F.3.3:	ARM
+	 F.3:	Definition Examples
+	 F.3.1:	ColdFire
 	 F.4:	Byte-Addressing Machines with 32 and 64 Bit Bus
 		Managing Alignments
 
@@ -16980,29 +16978,10 @@ masmx@gmx.ch
 
 
 
-<h2>F.3: Fragment Samples - ColdFire/68000, MIPS, ARM</h2>
-
-<p>
-Legacy code can be assembled unchanged.
-
-<p>
-In these fragment examples, masmx assembles code in some very individual
-syntaxes which were developed independently for different targets.
-
-<p>
-Keeping pace with architectural extensions is a matter of adding more
-macro language. This can be done anywhere that the target architecture
-is understood.
-
-<p>
-Fragments of definition for ColdFire/68K, MIPS, and ARM are shown here.
-
-<p>
-If you want a whole definition header for these or any machines and
-do not wish to build it from this manual, contact masmx@gmx.ch
+<h2>F.3: Definition Examples</h2>
 
   
-<h2>F.3.1: ColdFire and 68000</h2>
+<h2>F.3.1: ColdFire</h2>
 
 ColdFire instruction encoding appears formidably intricate, but operand
 space may be viewed simply as a set of spaces tagged by the instruction
@@ -17130,545 +17109,457 @@ There are some commands <b>$i_rr $i_rm $i_rx $i_rl</b> and these are instruction
 
 </pre>
 
+<p>
+masmx base-displacement addressing for ColdFire uses the program counter at instruction + 2
+or a register from a1..a5, for example
+<pre>
 
-The following example switches on listing at a few places in a kernel assembly
-for ColdFire. It illustrates
+$(.data:131072,a5)
 
-	<blockquote>
-	tokens like -(a7) and w*4 can be labels.
+</pre>
+Base-register a0..a7 maps to ColdFire operand space 5. Base-register identifiers are masmx label
+type <b>$equf</b>
 
 <p>
-	Macro language must declare and sometimes reference
-	labels like that in quotes as
+The subroutine referenced earlier in section 6.2<b>6.2: Run-Time Floating Algorithm Plotter</b> is
+assembled here. It uses masmx base_displacement addressing to assemble instructions with operand
+in mode 7.2 space 
+<pre>
+	
+$(.text:262144,pc/$literal)
+
+	lea	table_u+8*307, a0	; equivalent to (table_u+8*307, pc), a0
+
+</pre>
+Literals tagged with the label <b>$literal</b> are also mapped to <b>constant_storage_address-$-2, pc</b> in this assembly
+
+<pre>
+
+$ masmx s2double -lnk
+MASMX 7r3
+3/s2double.msm
+CONT_CHAR=|
+LTERM=;
+STERM=.
+*EOF*
+  :                            1 	$path		../smaragd.68k
+  :                            2: 	$include	coldfire.def
+  :                            3 	$path
+  :                            4: 	$include	ieee754.def
+  :                            5 
+  :                            6 	;	this demonstration code block
+  :                            7 	;	reads a string in ASCII or any other data code
+  :                            8 	;	and converts it to 64-bit floating in fp1
+  :                            9 
+  :                            10 	;	ColdFire floating instructions' ability
+  :                            11 	;	to convert and use 8/16/32-bit integer operands 
+  :                            12 	;	prompts this conversion directly from string
+  :                            13 	;	to double float. That is very feasible, so
+  :                            14 	;	there is no attempt to generate and then
+  :                            15 	;	convert a long long integer
+  :                            16 
+  :                            17 scale_10 $equ,$d_reg	d1
+  :                            18 
+  :                            19 $(0:262144,pc/$literal)
+  :                            20 
+  :                            21 s2double*
+00:00000000 F23A50801456      +22 	fmove.w		$literal(0), fp1
+  :                            23 s2dscanforit
+00:00000006 7000              +24 	moveq		#0, d0
+00:00000008 1018              +25 	move.b		(a0)+, d0
+00:0000000A 670000C6          +26 	beq		(eostringx).w
+00:0000000E B07C0020          +27 	cmp.w		#' ', d0
+00:00000012 67F2              +28 	beq		s2dscanforit	; walk any leading space
+  :                            29 					; if there are none it costs nothing
+  :                            30 
+00:00000014 0680FFFFFFD5      +31 	addi		#-'+', d0	; check for leading sign
+00:0000001A 671A              +32 	beq.b		read_1st_digit
+00:0000001C 0680FFFFFFFE      +33 	addi		#'+'-'-', d0
+00:00000022 6708              +34 	beq.b		s2dnegative
+00:00000024 0680FFFFFFF3      +35 	addi		#'-'-'0'-10, d0	; well was it a digit then?
+00:0000002A 6014              +36 	bra.b		check_1st_digit
+  :                            37 
+  :                            38 s2dnegative
+00:0000002C 6108              +39 	bsr.b		read_1st_digit	; read the number then switch polarity
+00:0000002E F23A50A3142A      +40 	fmul.w		$literal(-1), fp1 ; you can't just invert bits in fp1
+00:00000034 4E75              +41 	rts
+  :                            42 
+  :                            43 read_1st_digit
+00:00000036 7000              +44 	moveq		#0, d0
+00:00000038 1018              +45 	move.b		(a0)+, d0
+00:0000003A 0680FFFFFFC6      +46 	addi		#-'0'-10, d0	; first is it higher than '9' ?
+  :                            47 
+  :                            48 check_1st_digit
+00:00000040 655E              +49 	bcs.b		high
+00:00000042 06800000000A      +50 	addi		#10, d0		; was it then lower than '0' ?
+00:00000048 6420              +51 	bcc.b		low
+00:0000004A F20058A2          +52 integer	fadd.b		d0, fp1		; column 1 was in '0'..'9' and is now in 0..9
+00:0000004E 7000              +53 	moveq.l		#0, d0
+00:00000050 1018              +54 	move.b		(a0)+, d0	; read next column
+00:00000052 0680FFFFFFC6      +55 	addi		 #-'0'-10, d0	; is it higher than '9' ?
+00:00000058 6546              +56 	bcs.b		high		; if so it's the end of the integral part
+00:0000005A 06800000000A      +57 	addi		#10, d0		; was it lower than '0' ?
+00:00000060 6408              +58 	bcc.b		low
+00:00000062 F23A50A313F8      +59 	fmul.w		$literal(10), fp1 . multiply the accumulation so far
+00:00000068 60E0              +60 	bra		integer		; add the new stripped digit in 0..9
+  :                            61 
+  :                            62 	$if	'.'<'0'			; data code independent. If period < digit
+00:0000006A 068000000002      +63 low	addi		#'0'-'.', d0	; is this the decimal point?
+  :                            64 	$else
+  :                            65 high	addi		#'0'+10-'.', d0	; otherwise if period > digit was this . ?
+  :                            66 	$endif
+  :                            67 	
+00:00000070 6708              +68 	beq.b		fraction	; whatever the data code, was that decimal point
+00:00000072 0680FFFFFFC9      +69 	addi		#'.'-'e', d0	; if it wasn't is this an exponent string?
+00:00000078 602C              +70 	bra.b		estring?
+  :                            71 
+  :                            72 fraction				; decimal point has been found
+00:0000007A 7000              +73 	moveq.l		#0, d0		; read the fraction
+00:0000007C 1018              +74 	move.b		(a0)+, d0
+00:0000007E 0680FFFFFFC6      +75 	addi		#-'0'-10, d0	; higher than '9' ?
+00:00000084 651A              +76 	bcs.b		eofraction
+00:00000086 06800000000A      +77 	addi		#10, d0		; lower than '0' ?
+00:0000008C 6412              +78 	bcc.b		eofraction
+  :                            79 					; the accumulation attributes all columns to the
+00:0000008E D2BCFFFFFFFF      +80 	add		#-1, scale_10	; integral part, so keep track of the scale
+00:00000094 F23A50A313C6      +81 	fmul.w		$literal(10), fp1 ; multiply the accumulation by 10
+00:0000009A F20058A2          +82 	fadd.b		d0, fp1		; add the stripped digit to it
+00:0000009E 60DA              +83 	bra		fraction	
+  :                            84 
+  :                            85 	
+  :                            86 	$if	'.'<'0'			; data code independent, if period < digit
+  :                            87 high					; byte was higher than a digit
+  :                            88 eofraction
+00:000000A0 0680FFFFFFD5      +89 	addi		#'0'+10-'e', d0	; was it letter 'e'
+  :                            90 	$else				; periods are higher than digits
+  :                            91 low					; byte was lower than a digit
+  :                            92 eofraction
+  :                            93 	addi		#'0'-'e', d0	; so was it letter 'e' ?
+  :                            94 	$endif
+  :                            95 
+  :                            96 estring?
+  :                            97 	$if	'e'^='E'		; are there different code points for 'e' and 'E' ?
+00:000000A6 6708              +98 	beq.b		estring!	; if there are and it was an 'e' you've found it
+00:000000A8 068000000020      +99 	addi		#'e'-'E', d0	; otherwise was it an 'E' instead?
+  :                            100 	$endif
+  :                            101 
+00:000000AE 6606              +102 	bne.b		eostring	; it wasn't any 'e' or 'E'
+  :                            103 estring!
+00:000000B0 2F01              +104 	move.l		scale_10, -(a7)	; yes it was, add the e+- number
+00:000000B2 6128              +105 	bsr.b		string2i
+00:000000B4 D29F              +106 	add		(a7)+, scale_10	; to the scale we already have
+  :                            107 
+  :                            108 					; the exponent range [ -307 .. +307 ] (15 bits midpoint)
+  :                            109 					; is small enough to be handled in a table
+  :                            110 
+  :                            111 					; listing is off for the 615 constants at table_u
+  :                            112 					; generated with
+  :                            113 
+  :                            114 					; ?       $do     615,    ieee754_64      1.0e?-308
+  :                            115 
+  :                            116 					; you can't quite have
+  :                            117 					;	lea	(table_u+307*8-$-2, pc, scale_10.l*8), a0
+  :                            118 					; because table_u+307*8-$-2 is more than 255
+  :                            119 
+  :                            120 					; so we point a0 to the exponent factor in 2 instructions
+  :                            121 
+  :                            122 					; table_u is a base-displacement address
+  :                            123 					; with the meaning on reference
+  :                            124 					;	table_u-$-2, pc
+  :                            125 eostring
+00:000000B6 41FA0A00          +126 	lea		table_u+307*8, a0		; point to the table location 1.0e0
+00:000000BA 41F01E00          +127 	lea		(0, a0, scale_10.l*8), a0	; add the accumulated scale to it
+00:000000BE 427A0060          +128 	pea		table_u		; the table start is the minimum address
+00:000000C2 B1DF              +129 	cmpa		(a7)+, a0	; are you lower than that?
+00:000000C4 6B0E              +130 	bmi.b		outrange	; yes you are. NAN
+00:000000C6 427A1390          +131 	pea		table_u+615*8	; the table end is the maximum address + 1 instance
+00:000000CA B1DF              +132 	cmpa		(a7)+, a0	; are you lower than that?
+00:000000CC 6A06              +133 	bpl.b		outrange	; no you're not. NAN
+00:000000CE F21054A3          +134 	fmul.d		(a0), fp1	; the exponent is in range
+  :                            135 					; multiply by [ 1.0e-307 .. 1.0e+307 ]
+  :                            136 eostringx
+00:000000D2 4E75              +137 	rts
+  :                            138 outrange				; score a NAN
+00:000000D4 F23A54801388      +139 	fmove.d		$literal(-1q), fp1
+00:000000DA 4E75              +140 	rts
+  :                            141 
+  :                            142 string2i				; scan an integer for whatever purpose
+00:000000DC 7200              +143 	moveq		#0, d1		; there won't be leading space however
+00:000000DE 7000              +144 	moveq		#0, d0
+00:000000E0 1018              +145 	move.b		(a0)+, d0
+00:000000E2 0680FFFFFFD5      +146 	addi		#-'+', d0	; leading sign?
+00:000000E8 6716              +147 	beq.b		istring_next
+00:000000EA 0680FFFFFFFE      +148 	addi		#'+'-'-', d0
+00:000000F0 6708              +149 	beq.b		istring_minus
+00:000000F2 0680FFFFFFF3      +150 	addi		#'-'-'0'-10, d0	; well is it a digit?
+00:000000F8 6010              +151 	bra.b		istring_digit?
+  :                            152 
+  :                            153 istring_minus				; scan the magnitude and negate it
+00:000000FA 6104              +154 	bsr.b		istring_next
+00:000000FC 4481              +155 	neg		d1
+00:000000FE 4E75              +156 	rts
+  :                            157 
+  :                            158 istring_next
+00:00000100 7000              +159 	moveq		#0, d0
+00:00000102 1018              +160 	move.b		(a0)+, d0
+00:00000104 0680FFFFFFC6      +161 	addi		#-'0'-10, d0	; is it > '9' ?
+  :                            162 istring_digit?
+00:0000010A 6512              +163 	bcs.b		istring_end	; if so, not more
+00:0000010C 06800000000A      +164 	addi		#10, d0		; is it < '0' ?
+00:00000112 640A              +165 	bcc.b		istring_end	; if so no more
+00:00000114 E389              +166 	lsl		#1, d1		; multiply accumulation by 2
+00:00000116 D081              +167 	add		d1, d0		; add accumulation to stripped digit
+00:00000118 E589              +168 	lsl		#2, d1		; multiply accumulation by 4
+00:0000011A D280              +169 	add		d0, d1		; accumulation = accumulation * 10 + digit
+00:0000011C 60E2              +170 	bra		istring_next
+  :                            171 
+  :                            172 istring_end
+00:0000011E 4E75              +173 	rts
+  :                            174 
+  :                            175 table_u
+  :                            178 	$list
+*EOF*
+00:00001458+0000
+00:0000145a+FFFF
+00:0000145c+000A
+00:0000145e+FFFFFFFFFFFFFFFF
+:$(00):00040000:00041466 
+
+
+</pre>
+
+
+The following kernel assembly lists header file excerpts to show
+
+	<blockquote>
+	tokens like <b>-(a7)</b> and <b>w*4</b> may be labels, and labels may have a class or type.
+	Different instructions may share one mnemonic name, and label types enable the
+	assembly to pick the correct instruction code for storage operands and registers
+	of multiple categories
+<p>
+	Macro language declares, references and tests in quotes labels which are otherwise not
+	recognisable as labels
 <pre>
 
 	"-(a7)"		$equ,"$a_reg_@-" 	7
 
 	"w*4"		$equ,$special_reg	0*/2++2
 
+	$do		$t("p(1, 1)")="$a_reg_@+",	$formX	p(0, 0), p(1, 2), 3, +"p(1, 1)"
+
 </pre>
-	Macro language must sometimes puts quotes on parameter
-	references to labels like that, as "p(1, 1)".
+<p>
+	This prevents <b>-(a7)</b> from meaning minus <b>(a7)</b>, and for example <b>l*8</b> from meaning eight times <b>l</b>
 
 <p>
-	This especially	prevents -(a7) meaning minus (a7),
-	l*8 meaning eight times l etc.
+	When a macro actual parameter is inserted in a <b>$form</b> as an instruction field, unsigned
+	quotes would produce a character string. The addition of a unary sign <b>+"p(1, 1)"</b>
+	produces a label value instead
 
 <p>
-	When macro parameter reference in an instruction is in
-	quotes, it is forced to real parameter value meaning with a
-	unary sign, as +"p(1, 1)". Otherwise the characters "p(1, 1)"
-	would go into the instruction instead of the actual parameter.
-
-<p>
-	Application source code just uses the register tokens and
-	doesn't need to put any quotes on them
+	Application source code references labels like <b>l*8</b> and <b>-(a4)</b> without quotes 
 <pre>
 
 		move.w	(displacement, a0, d3.l*8), -(a4)
 
 </pre>
-	The following simple code sample shows the principle for
-	sending a list of comma-separated things in parentheses
-	all as one parameter to a nested macro. A function
-	macro can retrieve the subparameters from inside the parentheses
-	</blockquote>
 <pre>
 
-MASMX 7r2
-3/prango32.msm
-*EOF*
-  :                            1 	$word	32
-  :                            2 
-  :                            3 p*	$proc
-  :                            4 	q	p(1, 1)
-  :                            5 	$end
-  :                            6 
-  :                            7 q*	$proc
-  :                            8 	+	fourth(q(1, 1)), second(q(1, 1)), third(q(1, 1)), first(q(1, 1))
-  :                            9 	$end
-  :                            10 
-  :                            11 f	$func
-  :                            12 first*	$name	1
-  :                            13 second*	$name	2
-  :                            14 third*	$name	3
-  :                            15 fourth*	$name	4
-  :                            16 	$return	f($n, 1)
-  :                            17 	$end
-  :                            18 
-00:00000000 04020301          +19 	p	(1, 2, 3, 4)
-  :                            20 
-  :                            21 
-*EOF*
-:$(00):00000000:00000001 
-prango32.msm: object code 54 bytes: 0 errors: 0 undefined labels
-
-</pre>
-
-
-	<blockquote>
-	If anything could be prepended to the parentheses
-	like "displacement(a0, d3.l*8)", it is better to send
-	that complex parameter to the nested function macro as the
-	first SUBSTRING of itself, for example p(1, 1:1)
-
-<p>
-	Text joined before( is field 0 to the more nested macro,
-	otherwise the first field inside () is field 0.
-
-<p>
-	Text joined )after is a further field.
-
-<p>
-	Therefore the substituted parameter for paraform p(1, 1:1)
-	and actual parameter (displacement, a0, d3.l*8) is, one
-	field, field 0, with three subfields
-
-<p>
-	displacement, a0, d3.l*8
-
-<p>
-	If the actual parameter had been
-
-<p>
-	displacement(a0, d3.l*8 more, more)and, more
-
-<p>
-	fields 0 1 2 3 would be presented to the more-nested macro
-
-<p>
-	displacement a0,d3.l*8 more,more and,more
-
-<p>
-	where many instructions have the same name, labels
-	have a class or type. This enables macro language to
-	pick the correct instruction code for the operand types
-	and sizes, for example, register/storage
-	</b;pckquote>
-
-<pre>
-
-
-MASMX 7r2
+$ masmx -lnkV coldfire
+MASMX 7r3
 3/coldfire.msm
 CONT_CHAR=|
 LTERM=;
 STERM=.
 *EOF*
-  :                            1:       $include        "coldfire.def"
-  :                            10 	$list	2
-  :                            11 
-  :                            12 	$set_option	"c"
-  :                            13 
-  :                            14 "$d_reg" 	$equ	128
-  :                            15 "$a_reg" 	$equ	129
-  :                            16 "$a_reg_@"	$equ	130
-  :                            17 "$a_reg_@+" 	$equ	131
-  :                            18 "$a_reg_@-"	$equ	132
-  :                            19 "$special_reg"	$equ	133
-  :                            20 
-  :                            21 d0	$equ,"$d_reg"	0
-  :                            22 d1	$equ,"$d_reg"	1
-  :                            23 d2	$equ,"$d_reg"	2
-  :                            24 
-  :                            62         $list   2
-  :                            63 
-  :                            64 "-(a6)"	$equ,"$a_reg_@-"	6
-  :                            65 "-(a7)"	$equ,"$a_reg_@-"	7
-  :                            66 
-  :                            67 "(a0)+"	$equ,"$a_reg_@+"	0
-  :                            68 "(a1)+"	$equ,"$a_reg_@+"	1
-  :                            69 "(a2)+"	$equ,"$a_reg_@+"	2
-  :                            70 
-  :                            122         $list   2
-  :                            123 
-  :                            124 "l*2"	$equ,"$special_reg"	1*/2++1
-  :                            125 "l*4"	$equ,"$special_reg"	1*/2++2
-  :                            126 "l*8"	$equ,"$special_reg"	1*/2++3
-  :                            127 
-  :                            128 "$i_rr"	$form	4, 3, 3, 3, 3
-  :                            129 "$i_rm"	$form	4, 3, 3, 3, 3, 16
-  :                            130 "$i_rl"	$form	4, 3, 3, 3, 3, 32
-  :                            131 "$i_rx"	$form	4, 3, 3, 3, 3, 4, 3, 1, 8
-  :                            132 
-  :                            133 "$b_cs"	$form	8, 8
-  :                            134 "$b_cl"	$form	8, 8, 16
-  :                            135 
-  :                            136 f	$func
-  :                            137 ;
-  :                            138 ;	when no displacement is coded outside the parentheses
-  :                            139 ;
-  :                            140 "$inside"*	$name
-  :                            141 	$return	f(0)
-  :                            142 
-  :                            143 "$displacement8"*	$name
-  :                            144 	$do	f(0, 1)<-128,	$flag	displacement too low
-  :                            145 	$do	f(0, 1)>127,	$flag	displacement too high
-  :                            146 "$displacement"*	$name
-  :                            147 	$return	f(0, 1)
-  :                            148 
-  :                            149 "$base_a"*	$name
-  :                            150 	$do	$t(f(0, 2))^=$a_reg,	$flag base register not a0..a7
-  :                            151 	$do	$t(f(0, 2))^=$a_reg,	$trace f(0, 2)
-  :                            152 	$return	f(0, 2)
-  :                            153 
-  :                            154 "$idx_c"*	$name
-  :                            155 	$return	f(0, 3:)	; how many substrings are after (disp, a0,.
-  :                            156 
-  :                            157 "$idx_d"*	$name		; d-register
-  :                            158 	$do	$t(f(0, 3:1))=$a_reg,		$return	8++f(0, 3:1)
-  :                            159 	$do	$t(f(0, 3:1))^=$d_reg,		$flag	index not d0..d7
-  :                            160 	$return	f(0, 3:1)
-  :                            161 
-  :                            162 "$idx_w"*	$name		; width++scale
-  :                            163 	$do	f(0, 3:)=1,	$return	"l*1"
-  :                            164 	$do	$t("f(0, 3:2)")^=$special_reg,	$flag	scale not in scale
-  :                            165 	$return	"f(0, 3:2)"
-  :                            166 
-  :                            167 	$end
-  :                            168 
-  :                            169 f	$func
-  :                            170 ;
-  :                            171 ;	when there is a displacement and then parentheses
-  :                            172 ;
-  :                            173 "$icount"*	$name
-  :                            174 	$return	f(1)
-  :                            175 
-  :                            176 "$itype"*	$name
-  :                            177 	$return	$t("f(1, 1)")
-  :                            178 
-  :                            179 "$ibase"*	$name
-  :                            180 	$return	f(1, 1)
-  :                            181 
-  :                            182 	$end
-  :                            183 
-  :                            241         $list   2
-  :                            242 
-  :                            243 p	$proc
-  :                            244 adda*	$name	7*/4++13
-  :                            245 suba*	$name	7*/4++9
-  :                            246 cmpa*	$name	7*/4++11
-  :                            247 
-  :                            248 	$if		$t(p(1, 2))=$a_reg
-  :                            249 
-  :                            250 "$type"	  $set		$t("p(1, 1)")
-  :                            251 
-  :                            252 	  $if		$type**128	; register direct or indirect[+-]
-  :                            253 
-  :                            254 	    $i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, $type, +"p(1, 1)"
-  :                            255 
-  :                            256 	  $elseif	$itype\p(1, 1)=$a_reg	; displacement_outside(a_)
-  :                            257 
-  :                            259 	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $ibase\p(1, 1),|
-			p(1, 1)
-  :                            260 
-  :                            261 	  $elseif	$inside\p(1, 1:1)=2	; (displacement_inside, a_)
-  :                            262 
-  :                            264 	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5,	|
-			$base_a\p(1, 1:1), $displacement\p(1, 1:1)
-  :                            265 
-  :                            266 	  $elseif	$inside\p(1, 1:1)=3	; (displacement, a_, d_[.])
-  :                            267 
-  :                            270 	    $i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 6,	|
-			$base_a\p(1, 1:1), $idx_d\p(1, 1:1),	|
-			$idx_w\p(1, 1:1), 0, $displacement8\p(1, 1:1)
-  :                            271 
-  :                            272 	  $elseif	p(1, #1)		; immediate
-  :                            273 	    $i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 4, p(1, 1)
-  :                            274 
-  :                            275 	  $else
-  :                            276 	    $i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
-  :                            277 	  $endif
-  :                            278 	$else
-  :                            279 	  $flag	receiving operand must be a0..a7
-  :                            280 	$endif
-  :                            281 	$end
-  :                            282 
-  :                            462         $list   2
-  :                            463 
-  :                            464 ; coldfire doesn't have so many movem variations as 68k
-  :                            465 
-  :                            466 p	$proc
-  :                            467 
-  :                            468 movem.w*	$name	0x0122
-  :                            469 movem.l*	$name	0x0123
-  :                            470 movem*		$name	movem.l
-  :                            471 
-  :                            472 	$if	$t("p(1, 1)")="$a_reg_@"
-  :                            473 	$movem_i	p(0, 0)++16, 2, p(1, 1), right2left(p(1, 2))
-  :                            474 
-  :                            475 	$elseif	$t("p(1, 2)")="$a_reg_@"
-  :                            476 	$movem_i	p(0, 0), 2, p(1,2), right2left(p(1, 1))
-  :                            477 
-  :                            478 	$elseif	$itype\p(1,1)=$a_reg
-  :                            480 	$movem_im	p(0, 0)++16, 5, $ibase\p(1, 1),|
-			right2left(p(1, 2)), p(1, 1)
-  :                            481 
-  :                            482 	$elseif	$itype\p(1,2)=$a_reg
-  :                            484 	$movem_im	p(0, 0), 5, $ibase\p(1, 2),|
-			right2left(p(1, 1)), p(1, 2)
-  :                            485 
-  :                            486 	$elseif	$inside\p(1, 1:1)=2
-  :                            489 	$movem_im	p(0, 0)++16, 5, $base_a\p(1, 1:1),|
-			right2left(p(1, 2)),|
-			$displacement\p(1, 1)
-  :                            490 
-  :                            491 	$elseif	$inside\p(1, 2:1)=2
-  :                            494 	$movem_im	p(0, 0), 5, $base_a\p(1, 2:1),|
-			right2left(p(1, 1)),|
-			$displacement\p(1, 2)
-  :                            495  
-  :                            496 	$else
-  :                            497 
-  :                            498 	$flag	movem variant not in ColdFire set
-  :                            499 
-  :                            500 	$endif
-  :                            501 	$end
-  :                            502 
-  :                            503 ; removal of movem-predecrement means only one bitmask direction is needed
-  :                            504 
-  :                            505 f	$func
-  :                            506 right2left*	$name
-  :                            507 mask	$set	0
-  :                            508 	$sterm	'/'
-  :                            509 x	$do	f(1, 1:),mask	$set	mask++range_up(f(1, 1:x))
-  :                            510 	$sterm	'.'
-  :                            511 	$return	mask
-  :                            512 	$end
-  :                            513 
-  :                            514 f	$func
-  :                            515 range_up*	$name
-  :                            516 mask	$set	0
-  :                            517 	$sterm	'-'
-  :                            518 	$if	f(1,1:)=1
-  :                            519 	$if	$t(f(1, 1:1))=$d_reg
-  :                            520 mask	$set	1*/f(1, 1:1)
-  :                            521 	$elseif	$t(f(1, 1:1))=$a_reg
-  :                            522 mask	$set	256*/f(1, 1:1)
-  :                            523 	$else
-  :                            524 	$flag	tag not data register or address register
-  :                            525 	$endif
-  :                            526 	$elseif	f(1,1:)=2
-  :                            529 	$if	  ($t(f(1, 1:1))=$d_reg)|
-		**($t(f(1, 1:2))=$d_reg)|
-		**(f(1, 1:2)>f(1, 1:1))
-  :                            530 
-  :                            531 mask	$set	((1*/f(1, 1:1))-1)--((2*/f(1, 1:2))-1)
-  :                            532 
-  :                            535 	$elseif	  ($t(f(1, 1:1))=$a_reg)|
-		**($t(f(1, 1:2))=$a_reg)|
-		**(f(1, 1:2)>f(1, 1:1))
-  :                            536 
-  :                            537 mask	$set	((256*/f(1, 1:1))-1)--((512*/f(1, 1:2))-1)
-  :                            538 
-  :                            539 	$elseif	($t(f(1, 1:1))=$d_reg)**($t(f(1, 1:2))=$a_reg)
-  :                            540 
-  :                            541 mask	$set	((1*/f(1, 1:1))-1)--((512*/f(1, 1:2))-1)
-  :                            542 	$else
-  :                            543 	$flag	bad range
-  :                            544 	$endif
-  :                            545 	$else
-  :                            546 	$flag	too many ranges in range
-  :                            547 	$endif
-  :                            548 	$sterm	'/'
-  :                            549 	$return	mask
-  :                            550 	$end
-  :                            551 
-Note: coldfire.def Line 553: end of header include
-  :                            2 
-  :                            3 __LINK_POINTER	$equ,"$a_reg"	6
-  :                            4 __TCB_LOCATION	$equ		0
-  :                            5 
-  :                            6 
-  :                            7 CPUS		$set	1
-  :                            8 PRIORITIES	$set	8
-  :                            9 IDLE_STACK	$set	64
-  :                            10 
-Note: coldfire.msm Line 12: listing off
-Note: coldfire.msm Line 13: after all, the kernel structures aren't interesting
-  :                            114 	$list	1
-  :                            115 
-00:00000400 2F08              +116 	move	a0, -(a7)
-00:00000402 6100008C          +117 	bsr	p_tcb
-00:00000406 48E87FFF0010      +118 	movem	d0-a6, (tcb.genregs, a0)
-00:0000040C 2248              +119 	move	a0, a1
-00:0000040E 205F              +120 	move	(a7)+, a0
-00:00000410 23480030          +121 	move	a0, tcb.a_reg_0(a1)
-00:00000414 234F004C          +122 	move	a7, tcb.a_reg_7(a1)
-  :                            123 
-00:00000418 20290004          +124 	move	tcb.h.priority(a1), d0
-  :                            125 
-00:0000041C 6B50              +126 	bmi	qaside	$8_bits
-00:0000041E 0C8000000007      +127 	cmpi	#PRIORITIES-1, d0
-00:00000424 6E48              +128 	bgt	qaside	$8_bits
-  :                            129 
-Note: coldfire.msm Line 131: listing off
-Note: coldfire.msm Line 132: after all, the context switch isn't interesting
-  :                            158 	$list	1
-  :                            159 
-00:00000466 4CE9FFFF0010      +160 	movem	tcb.genregs(a1), d0-a7
-00:0000046C 4E73              +161 	rte
-  :                            162 
-  :                            163 
-  :                            164 
-(+03)20
-00:0000046E 4AB900000124      +165 qaside	tst	qaside_h
-00:00000474 670C              +166 	beq	first	$8_bits
-(+03)20
-00:00000476 207900000128      +167 	move	qaside_t, a0
-00:0000047C 21490000          +168 	move	a1, tcb.h.next(a0)
-00:00000480 6006              +169 	bra	last	$8_bits
-(+03)20
-00:00000482 23C900000124      +170 first	move	a1, qaside_h 	
-(+03)20
-00:00000488 23C900000128      +171 last	move	a1, qaside_t
-00:0000048E 60B0              +172 	bra	pick
-  :                            173 
-  :                            174 
-  :                            175 	$if	__LINK_POINTER
-  :                            176 
-  :                            178 	$do	$t(__LINK_POINTER)^=$a_reg,	|
-	$flag	__LINK_POINTER should be a6 or similar
-  :                            179 
-  :                            180 ;	this is callable from c and returns pointer to tcb
-  :                            181 ;	it requires that applications do not use stack frame
-  :                            182 ;	link register (often a6) for anything except linking stack frames
-  :                            183 
-  :                            184 ;	it does not matter if functions do not use stack
-  :                            185 ;	frames at all. It matters that nothing but LINK and UNLK
-  :                            186 ;	instructions should change the link register
-  :                            187 
-00:00000490 2F00              +188 p_tcb*	move	d0, -(a7)
-  :                            189 
-00:00000492 204E              +190 	move	__LINK_POINTER, a0
-00:00000494 6002              +191 	bra	again?	$8_bits
-00:00000496 2040              +192 again!	move	d0, a0
-00:00000498 2018              +193 again?	move	(a0)+, d0
-00:0000049A 66FA              +194 	bne	again!
-  :                            195 
-00:0000049C 201F              +196 	move	(a7)+, d0
-00:0000049E 4E75              +197 	rts
-  :                            198 
-  :                            199 
-  :                            200 	$elseif	__TCB_LOCATION
-  :                            201 
-  :                            202 ;	this is callable from c and returns pointer to tcb
-  :                            203 ;	if compilers can be directed to spare an address register,
-  :                            204 ;	possibly a5 or a4, then __TCB_LOCATION can be that register
-  :                            205 ;	and the encoding at the head of the assembly would be as
-  :                            206 ;
-  :                            207 ;	__LINK_POINTER	$equ		0
-  :                            208 ;	__TCB_LOCATION	$equ,$a_reg	a5
-  :                            209 ;
-  :                            210 ;	otherwise __TCB_LOCATION may be a longword in RAM
-  :                            211 ;	linked in location counter 3 (static data), but not if
-  :                            212 ;	more than one core is running in the execution space
-  :                            213 
-  :                            214 	$if	$t(__TCB_LOCATION)=$a_reg
-  :                            215 	$note	tcb pointer is an address register
-  :                            216 	$else
-  :                            217 	$note	tcb pointer is not at address register
-  :                            218 	$endif
-  :                            219 
-  :                            220 p_tcb*	move	__TCB_LOCATION, a0
-  :                            221 	rts
-  :                            222 
-  :                            223 	$else
-  :                            224 
-  :                            225 	$flag	you must have __LINK_POINTER or __TCB_LOCATION
-  :                            226 
-  :                            227 	$endif
-*EOF*
-:$(00):00000400:000004A0 :$(03):00000000:0000012C :$(43):00000000:00000058 
-coldfire.msm: object code 1441 bytes: 0 errors: 1 undefined labels
-
-</pre>
-The same macro language can assemble 68000 source which has
-tokens [] a4@ a0@+ a7@-
-<pre>
-
-MASMX 7r2
-3/coldfir@.msm
-CONT_CHAR=|
-LTERM=;
-STERM=.
-*EOF*
   :                            1: 	$include	"coldfire.def"
+  :                            1 	$do	$o('V'),	$list	2
+Note: coldfire.def Line 2: snapshot start of coldfire.def
+  :                            2 	$do	$o('V'),	$note	snapshot start of coldfire.def
+  :                            3 
+  :                            4 	$word	16
+  :                            5 	$awidth	32
+  :                            6 	$quantum 8
+  :                            7 	$byte	 8
+  :                            8 
+  :                            9 	$cont_char	'|'
+  :                            10 	$lterm		';'
+  :                            11 	$sterm		'.'
+  :                            12 
+  :                            13 	$set_option	"c"
+  :                            14 
+  :                            15 "$d_reg" 	$equ	128
+  :                            16 "$a_reg" 	$equ	129
+  :                            17 "$a_reg_@"	$equ	130
+  :                            18 "$a_reg_@+" 	$equ	131
+  :                            19 "$a_reg_@-"	$equ	132
+  :                            20 "$special_reg"	$equ	133
+  :                            21 "$fp_reg"	$equ	134
+  :                            22 
+  :                            23 d0	$equ,"$d_reg"	0
+  :                            24 d1	$equ,"$d_reg"	1
+  :                            25 d2	$equ,"$d_reg"	2
+  :                            26 
+  :                            52 	$do	$o('V'),	$list	2
+Note: coldfire.def Line 53: snapshot equates in coldfire.def
+  :                            53 	$do	$o('V'),	$note	snapshot equates in coldfire.def
+  :                            54 
+  :                            55 "(a5)"	$equ,"$a_reg_@"	5
+  :                            56 "(a6)"	$equ,"$a_reg_@"	6
+  :                            57 "(a7)"	$equ,"$a_reg_@"	7
+  :                            58 
+  :                            59 "-(a0)"	$equ,"$a_reg_@-"	0
+  :                            60 "-(a1)"	$equ,"$a_reg_@-"	1
+  :                            61 "-(a2)"	$equ,"$a_reg_@-"	2
+  :                            62 
+  :                            109 	$do	$o('V'),	$list	2
+Note: coldfire.def Line 110: snapshot equates in coldfire.def
+  :                            110 	$do	$o('V'),	$note	snapshot equates in coldfire.def
+  :                            111 
+  :                            112 "a5@+"	$equ,"$a_reg_@+"	5
+  :                            113 "a6@+"	$equ,"$a_reg_@+"	6
+  :                            114 "a7@+"	$equ,"$a_reg_@+"	7
+  :                            115 
+  :                            116 fp0	$equ,"$fp_reg"		0
+  :                            117 fp1	$equ,"$fp_reg"		1
+  :                            118 fp2	$equ,"$fp_reg"		2
+  :                            119 
+  :                            141 	$do	$o('V'),	$list	2
+Note: coldfire.def Line 142: snapshot equates in coldfire.def
+  :                            142 	$do	$o('V'),	$note	snapshot equates in coldfire.def
+  :                            143 
+  :                            144 "l*2"	$equ,"$special_reg"	1*/2++1
+  :                            145 "l*4"	$equ,"$special_reg"	1*/2++2
+  :                            146 "l*8"	$equ,"$special_reg"	1*/2++3
+  :                            147 
+  :                            148 ;	[ w l ] are only encoded [ 0 1 ]
+  :                            149 ;	in the index width construct (a0, d0.w[ *1 *2 *4 *8])
+  :                            150 
+  :                            151 ;	and otherwise get their encoding values
+  :                            152 ;	from instruction names, for example  move.[b w l]
+  :                            153 
+  :                            154 ;	however their values here combined with type $special_reg
+  :                            155 ;	can be used for recognition in macro language
+  :                            156 ;	and are used in the set [ b w l s d ]
+  :                            157 
+  :                            158 b	$equ,$special_reg	2*/2
+  :                            159 s	$equ,$special_reg	3*/2
+  :                            160 d	$equ,$special_reg	4*/2
+  :                            161 
+  :                            186 	$do	$o('V'),	$list	2
+Note: coldfire.def Line 187: operand attribute scan in coldfire.def
+  :                            187 	$do	$o('V'),	$note	operand attribute scan in coldfire.def
+  :                            188 
+  :                            189 f	$func
+  :                            190 ;
+  :                            191 ;	when no displacement is coded outside the parentheses
+  :                            192 ;
+  :                            193 "$inside"*	$name
+  :                            194 	$return	f(1)
+  :                            195 
+  :                            196 "$displacement8"*	$name
+  :                            197 	$do	f(1, 1)<-128,	$flag	displacement too low
+  :                            198 	$do	f(1, 1)>127,	$flag	displacement too high
+  :                            199 "$displacement"*	$name
+  :                            200 	$return	f(1, 1)
+  :                            201 
+  :                            202 "$base_a"*	$name
+  :                            203 	$do	$t(f(1, 2))^=$a_reg,	$flag base register not a0..a7
+  :                            204 	$do	$t(f(1, 2))^=$a_reg,	$trace f(1, 2)
+  :                            205 	$return	f(1, 2)
+  :                            206 
+  :                            207 "$idx_c"*	$name
+  :                            208 	$return	f(1, 3:)	; how many substrings are after (disp, a0,.
+  :                            209 
+  :                            210 "$idx_d"*	$name		; d-register
+  :                            211 	$do	$t(f(1, 3:1))=$a_reg,		$return	8++f(1, 3:1)
+  :                            212 	$do	$t(f(1, 3:1))^=$d_reg,		$flag	index not d0..d7/a0..a7
+  :                            213 	$return	f(1, 3:1)
+  :                            214 
+  :                            215 "$idx_w"*	$name		; width++scale
+  :                            216 	$do	f(1, 3:)=1,	$return	"l*1"
+  :                            217 	$do	$t("f(1, 3:2)")^=$special_reg,	$flag	scale not in scale
+  :                            218 	$return	"f(1, 3:2)"
+  :                            219 
+  :                            220 	$end
+  :                            221 
+Note: coldfire.def Line 1308: end of include coldfire.def
   :                            2 
-  :                            3 __LINK_POINTER	$equ,"$a_reg"	6
-  :                            4 __TCB_LOCATION	$equ		0
-  :                            5 
+  :                            3 
+  :                            4 __LINK_POINTER	$equ,"$a_reg"	6
+  :                            5 __TCB_LOCATION	$equ		0
   :                            6 
-  :                            7 CPUS		$set	1
-  :                            8 PRIORITIES	$set	8
-  :                            9 IDLE_STACK	$set	64
-  :                            10 
+  :                            7 
+  :                            8 CPUS		$set	1
+  :                            9 PRIORITIES	$set	8
+  :                            10 IDLE_STACK	$set	64
   :                            11 
-Note: coldfir@.msm Line 15: listing off
-Note: coldfir@.msm Line 16: after all, the kernel structures aren't interesting
+Note: coldfire.msm Line 13: listing off
+Note: coldfire.msm Line 14: after all, the kernel structures aren't interesting
   :                            116 	$list	1
   :                            117 
-00:00000400 2F08              +118 	move	a0, a7@-
-00:00000402 6100008C          +119 	bsr	p_tcb
-00:00000406 48E87FFF0010      +120 	movem	d0-a6, [tcb.genregs, a0]
-00:0000040C 2248              +121 	move	a0, a1
-00:0000040E 205F              +122 	move	a7@+, a0
-00:00000410 23480030          +123 	move	a0, [tcb.a_reg_0, a1]
-00:00000414 234F004C          +124 	move	a7, [tcb.a_reg_7, a1]
-  :                            125 
-00:00000418 20290004          +126 	move	[tcb.h.priority, a1], d0
+00:00000400 2F08              +118 	move	a0, -(a7)
+00:00000402 6100008A          +119 	bsr	p_tcb
+  :                            120 
+00:00000406 48E87FFF0010      +121 	movem	d0-a6, (tcb.genregs, a0)
+  :                            122 
+00:0000040C 2248              +123 	move	a0, a1
+00:0000040E 205F              +124 	move	(a7)+, a0
+00:00000410 23480030          +125 	move	a0, tcb.a_reg_0(a1)
+00:00000414 234F004C          +126 	move	a7, tcb.a_reg_7(a1)
   :                            127 
-00:0000041C 6B50              +128 	bmi	qaside	$8_bits
-00:0000041E 0C8000000007      +129 	cmpi	#PRIORITIES-1, d0
-00:00000424 6E48              +130 	bgt	qaside	$8_bits
-  :                            131 
-  :                            132 
-Note: coldfir@.msm Line 135: listing off
-Note: coldfir@.msm Line 136: after all, the context switch isn't interesting
+00:00000418 20290004          +128 	move	tcb.h.priority(a1), d0
+  :                            129 
+00:0000041C 6B4E              +130 	bmi	qaside	$8_bits
+00:0000041E 0C8000000007      +131 	cmpi	#PRIORITIES-1, d0
+00:00000424 6E46              +132 	bgt	qaside	$8_bits
+  :                            133 
+Note: coldfire.msm Line 135: listing off
+Note: coldfire.msm Line 136: after all, the context switch isn't interesting
   :                            162 	$list	1
   :                            163 
-00:00000466 4CE9FFFF0010      +164 	movem	[tcb.genregs, a1], d0-a7
-00:0000046C 4E73              +165 	rte
+00:00000464 4CE9FFFF0010      +164 	movem	tcb.genregs(a1), d0-a7
+00:0000046A 4E73              +165 	rte
   :                            166 
   :                            167 
   :                            168 
 (+03)20
-00:0000046E 4AB900000124      +169 qaside	tst	qaside_h
-00:00000474 670C              +170 	beq	first	$8_bits
+00:0000046C 4AB900000124      +169 qaside	tst	(qaside_h).l
+00:00000472 670C              +170 	beq	first	$8_bits
 (+03)20
-00:00000476 207900000128      +171 	move	qaside_t, a0
-00:0000047C 21490000          +172 	move	a1, [tcb.h.next, a0]
-00:00000480 6006              +173 	bra	last	$8_bits
+00:00000474 207900000128      +171 	move	(qaside_t).l, a0
+00:0000047A 21490000          +172 	move	a1, tcb.h.next(a0)
+00:0000047E 6006              +173 	bra	last	$8_bits
 (+03)20
-00:00000482 23C900000124      +174 first	move	a1, qaside_h 	
+00:00000480 23C900000124      +174 first	move	a1, (qaside_h).l 	
 (+03)20
-00:00000488 23C900000128      +175 last	move	a1, qaside_t
-00:0000048E 60B0              +176 	bra	pick
+00:00000486 23C900000128      +175 last	move	a1, (qaside_t).l
+00:0000048C 60B2              +176 	bra	pick
   :                            177 
   :                            178 
   :                            179 	$if	__LINK_POINTER
   :                            180 
-  :                            182 	$do	$t(__LINK_POINTER)^=$a_reg,	|
-	$flag	__LINK_POINTER should be a6 or similar
+                                	$do	$t(__LINK_POINTER)^=$a_reg,	|
+  :                            182 	$flag	__LINK_POINTER should be a6 or similar
   :                            183 
   :                            184 ;	this is callable from c and returns pointer to tcb
   :                            185 ;	it requires that applications do not use stack frame
-  :                            186 ;	link register (often a6) for anything else
+  :                            186 ;	link register (often a6) for anything except linking stack frames
   :                            187 
   :                            188 ;	it does not matter if functions do not use stack
   :                            189 ;	frames at all. It matters that nothing but LINK and UNLK
   :                            190 ;	instructions should change the link register
   :                            191 
-00:00000490 2F00              +192 p_tcb*	move	d0, a7@-
+00:0000048E 2F00              +192 p_tcb*	move	d0, -(a7)
   :                            193 
-00:00000492 204E              +194 	move	__LINK_POINTER, a0
-00:00000494 6002              +195 	bra	again?	$8_bits
-00:00000496 2040              +196 again!	move	d0, a0
-00:00000498 2018              +197 again?	move	a0@+, d0
-00:0000049A 66FA              +198 	bne	again!
+00:00000490 204E              +194 	move	__LINK_POINTER, a0
+00:00000492 6002              +195 	bra	again?	$8_bits
+00:00000494 2040              +196 again!	move	d0, a0
+00:00000496 2018              +197 again?	move	(a0)+, d0
+00:00000498 66FA              +198 	bne	again!
   :                            199 
-00:0000049C 201F              +200 	move	a7@+, d0
-00:0000049E 4E75              +201 	rts
+00:0000049A 201F              +200 	move	(a7)+, d0
+00:0000049C 4E75              +201 	rts
   :                            202 
   :                            203 
   :                            204 	$elseif	__TCB_LOCATION
@@ -17700,8 +17591,129 @@ Note: coldfir@.msm Line 136: after all, the context switch isn't interesting
   :                            230 
   :                            231 	$endif
 *EOF*
-:$(00):00000400:000004A0 :$(03):00000000:0000012C :$(43):00000000:00000058 
-coldfir@.msm: object code 1441 bytes: 0 errors: 1 undefined labels
+:$(00):00000400:0000049E :$(03):00000000:0000012C :$(43):00000000:00000058 
+
+</pre>
+The same macro language can assemble an alternative Motorola syntax with tokens [] a4@ a0@+ a7@-
+<pre>
+
+$ masmx -lnk coldfir@
+MASMX 7r3
+3/coldfir@.msm
+CONT_CHAR=|
+LTERM=;
+STERM=.
+*EOF*
+  :                            1: 	$include	"coldfire.def"
+  :                            2 
+  :                            3 __LINK_POINTER	$equ,"$a_reg"	6
+  :                            4 __TCB_LOCATION	$equ		0
+  :                            5 
+  :                            6 
+  :                            7 CPUS		$set	1
+  :                            8 PRIORITIES	$set	8
+  :                            9 IDLE_STACK	$set	64
+  :                            10 
+  :                            11 
+Note: coldfir@.msm Line 14: listing off
+Note: coldfir@.msm Line 15: after all, the kernel structures aren't interesting
+  :                            115 	$list	1
+  :                            116 
+00:00000400 2F08              +117 	move	a0, a7@-
+00:00000402 6100008A          +118 	bsr	p_tcb
+  :                            119 
+00:00000406 48E87FFF0010      +120 	movem	d0-a6, [tcb.genregs, a0]
+  :                            121 
+00:0000040C 2248              +122 	move	a0, a1
+00:0000040E 205F              +123 	move	a7@+, a0
+00:00000410 23480030          +124 	move	a0, [tcb.a_reg_0, a1]
+00:00000414 234F004C          +125 	move	a7, [tcb.a_reg_7, a1]
+  :                            126 
+00:00000418 20290004          +127 	move	[tcb.h.priority, a1], d0
+  :                            128 
+00:0000041C 6B4E              +129 	bmi	qaside	$8_bits
+00:0000041E 0C8000000007      +130 	cmpi	#PRIORITIES-1, d0
+00:00000424 6E46              +131 	bgt	qaside	$8_bits
+  :                            132 
+  :                            133 
+Note: coldfir@.msm Line 136: listing off
+Note: coldfir@.msm Line 137: after all, the context switch isn't interesting
+  :                            163 	$list	1
+  :                            164 
+00:00000464 4CE9FFFF0010      +165 	movem	[tcb.genregs, a1], d0-a7
+00:0000046A 4E73              +166 	rte
+  :                            167 
+  :                            168 
+  :                            169 
+(+03)20
+00:0000046C 4AB900000124      +170 qaside	tst	(qaside_h).l
+00:00000472 670C              +171 	beq	first	$8_bits
+(+03)20
+00:00000474 207900000128      +172 	move	(qaside_t).l, a0
+00:0000047A 21490000          +173 	move	a1, [tcb.h.next, a0]
+00:0000047E 6006              +174 	bra	last	$8_bits
+(+03)20
+00:00000480 23C900000124      +175 first	move	a1, (qaside_h).l 	
+(+03)20
+00:00000486 23C900000128      +176 last	move	a1, (qaside_t).l
+00:0000048C 60B2              +177 	bra	pick
+  :                            178 
+  :                            179 
+  :                            180 	$if	__LINK_POINTER
+  :                            181 
+                                	$do	$t(__LINK_POINTER)^=$a_reg,	|
+  :                            183 	$flag	__LINK_POINTER should be a6 or similar
+  :                            184 
+  :                            185 ;	this is callable from c and returns pointer to tcb
+  :                            186 ;	it requires that applications do not use stack frame
+  :                            187 ;	link register (often a6) for anything else
+  :                            188 
+  :                            189 ;	it does not matter if functions do not use stack
+  :                            190 ;	frames at all. It matters that nothing but LINK and UNLK
+  :                            191 ;	instructions should change the link register
+  :                            192 
+00:0000048E 2F00              +193 p_tcb*	move	d0, a7@-
+  :                            194 
+00:00000490 204E              +195 	move	__LINK_POINTER, a0
+00:00000492 6002              +196 	bra	again?	$8_bits
+00:00000494 2040              +197 again!	move	d0, a0
+00:00000496 2018              +198 again?	move	a0@+, d0
+00:00000498 66FA              +199 	bne	again!
+  :                            200 
+00:0000049A 201F              +201 	move	a7@+, d0
+00:0000049C 4E75              +202 	rts
+  :                            203 
+  :                            204 
+  :                            205 	$elseif	__TCB_LOCATION
+  :                            206 
+  :                            207 ;	this is callable from c and returns pointer to tcb
+  :                            208 ;	if compilers can be directed to spare an address register,
+  :                            209 ;	possibly a5 or a4, then __TCB_LOCATION can be that register
+  :                            210 ;	and the encoding at the head of the assembly would be as
+  :                            211 ;
+  :                            212 ;	__LINK_POINTER	$equ		0
+  :                            213 ;	__TCB_LOCATION	$equ,$a_reg	a5
+  :                            214 ;
+  :                            215 ;	otherwise __TCB_LOCATION may be a longword in RAM
+  :                            216 ;	linked in location counter 3 (static data), but not if
+  :                            217 ;	more than one core is running in the execution space
+  :                            218 
+  :                            219 	$if	$t(__TCB_LOCATION)=$a_reg
+  :                            220 	$note	tcb pointer is an address register
+  :                            221 	$else
+  :                            222 	$note	tcb pointer is not at address register
+  :                            223 	$endif
+  :                            224 
+  :                            225 p_tcb*	move	__TCB_LOCATION, a0
+  :                            226 	rts
+  :                            227 
+  :                            228 	$else
+  :                            229 
+  :                            230 	$flag	you must have __LINK_POINTER or __TCB_LOCATION
+  :                            231 
+  :                            232 	$endif
+*EOF*
+:$(00):00000400:0000049E :$(03):00000000:0000012C :$(43):00000000:00000058 
 
 </pre>
 
@@ -17711,23 +17723,23 @@ Managing Alignments</h1>
 
 
 <p>
-Word size set with the $WORD directive cannot always mean the
-architectural word size of the target.
-
-<p>
 If the address quantum of the target is also its word size, then
 then the real architectural word size is the only possible $WORD value.
 
+
 <p>
-This discussion concerns byte-addressing machines.
+Word size set with the $WORD directive may otherwise not always mean the
+architectural word size of the target.
+
 
 <p>
 In masmx $WORD sets the quantum of data which a line of assembly
 can generate. A line may generate no code, a word or some words.
 
 <p>
-Targets which can fetch instructions from any byte address and can have
-instructions one byte long must be described as having the geometry
+A target which can fetch instructions from any octet address and can have
+instructions one or three or five bytes long must be described as having word
+size one octet although its integer registers may be 32 or 64 bits in size
 <pre>
 
 	$cont_char	'|'
@@ -17814,7 +17826,7 @@ granule $set    1*/.align(1,1)
 <p>
 The executables in this package should not harm any
 systems on which you run them. No responsibility is
-accepted for them. They carry no garauntee.
+accepted for them. They carry no guarantee.
 
 <p>
 These are free products.
@@ -17841,7 +17853,7 @@ LICENCE NOTE
 
     This document describes the masmx.7r2 target-independent meta-assembler.
 
-    masmx.7r2 is free software. It is licensed
+    masmx.7r3 is free software. It is licensed
     under the GNU General Public Licence Version 3
 
     You can redistribute it and/or modify masmx.7r2
@@ -17849,7 +17861,7 @@ LICENCE NOTE
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    masmx.7r2 is distributed in the hope that it will be useful,
+    masmx.7r3 is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
