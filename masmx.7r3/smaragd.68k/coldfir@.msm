@@ -173,7 +173,7 @@ not_last
 
 
 
-qaside	tst	qaside_h
+qaside	tst	(qaside_h).l
 	beq	first	$8_bits
 	move	(qaside_t).l, a0
 	move	a1, [tcb.h.next, a0]
