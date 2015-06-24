@@ -1,0 +1,29 @@
+	$word		16
+
+p	$proc
+port*	$name
+*	$tree
+next	+	p(2, 1)L 
+local	0L
+port	+	p(1, 1)S
+remote	0L
+remoteP	0
+
+connection_chain	. connection port
+message_chain		. datagram_port
+	0L
+	$root
+	$end
+
+$(10:0A000)
+
+UPORTS	$equ	3
+TPORTS	$equ	3
+
+ufree	+	uport(1)S
+tfree	+	tport(1)S
+
+?	$do	UPORTS,uport(?)	port	1023+?	uport(?+1)
+
+?	$do	TPORTS,tport(?)	port	1023+?	tport(?+1)
+
