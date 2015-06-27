@@ -128,7 +128,7 @@ eostring
 	pea		table_u		; the table start is the minimum address
 	cmpa		(a7)+, a0	; are you lower than that?
 	bmi.b		outrange	; yes you are. NAN
-	pea		table_u+615*8	; the table end is the maximum address + 1 instance
+	pea		table_u+615*8	; the table ends after the last instance
 	cmpa		(a7)+, a0	; are you lower than that?
 	bpl.b		outrange	; no you're not. NAN
 	fmul.d		(a0), fp1	; the exponent is in range

@@ -116,6 +116,9 @@ User interface is a shell or command prompt
 <p>
 Binaries for all popular platforms are downloadable. Installation = copy the binaries
 
+<a href="http://timmilescox.github.io/masmx/">
+        Downloads Page</a>
+
 <p>
 masmx source code is in git and download zip. Build for new developer platforms is a one-line shell command
 
@@ -308,8 +311,9 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 	2.  Bit-Aligned Structures					5.2.2
 	    1.	Bit-Aligned Data $record..$root				5.2.2.1
-	    3.  Macro Code Access to Bit-Aligned Fields and Groups	5.2.2.2
-	    2.	Overlaid Structures $record,$branch			5.2.2.3
+	    2.  Macro Code Access to Bit-Aligned Fields and Groups	5.2.2.2
+	    3.	Overlaid Structures $record,$branch			5.2.2.3
+	    4.	Signed Bit Fields					5.2.2.4
 
 6.  Run-Time Algorithm Plotter						6
 
@@ -808,7 +812,7 @@ bash shell
 
 <p>
 masmx on Microsoft platforms runs with the simple command prompt
-sometimes called the DOS screen or shell
+sometimes called the DOS screen or command prompt
 
 <p>
 The command line is documented at Appendix A: masmx Command Line 
@@ -4671,16 +4675,21 @@ MASMX 7r3
 
 $(.text:524288,pc)
 
+;	translate a 32-bit unsigned integer in d0 to 12 decimal digits in d0:d1:d2 quickly
+;	three * 4-byte blocks are returned in registers without editing or truncation
+;	this routine may be called from others which action sign / edit / store
+;	the high order two digits of the 12 are guaranteed "00"
+
 i2string
 	divu.w	#10000, d0
-	moveq	#0, d1
-	move.w	d0, d1
+	moveq	#0, d1				; high-order half must be zero
+	move.w	d0, d1				; quotient of first divide may be > 10000
 	divu.w	#10000, d1
-	move.l	(table, pc, d1.w*4), (a0)+
-	swap	d1
-	move.l	(table, pc, d1.w*4), (a0)+
-	swap	d0
-	move.l	(table, pc, d0.w*4), (a0)+
+	swap	d0				; remainder to ls half d0
+	move.l	(table, pc, d0.w*4), d2		; low-order 4 digits
+	move.l	(table, pc, d1.w*4), d0 	; high-order 4 digits
+	swap	d1				; remainder to ls half d1
+	move.l	(table, pc, d1.w*4), d1		; 5th..8th digits
 	rts
 
 table
@@ -5268,6 +5277,99 @@ moreover.msm=0<00000003
 
 
 </pre>
+
+
+<h4>5.2.2.4: Signed Bit Fields</h4>
+
+Option <b>-Y</b> causes bit fields to be flagged as signed unless the length is marked
+with trailing <b>u</b>
+<pre>
+
+record1	$record
+quarter	4	; signed if option -Y	
+quintet	5u	; never signed
+	$root
+
+</pre>
+
+If <b>-Y</b> is not opted, only fields marked with trailing <b>s</b> on the length
+are flagged to be signed
+<pre>
+
+record2	$record
+quartet	4	; signed if option -Y
+quintet	5s	; always signed
+	$root
+
+</pre>
+Signedness is flagged on the length attribute of the field identifier. The flag
+indicates an intention of signedness which macro text <i>may</i> action
+
+<p>
+Macro text responds in this sample assembly to signed attribute on bit quintet fields
+<pre>
+
+layer4:quartet(60)=$05:0000501C,,,0000000C,00000004
+?=0028
+layer5=$05:00005000,,,,00000190
+layer5:quintet(1)=$05:00005000,,,,80000005
+layer5:quintet(2)=$05:00005000,,,00000005,80000005
+
+$ masmx -lnk mfeuille.msm 
+MASMX 7r3
+3/mfeuille.msm
+CONT_CHAR=|
+LTERM=;
+STERM=.
+*EOF*
+  :                            1 	$path		../smaragd.68k
+  :                            2: 	$include	coldfire.def
+  :                            3: 	$include	record_x.def
+  :                            4 	$path
+  :                            5 
+  :                            6 $(5:050000)
+  :                            7 
+  :                            8 layer4  $record,$branch         10 11 12 13 14 15
+05:00005000 ABCDEF000000000000000000000000000000000000000000
+                              +9 ?       $do     60,quartet(?)   4
+  :                            10         $root
+  :                            11 layer5  $record,$branch
+  :                            12 ?       $do     80,quintet(?)   5s
+  :                            13         $root
+  :                            14 layer6  $record,$branch
+  :                            15 ?       $do     40,sextet(?)    6
+  :                            16 	$root
+  :                            17 
+  :                            18 $(64:65536)
+  :                            19 
+40:00010000 30385000          +20 	retrieve	layer5.quintet(2)	; substring is .
+40:00010004 4840              +20 
+40:00010006 EB88              +20 
+40:00010008 303C001B          +20 
+40:0001000C E0A0              +20 
+
+
+
+</pre>
+Macro text may on access override the flagged signedness of a field. Here is an extract
+from a macro definition file with retrieval entry point names for default, unsigned
+override and signed override
+<pre>
+
+
+p       $proc
+retrieve* $name         1       . signed if field is flagged signed
+retrieves* $name        2       . signed override
+retrieveu* $name        0       . unsigned override
+
+SIGNED  $set    p(2, *5)+p(0, 0)/*1
+.
+.
+
+
+</pre>
+
+
 
 <h1>6: Run-Time Algorithm Plotter</h1>
 
@@ -7019,6 +7121,8 @@ $(.array::BASE+OFFSET/$literals_tag)
 
 </pre>
 
+<b>$lit</b> directive can also tag a literal pool. See section 8.28
+
 <h2>7.2: Relocatable Location Counters</h2>
 
 <pre>
@@ -7142,12 +7246,12 @@ a suitable $AWIDTH is 16:
 
 </pre>
 <p>
-A suitable $WORD for M68K is 16, but a suitable $AWIDTH is 32
+A suitable $word for ColdFire is 16, but a suitable $AWIDTH is 32
 <pre>
 
 	$WORD   16      ; Standard Size Generated Data Item is 16 bits
 	$AWIDTH 32      ; Load Strings have a 32-bit address 
-	
+
 </pre>
 <p>
 If giant address spaces are used, then the giant part of the address
@@ -7194,26 +7298,26 @@ entry_point
 
 <p>
 $BRANCH is the start of a structure overlay. The following assembly
-with part of its label listing shows an  example of overlaid
-storage definition
+with label listing shows an  example of overlaid storage definition
 <pre>
 
-MASMX 7r2
+$ masmx welblech -lnkx
+MASMX 7r3
 3/welblech.msm
 *EOF*
-  :                            1 p      $proc
-  :                            2 yooz*  $name
-  :                            3 *      $tree
-  :                            4 yo*    $branch
-  :                            5        +       7
-  :                            6        +       8
-  :                            7        +       9
-  :                            8        $root
-  :                            9 ho*    $branch
-  :                            10       +       12
-  :                            11       $root
-  :                            12       $root
-  :                            13       $end
+  :                            1 p	$proc
+  :                            2 yooz*	$name
+  :                            3 *	$tree
+  :                            4 yo*	$branch
+  :                            5 	+	7
+  :                            6 	+	8
+  :                            7 	+	9
+  :                            8 	$root
+  :                            9 ho*	$branch
+  :                            10 	+	12
+  :                            11 	$root
+  :                            12 	$root
+  :                            13 	$end
   :                            14 
   :                            15 $(6:06000)
   :                            16 well $tree
@@ -7224,45 +7328,41 @@ MASMX 7r2
 06:006003 000008              +20 
 06:006004 000009              +20 
 06:006002 00000C              +20 
-06:006005 000063              +21 down  +       99
+06:006005 000063              +21 down	+	99
   :                            22  $root
   :                            23 
-  :                            24 fest  $branch
-06:006001 000002              +25 left  +       2
-06:006002 000007              +26 centre        yooz
+  :                            24 fest	$branch
+06:006001 000002              +25 left	+	2
+06:006002 000007              +26 centre	yooz
 06:006003 000008              +26 
 06:006004 000009              +26 
 06:006002 00000C              +26 
-06:006005 000064              +27 right +       100
-  :                            28       $root
-  :                            29       $root
+06:006005 000064              +27 right	+	100
+  :                            28 	$root
+  :                            29 	$root
   :                            30 
-06:006006 006002              +31       +       well:blech:halfway:ho
-06:006007 006002              +32       +       well:fest:centre:yo
-06:006008 006005              +33       +       well:blech:down
-06:006009 006001              +34       +       well:fest:left
+06:006006 006002              +31 	+	well:blech:halfway:ho
+06:006007 006002              +32 	+	well:fest:centre:yo
+06:006008 006005              +33 	+	well:blech:down
+06:006009 006001              +34 	+	well:fest:left
 *EOF*
-.
-.
-.
-WELL=$06:006000
-WELL:SWITCH=$06:006000
-WELL:BLECH=$06:006001
-WELL:BLECH:UP=$06:006001
-WELL:BLECH:HALFWAY=$06:006002
-WELL:BLECH:HALFWAY:YO=$06:006002
-WELL:BLECH:HALFWAY:HO=$06:006002
-WELL:BLECH:DOWN=$06:006005
-WELL:FEST=$06:006001
-WELL:FEST:LEFT=$06:006001
-WELL:FEST:CENTRE=$06:006002
-WELL:FEST:CENTRE:YO=$06:006002
-WELL:FEST:CENTRE:HO=$06:006002
-WELL:FEST:RIGHT=$06:006005
-YOOZ=:N1:P:0:000000
+yooz=:N129:P:0:000000
+well=$06:006000
+well:switch=$06:006000
+well:blech=$06:006001
+well:blech:up=$06:006001
+well:blech:halfway=$06:006002
+well:blech:halfway:yo=$06:006002
+well:blech:halfway:ho=$06:006002
+well:blech:down=$06:006005
+well:fest=$06:006001
+well:fest:left=$06:006001
+well:fest:centre=$06:006002
+well:fest:centre:yo=$06:006002
+well:fest:centre:ho=$06:006002
+well:fest:right=$06:006005
 welblech.msm=0<000003
 :$(06):006000:00600A 
-welblech.msm: object code 215 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
@@ -7328,7 +7428,7 @@ $data_code directive tables and activates byte translate values for strings
 
 <p>
 If $word is not a  multiple of the $byte, bytes in strings straddle words.
-New strings start at a word, expect in bit-aligned $record structures
+New strings start at a word, except in bit-aligned $record structures
 <pre>
 
 $ ../masmx qzuli -ln
@@ -7374,14 +7474,7 @@ Slack bits remaining after the last character position are zeroed
 and a message is output
 
 <p>
-The constant in line 5 exactly fills 210 bits or seven data words.
-
-<p>
-Setting $WORD automatically sets $QUANTUM.
-
-<p>
-Best known architectures have an address quantum of 8 and a word
-size 16 or 32. For these, quantum must be set to 8 after word size.
+The constant in line 6 exactly fills 210 bits or seven data words.
 
 <p>
 This 30-bit architecture has a 30-bit quantum. So only 15 locations
@@ -7389,12 +7482,10 @@ have been filled.
 
 <p>
 The <b>-e</b> flag causes a space to be printed between each word of generated
-code. This makes readable when the word size does not fit an exact number of
-hex or octal symbols
+code
 
 <p>
-Another case of a text string being placed in a field not a multiple
-of $BYTE can arise where the target field is in a $FORM:
+A text string may be placed in a field not a multiple $byte in a $form template
 <pre>
 
 $ masmx ldes -ln
@@ -7486,17 +7577,25 @@ in the output file. Those are the two undefined labels.
 
 <h2>8.6:  $CHARACTERISTIC    Set Floating Point Characteristic Size</h2>
 
+<p>^M
+Floating point values are calculated to 192 bits precision, and the
+default floating constant size is 96 bits with 24-bit characteristic.
+See also 8.19: $floating_point directive
+
 <p>
-$CHARACTERISTIC sets the size or sizes of the characteristic part
-(sign + exponent) of floating point items. If the $CHARACTERISTIC
-directive has a subcommand, for example:
+Characteristic means exponent size plus a sign position
+
+<p>
+$characteristic directive sets the size of the characteristic part
+of floating constants. If the $CHARACTERISTICdirective has a subcommand,
+for example
 <pre>
 
-	$characteristic,64      SIZE 
+	$characteristic,64      <i>SIZE</i>
 	
 </pre>
 <p>
-then size is the characteristic size of a 64-bit floating point item.
+then <i>SIZE</i> is the characteristic size of a 64-bit floating point number
 
 <p>
 Without the subcommand, SIZE is the characteristic size of a
@@ -7526,7 +7625,7 @@ from the default of 8.
 
 <p>
 The largest characteristic size possible is 24 bits. The largest
-floating point item size possible is 192 bits.
+floating number size possible is 192 bits.
 <pre>
 
 
@@ -7571,7 +7670,7 @@ representation is the ones complement of the entire item.
 This is not IEEE 754 encoding. IEEE 754, or any 
 other encoding different from masmx default, is generated 
 with macros which use the <b>$set</b> directive to capture
-and manipulate a number argument.
+and manipulate a number argument. See section 11.2: IEEE754 Floating Values
 
 <p>
 Macro language does reversed byte order if needed. 
@@ -7581,29 +7680,8 @@ Code written for other assemblers has constant-generating
 pseudo-directives (for example, .float).
 
 <p>
-Macros implement these directives for masmx.
+Macros implement commands like DF or .float in masmx.
 
-<p>
-Floating point values are calculated to 192 bits precision, and
-the default output is 96 bits:
-<pre>
-
-$ masmx -ln gflo
-MASMX 7r2
-3/gflo.msm
-*EOF*
-00:000000 BFFFFE3FFFFFFFFFFFFFFFFF
-                              +1         -1.5
-00:000004 72B04D80286861658C3056A5
-                              +2         +15*+1000000
-00:000008 0D4FBCE0B90EE9FC3D9D7123
-                              +3         +15*-1000000
-*EOF*
-:$(00):000000:00000C 
-gflo.msm: object code 112 bytes: 0 errors: 0 undefined labels
-
-
-</pre>
 <p>
 24 is the maximum characteristic width, and the default for floating-point
 items three or more words in size. The default for a single floating-point
@@ -7637,15 +7715,14 @@ Note: hflo.msm Line 11: floating number is maximum words
 </pre>
 <p>
 The request to generate an octaword item only resulted in
-a hexaword, because 192 bits is the limit of masmx.
-Octawords may be generated when $WORD is 24 or less.
+a hexaword, because 192 bits is the limit of a number size in masmx.
 
 <p>
 Floating point items are not auto-sized like integers.
 
 <p>
-Floating point items are the default <b>$floating_point§</b> size, 
-or a words-size after the mantissa and before any scale
+Floating point items are the default <b>$floating_pointx§</b> size, 
+or a size words given immediately after the mantissa and before any scale
 <pre>
 
 	+(MANTISSA)[s d l t q p h o][{*+|*-}SCALE]
@@ -7787,9 +7864,14 @@ $data_code tables and activates byte translate values for quoted
 text strings and value strings in apostrophe
 
 <p>
-masmx input is octets containing ASCII values in code points 0..127.
+masmx input is octets containing ASCII values plus possible extensions like
+Latin-1 in code points 0..255
+
+<p>
 $data_code directive allows "text strings" and +'character value constants'
-to be composed in another character code
+to be composed in a translated character code. Only single-octet values
+can be translated. $data-code cannot meaningfully translate multi-byte values
+from for example UTF-8
 <pre>
 
 MASMX/-240 1r1X
@@ -7857,49 +7939,42 @@ do1.msm: object code 72 bytes: 0 errors: 0 undefined labels
 
 <p>
 $DO may be nested and the label on the $DO line represents a relative-1
-ascending counter:
+ascending counter
 <pre>
 
-
-        $word	32
-
-hunthou	$do	10,;
-hundred $do     10,;
-ten     $do     10,;
-unit    $do     10, + hunthou+'0'-1, hundred+'0'-1, ten+'0'-1, unit+'0'-1
-
-
-MASMX 7r2
-3/dotable.msm
-*EOF*
-  :                            1         $word	32
-  :                            2 
-00:00000000 30303030          +6 hunthou	$do	10,;
-hundred $do     10,;
-ten     $do     10,;
-unit    $do     10, + hunthou+'0'-1, hundred+'0'-1, ten+'0'-1, unit+'0'-1
-00:00000001 30303031          +6 
-00:00000002 30303032          +6 
-00:00000003 30303033          +6 
-00:00000004 30303034          +6 
-00:00000005 30303035          +6 
-.
-.
-.
-00:0000270B 39393935          +6 
-00:0000270C 39393936          +6 
-00:0000270D 39393937          +6 
-00:0000270E 39393938          +6 
-00:0000270F 39393939          +6 
-*EOF*
-:$(00):00000000:00002710 
-dotable.msm: object code 90045 bytes: 0 errors: 0 undefined labels
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+?	$do	10,     1.5*+?-1
+	$end
+00:000000 400001C00000000000000000
+                              +1 ? $do 10, 1.5*+?-1
+00:000004 400004F00000000000000000
+                              +1 
+00:000008 400008960000000000000000
+                              +1 
+00:00000C 40000BBB8000000000000000
+                              +1 
+00:000010 40000EEA6000000000000000
+                              +1 
+00:000014 400012927C00000000000000
+                              +1 
+00:000018 400015B71B00000000000000
+                              +1 
+00:00001C 400018E4E1C0000000000000
+                              +1 
+00:000020 40001C8F0D18000000000000
+                              +1 
+00:000024 40001FB2D05E000000000000
+                              +1 
+  :                            2  $end
+:$(00):000000:000028 
 
 </pre>
 <p>
-The counter argument to $DO is evaluated to a precision of 192 bits.
+The repeat argument to $do is evaluated to a precision of 192 bits.
 32 bits of the expression's final value are used as a count.
-	
+
 Therefore the expression
 <pre>
 
@@ -7907,16 +7982,10 @@ Therefore the expression
 
 </pre>
 <p>
-Is evaluated correctly. The value of the expression
-<pre>
+Is evaluated correctly. Its value is either one for "greater" or zero for "not greater". 
 
-		label>07FF0000000000000000000
-
-</pre>
-is either one for "greater" or zero for "not greater". 
 <p>
-A repeat count expression sometimes has possible values
-only of zero or one, as:
+Comparison operators <b>= ^= &gt; &lt;</b> and option flags have a value of zero or one
 <pre>
 
 	x=y
@@ -7927,33 +7996,16 @@ only of zero or one, as:
 
 </pre>
 <p>
-Then  $DO has the effect of a decision. The code line argument is
+Then  $do has the effect of a decision. The code line argument is
 assembled once or not.
 
 <p>
-When the count argument of $DO is zero, the code line argument
+When the count argument of $do is zero, the code line argument
 is not assembled.
 
 <p>
-A label on a $DO has an incrementing value starting from 1:
-<pre>
-
-MASMX 7r2
-0/-INPUT>>
-count_up        $do     5,      +       6-count_up
-        $end
-00:000000 000005              +1 count_up $do 5, + 6-count_up
-00:000001 000004              +1 
-00:000002 000003              +1 
-00:000003 000002              +1 
-00:000004 000001              +1 
-  :                            2  $end
-:$(00):000000:000005 
--INPUT>>: object code 72 bytes: 0 errors: 0 undefined labels
-
-</pre>
-<p>
-$DO can only iterate one line of code, but that line can be a macro call.
+$do can only iterate one line of code, but that line can be a macro call.
+See section 5.1 <b>$do Directive and $proc macros</b>
 
 
 <h2>8.10: $ELSE              Conditional Assembly</h2>
@@ -8064,7 +8116,7 @@ label   $equ    10*44*/180
 </pre>
 <p>
 If a label is equated again, a warning note is output
-and the label is given the new value.
+and the label retains the first value unless <b>-E</b> is opted
 
 <p>
 A label is equated on the second assembly pass if it does not yet exist.
@@ -8100,7 +8152,7 @@ To make . functionally the same as $ location counter, "$" is in
 quotes. Otherwise $ returns its functional value, the current location.
 
 <p>
-The developer may use a range of type values 128..191 to type,
+The developer may use a range of type values 128..255 to type,
 for example, register sets:
 <pre>
 
@@ -8136,6 +8188,8 @@ move.w  $name
 This is useful in dialects where many instructions have the same
 name but the encodings change for different operand types.
 
+See also Section 4.7.10: (function) $t(<i>ARGUMENT</i>) Label Type
+
 
 
 <h2>8.15: $EQUF              Assign List of Values to Label</h2>
@@ -8148,11 +8202,10 @@ Macro expansion can then retrieve each value individually as a
 separate argument. 
 
 <p>
-Each value corresponds to a subfield in the FIELD, SUBFIELD
-paradigm.
+Each value corresponds to a subfield in the FIELD, SUBFIELD macro argument construct
 
 <p>
-$EQUF typically equates a base-displacement tuple plus possibly
+$EQUF is typically used to identify a  base-displacement tuple with possible
 further attributes like indirection or field-size:
 <pre>
 
@@ -8252,7 +8305,7 @@ aName. addto can see four subfields.
 
 <p>
 Where r9 is supplied, not *r9, the value of "addto(1, *3)" is zero.
-Either way, the value of "addto(1, 3)" is r9.
+The value of "addto(1, 3)" is r9 with or without the flag
 
 <p>
 It's possible to override the trailing attributes. Where:
@@ -8287,9 +8340,9 @@ is
 </pre>
 <p>
 Only one subfield in a field of actual arguments can be a 
-$EQUF label. Developers wanting to use $EQUF for each of
-two operands in a two-address instruction set 
-would need to notate each operand as a separate field:
+$EQUF label. If there are two $equf identifiers on an argument line,
+they should not be subfields in the same field. They should be in
+separate fields
 <pre>
 
 left    $equf   input_buffer, a0, d0.w, 4, L        
@@ -8361,8 +8414,6 @@ subfields supplied by EQUF_LABEL are 1,3 1,4 1,5...
 Macro language calls its formal arguments <b>p(argument numbers)</b>
 if the macro is called <b>p</b>. The macro can be called anything
 and can have extra names each attached to a latent parameter value
-<p>
-The following assembly is for a 32-bit RISC architecture.
 
 <p>
 The load/add/store macro generates instructions with a register left-side
@@ -8460,95 +8511,8 @@ See also base-displacement segments (Sections 4.1.2.1:
 Describing Address Spaces: Location Counter Controls).
 
 <p>
-With flag <b>-i</b>, sign extended addressing, subfields of a <b>$EQUF</b>
-may not be *flagged
-<pre>
-MASMX 7r2
-3/see2it.msm
-*EOF*
-  :                            1 		$word	16
-  :                            2 
-  :                            3 r9		$equ	9
-  :                            4 r7		$equ	7
-  :                            5 
-  :                            6 		$set_option	"i"
-  :                            7 
-  :                            8 
-  :                            9 WRITABLE	$equ	1
-  :                            10 WRITE_PROTECTED	$equ	-WRITABLE
-  :                            11 STACK_FRAME 	$equ	64
-  :                            12 
-  :                            13 
-  :                            14 frame		$equ	-STACK_FRAME
-  :                            15 eprom		$equ	0F000
-  :                            16 
-Error: see2it.msm Line 17: sign extended address may not be *flagged
-  :                            17 parameter1	$equf	*frame, r9, WRITABLE
-  :                            18 parameter2	$equf	eprom, r7, WRITE_PROTECTED
-  :                            19 
-  :                            20 . If the flag is retrieved it is the sign bit of the address
-  :                            21 
-  :                            22 macro*		$proc
-  :                            23 		+	macro(1, *1)
-  :                            24 		+	macro(1,  2)
-  :                            25 		+	macro(1, *3)
-  :                            26 		+	macro(1,  3)
-  :                            27 		+	macro(1,  1)q
-  :                            28 		$end
-  :                            29 
-00:0000 0001                  +30 		macro	parameter1
-00:0001 0009                  +30 
-00:0002 0000                  +30 
-00:0003 0001                  +30 
-00:0004 FFFFFFFFFFFFFFC0      +30 
-  :                            31 
-00:0008 0000                  +32 		macro	parameter2
-00:0009 0007                  +32 
-00:000A 0001                  +32 
-00:000B FFFF                  +32 
-00:000C 000000000000F000      +32 
-  :                            33 
-*EOF*
-:$(00):0000:0010 
-see2it.msm: object code 103 bytes: 1 errors: 0 undefined labels
-</pre>
-<p>
-If <b>-i</b> is set and the *flag is retrieved, it is the sign bit
-of the address.
-
-<p>
-$EQUF is mainly for parameter lists for macros.
-
-<p>
-The field values may also be retrieved without a macro.
-
-<p>
-The  $EQUF label is referenced directly plus a backslash and a number,
-label\?
-<pre>
-
-zylabel	$equf	buffer+2047, r15, left_hand_half_extended
-
-</pre>
-<p>
-zylabel\1 returns the address buffer+2047
-
-<p>
-zylabel\2 returns the value represented by tag r15
-
-<p>
-zylabel\3 returns the encoding assigned the name "left_hand_half_extended"
-
-<p>
-Any values retrieved in this way are net of any relocation attribute.
-
-<p>
-The values retrieved are sign-extended to 192 bits.
-
-
-<p>
-The large number of attributes possible in a $EQUF label (six) is aimed
-at high-level language development requiring complex attribute information.
+The six possible attributes in a $EQUF label are intended for
+high-level language development requiring complex attribute information.
 
 
 <h2>8.16: $EXIT              Stop the Assembly with a Message</h2>
@@ -8644,7 +8608,7 @@ Sign-bit 1 indicates that all bits are inverted.
 
 <p>
 This is not IEEE 754 format. That is supported with macros.
-See Section 1.5: Any floating-point format, Section 10: ieee754
+See Section 1.5: Any floating-point format, Section 11.2: IEEE754 FLoating Formats
 
 
 <p>
@@ -8683,8 +8647,11 @@ Note: hflo.msm Line 11: floating number is maximum words
 </pre>
 <p>
 $FLOATING_POINT sets both the default size of a floating number constant,
-and also the default range and layout of $set and $equ values which have
-floating number arguments
+and the bit layour of $set and $equ labels containing floating values
+
+
+<p>
+The largest size is 192 bits, which is also the size of value which a label may hold
 <pre>
 
 	__________________________________________________________________
@@ -8694,7 +8661,7 @@ floating number arguments
 
 
 </pre>
-<h2>8.20: $FORM             Map Layout of Bit Structure or Instruction</h2>
+<h2>8.20: $FORM             Layout Template of Bit Structure or Instruction</h2>
 
 
 <p>
@@ -8769,7 +8736,7 @@ the base register as third subfield
 
 </pre>
 <p>
-And the code-generating line can then be
+And the code-generating line of macro text may then be
 <pre>
 
 	i$type_load_store $n, p(1, 1), p(1, 3), p(1, 2)
@@ -8805,7 +8772,7 @@ fname2*	$name	<i>LATENT_VALUE2</i>
 </pre>
 <p>
 
-See Section <b>4.6: Function Macros</b> for examples
+See Section <b>4.6: Function Macros</b>
 
 <p>
 The optional argument of asterisk on <b>$FUNC</b> directive suppresses
@@ -8827,7 +8794,7 @@ and second assembly passes, and then the asterisk must be omitted and the
 Default binary notation is hex.
 
 <p>
-A number string beginning ascii zero is in current binary notation. 
+A number string beginning 0 is in current binary notation. 
 
 <p>
 Therefore 1000 and 03e8 both mean one thousand, unless the opposite
@@ -8868,7 +8835,7 @@ the interpretation of number strings.
 The <b>-c</b> flag changes number syntax to C language for hex and octal.
 
 <p>
-The <b>-m</b> option turns on Motorola $hex syntax and %bit_pattern.
+The <b>-m</b> option turns on Motorola $hex syntax, @octal and %bit_pattern.
 
 
 
@@ -9075,7 +9042,7 @@ Not all relocation tuples include an offset value, only those which
 indicate manipulation (shift/truncate) of the value after relocation.
 
 <p>
-In the absence of offset+shift information, the offset is obtained from the code.
+Otherwise the offset is obtained from the code.
 
 <p>
 See Section 9: Output File Formats, Relocation and Linking,
@@ -9100,11 +9067,10 @@ Macro language must take this action where three circumstances combine:
 </pre>
 <p>
 When there is no extracted offset in the relocation tuple, the necessary
-adjustment is made by macro language on the code and the relocation tuple
-need not be adjusted.
+adjustment is made by macro language on the code
 
 <p>
-When the output is absolute, no relocation tuple is stacked.
+When the output becomes absolute, no further relocation tuple is output
 
 <h3>8.25.2: $INFO, $RANGE_CHECK
    and   $INFO, $RANGE_CHECK1: Request Linker Automatic Range Checking</h3>
@@ -10389,16 +10355,15 @@ Giant Address Spaces, Interfacing with GNU Tools
 <h2>8.40: $QUANTUM           Select Bit Size of Addressed Object</h2>
 
 <p>
-$QUANTUM must be set to 8 for target machines which address bytes.
+$quantum must be set to 8 for target machines which address bytes.
 
 <p>
-$WORD directive sets $QUANTUM to the value of $WORD. If the address
-quantum is not the word size, $QUANTUM must follow $WORD:
+$word directive also sets $quantum and $awidth to same the value as $word.
+If the address quantum is not the word size, $quantum must follow $word
 <pre>
 
 	$word   32
 	$quantum 8
-
 
 </pre>
 <h2>8.41: $QUOTE            Select Character for Bounding Text Strings</h2>
@@ -11828,7 +11793,7 @@ Directive
 
 </pre>
 <p>
-sets bit multiple in which code is generated
+sets bit multiple in which code is generated and default size of integer
 
 <p>
 A source line which generates any code at all generates an integral 
@@ -11858,8 +11823,10 @@ parameters like
 It does not follow that integers need to be 8 bits.
 
 <p>
-Code for machines like this usually has command names for generating
-numbers, and these commands can be reproduced as macros:
+Code for byte-addressing machines often uses command names like
+dw, dl or .long for generating numbers, and these commands
+are reproduced as masmx macros, which also handle non-canonical
+endianness
 <pre>
 
 
@@ -11883,8 +11850,8 @@ MASMX 7r3
 
 </pre>
 <p>
-$AWIDTH and $QUANTUM must be set after $WORD unless they are the same
-as $WORD. A suitable parameter set for M68K is
+$awidth and $quantum must be set after $word unless they are the same
+value as $word. Suitable parameters for ColdFire are
 <pre>
 
 	$word   16
@@ -11893,11 +11860,11 @@ as $WORD. A suitable parameter set for M68K is
 
 </pre>
 <p>
-because 68000 do not have instructions less than 16 bits in size
-or fetch them from odd boundaries.
+because ColdFire instructions are one or more  16-bits words
+fetched from a word boundary
 
 <p>
-A suitable parameter set for PowerPC is
+Suitable parameters for PowerPC are
 <pre>
 
 	$word   32
@@ -11905,7 +11872,7 @@ A suitable parameter set for PowerPC is
 
 </pre>
 <p>
-A suitable parameter set for 8-bit microcontrollers is
+Suitable parameters for 8-bit microcontrollers are
 <pre>
 
 	$word   8
@@ -11914,10 +11881,55 @@ A suitable parameter set for 8-bit microcontrollers is
 </pre>
 
 <h2>8.57: $xqt_i		run-time integer algorithm plotter</h2>
+
+<b>$xqt_i</b> directive generates a runtime integer algorithm instruction stream
+<pre>
+
+	$xqt_i	<i>expression</i>
+	
+</pre>
+See section <b>6.1: Run-Time Integer Algorithm Plotter $xqt_i</b>
+
 <h2>8.58: $xqt_fp		run-time floating algorithm plotter</h2>
+
+<b>$xqt_fp</b> directive generates a runtime floating algorithm instruction stream
+
+<pre>
+
+	$xqt_i	<i>expression</i>
+	
+</pre>
+See section <b>6.2: Run-Time Floating Algorithm Plotter $xqt_fp</b>
+
 <h2>8.59: $zero_code_point  character string escaped zero value</h2>
 
+<b>$zero_code_point</b> directive sets the value which represents embedded zero in a quoted string
+to distinguish data byte value zero from end of string or line
 
+<pre>
+
+	$zero_code_point	<i>expression</i>
+
+</pre>
+The default value of zero code point is 2700 hex.
+Zero code point is changed from its current value if that clashes with a data value required in the string 
+<pre>
+
+$ masmx zcp -lnk
+MASMX 7r3
+3/zcp.msm
+*EOF*
+  :                            1 	$set_option	"c"
+  :                            2 	$word	32
+  :                            3 	$byte	16
+  :                            4 
+  :                            5 	$zero_code_point	0x40000000
+00:00000000 27000000          +6 	"\x2700\x0000"
+  :                            7 
+*EOF*
+:$(00):00000000:00000001 
+
+</pre>
 
 <h1>9: Output File Formats, Relocation, Linking, Giant Address Spaces
    Interfacing with GNU Tools</h1>
@@ -17354,7 +17366,7 @@ STERM=.
 00:000000BE 427A0060          +128 	pea		table_u		; the table start is the minimum address
 00:000000C2 B1DF              +129 	cmpa		(a7)+, a0	; are you lower than that?
 00:000000C4 6B0E              +130 	bmi.b		outrange	; yes you are. NAN
-00:000000C6 427A1390          +131 	pea		table_u+615*8	; the table end is the maximum address + 1 instance
+00:000000C6 427A1390          +131 	pea		table_u+615*8	; the table ends after the last instance
 00:000000CA B1DF              +132 	cmpa		(a7)+, a0	; are you lower than that?
 00:000000CC 6A06              +133 	bpl.b		outrange	; no you're not. NAN
 00:000000CE F21054A3          +134 	fmul.d		(a0), fp1	; the exponent is in range
