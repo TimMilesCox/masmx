@@ -8923,6 +8923,10 @@ main(int argc, char *_argv[])
 
          *(flag_box *) selector = initial_flags;
          *(flag_box *) uselector = initial_uflags;
+
+         #ifdef ZERO_CODE_POINT
+         zero_code_point = DEFAULT_ZERO_CODE_POINT;
+         #endif
          
 	 continue;
       }

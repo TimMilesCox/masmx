@@ -559,7 +559,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	1.  Synthesising Legacy Functional Macros			10.3.1
 	2.  Synthesising Legacy Command Macros				10.3.2
 
-11. masmx Internal Floating Format and Alternative Floating Formats	11
+11. Alternative Floating Formats					11
     1.	masmx Floating Format						11.1
     2.	IEEE754 Floating Values						11.2
 	1.  Differences between masmx FLoating Format and IEEE754 Floating Formats
@@ -752,8 +752,8 @@ MASMX 7r3
 :$(00):00000000:00000028 
  
 </pre>
-The included macro package for generating IEEE754 constants is explained in section 11: masmx Floating<br>
-Format and Alternative Formats and section 11.2: IEEE754 Floating Formats
+The included macro package for generating IEEE754 constants is explained in<br>
+section 11.2: IEEE754 Floating Formats
 
 
 <h2>1.6: Structured Data and Structured Code Name Spaces</h2>
@@ -2281,7 +2281,7 @@ can be escaped with macro language
 Macros supplied in this package generate IEEE754 floating constants. 
 
 <p>
-See Section 11: masmx Internal Floating Format and Alternative Floating Formats
+See Section 11.2: IEEE754 Floating Values
 
 <p>
 This example generates storage constants of value 1.375e+1200000 in masmx-internal format typed in various source syntax.<br>
@@ -9522,60 +9522,54 @@ Macro Parameters.
 $NAME is a species of equate.
 <pre>
 
-tag     $name   value
+tag*     $name   <i>VALUE</i>
 
 </pre>
 <p>
 When declared within the body of of a procedural macro $PROC
 or a functional macro $FUNC, $NAME is used to equate a mnemonic
 to an opcode or an input parameter. The purpose of this is to
-allow many similar instructions or functions to be declared
-in one macro. Then the name must be exported from the macro
-
-tag*	$name	value
+allows similar instructions or functions to be declared
+in one macro. The name must be exported with trailing asterisk
 
 <p>
 This example from a PowerPC definition shows
-the mnemonic in the command field of a line acting as an
-entry point to the procedural macro or $PROC, p. 
+an exported $name label providing an
+entry point and latent instruction code value
+to $proc macro p. 
 
-<p>
-The value assigned to the call mnemonic by $NAME
-is retrieved during macro expansion as parameter p(0, 1).
-This yields the operation code required by the developer.
-
-<p>
-32 bits of the value of p(0, 1) may be retrieved via the 
-internal function $N in masmx, but $N is not used in the 
-PowerPC file because Motorola Hex Notation may be switched on.
 
 <p>
 In this example the instruction layout i$4 is filled first with 
-a 6-bit opcode p(0, 1). That's followed by a 5-bit register
-tag p(1, 1) and a 16-bit storage operand address p(1, 2). 
+a 6-bit opcode p(0, 0). That is the latent value on the $name line.
+There follow by a 5-bit register tag p(1, 1), a 5-bit index register
+which may be unspecified and zero, and a 16-bit storage operand address p(1, 2). 
 
-<p>
-A base register may be parenthesised on the trailing end of the 
-storage operand  
-<pre>
 
-	stw     r2, address(R15)
+<div	style="color:A0A0A0">
+	<blockquote>
+	The optional index or pointer register may in source syntax be parenthesised at the end of the
+	storage operand identifier
+	<pre>
 
-</pre>
-<p>
-And that has to be encoded in five bits before the address.
+		stw     r2, address(R15)
 
-<p>
-For efficiency the definition "ppc_603.def" also accepts the plain masmx
-syntax for one-address computers and by default adusts source on read:
-<pre>
+	</pre>
 
-	stw	r2, address, r15
+	<p>
+	ppc_603.def also accepts masmx native syntax which is typed
+	<pre>
 
-</pre>
-<p>
-The definition shown instead assigns the parenthesed part of the actual
-parameter to a function .f with the function call <b>.f\p(1, 2)</b>
+		stw	r2, address, r15
+
+	</pre>
+	<p>
+	The parenthesed index name is extracted with a function call <b>.f\p(1, 2)</b>
+	</blockquote>
+	</div>
+
+PowerPC load and store instructions share a $form and a $proc and each have a $name 
+
 <pre>
 
 
@@ -9638,8 +9632,8 @@ Object Code 76 Bytes: 0 Errors: 0 Undefined Labels
 
 </pre>
 <p>
-The name LWZ has been recognised and 32 has been placed in the
-upper 6 bits of the instruction on line 6. The name STB has been
+The name lwz has been recognised and 32 has been placed in the
+upper 6 bits of the instruction on line 6. The name stb has been
 recognised and 38 has been placed in the upper 6 bits of the
 instruction on line 7.
 
@@ -9719,7 +9713,7 @@ interpreted as octal and listings to be octal.
 
 </pre>
 <p>
-The default rule is hexadecimal. Assembly always starts in hexadecimal.
+The default rule is hexadecimal. Each assembly pass starts in leading-zero-hexadecimal notation
 
 <p>
 See also 8.22: $HEX directive
@@ -9738,10 +9732,6 @@ Line (option flags <b>-mc</b>).
 <b>$path</b> sets a text value to which is prefixed to the
 filename arguments of <b>$include</b> directive.
 
-<p>
-This encourages related files to be functionally grouped in directories
-where a wrapper file may include its functional relations from its own
-directory, without naming that directory. So
 <pre>
 
 	$path		../math_libs
@@ -9751,47 +9741,7 @@ directory, without naming that directory. So
 	$path		../electromechanical/stepper_type5
 	$include	stepper5
 	$path
-	$include	application7
-
-</pre>
-<p>
-Then directory <b>../math_libs</b> may contain
-<pre>
-
-	ieee754_scan_in.msm	ieee754_format_out.msm
-	ieee754_calculate.msm	math_libs.msm
-
-</pre>
-<p>
-And source file <b>../math_libs/math_libs.msm</b> may contain
-<pre>
-
-	$include	ieee754_scan_in
-	$include	ieee754_format_out
-	$include	ieee754_calculate
-
-</pre>
-<p>
-Directory <b>../network</b> may contain
-<pre>
-
-	../ipv4/	../ipv6/
-
-</pre>
-<p>
-Directory <b>../network/ipv4</b> may contain
-<pre>
-
-	socket.def	netservice.def	rpc.def		xdr.def
-
-</pre>
-<p>
-Source file <b>../network/ipv4/netservice.def</b> may contain
-<pre>
-
-	$include	socket.def
-	$include	rpc.def
-	$include	xdr.def
+	$include	this_application
 
 </pre>
 <p>
@@ -9801,11 +9751,8 @@ directory.
 
 <p>
 Note that Microsoft operating systems recognise the path separator <b>/</b>
-as well as <b>\</b> when open calls are made from <b>masmx</b>.
-
-<p>
-Therefore there is no need to change any <b>$include</b> or <b>$path</b>
-arguments when moving between Unix / Linux developer platforms and Microsoft machines. Just always use <b>/</b>
+as well as <b>\</b> when programs make file-open calls. Pathnames with <b>/</b>
+separator therefore work on all platforms where <b>masmx</b> suns
 
 <h2>8.37: $PLIST             Set Depth for Listing Macro Expansion</h2>
 
@@ -9909,7 +9856,7 @@ Line 165 directs the assembler to start listing lines
 from the included 8051 definition header file.
 
 <p>
-Line 166 is the structure template for long jump instructions.
+Line 166 is the bit layout template or $form for long jump instructions.
 
 <p>
 Line 168, not shown, directs the assembler to stop listing 
@@ -10063,8 +10010,8 @@ one for each subassembly layer to which the label is promoted:
 mymacro*   $proc
 	.
 	.
-"label1:p(1,1)"*
-"labelx:p(1,1)"**
+"label1:mymacro(1,1)"*
+"labelx:mymacro(1,1)"**
 labely  .
 	.
 	$end
@@ -10085,7 +10032,7 @@ assembly, because it has one asterisk.
 Actual parameters can be included in labels names in quotes.
 
 <p>
-"labelx:athing" is visible to the whole assembly and to links. 
+"labelx:athing" is visible to the whole assembly and to external linkage. 
 It has one more asterisk than the macro depth.
 
 <p>
@@ -10176,7 +10123,7 @@ Object Code 92 Bytes: 0 Errors: 0 Undefined Labels
 <h2>8.39: $PUSHREL	Acquire a Relocation Tuple from a Superword</h2>
 
 <p>
-Linking directive
+$pushrel directive is used in linking assemblies
 <pre>
 
 parameter_label		$pushrel	relocation_clause
@@ -11912,10 +11859,10 @@ to distinguish data byte value zero from end of string or line
 
 </pre>
 The default value of zero code point is 2700 hex.
-Zero code point is changed from its current value if that clashes with a data value required in the string 
+Zero code point may be changed from its current value if that clashes with a data value required in the string 
 <pre>
 
-$ masmx zcp -lnk
+$ masmx -lnky zcp
 MASMX 7r3
 3/zcp.msm
 *EOF*
@@ -11923,11 +11870,13 @@ MASMX 7r3
   :                            2 	$word	32
   :                            3 	$byte	16
   :                            4 
-  :                            5 	$zero_code_point	0x40000000
-00:00000000 27000000          +6 	"\x2700\x0000"
-  :                            7 
+Note: zcp.msm Line 5: \escaped expression equals $zero_code_point
+00:00000000 00000000          +5 	"\x2700\x0000"
+  :                            6 	$zero_code_point	0x40000000
+00:00000001 27000000          +7 	"\x2700\x0000"
+  :                            8 
 *EOF*
-:$(00):00000000:00000001 
+:$(00):00000000:00000002 
 
 </pre>
 
@@ -15562,7 +15511,7 @@ To explain the <b>DW</b> macro
 
 
 
-<h1>11: masmx Internal Floating Format and Alternative Floating Formats</h1>
+<h1>11: Alternative Floating Formats</h1>
 
 
 <h2>11.1: masmx Floating Format</h2>

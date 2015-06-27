@@ -1,0 +1,8 @@
+	$set_option	"c"
+	$word	32
+	$byte	16
+
+	"\x2700\x0000"
+	$zero_code_point	0x40000000
+	"\x2700\x0000"
+
