@@ -10130,12 +10130,42 @@ parameter_label		$pushrel	relocation_clause
 
 </pre>
 <p>
-used in the $MAP macro. $PUSHREL scans a relocation clause in Text
-Encoded Binary input and tables the relocation attributes in the label
-of the $PUSHREL line.
+A general explanation of $map macro and the position within it of $pushrel
+is give is given below
 
 <p>
-Therefore $PUSHREL must have a label.
+$pushrel scans a relocation clause in Text Encoded Binary input and tables the
+relocation attributes as the $equf label named on the $pushrel line
+
+<p>
+$map macro assigns each relocation clause in a superword successively
+to $pushrel directive
+
+<p>
+This superword from a 64-bit PowerPC relocatable has one relocation clause
+and two words of code. The relocation clause requests the segment base of
+location counter 36 to be added to all 64 bits of the two code words
+<pre>
+
+	(24)40:0000000000000000
+
+</pre>
+<p>
+This superword from a 32-bit PowerPC link has two relocation clauses and one word of code
+<pre>
+
+	[0001:FFFFFFB4/*02]18*/02+:(-01:FFFFFFB4/*02)18*/02+:4BFFFFB5
+
+</pre>
+
+The first relocation clause requests an external name to be added to the address field
+of a relative jump instruction and the sum shifted right two positions into bits 25..2
+of the instruction. The second clause requests the base address of the segment containing
+the instruction to be subtracted from the intermediate sum and shifted right two positions
+into bits 25..2 of the instruction
+
+<p>
+The line containing $pushrel has a label
 
 <p>
 $PUSHREL gives this label the type $EQUF. Macro Language can now use
@@ -10183,7 +10213,7 @@ parameter_label\5	right shift count encoded as a negative integer:
 <p>
 When the absolute address space is 32 bits or less, the relocation
 value is the address part of the $pushrel label. This is the same
-as part \1 of the pushrel label, except for sign extension.
+as part \1 of the pushrel label, except that \reference gets sign-extended
 
 <p>
 The expression
@@ -10193,15 +10223,13 @@ The expression
 
 </pre>
 <p>
-would be sign-extended from bit 31, so it is better to extract the
-principal $EQUF value address-fashion:
+would be sign-extended from bit 31, so it is preferable to extract the
+address attribute of the $EQUF identifier as
 <pre>
 
 value	$set	parameter_label
 
 </pre>
-<p>
-And that yields 32 bits unsigned, or signed if Flag -I is set.
 
 <p>
 When the absolute address space is between 33 and 192 bits, the
@@ -10212,12 +10240,19 @@ not from the label holding the parameter list:
 value	$pushrel,$long_absolute		relocation_clause
 
 </pre>
+
+masmx calls a developer-supplied macro $map with a line of text-encoded
+binary as arguments. The space-separated superwords contain single or multiple
+words of code and may be prefixed with colon-separated relocation clauses
+
+
 <p>
-A $MAP link macro consists of an outer loop which submits superwords
+A $map macro consists of an outer loop which successively submits superwords
 from the line of Text Encoded Binary to an inner macro, and of an inner
 macro which caches the code part of the superword, and submits each
-relocation tuple attached to it to another macro where the relocation
-is applied to the code: 
+relocation tuple attached to it to a third macro where the relocation request
+is applied to the code. The innermost macro containing $pushrel is here
+called <b>relocate</b>
 <pre>
 
 p	$proc
@@ -10243,12 +10278,12 @@ relocate* $name
 
 rel_params $pushrel	p(1, 1)
 
-value	$set	rel_params\1
+value	$set	rel_params\1	. relocation value to add
 
-bits    $set    rel_params\2
-scale   $set    rel_params\3
-offset  $set    rel_params\4
-descant $set    label1\5
+bits    $set    rel_params\2	. target field size in bits
+scale   $set    rel_params\3	. shift distance from low-order bit of superword
+offset  $set    rel_params\4	. intermediate value for shift / truncation
+descant $set    label1\5	. -shift count = right shift count
 
 limit   $set    1*/bits
 mask    $set    limit-1
@@ -10261,7 +10296,7 @@ value	$PUSHREL,$LONG_ABSOLUTE	p(1, 1)
 field	$set	value+offset
 	$info,$range_check1	field
 	$info,$offset		field
-field	$set	field*/descant
+field	$set	field*/descant	. this shift left is shift right algebraic. descant < 0
 	$else
 field	$set	value+(($data/*scale)**mask)
 	$info,$range_check1	field
@@ -17794,35 +17829,49 @@ size one octet although its integer registers may be 32 or 64 bits in size
 </pre>
 <p>
 32-bit and 64-bit integers are then described as quadwords and octawords,
-here for a reverse-byte-order target:
+for a canonical or a reverse-byte-order target:
 <pre>
 
 dl*	$proc
+	$if	$BYTE_ORDER_CANONICAL
+?	$do	d1(1),	+	d1(1, ?)q
+	$else
 ?	$do	dl(1),	+	dl(1, ?),	dl(1, ?)/*8,	|
 				dl(1, ?)/*16,	dl(1, ?)/*24:q
+	$endif
 	$end
 
 
 p	$proc
 long_long* $name
+	$if	$BYTE_ORDER_CANONICAL
+?	$do	p(1),	+	p(1, ?)o
+	$else
 ?	$do	p(1),	+	p(1, ?), 	p(1, ?)/*8,	|
 				p(1, ?)/*16, 	p(1, ?)/*24,	|
 				p(1, ?)/*32, 	p(1, ?)/*40,	|
 				p(1, ?)/*48, 	p(1, ?)/*56:o
+	$endif
 	$end
 
 </pre>
 <p>
-An integer longer than than an octaword can be described with $FORM
+An integer longer than than an octaword can be described with $form
 <pre>
 
-i128	$form	8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8
+i128	$form	128
+i128LE	$form	8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8
 
-d128*	$proc
-	i128	d128,     d128/*8,  d128/*16, d128/*24,	|
-	 	d128/*32, d128/*40, d128/*48, d128/*56,	|
-	 	d128/*64, d128/*72, d128/*80, d128/*88,	|
-	 	d128/*96, d128/*104,d128/*112,d128/*120
+p	$proc
+d128*	$name
+	$if	$BYTE_ORDER_CANONICAL
+?	$do	p(1),	i128	p(1, ?)
+	$else
+?	$do	p(1),	i128LE	p(1, ?),     p(1, ?)/*8,  p(1, ?)/*16, p(1, ?)/*24,	|
+			 	p(1, ?)/*32, p(1, ?)/*40, p(1, ?)/*48, p(1, ?)/*56,	|
+	 			p(1, ?)/*64, p(1, ?)/*72, p(1, ?)/*80, p(1, ?)/*88,	|
+			 	p(1, ?)/*96, p(1, ?)/*104,p(1, ?)/*112,p(1, ?)/*120
+	$endif
 	$end
 
 </pre>
