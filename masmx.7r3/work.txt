@@ -10,7 +10,7 @@ The Next Revolution is Efficient Code
 
 <center>
 
-<h1>MASMX.7r3</h1>
+<h1>masmx.7r3</h1>
 
 <div	style="color:C0C0FF;font-family:optima;font-size:24">
 The Watchmaker's Craft of Programming
@@ -117,7 +117,7 @@ User interface is a shell or command prompt
 Binaries for all popular platforms are downloadable. Installation = copy the binaries
 
 <a href="http://timmilescox.github.io/masmx/">
-        Downloads Page</a>
+        &lt;--Downloads Page</a>
 
 <p>
 masmx source code is in git and download zip. Build for new developer platforms is a one-line shell command
@@ -10241,13 +10241,16 @@ value	$pushrel,$long_absolute		relocation_clause
 
 </pre>
 
-masmx calls a developer-supplied macro $map with a line of text-encoded
+<blockquote>
+<div	style="color:A0A0A0">
+
+masmx calls a developer-supplied macro <b>$map</b> with a line of text-encoded
 binary as arguments. The space-separated superwords contain single or multiple
 words of code and may be prefixed with colon-separated relocation clauses
 
 
 <p>
-A $map macro consists of an outer loop which successively submits superwords
+A <b>$map</b> macro consists of an outer loop which successively submits superwords
 from the line of Text Encoded Binary to an inner macro, and of an inner
 macro which caches the code part of the superword, and submits each
 relocation tuple attached to it to a third macro where the relocation request
@@ -10272,7 +10275,9 @@ clause	$do	clauses-1,	relocate	p(1,1:clause)
 				. write the code
 
 	$end	. of SUPERWORD
-
+</pre>
+</div>
+<pre>
 p	$proc
 relocate* $name
 
@@ -10295,7 +10300,8 @@ value	$PUSHREL,$LONG_ABSOLUTE	p(1, 1)
 	$if	descant<0
 field	$set	value+offset
 	$info,$range_check1	field
-	$info,$offset		field
+	$info,$offset		field	. save a new offset clause
+					. if the target is still relocatable
 field	$set	field*/descant	. this shift left is shift right algebraic. descant < 0
 	$else
 field	$set	value+(($data/*scale)**mask)
@@ -10308,11 +10314,16 @@ field	$set	value+(($data/*scale)**mask)
 .  to the calling macro and not a new "data" only known in this macro
 
 	$end	. of RELOCATE
-
+</pre>
+<div	style="color:A0A0A0">
+<pre>
 index	$do	p(),	superword	p(index, 1)
 	$end	. of $MAP
 
 </pre>
+</div>
+</blockquote>
+
 <p>
 If a relocation clause does not go absolute at $PUSHREL, $PUSHREL also tables a relocation tuple internally.
 
@@ -10495,7 +10506,13 @@ in the current size and character code, by default 8-bit ASCII.
 
 <p>
 In this assembly an unconventional label is declared sucessfully but
-can not be referenced:
+can not be referenced. An integer value string
+<pre>
+
+	+'entional \ rough { label'
+
+</pre>
+the maximum 192 bits in size has been generated
 <pre>
 
 $ masmx vr -lx
@@ -10544,7 +10561,7 @@ actual parameters.
 
 
 <p>
-An expression token in quotes is expected to be a label.
+An expression token in quotes is a label.
 <pre>
 
 
@@ -10663,7 +10680,36 @@ an expression and the label will be searched:
 
 <h2>8.42: $record</h2>
 <h3>8.42.1: $record		bit-aligned data structures</h3>
+
+<b>$record</b> directive heads a structure of bit-aligned fields and must have a label
+<pre>
+
+record1	$record	[<i>values</i>]
+field1	9
+field2	11s
+	$root
+
+</pre>
+Where <b>$record</b> structures are nested, a new <b>$record</b> structure
+starts at the bit position which the immediately preceding <b>$record</b>
+srtucture reached.<br>See 5.2.2 Bit-Aligned Structures
+
 <h3>8.42.1: $record,$branch	bit-aligned structure overlay</h3>
+
+<b>$record,$branch</b> heads an overlaid or redefined structure of bit-aligned
+fields. All successive <b>$record,$branch</b> structures start at the same
+bit position
+<pre>
+
+recordA	$record,$branch	[<i>values</i>]
+?	$do	4,triplet(?)	3u
+	$root
+recordB	$record,$branch	[<i>values</i>]
+?	$do	3,quartet(?)	4s
+	$root
+
+</pre>
+See 5.2.2.3: Overlaid Structures $record,$branch
 
 
 <h2>8.43: $RES               Declare a Storage Buffer</h2>             
@@ -10819,8 +10865,8 @@ which is zero
 
 </pre>
 <p>
-sets the option flags which can otherwise be set on the command
-line:
+sets the option flags which can otherwise be set on the command line.<br>
+Options lowercase <b>-ksy</b> may only be set on the command line
 <pre>
 
        >masmx input [output] -a..z
@@ -10967,35 +11013,36 @@ pass, unless it has a subcommand of 1
 
 
 <h2>8.49: $STERM             Change the Substring Sentinel Character</h2>
+
+See also 4.2.2.5 Macro Parameters
+
 <pre>
 
-	$term	divider_character
+	$sterm	<i>expression</i>
 
 </pre>
+<p>§
+The substring character is changed to the value of the $TERM argument.<br>
+The substring character works as
+
+	<blockquote>
+	a character in a label<br><br>
+
+	the divider between substrings:of:subfields in macroparameters<br><br>
+
+	a join in a structured label<br><br>
+
+	a join in a text string	"text":LF:"string"
+	</blockquote>
+
 <p>
-The substring character is changed to the value of the $TERM argument.
-The substring character is
-<ul>
-
-	<li>-a character in a label
-
-	<li>-the divider between substrings:of:subfields in parameter
-	 actual arguments
-
-	<li>-a join in a structured label
-
-	<li>-a join in a text string
-
-</ul>
-<p>
-The default value of $STERM is colon : 
+The default value of $STERM is colon :
 
 <p>
 In the following assembly
 
 <p>
-Line 4 changes $STERM to period. Here period
-is a term in a label.
+Line 4 changes $STERM to period
 
 <p>
 Line 16 in nested macro "q" resolves q(1,1) 
@@ -11106,7 +11153,7 @@ text encoded binary is stored. A second filename on the command line
 overrides the <b>$STORE</b> name
 <pre>
 
-	$store	filename
+	$store	<i>filename</i>
 
 </pre>
 <p>
@@ -11156,103 +11203,58 @@ hex (or octal if $OCTAL is set ), when there is no actual suffix.
 Default with first digit 1..9 is decimal
 
 <p>
-When $SUFFIX is 2, any number string is decimal when there is no actual
-suffix.
+When $SUFFIX is 2, any number string without a suffix is decimal
 
 <p>
-Suffix letters are only examined on a number string beginning
-with a digit 0..9.
+Any words suffix [s d l t q p h o] is after any notation suffix [d o q h b] 
 
 <p>
-decimal/hex/octal/bit-binary suffixes do not
-conflict with the size flags which can appear at the
-trailing end of masmx number constants.
+Words suffix [d q h o] needs separation from a number string with
+suffix-determined notation
 
-<p>
-These are 
-<ul>
-
-	:S		one word
-
-<pre></pre>
-	:D or :L	two words
-
-<pre></pre>
-	:T		three words
-
-<pre></pre>
-	:Q		four words
-
-<pre></pre>
-	:P		five words
-
-<pre></pre>
-	:H		six words
-
-<pre></pre>
-	:O		eight words
-
-
-</ul>
-<p>
-The length override is the last token on a number item line.
-
-<p>
-It is recognised first and the value expression is inside it.
-
-<p>
-Where a notation suffix D Q H O is the last symbol in a number
-string token, any size override goes after it:
 <pre>
 
-MASMX 7r2
-0/-INPUT>>
-        $word   16
-        $suffix 2
-
-        +0bbbbhq
-        $end
-  :                            1  $word 16
-  :                            2         $suffix 2
-  :                            3 
-00:0000 000000000000BBBB      +4         +0bbbbhq
-  :                            5         $end
-:$(00):0000:0004 
-
-</pre>
-<p>
-Number suffix notation is mostly encountered in macros, because suffixes
-appear on instruction operands and on the arguments of pseudo-directives
-like DD and DW. All of these are macros for masmx:
-<pre>
-
-MASMX/24592 1r1X
-dde.msm 5
+$ masmx suffix -lnk
+MASMX 7r3
+3/suffix.msm
 CONT_CHAR=
 LTERM=;
-QDELIM='
-STERM=.
-*EOF*  :                        46:         $list           2
-  :                        47:         $word           8
-  :                        48:         $byte           8
-  :                        49:         $quantum        8
-  :                        50:         $awidth         16
-
-  :                        81:         $list   2
-  :                        82: dd*     macro
-  :                        83:         $do     dd(1)
-  :                        84: v       $set    dd(1,$d+1)        
-  :                        85:         +       v, v/*8, v/*16, v/*24:q
-  :                        86:         $endo
-  :                        87:         macend
-
-00:0000 01000063      +2         dd      99*4096*4096+1, 63h*4096*4096+2 
-00:0004 02000063      +2 
-*EOF*:$(00):0000:0008 :$(01):0400:0400 
-Object Code 71 Bytes: 0 Errors: 0 Undefined Labels
+*EOF*
+  :                            1        $suffix 2
+  :                            2        $cont_char 0
+  :                            3        $lterm ';'
+  :                            4        $word   16
+  :                            5        $quantum 8
+  :                            6        $floating_point 80
+  :                            7        $characteristic 16
+  :                            8        $characteristic,64 12
+  :                            9
+00:0000 007B                  +10       123             ; decimal notation, self-sizing
+00:0002 00000000000000000000007B
+                              +11       +(123d)h        ; decimal notation, hexaword
+00:000E 123D                  +12       123dh           ; hex notation, self-sized
+00:0010 00EA                  +13       234             ; decimal notation, self-sized
+00:0012 009C                  +14       234o            ; octal
+00:0014 009C                  +15       234os           ; single word octal
+00:0016 0000009C              +16       234ol           ; octal double word
+00:001A 0000001D              +17       01dh:d          ; hex double word
+  :                            18
+00:001E 401C000000000000      +19       1.5q            ; fraction string, no notation suffix, quad
+00:0026 40259502F90000000000  +20       010q*+0ah       ; octal mantissa, hex exponent, default 80 bits
+00:0030 40259502F90000000000  +21       8*+10           ; same thing, just testing
+00:003A 400007C80000000000000000
+                              +22       1.0h*+10b       ; fraction string always decimal, hexaword
+  :                            23                       ; but bit-pattern exponent, result = 100
+  :                            24
+*EOF*
+:$(00):0000:0046
 
 
 </pre>
+
+<p>
+See also 4.3.2 Number Constants
+
 <h2>8.52: $TEXT              Translate Input Text Patterns</h2>
 
 <p>
@@ -11271,7 +11273,8 @@ All the <b>$TEXT</b> patterns must be placed adjacent to each other
 in the assembly header. Any separated from the first block of
 them will not be used.
 
-
+<p>
+See also 10.1: Establishing your Syntax
 
 <h2>8.53: $TRACE             Display Value</h2>
         
@@ -11693,7 +11696,7 @@ ppcsinga.msm: object code 924 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
-<h2>8.55: $TWOS_COMPLEMENT   Change Negative Value Representation</h2>
+<h2>8.55: $TWOS_COMPLEMENT   Change Negative Integer Representation</h2>
 
 
 <p>
@@ -11786,7 +11789,7 @@ The word size may not be less than the size of the
 smallest instruction in the target instruction set.
  
 <p>
-A machine may have 32- (or even 64-) bit addressing and computation.
+A machine may have 32- or 64-bit addressing and computation.
 
 <p>
 If nevertheless the machine can fetch instructions from an
@@ -12098,7 +12101,7 @@ Code for converting to Motorola S-Records is also assembled to .txo format
 first:
 <pre>
 
-MASMX 7r2
+MASMX 7r3
 3/qplain.msm
 LTERM=#
 CONT_CHAR=|
@@ -12107,8 +12110,8 @@ STERM=.
   :                            2 
   :                            3 SEGMENT .equ    511*1024
   :                            4 $(48:SEGMENT,r15)
-30:0007FC00 0000000000400000  +5 part1   +       2048*2048d
-30:0007FC08 0000000000000064  +6 part2   +       100d
+30:0007FC00 0000000000400000  +5 part1   2048*2048d
+30:0007FC08 0000000000000064  +6 part2   100d
   :                            7 part3   $res    2048*2048-16
   :                            8 
 30:0047FC00 0007FC10          +9 	+	.absolute(part3)
@@ -12136,8 +12139,10 @@ The <b>-d</b> flag displayed the real addresses in SEGMENT instead of the
 displacements.
 
 <p>
-qplain.txo contains:
+This is the text-encoded binary of qplain
+
 <pre>
+$ cat qplain.txo
 
 $30:0007FC00
 0000000000400000 0000000000000064
@@ -12149,37 +12154,32 @@ $00:00030000
 
 :$00*00000000:00030000:00030018
 :$30*00000000:0007FC00:0047FC04
-</pre
-<ul>
-	a counter 48 location line with the address 0007FC00
-<pre></pre>
-	two two-word number values
 
-<pre></pre>
-	a counter 48 location line with the address 0047FC00
+</pre>
 
-<pre></pre>
-	an address constant pointing to the 16th byte of locator 48
+These lines of generated code and controls are
 
-<pre></pre>
-	a counter zero location line with the address 00030000
+	<blockquote>
+	start location counter 48 at address 0007FC00<br><br>
 
-<pre></pre>
-	two instructions which load the address SEGMENT to r15
+	two 64-bit integers<br><br>
 
-<pre></pre>
-	three instructions which reference SEGMENT with base
-	register R15
+	start location counter 48 at address 0047FC00<br><br>
 
-<pre></pre>
-	a return instruction
+	an address constant pointing to the 16th byte of program section 48<br><br>
 
-<pre></pre>
-	a transfer address symbol >00:00030000 pointing to the label start
+	start location counter 0 at address 00030000<br><br>
 
-<pre></pre>
+	two instructions which load the address SEGMENT to r15<br><br>
+
+	three instructions which reference SEGMENT with base register R15<br><br>
+
+	a return instruction<br><br>
+
+	a transfer address symbol >00:00030000 pointing to the label start<br><br>
+
 	summary information for two absolute addressed segments
-
+	</blockquote>
 
 </ul>
 There is no relocation information in qplain.txo. It goes
