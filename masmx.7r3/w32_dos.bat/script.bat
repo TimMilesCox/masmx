@@ -693,6 +693,8 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx sockets ..\test.o3\sockets -lyok > ..\text.o3\sockets.txt
 ..\masmx i2string ..\test.o3\i2string -lyok > ..\text.o3\i2string.txt
 ..\masmx zcp ..\test.o3\zcp -lyok > ..\text.o3\zcp.txt
+..\masmx gradual ..\test.o3\gradual -lyok > ..\text.o3\gradual.txt
+..\masmx quickly ..\test.o3\quickly -lyok > ..\text.o3\quickly.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire
