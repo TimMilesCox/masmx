@@ -790,7 +790,7 @@ This feature handles bit-field structures and overlays of any complexity consist
 <h3>1.6.4: Repeat Data</h3>
 
 masmx generates repeating data and data structures with the $do directive and subscripted labels.<br>
-See Section 5.1: $do and macros
+See <a href="#structure">5.1: $do and Macros</a>
 
 
 <a      name="streaf"/>
@@ -4665,7 +4665,7 @@ Example
 <a	name="structure"/>
 <h1>5: Iterated Code and Structured Data</h1>
 
-
+<a	name="domac"/>
 <h2>5.1: $do Directive and $proc Macros</h2>
 
 <b>$do</b> directive repeats a line of code. An optional label is a count value ascending from 1.
@@ -4798,7 +4798,7 @@ units		$do	10,	'0'+thousands-1, '0'+hundreds-1, '0'+tens-1, '0'+units-1L
 </pre>
 
 
-
+<a	name="stradata">
 <h2>5.2: Structured Data and Structured Code Name Spaces</h2>
 
 <h3>5.2.1: Word-Aligned Structures $TREE / $BRANCH..$ROOT</h3>
@@ -5818,7 +5818,7 @@ negates a accumulation in the result register to cover cases like
 	-(X*Y-Z)
 
 </pre>
-which may derive advantage from a different instruction sequence from the simple LOAD_NEGATIVE
+There may be advantage in a different instruction sequence from simple LOAD_NEGATIVE
 <p>
 The macro
 <pre>
