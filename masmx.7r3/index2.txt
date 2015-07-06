@@ -1,0 +1,416 @@
+1.  <a href="#cando">What masmx can do</a>							1
+
+    1.	<a href="#any">Any Target Architecture</a>						1.1
+    2.	<a href="#syntax">Any Input Syntax</a>
+	1  <a href="#legacy">Legacy Source Code Unchanged</a>					1.2.1
+    	2  <a href="#notate1">Number and Character String Notation</a>				1.2.2
+    3.	<a href="#anyword">Any Word Size</a>							1.3
+    4.	<a href="#anydress">Any Address Space</a>						1.4
+    5.	<a href="#anyfloat">Any Floating Point Format</a>					1.5
+    6.  <a href="#strip1">Structured Data and Repeat Data</a>					1.6
+	1.  <a href="#stridata">Structured Data</a>						1.6.1
+	2.  <a href="#stribata">Bit-Aligned Structured Data</a>					1.6.2
+    	3.  <a href="#bitaccess">Accessing Bit-Aligned Structured Data</a>			1.6.3
+	4.  <a href="#strip2">Repeat Data</a>							1.6.4
+	5.  <a href="#streaf">Functionally Compartmented Name Spaces</a>			1.6.5
+    7.	<a href="#strun">Run-Time Algorithm Plotting</a>					1.7
+
+2.  <a href="#developer">Developer Environment</a>						2
+
+3.  <a href="#start">Getting started</a>							3
+
+4.  <a href="#sourceline">The Assembly Language Source Line</a>					4
+
+    1.	<a href="#labels">Labels</a>								4.1
+
+    2.	<a href="#expression">Expressions</a>							4.2
+	1.  <a href="#operator">Operators</a>							4.2.1
+	2.  <a href="#xtoken">Tokens</a>							4.2.2
+	    1.	<a href="#notate2">Number Strings</a>						4.2.2.1
+		1.  <a href="#nstring">masmx Default Number and String Notation</a>		4.2.2.1.1
+		2.  <a href="#cstring">C Language Number and String Notation</a>		4.2.2.1.2
+		3.  <a href="#motorola">Motorola Old Number Notation</a>			4.2.2.1.3
+		4.  <a href="#suffix">Suffix-Determined Number Notation</a>			4.2.2.1.4
+	    2.	<a href="#labelref">Label References</a>					4.2.2.2
+	    3.	<a href="#ifunction">masmx Internal Functions</a>				4.2.2.3
+	    4.	<a href="#func_macro">Function Macro Reference</a>				4.2.2.4
+	    5.	<a href="#argument_ref">Macro Parameter Reference</a>				4.2.2.5
+
+    3.	<a href="#command">The Command Field</a>						4.3
+	1.  <a href="#directive">Directives</a>							4.3.1
+	2.  <a href="#constant">Storage Constants</a>						4.3.2
+	3.  <a href="#nconstant">Number Constants</a>						4.3.3
+	4.  <a href="#commas">Split Number Items</a>						4.3.4
+	5.  <a href="#text_string">Text Strings</a>						4.3.5
+	6.  <a href="#form">$form Items</a>							4.3.6
+	7.  <a href="#proc_call">$proc macro calls: instructions and structures</a>		4.3.7
+
+    4.  <a href="#argument">The Argument Field</a>						4.4
+	1.  <a href="#xargument">Argument Expressions</a>					4.4.1
+	2.  <a href="#largument">Literal Arguments</a>						4.4.2
+
+    5.  <a href="#literals">Literals</a>							4.5
+	1.  <a href="#literal_is">A literal is</a>						4.5.1
+	2.  <a href="#literal_pool">Literal Pools</a>						4.5.2
+	3.  <a href="#automatic">Automatic Literals</a>						4.5.3
+	4.  <a href="#iflag_lit">Indirection Flag on a Literal</a>				4.5.4
+	5.  <a href="#lpooltag">Literal Pool Tags</a>						4.5.6
+	6.  <a href="#ldirective">$lit Directive</a>						4.5.6
+	7.  <a href="#lnested">Nested Literals</a>						4.5.7
+    
+    6.  <a href="#fmacro">Function Macros</a>							4.6
+	1.  <a href="#fmacrois">A Function Macro is</a>						4.6.1
+	2.  <a href="#fmacdi">Directives used Constructing Functions</a>			4.6.2
+	    1.	<a href="#fmache">$FUNC	Function Head</a>					4.6.2.1
+		1.  <a href="#fmac2pass">Second-Pass-Only Functions</a>				4.6.2.1.1
+		2.  <a href="#fmacni">Non-Idempotent Functions</a>				4.6.2.1.2
+		3.  <a href="#fmacdisp">Functions affecting Program Displacements</a>		4.6.2.1.3
+     	    2.	$NAME	<a href="#fmacname">Entry Point and Value Tag</a>			4.6.2.2
+	    3.	$RETURN	<a href="#fmacret">Value of Result</a>					4.6.2.3
+	    4.	$END	<a href="#fmacend">Function Foot</a>					4.6.2.4
+	3.  <a href="#fmacode">Code Generated During Function Evaluation</a>			4.6.3
+
+    7.  <a href="#internalf">masmx Internal Functions in Detail</a>			 	4.7
+
+	1.  $	<a href="#location_c">location counter</a>					4.7.1
+	    1.  <a href="#alocator">$	this location counter</a>				4.7.1.1
+	    2.  <a href="#thisloc">$(..) named location counter</a>				4.7.1.2
+
+	2.  $a	<a href="#absolute">absolute address</a>					4.7.2
+	    1.	<a href="#absolute_here">$a		current absolute address</a>		4.7.2.1
+	    2.	<a href="#absolute_there">$a(..)	absolute value of expression</a>	4.7.2.2
+
+	3.  $b	<a href="#sectionbase">section base address</a>					4.7.3
+                    	  
+	4.  $bank_index	<a href="#bix">current memory block identifier</a>			4.7.4
+
+	5.  $n		<a href="#sname">short token for macro entry name value</a>		4.7.5
+
+	6.  $net(..)	<a href="#snet">unrelocated value of expression</a>			4.7.6
+
+	7.  $o(..)	<a href="#oflag">value of an option flag</a>				4.7.7
+
+	8.  $r	<a href="#region">region</a>							4.7.8
+	    1.	$r	<a href="#thisregion">identity of current location counter</a>		4.7.8.1
+	    2.	$r(..)	<a href="#thatregion">locator of named target</a>				4.7.8.2
+
+	9.  $rel(..)	<a href="#relocation">relocation factor</a>				4.7.9
+	    1.	$rel	<a href="#relocat_here">current relocation factor</a>			4.7.9.1
+	    2.  $rel(..) <a href="#relocat_there">relocation factor of named locator</a>		4.7.9.2
+
+	10. $t(..)	<a href="#labeltyp">type of a label</a>					4.7.10
+	    1.		<a href="#lt_undefined">undefined</a>					4.7.10.1
+	    2.		<a href="#lt_location">location</a>					4.7.10.2
+	    3.		<a href="#lt_equ">$EQU</a>						4.7.10.3
+	    4.		<a href="#lt_set">$SET</a>						4.7.10.4
+	    5.		<a href="#lt_equf">$EQUF</a>						4.7.10.5
+	    6.		<a href="#lt_directive">$DIRECTIVE</a>					4.7.10.6
+	    7.		<a href="#lt_function">$FUNCTION</a> (of masmx)				4.7.10.7
+	    8.		<a href="#lt_proc">$PROC</a> (macro)					4.7.10.8
+	    9.		<a href="#lt_name">$NAME</a>						4.7.10.9
+	    10. 	<a href="#lt_func">$FUNC</a> (macro)					4.7.10.10
+	    11. 	<a href="#lt_form">$FORM</a>						4.7.10.11
+	    12. 	<a href="#lt_user">user assigned label types</a>			4.7.10.12
+
+	11. $zenith	<a href="#zenith">high address of section + literals</a>		4.7.11
+	    1.	$zenith		<a href="#zenith">this section</a>				4.7.11.1
+	    2.	$zenith(..)	<a href="#azenith">named section</a>				4.7.11.2
+
+
+5.  <a href="#structure">Iterated Code and Structured Data</a>					5
+
+    1.	<a href="#domac">$do and macros</a>							5.1
+
+    2.	<a href="#stradata">Structured Data and Structured Code Name Spaces</a>			5.2
+
+	1.  <a href="#wstradata">Word-Aligned Structures $TREE / $BRANCH..$ROOT</a>		5.2.1
+	    1.  <a href="#tree_root">Structures $TREE..$ROOT</a>				5.2.1.1
+	    2.  <a href="#branch_root">Overlaid Structures $BRANCH..$ROOT</a>			5.2.1.2
+	    4.  <a href="#name_space">Structured Code Name Spaces</a>				5.2.1.3
+		    
+
+	2.  <a href="#bstradata">Bit-Aligned Structures</a>					5.2.2
+	    1.	<a href="#record_root">Bit-Aligned Data $record..$root</a>				5.2.2.1
+	    2.  <a href="#record_macro">Macro Code Access to Bit-Aligned Fields and Groups</a>	5.2.2.2
+	    3.	<a href="#record_overlay">Overlaid Structures $record,$branch</a>			5.2.2.3
+	    4.	<a href="#signed_bitfield">Signed Bit Fields</a>					5.2.2.4
+
+6.  <a href="#algors">Run-Time Algorithm Plotter</a>						6
+
+    1.  <a href="#ialgors">Run-Time Integer Algorithm Plotter</a>				6.1
+    2.  <a href="#fpalgors">Run-Time Floating Algorithm Plotter</a>				6.2
+
+
+7.  <a href="#sections">Constructing Program Sections</a>					7
+
+    1.  <a href="#abslocs">Absolute Location Counters</a>					7.1
+
+	1.  <a href="#sabslocs">Simple Absolute Location Counters</a>				7.7.1
+
+	1.  <a href="#breakpoint">Breakpointed Location Counters</a>				7.1.2
+	    1.  <a href="#abreakpt">Physical Address Offset</a>					7.1.2.1
+	    2.  <a href="#vbreakpt">Breakpointed Location Counters: -v Option</a>		7.1.2.2
+
+	3.  <a href="#bdflat">Simple Location Counter without Breakpoint</a>
+	    	    <a href="#bdflat">Base+Displacement in Flat Address Spaces</a>		7.1.3
+
+	4.  <a href="#bdbreakpt">Breakpointed Location Counters</a>
+             	    <a href="#bdbreakpt">Base+Displacement in Translated Address Spaces</a>	7.1.4
+
+	5.  <a href="#voidsection">Void Sections</a>						7.1.5
+
+	6.  <a href="#giantspace">Breakpointed Location Counters: Giant Address Spaces</a>	7.1.6
+
+	    1.  <a href="#giantdirect">Very Large Direct Addressed Sections</a>			7.1.6.1
+
+	    2.  <a href="#bdgiant">Very Large Load Address Base-Displacement Examples</a>	7.1.6.2
+
+		1.  <a href="#staticbdg">Giant Absolute Address Base-Displacement</a>
+		    <a href="#staticbdg">Example (static referencing)</a>			7.1.6.2.1
+
+		2.  <a href="#dynamicbdg">Giant Absolute Address Base-Displacement</a>
+		    <a href="#dynamicbdg">Example (dynamic referencing)</a>			7.1.6.2.2
+
+	7.   <a href="#lptag">Literal Pool Tag</a>						7.1.7
+
+    2.  <a href="#relocate">Relocatable Location Counters</a>					7.2
+
+
+
+8.  masmx Directives</a>							8
+
+    1.	<a href="#ascii">$ascii</a>		set character code to ASCII			8.1
+    2.	<a href="#awidth">$awidth</a>		set address width				8.2
+    3.	<a href="#blank">$blank</a>		set the globality of a future label		8.3
+    4.	<a href="#branch">$branch</a>		branch of a structured name space		8.4
+    5.	<a href="#byte">$byte</a>		set the width of a text byte			8.5
+
+    6.	<a href="#characteristic">$characteristic</a>		set floating exponent field size	8.6
+
+    7.	<a href="#cont_char">$cont_char</a>	change line continue character			8.7
+    8.	<a href="#data_code">$data_code</a>	define/select character string code points	8.8
+    9.	<a href="#do">$do</a>		generate repeated code				8.9
+    10.	<a href="#else">$else</a>		conditional assembly				8.10
+    11.	<a href="#elseif">$elseif</a>		conditional assembly				8.11
+    12.	<a href="#end">$end</a>		foot of macro or assembly			8.12
+    13.	<a href="#endif">$endif</a>		conditional assembly				8.13
+    14.	<a href="#equ">$equ</a>		assign a value to label				8.14
+    15.	<a href="#equf">$equf</a>		assign a list of values to label		8.15
+    16.	<a href="#exit">$exit</a>		abandon assembly with a message			8.16
+    17.	<a href="#flag">$flag</a>		diagnostic, mark assembly in error		8.17
+
+    18.	<a href="#flagf">$flagf</a>		first pass diagnostic, mark assembly in error	8.18
+
+    19.	<a href="#floating_point">$floating_point</a> set default floating number size		8.19
+
+    20.	<a href="#form">$form</a>		bit fields layout template			8.20
+
+    21.	<a href="#func">$func</a>		user macro to produce an operand value		8.21
+    22.	<a href="#hex">$hex</a>		set binary notation to hex			8.23
+
+    23.	<a href="#if">$if</a>		conditional assembly				8.23
+
+    24.	<a href="#include">$include</a>	include a source file or a binary file		8.24
+
+	1.  $include		read a nested source file		8.24.1
+
+	2.  $include,$binary 	linking directive:
+				read a text-encoded binary file
+				process its relocation information
+				output the linked code			8.24.2
+
+	3.  $include,$void	linking directive:
+				include addresses from a text-encoded
+				binary file, but no code from it	8.24.3
+
+    25.	<a href="#info">$info</a>			linking directive:			8.25
+
+	1.  $info,$offset	update tuple of relocation information	8.25.1
+
+	2.  $info,$range_check		
+	    $info,$range_check1	
+
+			request linker Automatic range-checking
+			of an updated field of output binary		8.25.2
+
+    26.	<a href="#linewidth">$linewidth</a>	control layout in text encoded binary		8.26
+
+    27.	<a href="#list">$list</a>								8.27
+	1.  $list	set inclusion nest level for listing		8.27.1
+	2.  $list 0	suppress list and labels export			8.27.2
+
+    28.	<a href="#lit">$lit</a>		select default location counter for literals
+			optionally declare literal tag			8.28
+
+    29.	<a href="#load">$load</a>		linking directive:
+			write revised binary information in
+			output text-encoded binary file			8.30
+
+    30.	<a href="#lterm">$lterm</a>		change comment character			8.30
+    31.	<a href="#name">$name</a>		macro call name and value			8.31
+    32.	<a href="#nop">$nop</a>		do nothing [+ comment]				8.32
+    33.	<a href="#note">$note</a>		informative diagnostic, not error		8.33
+    34.	<a href="#notef">$notef</a>		first pass informative diagnostic		8.34
+    35.	<a href="#octal">$octal</a>		set binary notation to octal			8.35
+    36.	<a href="#path">$path</a>		alter include path				8.36
+    37.	<a href="#plist">$plist</a>		nest depth for listing macro expansion		8.37
+    38.	<a href="#proc">$proc</a>		head of procedural macro			8.38
+
+    39.	<a href="#pushrel">$pushrel</a>	linking directive:
+
+			scan a relocation tuple applied to a
+			word group in the text-encoded binary.
+
+			Stack an unresolved relocation tuple
+			for replay to the $MAP linking macro		8.39
+
+    40.	<a href="#quantum">$quantum</a>	set address quantum				8.40
+
+    41.	<a href="#quote">$quote</a>		change quote mark				8.41
+
+
+    42.	<a href="#record">$record</a>								8.42
+
+	1.  $record		bit-aligned data structures		8.42.1
+	2.  $record,$branch	bit-aligned structure overlay		8.42.2
+
+    43.	<a href="#res">$res</a>		declare a storage buffer			8.43
+
+    44.	<a href="#return">$return</a>								8.44
+
+	1.		return a value from within $FUNC..$END		8.44.1
+	2.		return from within $PROC..$END			8.44.2
+
+    45.	<a href="#root">$root</a>		end of a structured name space which was	
+			begun with $tree, $branch or $record		8.45
+
+    46.	<a href="#set">$set</a>		assign value to a reassignable label		8.46
+
+    47.	<a href="#set_option">$set_option</a>							8.47
+
+	1.		set option flags				8.47.1
+
+	2.		Interaction of Run Options
+			and List Directives				8.47.2
+
+    48.	<a href="#snap">$snap</a>		list the label table				8.48
+
+	1.  $snap		2nd pass				8.48.1
+	2.  $snap, 1		1st pass				8.48.2
+	3.  $snap[,1]	2	dynamic label table			8.48.3
+
+    49.	<a href="#sterm">$sterm</a>		set the substring sentinel symbol		8.49
+    50.	<a href="#store">$store</a>		set the default output file name		8.50
+
+    51.	<a href="#suffix">$suffix</a>		suffix-determined  number string notation	8.51
+
+    52.	<a href="#text">$text</a>		translate input text patterns			8.52
+
+    53.	<a href="#trace">$trace</a>		display value of expression			8.53
+	1.  $trace	2nd pass display				8.53.1
+	2.  $trace, 1	display both passes				8.53.2
+
+    54.	<a href="#tree">$tree</a>		simple structured name space			8.54
+
+    55.	<a href="#twoscomp">$twos_complement</a>						8.55
+	1.  $twos_complement	1	2s complement, default		8.55.1
+	2.  $twos_complement	0	1s complement			8.55.2
+
+
+    56.	<a href="#word">$word</a>		declare size of target computer word		8.56
+    57.	<a href="#xqt_i">$xqt_i</a>		run-time integer algorithm plotter		8.57
+    58.	<a href="#xqt_fp">$xqt_fp</a>		run-time floating algorithm plotter		8.58
+    59.	<a href="#zcp">$zero_code_point</a>  character string escaped zero value		8.59
+
+
+
+9.  <a href="#file_formats">Output File Formats, Relocation and Linking</a>
+    Giant Address Spaces, Interfacing with GNU Tools			9
+
+    1.	<a href="#txo">Text Encoded Binary Format, S-Records and Intel Hex Records</a>	9.1
+
+    2.	<a href="#linking">Relocation, Linking, Giant Address Space</a>
+	and Interfacing with GNU Tools					9.2
+
+	1.  <a href="#relinfo">Relocation Information in Text Encoded Binary</a>		9.2.1
+
+	2.  <a href="#linkbasic">masmx Linking in Principle</a>					9.2.2
+
+	3.  <a href="#linkdems">Demonstration Links</a>						9.2.3
+
+	    1.	<a href="#link1">The Simplest Link</a>					9.2.3.1
+
+	    2.	<a href="#link2">Link Collected by Sections</a>				9.2.3.2
+
+	    3.	<a href="#link3">Link Specific Segments</a>					9.2.3.3
+
+	    4.	<a href="#link4">Link an Output Relocatable</a>				9.2.3.4
+
+	    5.	<a href="#link5">Link an Accumulated Relocatable</a>
+		plus a New Relocatable					9.2.3.5
+
+	    6.	<a href="#link6">The Incremental Link</a>					9.2.3.6
+
+	    7.	<a href="#link7">The Link in Giant Address Space</a>				9.2.3.7
+
+	    8.	<a href="#link8">The Incremental Link in Giant Address Space</a>		9.2.3.8
+
+	    9.	<a href="#link9">Linking with Void Inclusion</a>				9.2.3.9
+
+	    10.	<a href="#link10">Linking with void Inclusion</a>
+		in Giant Address Space					9.2.3.10
+
+
+10. <a href="#describe">Describing Target Architecture in Text</a>				10
+
+    1.  <a href="#describe1">Establishing Your Syntax</a>					10.1
+    2.	<a href="#describe2">Describing the Target Architecture</a>				10.2
+	1.  <a href="#architecture">$WORD, $BYTE, $QUANTUM, $AWIDTH</a>				10.2.1
+	2.  <a href="#macro">$FORM, $PROC, $NAME, $END</a>					10.2.2
+	    1.	<a href="#uform">The $FORM Template</a>					10.2.2.1
+	    2.	<a href="#uproc">The $PROC Header</a>					10.2.2.2
+	    3.	<a href="#uname">The $NAME Entry Point</a>					10.2.2.3
+	    4.	<a href="#uend">The $END Macro Footer</a>					10.2.2.4
+	    5.  <a href="#usample">Minimal Instruction Macro Example</a>			10.2.2.5
+	    6.	<a href="#u2passproc">The Two-pass $PROC</a>					10.2.2.6
+	    7.	<a href="#uprocaside">The Out of Line $PROC</a>					10.2.2.7
+	    8.	<a href="#unested">Nested Macro Descriptions</a>				10.2.2.8
+    3.  <a href="#legacyx">Synthesising Legacy Automatic Macros</a>				10.3
+	1.  <a href="#legacyfun">Synthesising Legacy Functional Macros</a>			10.3.1
+	2.  <a href="#legacycom">Synthesising Legacy Command Macros</a>				10.3.2
+
+11. <a href="#afloat">Alternative Floating Formats</a>					11
+    1.	<a href="#masmxfloat">masmx Floating Format</a>						11.1
+    2.	<a href="#ieeefloat">IEEE754 Floating Values</a>						11.2
+	1.  <a href="#fpdifferences">Differences between masmx FLoating Format and IEEE754 Floating Formats</a>
+									11.2.1
+	2.  <a href="#ieeemacro">Macro Language Generation of IEEE754 Floating Constants</a>	11.2.2
+
+
+
+
+Appendix A: <a href="#commandline">masmx Command Line</a>
+Appendix B: <a href="#whatsnew">What's new in 7r3?</a>
+Appendix C: <a href="#roadmap">The masmx Product Road Map</a>
+Appendix D: <a href="#languages">masmx's Potential for High Level Languages</a>
+
+Appendix E: <a href="#fixing">Tuning Macro Language and Fixing Problems</a>
+	 E.1:	<a href="#paramrefix">Fixing a Macro Parameter Reference</a>
+	 E.2:	<a href="#labelrefix">Label Cannot Be Referenced</a>
+	 E.3:	<a href="#labelrefind">Changed Label Value Disappears</a>
+	 E.4:	<a href="#walkingmacro">Tracing Macro Expansion</a>
+	 E.5:	<a href="#alias_fun">Aliasing masmx Internal Functions</a>
+	 E.6:	<a href="#labelshifted">Diagnostic about a Label Address</a>
+	 E.7:	<a href="#labelhidden">Label fails to be Exported</a>
+	 E.8:	<a href="#endshifted">Literal Table overlaps Trailing Edge of Code</a>
+
+Appendix F: <a href="#targets">Target Descriptions</a>
+	 F.1:	<a href="#8051">8051</a>
+	 F.2:	<a href="#powerpc">PowerPC</a>
+
+	 F.3:	<a href="#definitions">Definition Examples</a>
+	 F.3.1:	<a href="#coldfire">ColdFire</a>
+	 F.4:	<a href="#alignments">Byte-Addressing Machines with 32 and 64 Bit Bus:
+		Managing Alignments</a>
+
+Appendix G: <a href="#disclaimer">Disclaimer and Contact</a>
