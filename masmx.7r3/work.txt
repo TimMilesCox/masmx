@@ -391,23 +391,23 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     24.	<a href="#include">$include</a>	include a source file or a binary file		8.24
 
-	1.  $include		read a nested source file		8.24.1
+	1.  <a href="#include">$include</a>		read a nested source file		8.24.1
 
-	2.  $include,$binary 	linking directive:
+	2.  <a href="#include_b">$include,$binary</a> 	linking directive:
 				read a text-encoded binary file
 				process its relocation information
 				output the linked code			8.24.2
 
-	3.  $include,$void	linking directive:
+	3.  <a href="#include_v">$include,$void</a>	linking directive:
 				include addresses from a text-encoded
 				binary file, but no code from it	8.24.3
 
     25.	<a href="#info">$info</a>			linking directive:			8.25
 
-	1.  $info,$offset	update tuple of relocation information	8.25.1
+	1.  <a href="#info">$info,$offset</a>	update tuple of relocation information	8.25.1
 
-	2.  $info,$range_check		
-	    $info,$range_check1	
+	2.  <a href="#info_range">$info,$range_check</a>
+	    <a href="#info_range">$info,$range_check1</a>
 
 			request linker Automatic range-checking
 			of an updated field of output binary		8.25.2
@@ -4384,7 +4384,7 @@ See <a href="#equf">8.15: $equf directive</a>
 <a      name="lt_directive"/>
 <h4>4.7.10.6: Label Type $DIRECTIVE</h4>
 
-The names of the 59 directives are labels. See <a href="directive">8: masmx Directives</a>
+The names of the 59 directives are labels. See <a href="#Directives">masmx Directives</a><br>
 Directives may be assigned extra names using the <b>$equ</b> subcommand <b>$directive</b>
 <pre>
 
@@ -4416,7 +4416,8 @@ of "$" for "."
 
 <p>
 Without the quotes $ is evaluated functionally and "." receives
-the current location value. That would render "." an unusable function
+the current location value. See also <a href="option_Q">-Q option</a>
+and <a href="option_m">-m option</a>
 
 
 <a      name="lt_proc"/>
@@ -4586,8 +4587,7 @@ instructions which can only be fixed by understanding
 what sort of operands are addressed 
 
 <p>
-A definition file for M68K might
-contain
+A definition file for ColdFire might contain
 <pre>
 
 data_register   $equ    128
@@ -5544,7 +5544,7 @@ which use automatic literals would generate the literals (16) and (12*/20)
 <p>
 Automatic literals are not opted in <b>coldfire.def</b> because this would disrupt the many parenthesised
 operand expressions in accepted source syntax. For ColdFire integer arithmetic furthermore, literals
-are unnecessary because integer immediate operands indicated with prefix <b>#</b> are available
+are unnecessary because 32-bit integer immediate operands indicated with prefix <b>#</b> are available
 
 <p>
 The floated <b>#</b> yields in the two illustrated cases these two immediate operand clauses
@@ -5812,7 +5812,7 @@ The macro
 	REVERSE
 
 </pre>
-negates a accumulation in the result register to cover cases like
+negates an accumulation in the result register to cover cases like
 <pre>
 
 	-(X*Y-Z)
@@ -5869,6 +5869,7 @@ POP		$equ,$directive	$nop	; ColdFire
 #		in PowerPC saves/retrieves, only PUSH macro generates an instruction
 #		LOAD and arithmetic macros must distinguish register / storage / immediate argument
 #		arithmetic macros must load storage arguments to a GPR designated as threshold
+#		The threshold may be the next available set_aside register
 
 LISTP		$set	1		# PPC32
 SAVE(1)		$equ	r20
@@ -6017,8 +6018,8 @@ A function name $ieee64 will be prepended to any constants on line 32. ColdFire 
 instructions have neither immediate operands, nor operands in directly addressed storage
 
 <p>
-Floating operands are possible at an address offset from a0..a7 or from the program counter
-at (instruction + 2)
+Floating operands in memory are possible at an address offset from a0..a7
+or from the program counter at (instruction + 2)
 
 <p>
 Two 64-bit ieee754 floating numbers can be seen at address (fp_routine + 0x0070).
@@ -7302,10 +7303,11 @@ See also Section 9:	Output File Formats, Relocation and Linking,
 
 
 
-<h1>8: masmx Directives:</h1>                                         
+<a      name="Directives"/>
+<h1>8: masmx Directives:</h1>
 
-<h2>8.1:  $ASCII             Set Character Set to ASCII</h2>
-
+<a	name="ascii"/>
+<h2>8.1:  $ascii             Set Character Set to ASCII</h2>
 
 <p>
 $ascii switches string contents and values in apostrophes to source input
@@ -7324,7 +7326,8 @@ outside of strings are assembled from ASCII simple
 Assembly initial setting is $ascii
 
 
-<h2>8.2:  $AWIDTH            Output File Load Address Width</h2>
+<a      name="awidth"/>
+<h2>8.2:  $awidth            Output File Load Address Width</h2>
 
 
 <p>
@@ -7369,6 +7372,7 @@ See Section 9: Output File Formats, Relocation and Linking,
 Giant Address Spaces, Interfacing with GNU Tools.
 
 
+<a      name="blank"/>
 <h2>8.3:  $BLANK		Set the Globality of a Future Label</h2>
 
 
@@ -7387,8 +7391,9 @@ entry_point
 
 </pre>
 
-<h2>8.4:  $BRANCH		Structure Overlay</h2>
 
+<a      name="branch"/>
+<h2>8.4:  $BRANCH		Structure Overlay</h2>
 
 <p>
 $BRANCH is the start of a structure overlay. The following assembly
@@ -7461,6 +7466,7 @@ welblech.msm=0<000003
 
 </pre>
 
+<a      name="byte"/>
 <h2>8.5:  $BYTE              Set the Width of a Data Character</h2>
 
 
@@ -7669,6 +7675,7 @@ names as text. External references have been marked
 in the output file. Those are the two undefined labels.
 
 
+<a      name="characteristic"/>
 <h2>8.6:  $CHARACTERISTIC    Set Floating Point Characteristic Size</h2>
 
 <p>^M
@@ -7858,6 +7865,7 @@ see 4.2.2.2.5: The Decimal Scale Operator
 <b>*+ *-</b>
 
 
+<a      name="cont_char"/>
 <h2>8.7:  $CONT_CHAR          Change Line Continuation Character</h2>
 
 <p>
@@ -7951,6 +7959,7 @@ CONT_CHAR=\
 </pre>
 
 
+<a      name="data_code"/>
 <h2>8.8:  $DATA_CODE             Set Alternative Character Set</h2>
 
 <p>
@@ -8008,6 +8017,7 @@ values for code points 0..255
 Both assembly passes begin in $ascii mode
 
 
+<a      name="do"/>
 <h2>8.9: $DO                Generate Repeated Code</h2>     
 
 $DO repeats code.
@@ -8102,6 +8112,7 @@ $do can only iterate one line of code, but that line can be a macro call.
 See section 5.1 <b>$do Directive and $proc macros</b>
 
 
+<a      name="else"/>
 <h2>8.10: $ELSE              Conditional Assembly</h2>
       
 
@@ -8121,6 +8132,7 @@ Part of conditional assembly
 	$endif
 
 </pre>
+<a      name="elseif"/>
 <h2>8.11: $ELSEIF            Conditional Assembly</h2>                
 
 <p>
@@ -8141,6 +8153,7 @@ Part of conditional assembly
 
 </pre>
 
+<a      name="end"/>
 <h2>8.12: $END               End of Macro or Assembly</h2>          
 
 <p>
@@ -8173,6 +8186,7 @@ used in an include file to give a transfer address.
 
 
 
+<a      name="endif"/>
 <h2>8.13: $ENDIF             Conditional Assembly</h2>              
 
 <p>
@@ -8193,6 +8207,7 @@ Part of conditional assembly
 
 
 </pre>
+<a      name="equ"/>
 <h2>8.14: $EQU               Assign Value to Label</h2>
 
 
@@ -8286,7 +8301,8 @@ See also Section 4.7.10: (function) $t(<i>ARGUMENT</i>) Label Type
 
 
 
-<h2>8.15: $EQUF              Assign List of Values to Label</h2>
+<a      name="equf"/>
+<h2>8.15: $equf              Assign List of Values to Label</h2>
 
 <p>
 $EQUF equates a label to a list of values.
@@ -8609,6 +8625,7 @@ The six possible attributes in a $EQUF label are intended for
 high-level language development requiring complex attribute information.
 
 
+<a	name="exit"/>
 <h2>8.16: $EXIT              Stop the Assembly with a Message</h2>
 
 <p>
@@ -8623,9 +8640,10 @@ case_required $proc
 </pre>
 <p>
 The developer needed <b>-k</b> flag (case significant labels) to be set on the
-command line.
+command line. -k may not be opted with <b>$set_option</b> directive
 
 
+<a      name="flag"/>
 <h2>8.17: $FLAG              Diagnostic, Mark Assembly in Error</h2>
 
 
@@ -8643,6 +8661,7 @@ is actioned on the second pass. Example:
 File and line number are listed with the message.
 
 
+<a      name="flagf"/>
 <h2>8.18: $FLAGF             First Pass Diagnostic, Mark in Error</h2>
 
 
@@ -8661,6 +8680,7 @@ begun. Example:
 File and line number are listed with the message.
 
 
+<a      name="floating_point"/>
 <h2>8.19: $FLOATING_POINT    Default Size of Floating Point Item</h2> 
 
 
@@ -8755,6 +8775,7 @@ The largest size is 192 bits, which is also the size of value which a label may 
 
 
 </pre>
+<a      name="form"/>
 <h2>8.20: $FORM             Layout Template of Bit Structure or Instruction</h2>
 
 
@@ -8840,6 +8861,7 @@ And the code-generating line of macro text may then be
 The supplied definition "ppc_603.def" processes either syntax.
 
 
+<a      name="func"/>
 <h2>8.21: $FUNC              Macro to Produce Operand Value</h2>      
 
 <b>$func</b> is the directive at the head of a function macro, which
@@ -8866,7 +8888,7 @@ fname2*	$name	<i>LATENT_VALUE2</i>
 </pre>
 <p>
 
-See Section <b>4.6: Function Macros</b>
+See <a href="#fmacro">4.6: Function Macros</a>
 
 <p>
 The optional argument of asterisk on <b>$FUNC</b> directive suppresses
@@ -8882,6 +8904,7 @@ and second assembly passes, and then the asterisk must be omitted and the
 
 
 
+<a      name="hex"/>
 <h2>8.22: $HEX               Set Binary Notation to Hex</h2>
 
 <p>
@@ -8933,6 +8956,7 @@ The <b>-m</b> option turns on Motorola $hex syntax, @octal and %bit_pattern.
 
 
 
+<a      name="if"/>
 <h2>8.23: $IF                Conditional Assembly</h2>
 
 Part of conditional assembly
@@ -8953,6 +8977,7 @@ Part of conditional assembly
 
 
 </pre>
+<a      name="include"/>
 <h2>8.24:	$INCLUDE	Include a Source File or a Binary File</h2>		
 
 <h3>8.24.1:	$INCLUDE	Read a Nested Source File</h3>           
@@ -9015,6 +9040,7 @@ within quotes
 
 </pre>
 
+<a      name="include_b"/>
 <h3>8.24.2: $INCLUDE,$BINARY	Read a Text Encoded Binary File</h3>
 
 <p>
@@ -9090,6 +9116,7 @@ Giant Address Spaces, Interfacing with GNU Tools
 
 
 
+<a      name="include_v"/>
 <h3>8.24.3: $INCLUDE,$VOID		Bind to an Independent Text Encoded Binary</h3>
 
 <p>
@@ -9105,10 +9132,11 @@ include addresses from a text encoded binary file, but do not include
 code from it:
 
 <p>
-See also Section 9: Output File Formats, Relocation and Linking,
-Giant Address Spaces, Interfacing with GNU Tools
+See also <a href="file_formats">9: Output File Formats, Relocation and Linking,
+Giant Address Spaces, Interfacing with GNU Tools</a>
 
 
+<a	href="info"/>
 <h2>8.25: $INFO       Linking Directive used within $MAP macro</h2>
 <h3>8.25.1: $INFO, $OFFSET     Replace Information at the Relocation Stack Top</h3>
 
@@ -9166,6 +9194,7 @@ adjustment is made by macro language on the code
 <p>
 When the output becomes absolute, no further relocation tuple is output
 
+<a      href="info_range"/>
 <h3>8.25.2: $INFO, $RANGE_CHECK
    and   $INFO, $RANGE_CHECK1: Request Linker Automatic Range Checking</h3>
 <pre>

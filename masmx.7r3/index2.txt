@@ -177,7 +177,7 @@
 
 
 
-8.  masmx Directives</a>							8
+8.  <a href="#Directives">masmx Directives</a>							8
 
     1.	<a href="#ascii">$ascii</a>		set character code to ASCII			8.1
     2.	<a href="#awidth">$awidth</a>		set address width				8.2

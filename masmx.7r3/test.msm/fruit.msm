@@ -16,7 +16,7 @@ fruit*  $proc
 times   $do     fruit(1,1),      +       100-times
 zes     $set    $
 yes     $set     $        
-welly*** $equ    100,100      
+	$do	$t(welly)=0,welly*** $equ    100,100      
         $root
         $end
 

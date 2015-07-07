@@ -411,27 +411,13 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
             }
             else
             {
-               if (type == EQU)
-               {
-                  notep1p(o->l.name, "equate restated");
-
-                  if (uselector['E'-'A'] == 0)
-                  {
-                     printf("unchanged from");
-                     print_item(&o->l.value);
-                     return o;
-                  }
-               }
+               #ifdef BINARY
+               if (o->l.valued == UNDEFINED) o->l.valued = type;
                else
+               #endif
                {
-                  #ifdef BINARY
-                  if (o->l.valued == UNDEFINED) o->l.valued = type;
-                  else
-                  #endif
-                  {
-                     flagp1p(o->l.name, "may not be restated");
-                     return o;
-                  }
+                  flagp1p(o->l.name, "may not be restated");
+                  return o;
                }
             }
          }

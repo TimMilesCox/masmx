@@ -160,7 +160,7 @@ S1BUF	EQU 09Ch
 S1CON	EQU 09Bh
 S1REL	EQU 09Dh
 
-p3      equ     0B0H
+;	p3      equ     0B0H
 P3.0    EQU     0B0H
 P3.1    EQU     0B1H
 P3.2    EQU     0B2H
@@ -170,7 +170,7 @@ P3.5    EQU     0B5H
 P3.6    EQU     0B6H
 P3.7    EQU     0B7H
 
-p1      equ     090H
+;	p1      equ     090H
 P1.0    EQU     090H
 P1.1    EQU     091H
 P1.2    EQU     092H
