@@ -233,7 +233,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	2.  <a href="#literal_pool">Literal Pools</a>						4.5.2
 	3.  <a href="#automatic">Automatic Literals</a>						4.5.3
 	4.  <a href="#iflag_lit">Indirection Flag on a Literal</a>				4.5.4
-	5.  <a href="#lpooltag">Literal Pool Tags</a>						4.5.6
+	5.  <a href="#lpooltag">Literal Pool Tags</a>						4.5.5
 	6.  <a href="#ldirective">$lit Directive</a>						4.5.6
 	7.  <a href="#lnested">Nested Literals</a>						4.5.7
     
@@ -345,10 +345,10 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    2.  <a href="#bdgiant">Very Large Load Address Base-Displacement Examples</a>	7.1.6.2
 
 		1.  <a href="#staticbdg">Giant Absolute Address Base-Displacement</a>
-		    <a href="#staticbdg">Example (static referencing)</a>			7.1.6.2.1
+		    <a href="#staticbdg">Static Reference Example</a>			7.1.6.2.1
 
 		2.  <a href="#dynamicbdg">Giant Absolute Address Base-Displacement</a>
-		    <a href="#dynamicbdg">Example (dynamic referencing)</a>			7.1.6.2.2
+		    <a href="#dynamicbdg">Dynamic Reference Example</a>			7.1.6.2.2
 
 	7.   <a href="#lptag">Literal Pool Tag</a>						7.1.7
 
@@ -415,8 +415,9 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     26.	<a href="#linewidth">$linewidth</a>	control layout in text encoded binary		8.26
 
     27.	<a href="#list">$list</a>								8.27
-	1.  $list	set inclusion nest level for listing		8.27.1
-	2.  $list 0	suppress list and labels export			8.27.2
+	1.  <a href="#list">$list <i>include_depth</i></a>
+				set file include depth for listing	8.27.1
+	2.  <a href="#list_0">$list 0</a>	suppress list and labels export			8.27.2
 
     28.	<a href="#lit">$lit</a>		select default location counter for literals
 			optionally declare literal tag			8.28
@@ -450,15 +451,15 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     42.	<a href="#record">$record</a>								8.42
 
-	1.  $record		bit-aligned data structures		8.42.1
-	2.  $record,$branch	bit-aligned structure overlay		8.42.2
+	1.  <a href="#record">$record</a>		bit-aligned data structures		8.42.1
+	2.  <a href="#record_b">$record,$branch</a>	bit-aligned structure overlay		8.42.2
 
     43.	<a href="#res">$res</a>		declare a storage buffer			8.43
 
     44.	<a href="#return">$return</a>								8.44
 
-	1.		return a value from within $FUNC..$END		8.44.1
-	2.		return from within $PROC..$END			8.44.2
+	1.  <a href="#return">$return</a>	return a value from a $func macro		8.44.1
+	2.  <a href="#preturn">$return</a>	return from a $proc macro			8.44.2
 
     45.	<a href="#root">$root</a>		end of a structured name space which was	
 			begun with $tree, $branch or $record		8.45
@@ -481,7 +482,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     49.	<a href="#sterm">$sterm</a>		set the substring sentinel symbol		8.49
     50.	<a href="#store">$store</a>		set the default output file name		8.50
 
-    51.	<a href="#suffix">$suffix</a>		suffix-determined  number string notation	8.51
+    51.	<a href="#suffix_directive">$suffix</a>		suffix-determined  number string notation	8.51
 
     52.	<a href="#text">$text</a>		translate input text patterns			8.52
 
@@ -489,7 +490,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	1.  $trace	2nd pass display				8.53.1
 	2.  $trace, 1	display both passes				8.53.2
 
-    54.	<a href="#tree">$tree</a>		simple structured name space			8.54
+    54.	<a href="#tree">$tree</a>		head of structured name space			8.54
 
     55.	<a href="#twoscomp">$twos_complement</a>						8.55
 	1.  $twos_complement	1	2s complement, default		8.55.1
@@ -3075,7 +3076,7 @@ Macro language places the address of the literal in the instruction.<br>
 Macro language retrieves flag value 0 or 1 for unary * absent or present
 
 
-<a      name="lpool_tag"/>
+<a      name="lpooltag"/>
 <h3>4.5.5: Literal Pool Tags</h3>
 
 Literal Pool Tags are labels of literal pools, and referencing them
@@ -4801,9 +4802,11 @@ units		$do	10,	'0'+thousands-1, '0'+hundreds-1, '0'+tens-1, '0'+units-1L
 <a	name="stradata">
 <h2>5.2: Structured Data and Structured Code Name Spaces</h2>
 
+<a      name="wstradata">
 <h3>5.2.1: Word-Aligned Structures $TREE / $BRANCH..$ROOT</h3>
 
-<h4>5.2.1.1: Simple Structures $TREE..$ROOT</h4>
+<a      name="tree_root">
+<h4>5.2.1.1: Structures $TREE..$ROOT</h4>
 
 <p>
 $TREE is used to structure a name space containing data or code.
@@ -4841,6 +4844,7 @@ Other examples can be found in Section
 8.54: $TREE Directive.
 
 
+<a      name="branch_root">
 <h4>5.2.1.2: Overlaid Structures $BRANCH..$ROOT</h4>
 
 
@@ -4973,6 +4977,7 @@ transport.msm=0<00000003
 
 </pre>
 
+<a      name="name_space">
 <h4>5.2.1.4: Structured Code Name Spaces</h4>
 
 <b>$tree..$root</b> construct may be used to compartment the local names
@@ -5039,8 +5044,10 @@ routines.msm=0<00000003
 
 </pre>
 
+<a      name="bstradata"/>
 <h3>5.2.2: Bit-Aligned Structures</h3>
 
+<a      name="record_root"/>
 <h4>5.2.2.1: Bit-Aligned Data $record..$root</h4>
 
 <b>$record</b>..<b>$root</b> structures are bit aligned
@@ -5131,6 +5138,7 @@ $proc macros can assign actual arguments to any nested $record in their scope
 
 
 
+<a      name="record_macro"/>
 <h4>5.2.2.2: Macro Code Access to Bit-Aligned Fields and Groups</h4>
 
 
@@ -5208,6 +5216,7 @@ STERM=.
 </pre>
 
 
+<a      name="record_overlay"/>
 <h4>5.2.2.3: Bit-Aligned Structure Overlay and Overload: $RECORD,$BRANCH</h4>
 
 <b>$record</b> structures can may be overlaid or redefined with the addition of
@@ -5373,6 +5382,7 @@ moreover.msm=0<00000003
 </pre>
 
 
+<a      name="signed_bitfield"/>
 <h4>5.2.2.4: Signed Bit Fields</h4>
 
 Option <b>-Y</b> causes bit fields to be flagged as signed unless the length is marked
@@ -5465,6 +5475,7 @@ SIGNED  $set    p(2, *5)+p(0, 0)/*1
 
 
 
+<a      name="algors"/>
 <h1>6: Run-Time Algorithm Plotter</h1>
 
 <p>
@@ -5480,6 +5491,7 @@ These instruction steps are planned with the support of target-specific macros w
 fixed call-names known to masmx 
 
 
+<a      name="ialgors"/>
 <h2>6.1: Run-Time Integer Algorithm Plotter $xqt_i</h2>
 
 <b>$xqt_i</b> processes integers and can resolve all expression steps
@@ -5893,6 +5905,7 @@ LISTP**		$set	LISTP-1
 
 </pre>
 
+<a      name="fpalgors"/>
 <h2>6.2: Run-Time Floating Algorithm Plotter</h2>
 
 <p>
@@ -6269,9 +6282,12 @@ MASMX 7r3
 </pre>
 
 
+<a      name="sections"/>
 <h1>7: Constructing Program Sections</h1>
 
+<a      name="abslocs"/>
 <h2>7.1: Absolute Location Counters</h2>
+<a      name="sabslocs"/>
 <h3>7.1.1: Simple Absolute Location Counters</h3>
 
 The plainest use of location counter controls has the syntax
@@ -6415,6 +6431,7 @@ If the base register is specified, labels of locations in the
 segment have a tuple base+displacement attribute.
 
 
+<a      name="breakpoint"/>
 <h3>7.1.2: Breakpointed Location Counters</h3>
 
 Breakpointed location counters concern targets where software assigns
@@ -6431,6 +6448,7 @@ $(id:logical_base_address:<i>breakpoint value</i>)
 The section identified by location counter may have many segments in
 different memory blocks. The segments may share program-visible addresses 
 
+<a      name="abreakpt"/>
 <h4>7.1.2.1 Physical Address Offset</h4>
 
 The breakpointed location counter may be used to describe the absolute
@@ -6527,6 +6545,7 @@ addresses instead, use the -d flag as well as the -l flag
 Program code never accesses the physical load
 address except via masmx internal function $bank_index (Section 4.6.5)
 
+<a      name="vbreakpt"/>
 <h4>7.1.2.2: The Breakpointed Location Counter: -v Option</h4>
 
 If -v option is applied, the treatment of breakpoint values is different.
@@ -6571,6 +6590,7 @@ $(4:04000:99)
 
 </pre>
 
+<a      name="bdflat"/>
 <h3>7.1.3: Simple Location Counter without Breakpoint:
 	 Base+Displacement in Flat Address Spaces</h3>
 
@@ -6634,6 +6654,7 @@ STERM=.
 
 </pre>
 
+<a      name="bdbreakpt"/>
 <h3>7.1.4: The Breakpointed Location Counter:
              Base+Displacement in Translated Address Spaces</h3>
 
@@ -6692,14 +6713,17 @@ STERM=.
 
 
 </pre>
-<h3>7.1.5: Void Segments</h3>
 
-A void segment has zero base address, no breakpoint address, is not
+
+<a      name="voidsection"/>
+<h3>7.1.5: Void Sections</h3>
+
+A void section has zero base address, no breakpoint address, is not
 relocatable and has a base register
 
 <p>
-Data is described in a void segment but not generated. It reserves
-no storage but is a map of storage. Labels in a void segment map
+Data is described in a void section but not generated. It reserves
+no storage but is a map of storage. Labels in a void section map
 to displacements on the base register
 <pre>
 
@@ -6718,7 +6742,7 @@ $(66::,rY)
 name2	descriptor_type_B
 
 </pre>
-Void Segment addresses two cases, where 
+Void section addresses two cases, where 
 
 	<blockquote>
 	The data is supplied by a calling
@@ -6730,13 +6754,13 @@ Void Segment addresses two cases, where
 	with a register
 	</blockquote>
 
-It is safe to place data-generating macros in the void segment. 
+It is safe to place data-generating macros in the void section. 
 They will not generate data. This allows the same macros to construct
-data and to map instances of it into a void segment for attention.
+data and to map instances of it into a void section for attention.
 	
 <p>
 Macro "tree" in this example is called both in section $(55) ARRAY
-where it does generate data, and segment $(56) VSEGMENT, where it doesn't.
+where it does generate data, and section $(56) VSEGMENT, where it doesn't.
 <pre>
 
 MASMX 7r2
@@ -6820,8 +6844,10 @@ STERM=.
 pusingv.msm: object code 18447 bytes: 0 errors: 0 undefined labels
 
 </pre>
+<a      name="giantspace"/>
 <h3>7.1.6: The Breakpointed Location Counter: Giant Address Spaces</h3>
 
+<a      name="giantdirect"/>
 <h4>7.1.6.1: Very Large Direct Addressed Segments</h4>
 
 If breakpoint is prefixed with an asterisk, it is a
@@ -6981,7 +7007,11 @@ The addresses values in location labels and in load strings are
 the sum of the location counter plus step or giant breakpoint value.
 
 
+<a      name="bdgiant"/>
 <h4>7.1.6.2: Very Large Load Address Base-Displacement Examples</h4>
+
+<a      name="staticbdg"/>
+<h4>7.1.6.2.1: Giant Absolute Address Base-Displacement Static Reference Example</h4>
 
 	<blockquote>
         <b>
@@ -7049,8 +7079,10 @@ STERM=.
 :$(00):00030000:00030020 :$(30):00000000:00400000 
 modest.msm: object code 217 bytes: 0 errors: 0 undefined labels
 
-
 </pre>
+<a      name="dynamicbdg"/>
+<h4>7.1.6.2.1: Giant Absolute Address Base-Displacement Dynamic Reference Example</h4>
+
 
 	<blockquote>
         <b>
@@ -7152,6 +7184,7 @@ See also Section 9: Output File Formats, Relocation and Linking,
 Giant Address Spaces, Interfacing with GNU Tools.
 
 
+<a      name="lptag"/>
 <h3>7.1.7: Literal Pool Tag</h3>
 
 Literals may be generated in any sort of segment where code is
@@ -7218,6 +7251,7 @@ $(.array::BASE+OFFSET/$literals_tag)
 
 <b>$lit</b> directive can also tag a literal pool. See section 8.28
 
+<a      name="relocate"/>
 <h2>7.2: Relocatable Location Counters</h2>
 
 <pre>
@@ -7688,7 +7722,7 @@ Characteristic means exponent size plus a sign position
 
 <p>
 $characteristic directive sets the size of the characteristic part
-of floating constants. If the $CHARACTERISTICdirective has a subcommand,
+of floating constants. If the $CHARACTERISTICdirective has a subcommand,
 for example
 <pre>
 
@@ -8224,21 +8258,12 @@ label   $equ    10*44*/180
 
 </pre>
 <p>
-If a label is equated again, a warning note is output
-and the label retains the first value unless <b>-E</b> is opted
-
-<p>
 A label is equated on the second assembly pass if it does not yet exist.
 
 <p>
-If the label is equated for the first time on the second assembly pass
-(see Functions which Generate Code and Second Pass Only Functions,
-Section 8.22.1), then only its first equate is actioned.
-
-<p>
-Labels mostly cannot be changed in type between location, $EQU, $SET etc,
-although $SET labels may be $SET again to new values. See Section 8.46:
-$SET Directive.
+Labels cannot be changed between types location, $EQU, $SET,
+and cannot except for $set labels be redefined.
+See <a href="#set">8.46:$SET Directive</a>
 
 <p>
 $EQU may have a subfunction which assigns a TYPE to the label.
@@ -8297,7 +8322,7 @@ move.w  $name
 This is useful in dialects where many instructions have the same
 name but the encodings change for different operand types.
 
-See also Section 4.7.10: (function) $t(<i>ARGUMENT</i>) Label Type
+See also <a href="labeltyp">4.7.10: (function) $t(<i>ARGUMENT</i>) Label Type</a>
 
 
 
@@ -9132,11 +9157,11 @@ include addresses from a text encoded binary file, but do not include
 code from it:
 
 <p>
-See also <a href="file_formats">9: Output File Formats, Relocation and Linking,
+See also <a href="#file_formats">9: Output File Formats, Relocation and Linking,
 Giant Address Spaces, Interfacing with GNU Tools</a>
 
 
-<a	href="info"/>
+<a	name="info"/>
 <h2>8.25: $INFO       Linking Directive used within $MAP macro</h2>
 <h3>8.25.1: $INFO, $OFFSET     Replace Information at the Relocation Stack Top</h3>
 
@@ -9194,7 +9219,7 @@ adjustment is made by macro language on the code
 <p>
 When the output becomes absolute, no further relocation tuple is output
 
-<a      href="info_range"/>
+<a      name="info_range"/>
 <h3>8.25.2: $INFO, $RANGE_CHECK
    and   $INFO, $RANGE_CHECK1: Request Linker Automatic Range Checking</h3>
 <pre>
@@ -9242,10 +9267,10 @@ must fit a 48-bit offset maintained in the relocation stack. The final result mu
 Otherwise each add/subtract must fit the target field.
 
 <p>
-See Linker Examples in Section 9.2.3.
+See Linker Examples in <a href="#linkdems">9.2.3: Demonstration Links</a>
 
 
-
+<a	name="linewidth"/>
 <h2>8.26: $LINEWIDTH      Text Encoded Binary Line Length</h2>
 
 <p>
@@ -9257,29 +9282,36 @@ outupt. The default is 60 columns.
 
 
 </pre>
-<h2>8.27: $LIST              Set Inclusion Nest Level for Listing</h2>
+
+<a      name="list"/>
+<h2>8.27: $LIST              Set File Include Depth for Listing</h2>
+<h3>8.27.1: $list <i>include_depth</i></h3>
 
 <p>
-<i><b>$list 0, masking names from list/export</b></i>
+When <b>$LIST</b> is > zero, and lowercase <b>-l</b> (list) is opted,
+source is listed to a file include  depth of the <b>$list</b> value.
+Default is
+<pre>
 
-<p>
-$LIST is initially set to 1, which means the primary assembly
-input file is listed but include files are not listed.
+	$list	1
 
-<p>
-When $LIST is cleared
+</pre>
+This causes the primary input file to be listed, but no include files<br>
+<b>$list 2</b> causes the next depth of include files to be listed, and
+so on up to maximum include depth
+
+<a	name="list_0">
+<h3>8.27.2: $list 0</h3>
+When $list is zero
 <pre>
 
 	$list   0
 
 </pre>
 <p>
-Nothing will be listed. When <b>$LIST</b> is set to more than 1, then 
-with option <b>-l</b>, included source is listed to an include nesting
-depth of the <b>$LIST</b> value.
+Nothing will be listed, and labels are also not exported or included
+in option -x lists
 
-<p>
-Labels are not catalogued for listing or export when <b>$LIST</b> is 0.
 
 <p>
 This allows developers to list the labels in applications without
@@ -9292,7 +9324,7 @@ listing all the names in a complex target machine definition:
 
 </pre>
 <p>
-However labels which are not catalogued for listing are also not
+Labels which are not catalogued for listing are also not
 exported.
 
 <p>
@@ -9391,6 +9423,7 @@ names.msm: object code 52537 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
+<a      name="lit"/>
 <h2>8.28: $LIT               Set Default Location Counter for Literals</h2>
 <pre>
 
@@ -9412,15 +9445,13 @@ the current location counter.
 If there is a label on a $LIT line, the label is a literal pool tag.
 
 <p>
-See Section 4.1.2.1: Describing Address Spaces: Location Counter Controls,
-Section 4.2.3.2.2.4.11: Label Types, and 
-Section 5: Functions and Literals.
+See <a href="#sections">7: Constructing Program Sections</a>, <a href="#lptag">7.1.7: Literal Pool Tag</a>
+<a href="#labeltyp>" 4.7.10: Label Types</a>, and
+<a href="literals">4.5: Literals</a>
 
 <p>
-Automatic literals are literals not triggered by a literal pool
-tag (see section 5.2: Literals), but by a leading parenthesis 
-on expressions encountered at some syntactical points, chiefly
-instruction operands.
+Automatic literals are literals not triggered by a literal pool tag 
+<a href="#literals">4.5: Literals</a>), but by operands and constants in parentheses
 
 <p>
 Automatic literals may be generated if option flag <b>-a</b> is on.
@@ -9434,8 +9465,7 @@ By default option <b>-a</b> is off, and automatic literals are not
 generated.
 
 <p>
-Developers who want automatic literals can include option -<b>a</b>
-in a target definition include file:
+Option -<b>a</b> may be included in target definition iles
 <pre>
 
 	$set_option     "a"
@@ -9563,6 +9593,7 @@ lit.msm: object code 196 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
+<a      name="load"/>
 <h2>8.29: $LOAD		Output Text Encoded Binary</h2>
 
 <p>
@@ -9594,10 +9625,11 @@ data_label	$set,$binary	superword_parameter
 
 </pre>
 <p>
-The subcommand does not have to be the automatic label $BITS, but
-the same size superword must be written as read.
+
+The same size superword must be written as read. $bits contains the size
 
 
+<a      name="lterm"/>
 <h2>8.30: $LTERM             Change Comment Sentinel</h2>
      
 
@@ -9635,11 +9667,12 @@ is the same as
 </pre>
 <p>
 If # is used as the comment sentinel, it cannot 
-also be used as a flag value on the front of 
-operand expressions (see Section 4.2.3.2.2.3: 
+also be used as a flag value on the front of, for example,
+immediate operand expressions. See <a href="#argument_ref">Macro Parameter Reference</a>
 Macro Parameters.
 
 
+<a      name="name"/>
 <h2>8.31: $NAME              Declare Macro Entry Point</h2>         
 
 $NAME is a species of equate.
@@ -9761,6 +9794,7 @@ recognised and 38 has been placed in the upper 6 bits of the
 instruction on line 7.
 
 
+<a      name="nop"/>
 <h2>8.32: $NOP               Do Nothing [+ comment]</h2>
                   
 <p>
@@ -9784,6 +9818,7 @@ preset  equ,$directive     $nop
 
 
 </pre>
+<a	name="note">
 <h2>8.33: $NOTE              Informative Diagnostic, Not Error</h2>   
 
 <p>
@@ -9817,6 +9852,7 @@ if the operand is illegal.
 $NOTE displays on the second assembly pass.
 
 
+<a      name="notef">
 <h2>8.34: $NOTEF             First Pass Informative Diagnostic</h2>
 
 <p>
@@ -9824,6 +9860,7 @@ $NOTEF is similar to $NOTE, except it displays on the first
 assembly pass.
 
 
+<a      name="octal">
 <h2>8.35: $OCTAL             Set Binary Notation to Octal</h2>         
 
 
@@ -9842,13 +9879,13 @@ The default rule is hexadecimal. Each assembly pass starts in leading-zero-hexad
 See also 8.22: $HEX directive
 
 <p>
-See also Section 6.1: Establishing Your Syntax,
-Section 8.51: The <b>$SUFFIX</b> Directive, Section 4.2.3.2.2.1: 
-Number Strings (C-Language Octal/Hex Notataion, Motorola 
-Hex and Bit-List Notation), and Section 3.1: Command
-Line (option flags <b>-mc</b>).
+See also <a href="#describe1">10.1: Establishing Your Syntax</a>,
+<a href="#suffix_directive">8.51: $suffix Directive</a>,
+<a href="#notate2">4.2.2.1: Number Strings</a> (masmx native / C / suffix),
+and <a href="#appendix_a">Appendix A: Command Line</a> (option flags <b>-mc</b>)
 
 
+<a      name="path">
 <h2>8.36: $PATH      	     Alter Include Path</h2>
 
 <p>
@@ -9877,6 +9914,7 @@ Note that Microsoft operating systems recognise the path separator <b>/</b>
 as well as <b>\</b> when programs make file-open calls. Pathnames with <b>/</b>
 separator therefore work on all platforms where <b>masmx</b> suns
 
+<a      name="plist">
 <h2>8.37: $PLIST             Set Depth for Listing Macro Expansion</h2>
 
 
@@ -9910,6 +9948,7 @@ Generated code is listed according to the <b>$LIST</b> level
 and <b>-l</b> option, not the <b>$PLIST</b> level and <b>-pq</b> options.
 
 
+<a      name="proc">
 <h2>8.38: $PROC              Declare Procedural Macro</h2>
    
 
@@ -10243,6 +10282,7 @@ Object Code 92 Bytes: 0 Errors: 0 Undefined Labels
 
 </pre>
 
+<a      name="pushrel">
 <h2>8.39: $PUSHREL	Acquire a Relocation Tuple from a Superword</h2>
 
 <p>
@@ -10472,6 +10512,7 @@ See Section 9: Output File Formats, Relocation and Linking,
 Giant Address Spaces, Interfacing with GNU Tools
 
 
+<a      name="quantum">
 <h2>8.40: $QUANTUM           Select Bit Size of Addressed Object</h2>
 
 <p>
@@ -10486,6 +10527,9 @@ If the address quantum is not the word size, $quantum must follow $word
 	$quantum 8
 
 </pre>
+
+
+<a      name="quote">
 <h2>8.41: $QUOTE            Select Character for Bounding Text Strings</h2>
 
 
@@ -10805,6 +10849,7 @@ an expression and the label will be searched:
 
 </pre>
 
+<a      name="record">
 <h2>8.42: $record</h2>
 <h3>8.42.1: $record		bit-aligned data structures</h3>
 
@@ -10819,8 +10864,9 @@ field2	11s
 </pre>
 Where <b>$record</b> structures are nested, a new <b>$record</b> structure
 starts at the bit position which the immediately preceding <b>$record</b>
-srtucture reached.<br>See 5.2.2 Bit-Aligned Structures
+srtucture reached.<br>See <a href="#bstradata">5.2.2: Bit-Aligned Structures</a>
 
+<a      name="record_b">
 <h3>8.42.1: $record,$branch	bit-aligned structure overlay</h3>
 
 <b>$record,$branch</b> heads an overlaid or redefined structure of bit-aligned
@@ -10836,9 +10882,10 @@ recordB	$record,$branch	[<i>values</i>]
 	$root
 
 </pre>
-See 5.2.2.3: Overlaid Structures $record,$branch
+See <a href="#record_overlay">5.2.2.3: Overlaid Structures $record,$branch</a>
 
 
+<a      name="res">
 <h2>8.43: $RES               Declare a Storage Buffer</h2>             
 
 <p>
@@ -10901,14 +10948,18 @@ linitup.msm: object code 72 bytes: 0 errors: 0 undefined labels
 
 </pre>
 
+<a	name="return"/>
 <h2>8.44: $RETURN            Return a Value from $FUNC..$END</h2>
 
 <p>
 $RETURN may be used to jump out of any macro <b>$PROC..$END</b>
 or <b>$FUNC..$END</b>
 
+<h3>8.44.1: Return a value from a $func Macro</h3>
+Function $RETURN delivers the value of its argument
+
 <p>
-Function $RETURN delivers the value of its argument.
+The return value is used in an expression which invokes a <b>$func</b> macro
 
 <p>
 The function HIGH in the following example returns the upper
@@ -10937,16 +10988,22 @@ Object Code 59 Bytes: 0 Errors: 0 Undefined Labels
 <p>
 Functional results are 192 bits.
  
+<a      name="preturn"/>
+<h3>8.44.2: Return from a $proc Macro</h3>
 
+<b>$return</b> directive leaves a $proc macro before the <b>$end</b> image
 
+<a	name="root"/>
 <h2>8.45: $ROOT              Foot of Structured Name Space</h2>
 
 <p>
-$ROOT is the end of a structured name space. See Section
-8.53: $TREE, 8.4: $BRANCH
+$ROOT is the end of a structured name space.
+See <a href="#stradata">Structured Data and Structured Code Name Spaces</a>,
+<a href="#tree">8.54: $tree</a>, <a href="record">8.42: $record</a>, <a href="branch">8.4: $branch</a>
 
 
 
+<a      name="set"/>
 <h2>8.46: $SET               Assign Reassignable Value to Label</h2>
 
 
@@ -10980,6 +11037,7 @@ which is zero
 	$do	$t(alabelname)=0,	....
 
 </pre>
+<a      name="set_option"/>
 <h2>8.47: $SET_OPTION</h2>
 
 <h3>8.47.1:Set Option Flags</h3>
@@ -11094,6 +11152,7 @@ The option values are listed in Section 3.1: The Command Line
 
 
 
+<a      name="snap"/>
 <h2>8.48: $SNAP              List Label Table</h2>
 
 
@@ -11139,6 +11198,7 @@ pass, unless it has a subcommand of 1
 </pre>
 
 
+<a      name="sterm"/>
 <h2>8.49: $STERM             Change the Substring Sentinel Character</h2>
 
 See also 4.2.2.5 Macro Parameters
@@ -11226,6 +11286,8 @@ is the same as
 	$store	"reloca1.txo"
 
 </pre>
+
+<a      name="suffix_directive"/>
 <h2>8.51: $SUFFIX    Use Suffix for Number String Interpretation</h2> 
 
 
@@ -11311,6 +11373,7 @@ LTERM=;
 <p>
 See also 4.3.2 Number Constants
 
+<a      name="text"/>
 <h2>8.52: $TEXT              Translate Input Text Patterns</h2>
 
 <p>
@@ -11332,6 +11395,7 @@ them will not be used.
 <p>
 See also 10.1: Establishing your Syntax
 
+<a      name="trace"/>
 <h2>8.53: $TRACE             Display Value</h2>
         
 <p>
@@ -11372,11 +11436,13 @@ When a macro actual argument is an automatic literal, $TRACE
 obtains the literal value and not the literal address
 
 
+<a      name="tree"/>
 <h2>8.54: $TREE              Head of Structured Name Space</h2>
 
 
 <p>
 $TREE is used to structure a name space containing data or code.
+See also <a href="#stradata">5.2: Structured Data and Structured Code Name Spaces</a>
 
 <p>
 The structure is ended with $ROOT. The tree must 
@@ -11752,6 +11818,7 @@ ppcsinga.msm: object code 924 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
+<a      name="twoscomp"/>
 <h2>8.55: $TWOS_COMPLEMENT   Change Negative Integer Representation</h2>
 
 
@@ -11824,6 +11891,7 @@ Object Code 221 Bytes: 0 Errors: 0 Undefined Labels
 
 </pre>
 
+<a      name="word"/>
 <h2>8.56: $WORD              Set the Size of a Target Computer Word</h2>
 
 <p>
@@ -11921,6 +11989,7 @@ Suitable parameters for 8-bit microcontrollers are
 
 </pre>
 
+<a      name="xqt_i"/>
 <h2>8.57: $xqt_i		run-time integer algorithm plotter</h2>
 
 <b>$xqt_i</b> directive generates a runtime integer algorithm instruction stream
@@ -11931,6 +12000,7 @@ Suitable parameters for 8-bit microcontrollers are
 </pre>
 See section <b>6.1: Run-Time Integer Algorithm Plotter $xqt_i</b>
 
+<a      name="xqt_fp"/>
 <h2>8.58: $xqt_fp		run-time floating algorithm plotter</h2>
 
 <b>$xqt_fp</b> directive generates a runtime floating algorithm instruction stream
@@ -11942,6 +12012,7 @@ See section <b>6.1: Run-Time Integer Algorithm Plotter $xqt_i</b>
 </pre>
 See section <b>6.2: Run-Time Floating Algorithm Plotter $xqt_fp</b>
 
+<a      name="zcp"/>
 <h2>8.59: $zero_code_point  character string escaped zero value</h2>
 
 <b>$zero_code_point</b> directive sets the value which represents embedded zero in a quoted string
