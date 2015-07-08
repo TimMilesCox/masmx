@@ -141,7 +141,9 @@ as possible are executed.
 masmx saves electronics and energy, and may be used as the substance of thin-layer compilers.<br>
 masmx makes the miniature more possible, and can multiply the performance of giant servers by ten- and twentyfold.<br>
 Language compilers can be reinvented to generate a common macro-assembly language for all targets<br>
-See <a href="#roadmap">Appendix C: Road Map</a>, <a href="#languages">Appendix D: High Level Languages</a>
+See <a href="#roadmap">Appendix C: Road Map</a>, <a href="#languages">Appendix D: High Level Languages</a><br>
+Compiler/target portation becomes instantaneous and target code efficiency is written and tuned in open text<br>
+Any PC has a developer toolchain for any target
 </blockquote>
 </div>
 
@@ -571,6 +573,9 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 
 Appendix A: <a href="#commandline">masmx Command Line</a>
+	 A.a:	<a href="#clopts">Command Line Option Flags</a>
+	 A.b:	<a href="#uclopts">Developer Assembly Switch and Trace Option Flags</a>
+
 Appendix B: <a href="#whatsnew">What's new in 7r3?</a>
 Appendix C: <a href="#roadmap">The masmx Product Road Map</a>
 Appendix D: <a href="#languages">masmx's Potential for High Level Languages</a>
@@ -776,7 +781,8 @@ Structured Data
 
 masmx can construct and label complex hierarchical data which does not map to the target architecture<br>
 but instead groups and overlays bit-fields of arbitrarily large size.
-See <a href="#bstradata">5.2.2: Bit-Aligned Structures</a>
+See <a href="#bstradata">5.2.2: Bit-Aligned Structures</a><br>
+masmx solves a problem which has produced noticeable difficulty for compiler writers
 
 
 <a      name="bitaccess"/>
@@ -1290,7 +1296,7 @@ octal, depending $octal or default $hex directives. Leading digit
 By default 1000 and 03e8 mean one thousand
 
 <p>
-With $octal 1000 and 01750 mean one thousand
+With directive <a href="#octal">$octal</a> 1000 and 01750 mean one thousand
 
 <p>
 character strings are space filled to containing word in absence
@@ -1887,13 +1893,13 @@ setbyte	$equ,"$directive"  "$byte" . setbyte is the same directive (and function
 
 </pre>
 <p>
-See also <a href="option_m">option -m</a>,
-<a href="motorola">Motorola old Number Notation (4.2.2.1.3)</a>, and
-<a href="option_Q">option -Q</a>
+See also <a href="#option_m">option -m</a>,
+<a href="#motorola">Motorola old Number Notation (4.2.2.1.3)</a>, and
+<a href="#option_Q">option -Q</a>
 
 <p>
 
-A token in the command field only begins with a quote if it is a <a href="#text_string"text string (4.3.5)</a>
+A token in the command field only begins with a quote if it is a <a href="#text_string">text string (4.3.5)</a>
 
 <p>
 Directive names and macro names always are recognised in the command field without quotes
@@ -2559,7 +2565,8 @@ $(12:65536)
 
 
 </pre>
-See also Appendix A: Command Line, Options -zc for space or zero pad
+See also Appendix A.a: Command Line Option Flags -zc for space or zero pad
+<a href="#option_z">-z</a> <a href="#option_c">-c</a>
 
 <p>
 Text string constants are described further in 
@@ -2671,11 +2678,16 @@ jump*		$proc
 
 
 Most code lines have macro calls in the command position.
-That's how instructions are in masmx.
+Instructions are macros in masmx
 
 <p>
 Instruction names are not known to masmx until
 they are the names of macros or macro entry points:
+
+<p>
+See also <a href="#proc">8.38: Head of Procedural Macro</a> and
+<a href="#u2passproc">10.2.2.6: The Two-pass $PROC</a>
+
 <pre>
 
 instruction_form $form	8, 12, 12
@@ -2877,9 +2889,31 @@ not reached -r flag displays macros on the first assembly pass.
 
 <p>
 See <a href="#plist">8.38: $plist Directive</a>,
-<a href="#commandline">Appendix A: Command Line</a> (Options),
+<a href="#clopts">Appendix A.a: Command Line Option Flags</a>,
 <a href="#walkingmacro">Appendix E.4: Tracing Macro Expansion</a>
 
+
+<p>
+An actual argument to a <b>$proc</b> macro may be placed in the command
+field of it is a command, for example a further macro name.
+
+<p>
+This extract is from macro language illustrated at
+<a href="#fpalgors">6.2: Run-Time Floating Algorithm Plotter</a><br>
+A macro name is found in actual arguments and inserted into the assembly
+<pre>
+
+p       $proc
+FOP*    $name
+"$TYPE" $set    $t(p(1, 1))
+"$RING" $set    0
+        $do     p()>1,  $do     $t(p(2, 1))=$name,"$RING"       $set    p(2, 1)
+        $if     $RING=IEEE754_64_ACQUIRE$
+        p(2, 1) p(1)
+	.
+	.
+
+</pre>
 <p>
 $proc macros are described in detail with application to instruction
 code definition in Section 6.2: Describing Target Architecture in Text
@@ -3026,7 +3060,7 @@ The default literal pool is at the segment-end of the default
 location counter for literals, initially locator $(0).
 
 <p>
-Command line flag -a opts automatic literals. Assembly source
+Command line <a href="#option_a">option -a</a> switches automatic literals. Assembly source
 may set this and most other option flags, typically in target
 definition header files
 <pre>
@@ -3908,7 +3942,8 @@ of one program section. The parts may share program-visible address space
 <p>
 If assembly flag -v is set, <i>breakpoint_value</i> is an abstraction like a handle or block identifier,<br>
 and the binary output appends it to load string addresses without interpreting it. A section defined by location counter<br>
-may have many partss with different storage block identifiers. See 7.1.2.2: Breakpointed Location Counters: -v Option
+may have many partss with different storage block identifiers.
+See <a href="#vbreakpt">7.1.2.2: Breakpointed Location Counters: -v Option</a>
 
 <p>
 Whether the section breakpoint address is absolute or a translatable value, $bank_index function retrieves the current breakpoint<br>
@@ -4138,9 +4173,16 @@ parentheses, and 1 is returned if the equivalent flag is on, for example:
 	$endif 
 
 </pre>
-The flag is set by any of -abcdefghijklmnopqrsuvwxyzEFGQZ+ anywhere 
-on the command line, or with the  $SET_OPTIONS directive.
+Flags -<b>abcdefghjklmnopqrsuvwxyzDFGQYZ+</b> are set at any or several positions of
+the <a href="#commandline">command line</a><br>
+or with the exception of flags -<b>ksy</b> with the <a href="#set_option">$set_option</a> directive
 
+<p>
+Flags used by masmx are listed at <a href="clopts">A.a: Command Line Option Flags</a>
+
+<p>
+Flags -<b>VUOS</b> may be used to switch and trace assembly language code
+and may for this purpose also be opted at the command line
 
 
 <a      name="region"/>
@@ -4418,8 +4460,8 @@ of "$" for "."
 
 <p>
 Without the quotes $ is evaluated functionally and "." receives
-the current location value. See also <a href="option_Q">-Q option</a>
-and <a href="option_m">-m option</a>
+the current location value. See also <a href="#option_Q">-Q option</a>
+and <a href="#option_m">-m option</a>
 
 
 <a      name="lt_proc"/>
@@ -6547,7 +6589,7 @@ Program code never accesses the physical load
 address except via masmx internal function $bank_index (Section 4.6.5)
 
 <a      name="vbreakpt"/>
-<h4>7.1.2.2: The Breakpointed Location Counter: -v Option</h4>
+<h4>7.1.2.2: Breakpointed Location Counters: -v Option</h4>
 
 If -v option is applied, the treatment of breakpoint values is different.
 
@@ -6656,7 +6698,7 @@ STERM=.
 </pre>
 
 <a      name="bdbreakpt"/>
-<h3>7.1.4: The Breakpointed Location Counter:
+<h3>7.1.4: Breakpointed Location Counters:
              Base+Displacement in Translated Address Spaces</h3>
 
 The following example has a base+displacement segment at a high
@@ -6846,7 +6888,7 @@ pusingv.msm: object code 18447 bytes: 0 errors: 0 undefined labels
 
 </pre>
 <a      name="giantspace"/>
-<h3>7.1.6: The Breakpointed Location Counter: Giant Address Spaces</h3>
+<h3>7.1.6: Breakpointed Location Counters: Giant Address Spaces</h3>
 
 <a      name="giantdirect"/>
 <h4>7.1.6.1: Very Large Direct Addressed Segments</h4>
@@ -8975,10 +9017,10 @@ $SUFFIX directive (see section 8.50: $SUFFIX Directive) changes
 the interpretation of number strings. 
 
 <p>
-The <b>-c</b> flag changes number syntax to C language for hex and octal.
+<a href="#option_c">option flag -c</a> changes number syntax to C language for hex and octal.
 
 <p>
-The <b>-m</b> option turns on Motorola $hex syntax, @octal and %bit_pattern.
+<a href="#option_m">option flag -m</a> turns on Motorola $hex syntax, @octal and %bit_pattern.
 
 
 
@@ -9090,7 +9132,7 @@ they are relocatable, default behaviour collects the segments
 exactly in order of appearance.
 
 <p>
-Option flag <b>-b</b> causes instead all the relocatable segments of all
+<a href="#option_b">option flag -b</a> causes instead all the relocatable segments of all
 the binary files included to be collated by section.
 
 <p>
@@ -9456,26 +9498,26 @@ If there is a label on a $LIT line, the label is a literal pool tag.
 
 <p>
 See <a href="#sections">7: Constructing Program Sections</a>, <a href="#lptag">7.1.7: Literal Pool Tag</a>
-<a href="#labeltyp>" 4.7.10: Label Types</a>, and
-<a href="literals">4.5: Literals</a>
+<a href="#labeltyp">4.7.10: Label Types</a>, and
+<a href="#literals">4.5: Literals</a>
 
 <p>
-Automatic literals are literals not triggered by a literal pool tag 
-<a href="#literals">4.5: Literals</a>), but by operands and constants in parentheses
+Automatic literals are literals not triggered by a literal pool tag
+(<a href="#lpooltag">4.5.5: Literal Pool Tags</a>), but by operands and constants in parentheses
 
 <p>
-Automatic literals may be generated if option flag <b>-a</b> is on.
+Automatic literals may be generated if <a href="#option_a">option flag -a</a> is opted
 
 <p>
 Developers not wishing leading parenthesis on an operand to 
-trigger literal generation can let option <b>-a</b> default.
+trigger literal generation should not opt <a href="#option_a">flag -a</a>
 
 <p>
-By default option <b>-a</b> is off, and automatic literals are not
+By default <a href="#option_a">option flag -a</a> is off, and automatic literals are not
 generated.
 
 <p>
-Option -<b>a</b> may be included in target definition iles
+<a href="#option_a">option flag -a</a> may be included in target definition files
 <pre>
 
 	$set_option     "a"
@@ -9892,7 +9934,7 @@ See also 8.22: $HEX directive
 See also <a href="#describe1">10.1: Establishing Your Syntax</a>,
 <a href="#suffix_directive">8.51: $suffix Directive</a>,
 <a href="#notate2">4.2.2.1: Number Strings</a> (masmx native / C / suffix),
-and <a href="#appendix_a">Appendix A: Command Line</a> (option flags <b>-mc</b>)
+<a href="#option_c">command line option flag -c</a> and <a href="#option_m">-m</a>
 
 
 <a      name="path">
@@ -10232,6 +10274,7 @@ StackOk:
 The label StackOK is not exported from the macro expansion. Therefore
 it stopped existing when the macro exited on the first assembly pass.
 So the macro needs a preliminary pass on the second main assembly pass.
+See also  <a href="#u2passproc">10.2.2.6: The Two-pass $proc</a>
 
 <p>
 A $PROC line can have a location counter argument in syntax $(n)
@@ -13270,7 +13313,7 @@ $01:000A00D4
 
 
 <p>
-The second link uses <b>-b</b> option, which collects the segments by section.
+The second link uses <a href="#option_b">option -b</a>, which collects the segments by section.
 
 <p>
 A start address has to be given for each section.
@@ -14970,7 +15013,7 @@ The quotes are necessary to give "$" "$r" "$t" the new names
 . .locator_id .class
 
 <p>
-Directives beginning with $ when Motorola Hex (option <b>-m</b>) is
+Directives beginning with $ when Motorola Hex <a href="#option_m">option flag -m</a> is
 asserted are still recognised in the command field, but not
 in the subcommand or argument fields. If your code has many
 directives with other names, you may alias masmx directives:
@@ -16332,13 +16375,16 @@ the 8051 definition header says
 	$set_option     "u"
 
 </pre>
-<h2>A.2: Command Line Options</h2>
+
+<a	name="clopts"/>
+<h2>A.a: Command Line Option Flags</h2>
 
 
 The full set of masmx command line options are
 <pre>
 
 
+		<a	name="option_a"/>
 	-a      allow automatic literals
 
 		a literal is a storage constant which is
@@ -16362,8 +16408,10 @@ The full set of masmx command line options are
 
 		-see section 5.2: Literals
 
+		<a	name="option_b"/>
 	-b	linker option: collate all input files by section
 
+		<a	name="option_c"/>
 	-c      C language hex and octal Notation
 		C Language \escape sequences in strings
 		aligned strings zero padded. See also -z option
@@ -16444,6 +16492,7 @@ The full set of masmx command line options are
 	-l      list source and assembly when the $LIST setting is 
 		higher than the current include nesting depth
 
+		<a	name="option_m"/>
 	-m       Motorola Hex, Octal and Bit Notation
 
 		-m flag is for	$hex
@@ -16584,6 +16633,7 @@ The full set of masmx command line options are
 		-see Section 8.28: $LIST directive
 				   $list 0, masking names from list/export
 
+		<a	name="option_z"/>
 	-z	Pad aligned quoted strings with zero.
 		Default behaviour is to space fill.
 
@@ -16694,6 +16744,7 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 
 
 
+		<a	name="option_Q"/>
         -Q      execute a function name encountered in an
                 expression even if it is in quotes
 
@@ -16776,54 +16827,25 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 
 </pre>
 
+<a	name="uclopts"/>
+<h2>Appendix A.b: Developer Assembly Switch and Trace Option Flags</h2>
+
+Flags -<b>VUOS</b> may be used to switch and trace assembly language code
+and may for this purpose also be opted at the command line. Code can examine
+command line option flags with masmx function <a href="#oflag">4.7.7: $o()</a>
+
+
 
 <a      name="whatsnew"/>
-<h1>Appendix B: What's new in 7r2?</h1>
-<ul>
+<h1>Appendix B: What's new in 7r3?</h1>
 
-Faster
+	<blockquote>
+	<a href="#stribata">Bit-Aligned Structures</a><br><br>
 
-<pre></pre>
-More Stable
+	<a href="#algors">Run-Time Algorithm Plotter</a><br><br>
 
-<pre></pre>
-Address Schemes Better Integrated
-
-<pre></pre>
-Inconsistencies Removed
-
-<pre></pre>
-<b>$path</b> directive helps neat and efficient inclusion
-across file trees.
-
-<pre></pre>
-Has Linker
-
-<pre></pre>
-Assembles gcc Output
-<pre></pre>
-Macros concealed in macros:
-
-</ul>
-
-<pre>
-
-one*	$proc
-two*	$proc
-three*	$func
-	$end
-	$end
-	$end
-
-</pre>
-<pre></pre>
-$RES buffers (section 8.43) may be zero-filled instead of void
-
-<pre></pre>
-The command line option flags are newly case significant and there are now
-28 of them: <b>-abcdefghijklmnopqrsuvwxyzQZ+</b>
-(section 3.2: Command Line Options)
-
+	<a href="#path">$path</a> directive adds readability and structure to file inclusion across directory trees
+	</blockquote>
 
 <a      name="roadmap"/>
 <h1>Appendix C: The masmx Product Road Map</h1>
@@ -16935,7 +16957,7 @@ to the target architecture
 Bit-Aligned structuring can redefine and overlay storage without limit
 
 <p>
-Word-aligned structuring <b>$tree></b>..<b>$root</b> is completely analogous to bit-aligned
+Word-aligned structuring <b>$tree</b>..<b>$root</b> is completely analogous to bit-aligned
 structuring, but generates all fields at word boundaries
 
 <h2>D.3: RunTime Algorithm Plotting</h2>
