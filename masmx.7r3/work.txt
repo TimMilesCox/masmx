@@ -140,7 +140,8 @@ as possible are executed.
 
 masmx saves electronics and energy, and may be used as the substance of thin-layer compilers.<br>
 masmx makes the miniature more possible, and can multiply the performance of giant servers by ten- and twentyfold.<br>
-Language compilers can be reinvented to generate a common macro-assembly language for all targets
+Language compilers can be reinvented to generate a common macro-assembly language for all targets<br>
+See <a href="#roadmap">Appendix C: Road Map</a>, <a href="#languages">Appendix D: High Level Languages</a>
 </blockquote>
 </div>
 
@@ -529,11 +530,11 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    5.	<a href="#link5">Link an Accumulated Relocatable</a>
 		plus a New Relocatable					9.2.3.5
 
-	    6.	<a href="#link6">The Incremental Link</a>					9.2.3.6
+	    6.	<a href="#link6">Incremental Link</a>					9.2.3.6
 
-	    7.	<a href="#link7">The Link in Giant Address Space</a>				9.2.3.7
+	    7.	<a href="#link7">Link in Giant Address Space</a>				9.2.3.7
 
-	    8.	<a href="#link8">The Incremental Link in Giant Address Space</a>		9.2.3.8
+	    8.	<a href="#link8">Incremental Link in Giant Address Space</a>		9.2.3.8
 
 	    9.	<a href="#link9">Linking with Void Inclusion</a>				9.2.3.9
 
@@ -580,9 +581,8 @@ Appendix E: <a href="#fixing">Tuning Macro Language and Fixing Problems</a>
 	 E.3:	<a href="#labelrefind">Changed Label Value Disappears</a>
 	 E.4:	<a href="#walkingmacro">Tracing Macro Expansion</a>
 	 E.5:	<a href="#alias_fun">Aliasing masmx Internal Functions</a>
-	 E.6:	<a href="#labelshifted">Diagnostic about a Label Address</a>
+	 E.6:	<a href="#labelshifted">Diagnostic about a Label Address or Literal Table Start Address</a>
 	 E.7:	<a href="#labelhidden">Label fails to be Exported</a>
-	 E.8:	<a href="#endshifted">Literal Table overlaps Trailing Edge of Code</a>
 
 Appendix F: <a href="#targets">Target Descriptions</a>
 	 F.1:	<a href="#8051">8051</a>
@@ -1486,7 +1486,7 @@ Directive $suffix 1 defaults leading zero to hex
 
 <p>
 Storage constant numbers in all notations may also have a storage  
-words suffix [s d l t q p h o]. See 4.2.2.3: Number constants
+words suffix [s d l t q p h o]. See <a href="nconstant">4.2.3.3: Number constants</a>
 
 
 <a      name="labelref"/>
@@ -1502,7 +1502,8 @@ macro names, $do loop tags) may be referenced in expressions
 </pre>
 Most labels return an absolute or a relocatable value. Some labels work
 functionally and return a computed value.<br>
-See 4.2.1.2.3: Assembler-Supplied Functions and 4.2.1.2.4 Function Macro Reference
+See <a href="ifunction">4.2.2.3: masmx-Supplied Functions</a>
+and <a href="func_macro">4.2.2.4 Function Macro Reference</a>
 
 <p>
 Labels may be bounded with quotes on reference
@@ -7179,9 +7180,9 @@ than 4 gigaquanta without being stepped. The default of
 the giant part of $AWIDTH is 48 and the limit is 192.
 
 <p>
-See also Section 8.2: $AWIDTH directive
-See also Section 9: Output File Formats, Relocation and Linking,
-Giant Address Spaces, Interfacing with GNU Tools.
+See also <a href="#awidth">8.2: $awidth</a> directive<br>
+See also <a href="#file_formats">9: Output File Formats, Relocation and Linking,
+Giant Address Spaces, Interfacing with GNU Tools</a>
 
 
 <a      name="lptag"/>
@@ -7189,7 +7190,7 @@ Giant Address Spaces, Interfacing with GNU Tools.
 
 Literals may be generated in any sort of segment where code is
 allowed. The only other sort of segment is a void segment, sometimes known
-as a dsect. That's a base-displacement segment with no addresses
+as a dsect. That is a base-displacement segment with no addresses
 and no relocation rule.
 
 <p>
@@ -7402,8 +7403,8 @@ The maximum size of the second or giant-stepped part is 192 bits.
 See Section 4.1.2.1: Describing the Address Space: Location Counter Controls.
 
 <p>
-See Section 9: Output File Formats, Relocation and Linking,
-Giant Address Spaces, Interfacing with GNU Tools.
+See <a href="#file_formats">9: Output File Formats, Relocation and Linking,
+Giant Address Spaces, Interfacing with GNU Tools</a>
 
 
 <a      name="blank"/>
@@ -9192,8 +9193,8 @@ indicate manipulation (shift/truncate) of the value after relocation.
 Otherwise the offset is obtained from the code.
 
 <p>
-See Section 9: Output File Formats, Relocation and Linking,
-Giant Address Spaces, Interfacing with GNU Tools
+See <a href="#file_formats">9: Output File Formats, Relocation and Linking,
+Giant Address Spaces, Interfacing with GNU Tools</a>
 
 <p>
 New offset carries an adjusted value forward in cumulative links.
@@ -9309,12 +9310,21 @@ When $list is zero
 
 </pre>
 <p>
-Nothing will be listed, and labels are also not exported or included
-in option -x lists
-
+Nothing will be listed, and labels declared while $list = zero are also not
+exported or included in option -x lists
 
 <p>
-This allows developers to list the labels in applications without
+When $list is < zero
+<pre>
+
+	$list	-1
+
+</pre>
+Nothing is listed, but labels declared while $list < zero may be exported.
+See <a href="#labelhidden">Appendix E.7: Label fails to be exported</a>
+
+<p>
+$list &le; zero allows developers to list the labels in applications without
 listing all the names in a complex target machine definition:
 <pre>
 
@@ -10508,8 +10518,8 @@ unresolved relocation tuples. All internally stacked  relocation
 tuples have been actioned and are removed.
 
 <p>
-See Section 9: Output File Formats, Relocation and Linking,
-Giant Address Spaces, Interfacing with GNU Tools
+See <a href="#file_formats">9: Output File Formats, Relocation and Linking,
+Giant Address Spaces, Interfacing with GNU Tools</a>
 
 
 <a      name="quantum">
@@ -12045,10 +12055,12 @@ Note: zcp.msm Line 5: \escaped expression equals $zero_code_point
 
 </pre>
 
+<a	name="file_formats"/>
 <h1>9: Output File Formats, Relocation, Linking, Giant Address Spaces
    Interfacing with GNU Tools</h1>
 
 
+<a      name="txo"/>
 <h2>9.1: Text Encoded Binary Format, S-Records and Intel Hex Records</h2>
 
 <p>
@@ -12211,7 +12223,7 @@ PROMPT\>imx uart.txo uart.hex
 </pre>
 
 <p>
-And that produces
+That produces
 <pre>
 
 
@@ -12334,9 +12346,11 @@ to copy the S-records to binary. objcopy otherwise refuses. Transfer
 address is the S7 record.
 
 
+<a      name="linking"/>
 <h2>9.2: Relocation, Linking, Giant Addresses and Interfacing with GNU Tools</h2>
 
 
+<a      name="relinfo"/>
 <h3>9.2.1: Relocation Information in Text Encoded Binary</h3>
 
 <p>
@@ -12565,6 +12579,7 @@ $01:00000000
 
 </ul>
 
+<a      name="linkbasic"/>
 <h3>9.2.2:  masmx Linking in Principle</h3>
 
 
@@ -12846,6 +12861,7 @@ macro relocate
 
 </ul>
 
+<a      name="linkdems"/>
 <h3>9.2.3: Demonstration Links</h3>
 
 
@@ -13171,6 +13187,7 @@ The call to soso is relative, so the unrelocated address is
 "unknown" minus hex 00000044 = FFFFFFBC
 
 
+<a      name="link1"/>
 <h4>9.2.3.1: The Simplest Link</h4>
 
 
@@ -13247,6 +13264,8 @@ $01:000A00D4
 
 
 </pre>
+
+<a      name="link2"/>
 <h4>9.2.3.2: Link Collected by Section</h4>
 
 
@@ -13295,6 +13314,7 @@ map2.msm: object code 962 bytes: 0 errors: 0 undefined labels
 
 </pre>
 
+<a      name="link3"/>
 <h4>9.2.3.3: Link Specific Segments</h4>
 
 
@@ -13339,6 +13359,10 @@ map3.msm: object code 994 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
+
+
+
+<a      name="link4"/>
 <h4>9.2.3.4: Link an Output Relocatable</h4>
 
 
@@ -13628,6 +13652,7 @@ relocation. masmx suppresses relocation information in
 if <b>location_X</b> and <b>location_Y</b> are in the same segment.
 
 
+<a      name="link5"/>
 <h4>9.2.3.5: Link an Accumulated Relocatable plus a New Relocatable</h4>
 
 
@@ -13667,7 +13692,10 @@ map5.msm: object code 1072 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
-<h4>9.2.3.6: The Incremental Link</h4>
+
+
+<a      name="link6"/>
+<h4>9.2.3.6: Incremental Link</h4>
 
 
 <p>
@@ -13706,7 +13734,8 @@ $ diff -w image5.txo image6.txo
 $ 
 
 </pre>
-<h4>9.2.3.7: The Link into Giant Address Space</h4>
+<a      name="link7"/>
+<h4>9.2.3.7: Link into Giant Address Space</h4>
 
 
 <p>
@@ -14458,7 +14487,10 @@ index	$do	p(),	word	p(index, 1)
 	$end	. $MAP
 
 </pre>
-<h4>9.2.3.8: The Incremental Link in Giant Address Space</h4>
+
+
+<a      name="link8"/>
+<h4>9.2.3.8: Incremental Link in Giant Address Space</h4>
 
 
 <p>
@@ -14588,8 +14620,8 @@ $24:00000028
 
 </pre>
 
+<a      name="link9"/>
 <h4>9.2.3.9: Linking with Void Inclusion</h4>
-
 
 <p>
 The ninth and tenth links have void inclusions. A void inclusion integrates
@@ -14643,6 +14675,9 @@ $01:000A00F4
 
 
 </pre>
+
+
+<a      name="link10"/>
 <h4>9.2.3.10: Linking With Void Inclusion in Giant Address Space</h4>
 
 
@@ -14732,8 +14767,10 @@ $24:00000028
 
 </pre>
 
+<a      name="describe"/>
 <h1>10:  Describing Target Architecture in Text</h1>
 
+<a      name="describe1"/>
 <h2>10.1: Establishing your Syntax</h2>
 
 
@@ -15016,6 +15053,7 @@ All $TEXT directive lines must be together in your header.
 masmx will only search one sequence of $TEXT in the label
 table, for efficiency.
 
+<a      name="describe2"/>
 <h2>10.2: Describing the Target Architecture</h2>
 
 
@@ -15030,6 +15068,7 @@ language line.
 
 
 
+<a      name="architecture"/>
 <h3>10.2.1: $WORD, $BYTE, $QUANTUM, $AWIDTH</h3>
 
 	       
@@ -15115,6 +15154,7 @@ See also section 9:	Output File Formats, Relocation and Linking,
 			Giant Address Spaces, Interfacing with GNU Tools
 
 
+<a      name="macro"/>
 <h3>10.2.2: $FORM, $PROC, $NAME, $END</h3>
 
 
@@ -15122,6 +15162,7 @@ See also section 9:	Output File Formats, Relocation and Linking,
 These four directives are the building blocks of machine
 instructions and architectural descriptors.
 
+<a      name="uform"/>
 <h4>10.2.2.1: The $FORM Template</h4>
 <pre>
 
@@ -15138,6 +15179,7 @@ instructions for PowerPC have the layout
 
 
 </pre>
+<a      name="uproc"/>
 <h4>10.2.2.2: The $PROC Header</h4>
 <pre>      
 
@@ -15170,16 +15212,17 @@ p       $proc
 lwz*	$name	OPCODE_LWZ
 stw*	$name	OPCODE_STW
 	.
-	$instruction_form   p(0, 1), p(1, 1) .index\p(1, 2), p(1, 2)
+	$instruction_form   p(0, 0), p(1, 1) .index\p(1, 2), p(1, 2)
 	$end
 
 </pre>
 <p>
-p(0, 1) references the command on the call line,
+p(0, 0) references the command on the call line,
 p(1, 1) the first argument subfield. See Section 
-4.2.3.2.2.3: Macro Parameters
+4.2.3.2.2.3: Macro Parameter Reference
 
 
+<a      name="uname"/>
 <h4>10.2.2.3: The $NAME Entry Point</h4>
  <pre> 
 
@@ -15203,12 +15246,14 @@ One $PROC macro may generate several instructions
 with similar layout. Such a macro has several
 $NAME entry points.
 
+<a      name="uend"/>
 <h4>10.2.2.4: The $END Macro Footer</h4>
 
 <p>
 $END ends a subassembly (the macro or the main assembly).
 
 
+<a      name="usample"/>
 <h4>6.2.2.5: Minimal Instruction Macro Example</h4>
 
 <p>
@@ -15260,6 +15305,7 @@ will generate
 </pre>
 
 
+<a      name="u2passproc"/>
 <h4>10.2.2.6: The Two-pass $PROC</h4>
 
 
@@ -15289,11 +15335,12 @@ necessary for any labels which are forward-referenced and not global.
 
 
 
+<a      name="uprocaside"/>
 <h4>10.2.2.7 The Out of Line $PROC</h4>
 
 
 <p>
-A location counter with the strict syntax $(expression) can be coded
+A location counter $(<i>counter</i>) may be coded
 as the first or second argument on a $PROC directive
 <pre>
 
@@ -15310,10 +15357,12 @@ aside*	$proc	$(6)
 
 </pre>
 <p>
-The $(expression) part may be the second argument when the two-pass
-asterisk * flag is the first argument.
+If the two-pass flag * is present it is the first argument
+and $(<i>counter</i>) is the second argument
 
 
+
+<a      name="unested"/>
 <h4>10.2.2.8: Nested Macro Descriptions</h4>
 
 <p>
@@ -15414,8 +15463,11 @@ index	$do	A_LOT,	copyright
 	$end
 
 </pre>
+
+<a	name="legacyx"/>
 <h2>10.3: Synthesising Legacy Automatic Macros</h2>
 
+<a      name="legacyfun"/>
 <h3>10.3.1: Synthesising Legacy Functional Macros</h3>
 
 <p>
@@ -15508,6 +15560,7 @@ Object Code 58 Bytes: 0 Errors: 0 Undefined Labels
 <p>
 However you may need to generate little-endian.
 
+<a      name="legacycom"/>
 <h3>10.3.2: Synthesising Legacy Command Macros</h3>
 
 <p>
@@ -15682,9 +15735,11 @@ To explain the <b>DW</b> macro
 
 
 
+<a      name="afloat"/>
 <h1>11: Alternative Floating Formats</h1>
 
 
+<a      name="masmxfloat"/>
 <h2>11.1: masmx Floating Format</h2>
 
 The default masmx floating number is the the 192-bit
@@ -15709,9 +15764,11 @@ but the scheme
 </pre>
 is only changed with macro language
 
+<a      name="ieeefloat"/>
 <h2>11.2: IEEE754 Floating Values</h2>
 
 
+<a      name="fpdifferences"/>
 <h3>11.2.1: Differences between masmx FLoating Format at IEEE754 Floating Formats</h3>
 
 <p>
@@ -15817,6 +15874,7 @@ MASMX 7r2
 
 </pre>
 
+<a      name="ieeemacro"/>
 <h3>11.2.2: Macro-Language Generation of IEEE754 FLoating Constants</h3>
 
 The macro language for generating IEEE754 floating values is shown here.
@@ -16084,6 +16142,7 @@ MASMX 7r2
 
 
 
+<a      name="commandline"/>
 <h1>Appendix A: masmx Command Line</h1>
 
 An example assembly command may have the shape
@@ -16257,8 +16316,8 @@ options
 The similar utility for S-records (32-bit address) is mmx
 
 <p>
-See Section 9: Output File Formats, Relocation and Linking,
-Giant Address Spaces, Interfacing with GNU Tools.
+See <a href="#file_formats">9: Output File Formats, Relocation and Linking,
+Giant Address Spaces, Interfacing with GNU Tools</a>
 
 <p>
 This example has no link. Application called fastpass is
@@ -16592,15 +16651,6 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 		translate only unescaped quoted symbols
 
 
-	-E	accept new equation of a label which is already
-		equated ($equ directive), with a warning diagnostic
-
-		default behaviour retains the first and discards
-		the new value with a warning diagnostic
-
-		$set directive freely restates labels without restriction
-
-
 	-F	floating point rounding guard pattern is 110
 		instead of 111
 
@@ -16727,6 +16777,7 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 </pre>
 
 
+<a      name="whatsnew"/>
 <h1>Appendix B: What's new in 7r2?</h1>
 <ul>
 
@@ -16774,11 +16825,16 @@ The command line option flags are newly case significant and there are now
 (section 3.2: Command Line Options)
 
 
+<a      name="roadmap"/>
 <h1>Appendix C: The masmx Product Road Map</h1>
 
+<p>
+The first C compiler generating target-independent macro-assembly
+language shall be begun. See <a href="#languages">Appendix D.1:
+A Target-Independent Macro-Assembly Language</a>
 
 <p>
-One further tool is planned to convert relocatable Text Encoded Binaries
+A further tool is planned to convert relocatable Text Encoded Binaries
 to ELF, because macro language alone cannot quite do this.
 
 <p>
@@ -16786,7 +16842,7 @@ Further output converters like the already-packaged imx (irec)
 and mmx (srec) may be distributed on request.
 
 <p>
-It is otherwise intended mainly to distribute macro source for new
+It is otherwise intended mainly to distribute macro text for new
 targets on request.
 
 <p>
@@ -16794,6 +16850,7 @@ All requests to masmx@gmx.ch
 
 
 
+<a      name="languages"/>
 <h1>Appendix D: masmx's Potential for High Level Languages</h1>
 
 <h2>D.1: A Target-Independent Macro-Assembly language</h2>
@@ -16890,10 +16947,11 @@ integer expression are resolved at assembly time. The compiler need neither
 understand the target architecture nor order the expression sequence
 
 
-
+<a	name="fixing"/>
 <h1>Appendix E: Tuning Macro Language and Fixing Problems</h1>
 
-<h2> 11.1: Fixing a Macro Parameter Reference</h2>
+<a      name="paramrefix"/>
+<h2>E.1: Fixing a Macro Parameter Reference</h2>
 
 <p>
 If a macro appears unable to reference an actual parameter, equate a
@@ -16918,7 +16976,8 @@ actual parameter is not predictable to the macro, and referencing it
 may, for example, cause functions to be called. One case of multiple
 references to macro parameters is where range checks are carried out.
 
-<h2> 11.2: Label Cannot Be Referenced</h2>
+<a      name="labelrefix"/>
+<h2>E.2: Label Cannot Be Referenced</h2>
 
 <p>
 Another possible cause of confusion, is that a label can't be
@@ -16941,7 +17000,8 @@ generate* $name
 	$end
 
 </pre>
-<h2> 11.3: Changed Label Value Disappears</h2>
+<a      name="labelrefind"/>
+<h2>E.3: Changed Label Value Disappears</h2>
 
 <p>
 This is the same problem as the previous one. If you have
@@ -16972,7 +17032,8 @@ alabel*	$set	SOMETHING_ELSE
 
 </pre>
 
-<h2> 11.4: Tracing Macro Expansion</h2>
+<a      name="walkingmacro"/>
+<h2>E.4: Tracing Macro Expansion</h2>
 
 <p>
 For monitoring the expansion of $PROC and $FUNC macros, see especially
@@ -17002,7 +17063,8 @@ only produced on the second assembly pass.
 <p>
 See also Sections 8.48: $SNAP directive and 8.53: $TRACE directive.
 
-<h2> 11.5: Aliasing masmx Internal Functions</h2>
+<a      name="alias_fun"/>
+<h2>E.5: Aliasing masmx Internal Functions</h2>
 
 <p>
 If you want to give a new name to a masmx internal function <b>$ $a $b $n
@@ -17018,18 +17080,32 @@ The quotes on the masmx function name, here <b>$a</b>, are necessary.
 <p>
 Without the quotes, absolute will not have the functional meaning
 <b>$a</b>, but instead the value returned from <b>$a</b> at this
-point in the assembly.
+point in the assembly
+
+See also <a href="#option_Q">option -Q</a>
 
 
-<h2> 11.6: Error Diagnostic about a Label Address</h2>
+<a	name="labelshifted"/>
+<h2>E.6: Error Diagnostic about a Label Address or Literal Table Start Address</h2>
 
+This group of problems all stem from code changing in size between the first
+and second assembly passes
+
+<p>
+It is permissible for code to change in size unless in consequence
+
+	<blockquote>
+	a storage address label changes<br><br>
+
+	the code is followed by a literal table
+	</blockquote>
 
 <p>
 An error diagnostic is issued like the one in this assembly
 <pre>
 
-$masmx -l
-MASMX 7r2
+$ masmx -ln
+MASMX 7r3
 0/-INPUT>>
 	$list	0
 	$include 8051.def
@@ -17037,25 +17113,26 @@ CONT_CHAR=
 LTERM=;
 QDELIM='
 STERM=.
-	$list	2
+        $list   2
 
-first	var	size?
+first   var     size?
 
-second	var	8
+second  var     8
 
-size?	equ	1024
-	$end
-  :                            677  $list 2
-  :                            678 
-  :                            679 first var size?
-  :                            680 
-SECOND [80000/40000]
-Error: -INPUT>> Line 681: displacement changed between 1st and 2nd passes
-Note: -INPUT>> Line 681: foregoing object has been sized by forward reference
-  :                            681 second var 8
-  :                            682 
-  :                            683 size? equ 1024
-  :                            684  $end
+size?   equ     1024
+        $end
+  :                            646         $list   2
+  :                            647 
+  :                            648 first   var     size?
+  :                            649 
+
+[000000000000000000000000000000000000000000000400]
+[000000000000000000000000000000000000000000000800]
+Error: -INPUT>> Line 650: SECOND displacement altered
+  :                            650 second  var     8
+  :                            651 
+  :                            652 size?   equ     1024
+  :                            653         $end
 :$(01):0400:0808 
 -INPUT>>: object code 20 bytes: 1 errors: 0 undefined labels
 
@@ -17123,7 +17200,37 @@ pattern	$equ	0800000000000
 
 </pre>
 
-<h2>11.7: Label fails to be Exported</h2>
+In this following example instruction formats have changed on
+the second pass as a result of function macros which were not
+expanded on the first path. There is then a conflict between
+the literal table load address and code preceding it
+
+<pre>
+
+f       $func   *
+constant* $name
+        $do     f(1, 1:2)=s,    $return literal(ieee754_32 f(1, 1))
+        $return literal(iee754_64 f(1, 1))
+        $end
+
+</pre>
+
+In this case the function  must be a two-pass function and then the
+literal table originates immediately after the code
+<pre>
+
+f       $func
+constant* $name
+        $do     f(1, 1:2)=s,    $return literal(ieee754_32 f(1, 1))
+        $return literal(iee754_64 f(1, 1))
+        $end
+
+</pre>
+
+
+
+<a      name="labelhidden"/>
+<h2>E.7: Label fails to be Exported</h2>
 
 <p>
 Labels are not catalogued for listing or export if they are declared
@@ -17150,40 +17257,14 @@ location_after*
 
 </pre>
 <p>
-See also 8.28: <b>$LIST 0</b>, masking names from list and export
-
-<h2>11.8: Literal Table overlaps Trailing Edge of Code</h2>
-
-A literal table may originate some words back over the last code words
-if literals are generated from within a second pass only function
-<pre>
-
-f	$func	*
-constant* $name
-	$do	f(1, 1:2)=s,	$return	literal(ieee754_32 f(1, 1))
-	$return	literal(iee754_64 f(1, 1))
-	$end
-
-</pre>
-
-If it is necessary to do this (see runtime algorithms for ColdFire), the
-function must be a two-pass function and then the literal table originates
-after the code
-<pre>
-
-f	$func
-constant* $name
-	$do	f(1, 1:2)=s,	$return	literal(ieee754_32 f(1, 1))
-	$return	literal(iee754_64 f(1, 1))
-	$end
-
-</pre> 
+See also <a href="#list_0">8.27.2: $list 0</a>, masking names from list and export
 
 
-
+<a      name="targets"/>
 <h1>Appendix F: Target Descriptions</h1>
 
 
+<a      name="8051"/>
 <h2>F.1: 8051</h2>
 
 
@@ -17192,6 +17273,7 @@ used with masmx to build mission-critical software for
 a number of prestige clients.
 
 
+<a      name="powerpc"/>
 <h2>F.2: PowerPC</h2> 
 
 The ppc_603.def file in this delivery has been successfully used
@@ -17215,9 +17297,11 @@ masmx@gmx.ch
 
 
 
+<a      name="definitions"/>
 <h2>F.3: Definition Examples</h2>
 
   
+<a      name="coldfire"/>
 <h2>F.3.1: ColdFire</h2>
 
 ColdFire instruction encoding appears formidably intricate, but operand
@@ -17955,6 +18039,7 @@ Note: coldfir@.msm Line 137: after all, the context switch isn't interesting
 </pre>
 
 
+<a      name="alignments"/>
 <h1>F.4: Byte-Addressing Machines with 32 and 64 Bit Bus:
 Managing Alignments</h1>
 
@@ -18055,8 +18140,9 @@ load/store instructions may however need xxxxxx00 alignment for 32-bit
 loads and stores and xxxxxxx0 alignment for 16-bit loads and stores.
 
 <p>
-It may be necessary or advantageous to follow up .byte or .space with
-a command often called .align which usually has a power-2 argument
+It may be necessary or an advantage in bus efficiency  to follow up 
+.byte or .space with a command often called .align which usually has
+a power-2 argument
 
 <p>
 This is how .align looks as implemented with a masmx macro. .align
@@ -18071,6 +18157,7 @@ granule $set    1*/.align(1,1)
 
 </pre>
 
+<a      name="disclaimer"/>
 <h1>Appendix G: Disclaimer and Contact</h1>
 
 
