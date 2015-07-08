@@ -3783,7 +3783,7 @@ register value is not available at either assembly or link
 
 <p>
 A breakpoint value in the locator declaration indicates a physical segment load address known in advance.<br>
-It is seen here that in base-displacement $a(<i>location</i>) retrieves the program-absolute address,<br>
+It can be seen here that in base-displacement $a(<i>location</i>) retrieves the program-absolute address,<br>
 <i>location</i> retrieves the displacement only, and the physical load address is not accessed
 <pre>
 
@@ -5121,7 +5121,8 @@ Nested <b>$record</b>s have their own arguments. Containing <b>$record</b>s plac
 initial values in their own fields and not in the fields of nested <b>$records</b>
 
 <p>
-It is seen here that initial value 10 is assembled after embedded <b>inner $record</b> 
+It can be seen here that initial value 10 is assembled after embedded
+<b>inner $record</b> 
 
 <pre>
 
@@ -5154,7 +5155,7 @@ outermost:inner:field(2)=$03:3002,,,0007,0003
 outermost:inner:field(3)=$03:3002,,,000A,0003
 outermost:inner:field(4)=$03:3002,,,000D,0003
 outermost:trailing=$03:3003,,,,000C
-?=$03:0004
+?=0004
 record.msm=0<0003
 :$(03):3000:3004 
 
