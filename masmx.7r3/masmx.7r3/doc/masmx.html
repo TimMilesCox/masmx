@@ -140,10 +140,13 @@ as possible are executed.
 
 masmx saves electronics and energy, and may be used as the substance of thin-layer compilers.<br>
 masmx makes the miniature more possible, and can multiply the performance of giant servers by ten- and twentyfold.<br>
+<blockquote>
 Language compilers can be reinvented to generate a common macro-assembly language for all targets<br>
 See <a href="#roadmap">Appendix C: Road Map</a>, <a href="#languages">Appendix D: High Level Languages</a><br>
-Compiler/target portation becomes instantaneous and target code efficiency is written and tuned in open text<br>
+Compiler/target portation becomes instantaneous<br>
+Language maps to macro code written in open text for instruction economy and efficiency<br>
 Any PC has a developer toolchain for any target
+</blockquote>
 </blockquote>
 </div>
 
@@ -565,7 +568,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 11. <a href="#afloat">Alternative Floating Formats</a>					11
     1.	<a href="#masmxfloat">masmx Floating Format</a>						11.1
     2.	<a href="#ieeefloat">IEEE754 Floating Values</a>						11.2
-	1.  <a href="#fpdifferences">Differences between masmx FLoating Format and IEEE754 Floating Formats</a>
+	1.  <a href="#fpdifferences">Differences between masmx Floating Format and IEEE754 Floating Formats</a>
 									11.2.1
 	2.  <a href="#ieeemacro">Macro Language Generation of IEEE754 Floating Constants</a>	11.2.2
 
@@ -614,9 +617,9 @@ Target architecture is described to masmx in macro language. See
 
 
 	<blockquote>
-	<href="#start">3:  Getting Started</a><br><br>
+	<a href="#start">3:  Getting Started</a><br><br>
 
-	<href="#describe">10: Describing Target Architecture in Text</a>
+	<a href="#describe">10: Describing Target Architecture in Text</a>
 	</blockquote>
 
 <a	name="syntax"/>
@@ -634,20 +637,21 @@ masmx interprets imported notation for code, data and even
 arithmetic and manipulation operators 
 
 <p>
-See  <href="#describe1">10.1: Establishing your Syntax</a>
+See  <a href="#describe1">10.1: Establishing your Syntax</a>
 
 
 <a	name="notate1"/>
 <h3>1.2.2:  Number String and Character String Notation</h3>
 
 
-Number and character strings are assembled in masmx native
-notation, C-Language notation,<br>
-Motorola Old Notation or suffix-determined notation
+Number and character strings are assembled in
+<a href="#nstring">masmx native notation</a>,
+<a href="#cstring">C-Language notation</a>,<br>
+<a href="#motorola">Motorola Old Notation</a> or
+<a href="#suffix">suffix-determined notation</a>
 
 <p>
-See Section 4.2.2.1: Number Strings and Section 4.2: Expressions
-
+See <a href="#notate2">4.2.2.1: Number Strings</a> and <a href="#expression">4.2: Expressions</a>
 
 <a	name="anyword"/>
 <h2>1.3: masmx is for Any Word Size</h2>
@@ -668,6 +672,8 @@ Integer constants occupy by default their containing number of words
 <p>
 <h2>1.4: masmx is for Any Address Space</h2>
 
+masmx assembles absolute or relocatable code
+
 <p>
 masmx can construct absolute arrays and instruction segments to fit
 in address spaces up to 1*/192 bits.
@@ -680,7 +686,7 @@ with new source or relocatable code
 A masmx link is an assembly which uses masmx linker features.
 Text-encoded-binary files are included<br>plus macro
 text which processes text-encoded-binary.
-See section 9.2.2: masmx Linking in Principle
+See <a href="#linkbasic">9.2.2: masmx Linking in Principle</a>
 
 <p>
 The memory space in programs may be larger than any known file systems,<br>
@@ -691,7 +697,7 @@ to the degree that the developer platform file system contains it
 Base-displacement addressing modes are supported for accessing data or code<br>
 at high effective addresses beyond the direct-address range of instruction sets.<br>
 Data segments in 32-bit and 64-bit PowerPC<br>are an example of base-displacement addressing.<br>
-See Section 7: Constructing Program Sections
+See <a href="#sections">7: Constructing Program Sections</a>
 
 <a      name="anyfloat"/>
 <h2>1.5: masmx is for Any Floating Point Format</h2>
@@ -763,7 +769,7 @@ MASMX 7r3
  
 </pre>
 The included macro package for generating IEEE754 constants is explained in<br>
-section 11.2: IEEE754 Floating Formats
+section <a href="#ieeefloat">11.2: IEEE754 Floating Formats</a>
 
 
 <a      name="strip1"/>
@@ -797,7 +803,7 @@ This feature handles bit-field structures and overlays of any complexity consist
 <h3>1.6.4: Repeat Data</h3>
 
 masmx generates repeating data and data structures with the $do directive and subscripted labels.<br>
-See <a href="#structure">5.1: $do and Macros</a>
+See <a href="#structure">5.1: $do and Macros</a> and <a href="#labels">4.1:Labels</a>
 
 
 <a      name="streaf"/>
@@ -977,7 +983,7 @@ A label may also start with $ and is then declared in quotes
 <blockquote>
 $ in column one is a location counter switch.<br>
 A location counter switch is a program section control with syntax <b>$(number[:attributes])</b><br>
-See section 7: Constructing Program Sections
+See <a href="#sections">7: Constructing Program Sections</a>
 </blockquote>
 </div>
 
@@ -1492,7 +1498,7 @@ Directive $suffix 1 defaults leading zero to hex
 
 <p>
 Storage constant numbers in all notations may also have a storage  
-words suffix [s d l t q p h o]. See <a href="nconstant">4.2.3.3: Number constants</a>
+words suffix [s d l t q p h o]. See <a href="#nconstant">4.3.3: Number Constants</a>
 
 
 <a      name="labelref"/>
@@ -1508,8 +1514,8 @@ macro names, $do loop tags) may be referenced in expressions
 </pre>
 Most labels return an absolute or a relocatable value. Some labels work
 functionally and return a computed value.<br>
-See <a href="ifunction">4.2.2.3: masmx-Supplied Functions</a>
-and <a href="func_macro">4.2.2.4 Function Macro Reference</a>
+See <a href="#ifunction">4.2.2.3: masmx-Supplied Functions</a>
+and <a href="#func_macro">4.2.2.4 Function Macro Reference</a>
 
 <p>
 Labels may be bounded with quotes on reference
@@ -1540,7 +1546,7 @@ If $quote has been changed to ' apostrophe, labels in ' will not be detected in 
 The character values between ' are right justified<br>
 as values juxtaposed at current $byte size and translated from input to current data code,
 default 8-bits and ASCII.<br>
-See also 8.8 $DATA_CODE directive and 8.5 $BYTE directive
+See also directives <a href="#data_code">8.8 $data_code</a> and <a href="#byte">8.5 $byte</a>
 <pre>
 
 
@@ -1590,8 +1596,8 @@ Internal functions are in summary:
 				an argument to $a(..) is an expression
  				not a location counter identity
 
-				the expression may reference a location
-				counter: + $a($(5))
+				the expression may reference a location counter: + $a($(5))
+				but more often references an identifier label:   + a(<i>label</i>)
 
 	$a(..)		absolute value of expression
                     	  
@@ -1836,7 +1842,7 @@ a name of a $proc macro, or the name of a $form template.
 <h3>4.3.1 Directives</h3>
 
 
-Directives are commands to the assembler. They are listed in Section 8: Directives
+Directives are commands to the assembler. They are listed in Section <a href="#directive">8: Directives</a>
 
 <p>
 Some directives control assembly settings, for example
@@ -1916,7 +1922,7 @@ of a macro
 <h3>4.3.2: Storage Constants</h3>
 
 For complex data constants see <a href="#structure"> 5: Iterated Code and Structured Data</a>
-and <a href="proc_call">4.3.7: $proc Macro Calls: Instructions and Structures</a> 
+and <a href="#proc_call">4.3.7: $proc Macro Calls: Instructions and Structures</a> 
 
 <p>
 Simple data constants may be integers, microstructures of bit fields, 
@@ -2118,8 +2124,9 @@ MASMX 7r3
 :$(00):0000:0003 
 
 </pre>
-$suffix-determined number notation (4.2.2.1: Number String Notation) masks length flags [d q h o]<br>
-if the length flag is not separated. Fraction strings containing decimal point are decimal and a suffix<br>
+$suffix-determined number notation (<a href="#notate2">4.2.2.1: Number String Notation</a>)
+masks length flags [d q h o]<br> if the length flag is not separated.
+Fraction strings containing decimal point are decimal and a suffix<br>
 is interpreted as size in words and not as notation
 <pre>
 
@@ -2909,14 +2916,14 @@ FOP*    $name
 "$RING" $set    0
         $do     p()>1,  $do     $t(p(2, 1))=$name,"$RING"       $set    p(2, 1)
         $if     $RING=IEEE754_64_ACQUIRE$
-        p(2, 1) p(1)
+	<a style="color:blue">p(2, 1) p(1)</a>
 	.
 	.
 
 </pre>
 <p>
-$proc macros are described in detail with application to instruction
-code definition in Section 6.2: Describing Target Architecture in Text
+$proc macros are also described in <a href="#proc">8.38 $proc Directive</a> and
+<a href="#macro">10.2.2: Describing Target Architecture in Text... $proc, $name, $end</a>
 
 
 <a      name="argument"/>
@@ -2962,7 +2969,8 @@ See <a href="#sections">7: Constructing Program Sections</a>,
 <a href="#lptag">7.1.7: Literal Pool Tag</a>,
 <a href="#literals">4.5: Literals</a>,
 <a href="#lpooltag">4.5.5: Literal Pool Tags</a>,
-<a href="#ldirective">4.5.6: $lit directive</a>
+<a href="#ldirective">4.5.6: $lit directive</a>,
+directive <a href="#lit">8:28 $lit</a>
 
 <p>
 With assembly flag -a an operand entirely in parentheses is an 
@@ -3128,7 +3136,7 @@ Literal Pool Tags may be generated:
 
 $(5:DATA_SEGMENT/literal_pool_5)
 
-	as the label of a $LIT directive:
+	as the label of a $LIT directive: See directive <a href="#lit">8:28 $lit</a>
 
 lits7  $LIT    7
 
@@ -3165,6 +3173,8 @@ pool tag).
 If $lit has a label, the label becomes a literal
 tag for the literal pool.
 
+<p>
+See also directive <a href="#lit">8:28 $lit</a>
 
 <a      name="lnested"/>
 <h3>4.5.7: Nested Literals</h3>
@@ -3309,9 +3319,9 @@ may be that two passes of the same function have a
 cumulative effect which is undesirable 
 
 <p>
-It may to the contrary be necessary to expand a function macro on both
-assembly passes, because the function has determining effect how much
-code is generated. See 4.6.2.1.3: Functions affecting Program Displacements
+It may to the contrary be necessary to expand a function macro on both assembly
+passes, because the function has determining effect how much code is generated.<br>
+See <a href="#fmacdisp">4.6.2.1.3: Functions affecting Program Displacements</a>
 
 
 <a      name="fmacni"/>
@@ -4178,7 +4188,7 @@ the <a href="#commandline">command line</a><br>
 or with the exception of flags -<b>ksy</b> with the <a href="#set_option">$set_option</a> directive
 
 <p>
-Flags used by masmx are listed at <a href="clopts">A.a: Command Line Option Flags</a>
+Flags used by masmx are listed at <a href="#clopts">A.a: Command Line Option Flags</a>
 
 <p>
 Flags -<b>VUOS</b> may be used to switch and trace assembly language code
@@ -7064,25 +7074,20 @@ the sum of the location counter plus step or giant breakpoint value.
 	</b>
 	</blockquote>
 
-This example is described as static because the base-displacement
-construct and the code-generating segment are assembled together.
+This example is called static because the base-displacement view
+does not move. It is mapped to the start of the code section
 
 <p>
-Base register r15 is loaded to access the first part of the array
+Base register r15 is loaded to point to the array start
 
 <p>
-Whether ,register is given for base-displacement or not, giant
-addressing is specified by a giant breakpoint flagged with *
+A giant address breakpoint is flagged with * and may be a 192-bit pointer
 <pre>
 
 $(id:<i>base</i>:*<i>giant_breakpoint</i>,<i>register</i>[/literal_pool])
 
 </pre>
-Where <i>register</i> is also stated base-displacement label references
-are generated.
-
-<p>
-<i>giant_breakpoint</i> is an address expression up to 192 bits wide.
+Where <i>register</i> is also given base-displacement identifier labels are generated.
 
 <p>
 displacements within the breakpointed part may only reach four gigaquanta beyond <i>base</i>,
@@ -7135,28 +7140,16 @@ modest.msm: object code 217 bytes: 0 errors: 0 undefined labels
 	</b>
 	</blockquote>
 
-This example is described as dynamic because the base-displacement
-construct and the code-generating segment appear to be different segments.
+The base-displacement view and the code-generating section are declared
+separately in the following example
 
 <p>
-The code is an array covering many times more address space than the
-base-displacement construct, which can be mapped to different array
-locations at different moments.
+The base-displacement view <b>$(49)</b> is called dynamic because it maps
+to different array locations at different moments.<br>It is a void section
+with base register but no address, breakpoint address or relocation rule.
+See <a href="#voidsection">7.1.5: Void Sections</a>
 
-<p>
-The base-displacement segment $(49) is called a void segment because
-its declaration doesn't generate code. This is achieved by having a
-base register but no address or relocation rule.
 
-<p>
-A giant array constructed as a stepped segment may be 
-randomly accessed by basing different parts of the array 
-at different moments for base-displacement addressing.
-
-<p>
-The use of a Void Segment to map  onto different parts of an array is
-not confined to giant address models. See Section 4.1.2.1.1.5: Void
-Segments
 <pre>
 
 MASMX 7r2
@@ -17115,10 +17108,10 @@ This group of problems all stem from code changing in size between the first
 and second assembly passes
 
 <p>
-It is permissible for code to change in size unless in consequence
+It is permissible for code to change in size unless
 
 	<blockquote>
-	a storage address label changes<br><br>
+	a storage address label consequently changes in value<br><br>
 
 	the code is followed by a literal table
 	</blockquote>
@@ -17223,29 +17216,36 @@ pattern	$equ	0800000000000
 
 </pre>
 
-In this following example instruction formats have changed on
-the second pass as a result of function macros which were not
-expanded on the first path. There is then a conflict between
-the literal table load address and code preceding it
+The following example concerns a target architecture with
+more than one instruction size for operands in register or
+address space, with or without pointer offset
+
+Instruction formats have changed on the second pass as a result
+of function macros which were not expanded on the first path.
+There is then a conflict between the literal table start address
+and the code end address
 
 <pre>
 
 f       $func   *
-constant* $name
+constant_token* $name
+__FORMAT* $set	7*/3++2
         $do     f(1, 1:2)=s,    $return literal(ieee754_32 f(1, 1))
-        $return literal(iee754_64 f(1, 1))
+        $do	f(1, 1:2)=d,	$return literal(ieee754_64 f(1, 1))
         $end
 
 </pre>
 
 In this case the function  must be a two-pass function and then the
-literal table originates immediately after the code
+second assembly pass generates code matching the size estimated in
+the first assembly pass
 <pre>
 
 f       $func
-constant* $name
+constant_token* $name
+__FORMAT* $set	7*/3++2
         $do     f(1, 1:2)=s,    $return literal(ieee754_32 f(1, 1))
-        $return literal(iee754_64 f(1, 1))
+	$do	f(1, 1:2)=d,	$return literal(ieee754_64 f(1, 1))
         $end
 
 </pre>

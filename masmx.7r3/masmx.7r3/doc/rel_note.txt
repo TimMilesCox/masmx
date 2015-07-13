@@ -1,10 +1,10 @@
-Preliminary	masmx.7r3	Distribution 01 October 2014
-___________	_________	____________________________
+Preliminary	masmx.7r3	Distribution 01 July 2015
+___________	_________	_________________________
 
 
 
         _________________________________________________
-        |       Copyright Tim Cox, 2014			|
+        |       Copyright Tim Cox, 2015			|
         |                                               |
         |       This document describes the masmx.7r3   |
         |        target-independent meta-assembler      |
@@ -98,18 +98,21 @@ imx converts the output of masmx and masmz to 16-bit address I-Records.
 
 mmx converts the output of masmx and masmz to 32-bit address S-Records.
 
-The masmx feature absent from masmz is hierarchical data structure.
-The directives $TREE $BRANCH $ROOT are therefore absent from masmz.
-
-Binaries delivered for 640K DOS are the subset masmz, imx and mmx.
-masmz for 640K DOS does not have the internal linker. masmz for 640K DOS
-generates relocatable as well as absolute code for reasons of uniformity.
+The masmx features absent from masmz are hierarchical data structure
+and runtime algorithm plotter
+.
+The directives $TREE $BRANCH $ROOT $RECORD $XQT_I $XQT_FPare therefore absent from masmz.
 
 The relocatable code model and internal linker are in both masmx
 and masmz for all developer platforms except 640K MS DOS.
 
-Therefore all features of all binaries are available for Unix, Windows,
-and Extended-Memory DOS.
+All features of all binaries are available for Unix, Windows,
+
+Any binaries delivered for 640K DOS are the subset masmz, imx and mmx.
+masmz for 640K DOS does not have the internal linker. masmz for 640K DOS
+generates relocatable as well as absolute code for reasons of uniformity.
+
+Any binaries delivered for extended DOS have all features
 
 
 Assistance
@@ -123,7 +126,7 @@ ________________________________________________________________________________
 
 LICENCE NOTE
 
-    Copyright Tim Cox, 2014
+    Copyright Tim Cox, 2015
     TimMilesCox@gmx.ch
 
     This document describes the masmx.7r3 target-independent meta-assembler.
