@@ -2436,7 +2436,7 @@ static line_item *xpression(char *s, char *e, char *param)
 
    if (d = contains(s, e, "*+\0*-\0"))
    {
-      transient_floating_bits = fpwidth;
+      if (!transient_floating_bits) transient_floating_bits = fpwidth;
 
       margin = d;
 
@@ -2501,9 +2501,12 @@ static line_item *xpression(char *s, char *e, char *param)
          }
       }
 
-      if (transient_floating_bits > RADIX) transient_floating_bits = RADIX;
+      if (transient_floating_bits > RADIX) transient_floating_bits = RADIX / word * word;
+
+      #if 0
       transient_floating_bits /= word;
       transient_floating_bits *= word;
+      #endif
 
       if (pass)
       {
@@ -2618,6 +2621,14 @@ static line_item *xpression(char *s, char *e, char *param)
             c = transient_floating_bits;
 	    right = xpression(d+1, e, param);
 
+            #if 0
+            if (transient_floating_bits)
+            {
+               operand_reverse(right);
+               operand_add(left, right);
+            }
+            else
+            #else
             if ((c == 0) && (transient_floating_bits))
             {
                /*****************************************
@@ -2645,6 +2656,7 @@ static line_item *xpression(char *s, char *e, char *param)
 
                if (twoscomp) flag("floating cast to integer yields a wrong value");
             }
+            #endif
 
 	    operand_add_negative(left, right);
 	    sp++;
@@ -5687,7 +5699,7 @@ static void floating_generate(char *a, char *margin, char *param, line_item *ite
       #endif
    }
 
-   transient_floating_bits = fpwidth;
+   if (!transient_floating_bits) transient_floating_bits = fpwidth;
 
    if (carry == ':')
    {
@@ -5700,9 +5712,15 @@ static void floating_generate(char *a, char *margin, char *param, line_item *ite
        carry = *a++;
    }
 
-   if (transient_floating_bits > RADIX) transient_floating_bits = RADIX;
+   if (transient_floating_bits > RADIX)
+   {
+      transient_floating_bits = RADIX / word * word;
+   }
+
+   #if 0
    transient_floating_bits /= word;
-   transient_floating_bits *= word;   
+   transient_floating_bits *= word;
+   #endif
 
    if (carry == '*')
    {
@@ -5752,6 +5770,11 @@ static void floating_position(int bits, line_item *item)
 
    #ifdef ROUNDING
    int			 carry, xlow_1, xlow_2;	
+   #endif
+
+
+   #if 0
+   if (bits > RADIX) bits = RADIX / word * word;
    #endif
 
    characteristic = characteristic_width[(bits-1)/word];
@@ -6381,8 +6404,15 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	          }
 	          else
 	          #endif
+                  {
+                     transient_floating_bits = 0;
 
-	          oo = xpression(argument, limit, param);
+                     if ((digitstring_fraction(argument, limit))
+                     ||  (contains(argument, limit, "*+\0*-\0"))) transient_floating_bits = slice;
+
+	             oo = xpression(argument, limit, param);
+                  }
+
 	          x = slice & 7;
 	          j = slice >> 3;
   	          xmask = 255 << x;
@@ -6476,7 +6506,13 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             {
                if (bits ^ transient_floating_bits)
                {
-                  if (bits > RADIX) note("floating number is maximum words");
+                  if (bits > RADIX)
+                  {
+                     note("floating number is maximum words");
+                     #if 0
+                     transient_floating_bits = RADIX / word * word;
+                     #endif
+                  }
                   else
                   {
                      note("floating number words given tag may follow the fraction");
@@ -6859,6 +6895,11 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                      apwx = (xadw + 3) / 4;
                   }
 	       }
+
+               fpwidth /= word;
+               fpwidth *= word;
+               if (fpwidth == 0) fpwidth = word;
+               
 	       break;
 	    case BYTE:
 	       if (argument)
@@ -7527,15 +7568,17 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                #ifdef FLOATING_POINT
 	    case FLOATING_POINT:
-	       if (!argument)
+	       if (argument)
                {
-                  fpwidth = 96;
-                  break;
+	          limit = edge(argument, " ");
+	          fpwidth = expression(argument, limit, param);
                }
+               else fpwidth = 96;
 
-	       limit = edge(argument, " ");
-	       fpwidth = expression(argument, limit, param);
-	       if (fpwidth < word) fpwidth = word;
+               if (fpwidth > RADIX) fpwidth = RADIX;
+               fpwidth /= word;
+               fpwidth *= word;
+	       if (fpwidth == 0) fpwidth = word;
 	       break;
 
 	    case CHARACTERISTIC:

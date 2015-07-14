@@ -225,10 +225,10 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	1.  <a href="#directive">Directives</a>							4.3.1
 	2.  <a href="#constant">Storage Constants</a>						4.3.2
 	3.  <a href="#nconstant">Number Constants</a>						4.3.3
-	4.  <a href="#commas">Split Number Items</a>						4.3.4
+	4.  <a href="#commas">Split Number Constants</a>					4.3.4
 	5.  <a href="#text_string">Text Strings</a>						4.3.5
 	6.  <a href="#form">$form Items</a>							4.3.6
-	7.  <a href="#proc_call">$proc macro calls: instructions and structures</a>		4.3.7
+	7.  <a href="#proc_call">$proc Macro Calls: Instructions and Structures</a>		4.3.7
 
     4.  <a href="#argument">The Argument Field</a>						4.4
 	1.  <a href="#xargument">Argument Expressions</a>					4.4.1
@@ -309,7 +309,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     2.	<a href="#stradata">Structured Data and Structured Code Name Spaces</a>			5.2
 
 	1.  <a href="#wstradata">Word-Aligned Structures $TREE / $BRANCH..$ROOT</a>		5.2.1
-	    1.  <a href="#tree_root">Structures $TREE..$ROOT</a>				5.2.1.1
+	    1.  <a href="#tree_root">Structures $TREE..$ROOT</a>					5.2.1.1
 	    2.  <a href="#branch_root">Overlaid Structures $BRANCH..$ROOT</a>			5.2.1.2
 	    4.  <a href="#name_space">Structured Code Name Spaces</a>				5.2.1.3
 		    
@@ -907,7 +907,8 @@ A definition file included at the head of the assembly defines:
 
 
 See <a href="#describe1">10.1: Establishing Syntax</a>,
-<a href="#describe2">10.2: Describing Target Architecture</a>
+<a href="#describe2">10.2: Describing Target Architecture</a>,
+<a href="#legacyx">Synthesising Legacy Macros</a>
 
 <a      name="sourceline"/>
 <h1>4: The Assembly Language Source Line</h1>
@@ -1842,7 +1843,7 @@ a name of a $proc macro, or the name of a $form template.
 <h3>4.3.1 Directives</h3>
 
 
-Directives are commands to the assembler. They are listed in Section <a href="#directive">8: Directives</a>
+Directives are commands to the assembler. They are listed in Section <a href="#Directives">8: masmx Directives</a>
 
 <p>
 Some directives control assembly settings, for example
@@ -2324,7 +2325,7 @@ can be escaped with macro language
 Macros supplied in this package generate IEEE754 floating constants. 
 
 <p>
-See A href="#ieeefloat">11.2: IEEE754 Floating Values</a>
+See <a href="#ieeefloat">11.2: IEEE754 Floating Values</a>
 
 <p>
 This example generates storage constants of value 1.375e+1200000 in masmx-internal format typed in various source syntax.<br>
@@ -2437,14 +2438,14 @@ MASMX 7r3
 </pre>
 
 <a      name="commas"/>
-<h4>4.2.2.4: Split Integers</h4>
+<h4>4.3.4: Split Number Constants</h4>
 
 
-A split integer item is a small list of equal size fields. The size of the total is one word.<br>
+A split number constant is a small list of equal size fields. The size of the total is one word.<br>
 The suffixes [d l t q p h o] can make the size  two, three, four, five, six or eight words.
 
 <p>
-The source syntax of split integers has commas between the fields:
+Split number constants have commas between the fields
 <pre>
 
 $ masmx commas -lny
@@ -3508,8 +3509,8 @@ target  $set    f(1,1)-$-f(0, 0)
 </pre>
 
 The <b>$func</b> label <i>f</i> need then not be exported from the macro text
-(it wears no asterisk), and this allows <i>f</i> to be reused and argument paraforms
-like <i>f(1,1)</i> to be quickly recognisable in many different functions
+(it wears no asterisk), and this allows <i>f</i> to be reused and argument paraforms like
+<i>f(1,1)</i> to be recognisably familiar to the developer in many different function macros
 
 
 <a      name="fmacret"/>
@@ -4513,7 +4514,7 @@ identify value unique in the calling subassembly
 
 </pre>
 <a      name="lt_name"/>
-<h4>4.7.10.9: Label Type $NAME</h4>
+<h4>4.7.10.9: Label Type $name</h4>
 
 
 $name is used within macro text $proc..$end or $func..$end
@@ -4561,9 +4562,15 @@ A macro is callable by its $proc or $func label or or by a  $name label,
 whichever is exported with trailing asterisk*<br>Labels exported from macros
 must be unique in the containing subassembly
 
+<p>
+See directive <a href="#name">8.31: $name</a>,
+<a href="#proc_call">4.3.7: $proc Macro Calls: Instructions and Structures</a>,
+<a href="#macro">10.2.2: ...$proc, $name, $end</a>,
+<a href="#fmacname">4.6.2.2: ($func) Entry Point and Value Tag</a> 
+
 
 <a      name="lt_func"/>
-<h4>4.7.10.10: Label Type $FUNC</h4> 
+<h4>4.7.10.10: Label Type $func</h4> 
 
 
 <p>
@@ -4584,7 +4591,7 @@ hi*	$func
 
 </pre>
 	
-
+See directive <a href="#func">8.21: $func</a>, <a href="#func_macro">4.2.2.4: Function Macro Reference</a> 
 
 <a      name="lt_form"/>
 <h4>4.7.10.11: Label Type $FORM</h4>
@@ -4892,9 +4899,8 @@ many    $do     p(),branch(many)   $res    4
 
 
 <p>
-$TREE..$ROOT structures may be nested to depth 8.
-Other examples can be found in Section
-8.54: $TREE Directive.
+$tree..$root structures may be nested to depth 8.
+Other examples can be found in <a href="#tree">8.54: $tree Directive</a>
 
 
 <a      name="branch_root">
