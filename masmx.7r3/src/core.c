@@ -2090,6 +2090,7 @@ static line_item *xpression(char *s, char *e, char *param)
    if (s == STACK_TOP_VALUE) return sp;
 
    *sp = zero_o;
+   floating_field = 0;
    
    #ifdef RELOCATION
    mapx->m.i = 0;
@@ -2431,6 +2432,7 @@ static line_item *xpression(char *s, char *e, char *param)
 
       floating_generate(s, e, param, sp);
       floating_position(transient_floating_bits, sp);
+      floating_field = transient_floating_bits;
       return sp;
    }
 
@@ -2536,6 +2538,7 @@ static line_item *xpression(char *s, char *e, char *param)
          }
       }
 
+      floating_field = transient_floating_bits;
       return sp;
    }
    #endif       /*      FP_EARLIER        */
@@ -2621,16 +2624,11 @@ static line_item *xpression(char *s, char *e, char *param)
             c = transient_floating_bits;
 	    right = xpression(d+1, e, param);
 
-            #if 0
-            if (transient_floating_bits)
+            if (floating_field)
             {
                operand_reverse(right);
                operand_add(left, right);
-            }
-            else
-            #else
-            if ((c == 0) && (transient_floating_bits))
-            {
+
                /*****************************************
 
 		-unary has become effectively 0 - token
@@ -2639,26 +2637,10 @@ static line_item *xpression(char *s, char *e, char *param)
                 getting 2s-complemented. It must be
                 1s-complemented
 
-		this only arises where the unary minus
-		is outside (parentheses) which contain
-		all fields of the floating number
-		as -(1.5*+exponent)
-
-		it's never necessary to do that but
-		someone might. It's not intuitive in
-		that event to realise that you are about
-		to 2-s complement the floating number
-
-		and not nice to expect anyone to realise
-		so we guard it here
-
                *****************************************/
-
-               if (twoscomp) flag("floating cast to integer yields a wrong value");
             }
-            #endif
+	    else operand_add_negative(left, right);
 
-	    operand_add_negative(left, right);
 	    sp++;
 
 	    #ifdef RELOCATION
@@ -6405,11 +6387,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	          else
 	          #endif
                   {
-                     transient_floating_bits = 0;
-
-                     if ((digitstring_fraction(argument, limit))
-                     ||  (contains(argument, limit, "*+\0*-\0"))) transient_floating_bits = slice;
-
+                     transient_floating_bits = slice;
 	             oo = xpression(argument, limit, param);
                   }
 

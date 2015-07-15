@@ -695,6 +695,8 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx zcp ..\test.o3\zcp -lyok > ..\text.o3\zcp.txt
 ..\masmx gradual ..\test.o3\gradual -lyok > ..\text.o3\gradual.txt
 ..\masmx quickly ..\test.o3\quickly -lyok > ..\text.o3\quickly.txt
+..\masmx signify ..\test.o3\signify -lyok > ..\text.o3\signify.txt
+..\masmx paxels ..\test.o3\paxels -lyok > ..\text.o3\paxels.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

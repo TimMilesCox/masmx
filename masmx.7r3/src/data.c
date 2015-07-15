@@ -421,6 +421,7 @@ static int linex, list, plist;
 static int fpwidth = 96;
 static int transient_floating_bits = 0;
 static int floating_conversion = 0;
+static int floating_field = 0;
 
 static int characteristic_width[12] = { 8, 12, 24, 24, 24, 24,
 				       24, 24, 24, 24, 24, 24 } ;

@@ -11,4 +11,6 @@ right   $equ    0ccccccccccccccccccccc
 
         +       left, right, centre
         +       left, right, centre:d   
-        +       left, right, centre:q   
+        +       left, right, centre:q
+		-1.5, -1*-1, -1.875
+		-0.8, -0.9   

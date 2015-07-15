@@ -677,4 +677,6 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz but ..\test.zo3\but -lok > ..\text.zo3\but.txt
 ..\masmz i2string ..\test.zo3\i2string -lok > ..\text.zo3\i2string.txt
 ..\masmz zcp ..\test.zo3\zcp -lok > ..\text.zo3\zcp.txt
+..\masmz signify ..\test.zo3\signify -lok > ..\text.zo3\signify.txt
+..\masmz paxels ..\test.zo3\paxels -lok > ..\text.zo3\paxels.txt
 
