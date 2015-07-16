@@ -12,6 +12,9 @@ fieee754_128 $form 1, 15, 112
 p       $proc
 ieee754_32* $name 0
 
+	$nop	request a 33-bit number so masmx rounds the true 24-bit mantissa
+	$nop	the normalising bit is suppressed on storage
+
 tag     $set,33	 p(1,1)
 signs   $set    tag*/192-33*/-191
 tag     $set    tag--signs
@@ -20,7 +23,7 @@ characteristic $set (tag/*24)-2
 
 	$do	$o('V'),	$snap	2
 
-        $nop	normalising bit truncated
+        $nop	normalising bit truncated by copy to 23-bit field
 
         fieee754_32 signs, characteristic, tag
         $end
@@ -28,6 +31,9 @@ characteristic $set (tag/*24)-2
 
 p       $proc
 ieee754_64* $name
+
+	$nop	request a 65-bit number so masmx rounds the true 53-bit mantissa
+	$nop	the normalising bit is suppressed on storage
 
 tag     $set,65	p(1,1)
 signs	$set    tag*/192-65*/-191
@@ -37,13 +43,16 @@ characteristic $set (tag/*53)-2
 
 	$do	$o('V'),	$snap	2
 
-        $nop	normalising bit truncated
+        $nop	normalising bit truncated by copy to 52-bit field
 
         fieee754_64 signs, characteristic, tag
         $end
 
 p	$proc
 ieee754_128* $name
+
+	$nop	request a 129-bit number so masmx rounds the true 113-bit mantissa
+	$nop	the normalising bit is suppressed on storage
 
 tag	$set,129	p(1, 1)
 signs	$set	tag*/192-129*/-191
@@ -53,7 +62,7 @@ characteristic $set (tag/*113)-2
 
 	$do	$o('V'),	$snap	2
 
-	$nop	normalising bit truncated
+	$nop	normalising bit truncated by copy to 112-bit field
 
 	fieee754_128	signs, characteristic, tag
 	$end

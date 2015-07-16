@@ -11,17 +11,19 @@ __MANTISSA_BITS	$set	__BITS-__CHARACTERISTIC_BITS
 
 __NUMBER	$set,__BITS+1	f(1, 1)
 __SIGNS		$set	__NUMBER*/191-__BITS*/-191
-__NUMBER	$set	__NUMBER--(__SIGNS**((1*/__BITS)-1))
+__NUMBER	$set	__NUMBER--__SIGNS
 
 		$do	$o('V'),	$snap	2
 
 		$nop	adjust the characteristic magnitude
 		$nop	truncate the integer bit. slide the exponent over it
 
-__NUMBER	$set	__NUMBER-(2*/__MANTISSA_BITS+1)
+		$do	__NUMBER^=0,__NUMBER	$set	__NUMBER-(2*/__MANTISSA_BITS+1)
 
-		$return	++(__NUMBER/*__MANTISSA_BITS+1)*/__MANTISSA_BITS|
-			++__NUMBER**((1*/__MANTISSA_BITS)-1)
+
+		$return	__SIGNS**1*/__BITS-1++|
+			(__NUMBER/*__MANTISSA_BITS+1)*/__MANTISSA_BITS++|
+			__NUMBER**((1*/__MANTISSA_BITS)-1)
 
 		$end
 
