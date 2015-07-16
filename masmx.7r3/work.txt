@@ -8884,7 +8884,7 @@ Sign-bit 1 indicates that all bits are inverted.
 
 <p>
 This is not IEEE 754 format. That is supported with macros.
-See Section 1.5: Any floating-point format, Section 11.2: IEEE754 FLoating Formats
+See Section 1.5: Any floating-point format, Section 11.2: IEEE754 Floating Formats
 
 
 <p>
@@ -15906,7 +15906,7 @@ is only changed with macro language
 
 
 <a      name="fpdifferences"/>
-<h3>11.2.1: Differences between masmx FLoating Format at IEEE754 Floating Formats</h3>
+<h3>11.2.1: Differences between masmx Floating Format at IEEE754 Floating Formats</h3>
 
 <p>
 This package contains macros for assembling 128-bit,  64- and 32-bit
@@ -16012,7 +16012,7 @@ MASMX 7r2
 </pre>
 
 <a      name="ieeemacro"/>
-<h3>11.2.2: Macro-Language Generation of IEEE754 FLoating Constants</h3>
+<h3>11.2.2: Macro-Language Generation of IEEE754 Floating Constants</h3>
 
 The macro language for generating IEEE754 floating values is shown here.
 
@@ -16181,59 +16181,6 @@ The labels tag, sign, and characteristic are not promoted with
 any trailing asterisk, so they only exist during the subassembly of
 the macro.
 
-<p>
-All the macros shown are called "p". They don't have to be.
-
-<p>
-Argument reference paraforms start with the label on the <b>$proc</b> or <b>$func</b> line:
-<pre>
-
-	<i>macro_label</i>(x,y)
-
-</pre>
-for example in the macros shown
-<pre>
-
-	p(1,1)
-
-</pre>
-Giving many macros the same <b>$proc</b> or <b>$func</b> label means that blocks of
-macro language can be cut-and-pasted between different macros.
-
-<p>
-In this example the label "p" isn't available for calling. Only labels
-with asterisk* at the end can be seen outside the macro they are in.
-
-<p>
-The trailing asterisk on ieee754_32* ieee754_64* and ieee754_128* make
-those names visible as macros. They're the labels on the $name lines
-
-<p>
-An asterisk on the label of the $proc line would make that label visible:
-<pre>
-
-unique_macro_label*	$proc
-
-</pre>
-Then unique_macro_label must be unique. See Section 6.2.2.2:
-The <b>$proc</b> Header
-
-<p>
-Macros with non-unique labels are called by the labels on the <b>$name</b> lines,
-and these names are visible* and unique*.
-
-<p>
-The label on $PROC, $NAME or $FUNC is only visible for calling outside
-the macro if the LABEL* has an asterisk after it.
-
-<p>
-There is a layout directive $FORM and code-generating macros
-run from $PROC to $END. That's the essence of masmx.
-
-<p>
-Macros can all have the same label on the $PROC line to make them easy 
-to write. Then they must have unique names on the $NAME line
-to make them possible to call
 <pre>
 
 
