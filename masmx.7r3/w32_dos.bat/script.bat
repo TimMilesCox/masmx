@@ -698,6 +698,8 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx signify ..\test.o3\signify -lyok > ..\text.o3\signify.txt
 ..\masmx paxels ..\test.o3\paxels -lyok > ..\text.o3\paxels.txt
 ..\masmx fieee754 ..\test.o3\fieee754 -lyok > ..\text.o3\fieee754
+..\masmx paxout ..\test.o3\paxout -lyok > ..\text.o3\paxout.txt
+..\masmx paxel16 ..\test.o3\paxel16 -lyok > ..\text.o3\paxel16.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

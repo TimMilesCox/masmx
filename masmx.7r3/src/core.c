@@ -5754,12 +5754,12 @@ static void floating_position(int bits, line_item *item)
    int			 carry, xlow_1, xlow_2;	
    #endif
 
+   int			 x = bits / word;
 
-   #if 0
-   if (bits > RADIX) bits = RADIX / word * word;
-   #endif
 
-   characteristic = characteristic_width[(bits-2)/word];
+   if (x > 17) x = 17;
+
+   characteristic = characteristic_width[x];
 
    if (characteristic < 24)
    {
@@ -7569,8 +7569,9 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       x = fpwidth;
 	       if (subfunction > -1) x = subfunction;
 	       x /= word;
+               if (x > 17) x = 17;
 	       limit = edge(argument, " ");
-	       characteristic_width[x - 1] = expression(argument, limit, param);
+	       characteristic_width[x] = expression(argument, limit, param);
 	       break;
                #endif
               
@@ -8945,6 +8946,14 @@ main(int argc, char *_argv[])
          #endif
 
          fpwidth = 96;
+
+         characteristic_width[0] = characteristic_width[1] = 8;
+         characteristic_width[2] = 12;
+         characteristic_width[3] = characteristic_width[4] = characteristic_width[5] = 24;
+         characteristic_width[6] = characteristic_width[7] = characteristic_width[8] = 24;
+         characteristic_width[9] = characteristic_width[10] = characteristic_width[11] = 24;
+         characteristic_width[12] = characteristic_width[13] = characteristic_width[14] = 24;
+         characteristic_width[15] = characteristic_width[16] = characteristic_width[17] = 24;
 
          *(flag_box *) selector = initial_flags;
          *(flag_box *) uselector = initial_uflags;

@@ -423,7 +423,8 @@ static int transient_floating_bits = 0;
 static int floating_conversion = 0;
 static int floating_field = 0;
 
-static int characteristic_width[12] = { 8, 12, 24, 24, 24, 24,
+static int characteristic_width[18] = { 8,  8, 12, 24, 24, 24,
+                                       24, 24, 24, 24, 24, 24,
 				       24, 24, 24, 24, 24, 24 } ;
 static int handle[INCLUDE_MAXDEPTH];
 static int ohandle, depth, nhandle;

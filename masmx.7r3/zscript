@@ -676,4 +676,6 @@ rm ../text.zo3/*
 ../masmz signify ../test.zo3/signify -lok > ../text.zo3/signify.txt
 ../masmz paxels ../test.zo3/paxels -lok > ../text.zo3/paxels.txt
 ../masmz fieee754 ../test.zo3/fieee754 -lok > ../text.zo3/fieee754
+../masmz paxout ../test.zo3/paxout -lok > ../text.zo3/paxout.txt
+../masmz paxel16 ../test.zo3/paxel16 -lok > ../text.zo3/paxel16.txt
 
