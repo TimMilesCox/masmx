@@ -14,9 +14,9 @@ ieee754_32* $name 0
 
 tag     $set,33	 p(1,1)
 signs   $set    tag*/192-33*/-191
-tag     $set    tag--(signs**((1*/33)-1))    
+tag     $set    tag--signs
 characteristic $set (tag/*24)-2
-	$do	tag**((1*/33-1)-1)=0,characteristic	$set	0
+	$do	tag=0,characteristic	$set	0
 
 	$do	$o('V'),	$snap	2
 
@@ -31,9 +31,9 @@ ieee754_64* $name
 
 tag     $set,65	p(1,1)
 signs	$set    tag*/192-65*/-191
-tag     $set	tag--(signs**((1*/65)-1))
+tag     $set	tag--signs
 characteristic $set (tag/*53)-2
-	$do	tag**((1*/65-1)-1)=0,characteristic	$set	0
+	$do	tag=0,characteristic	$set	0
 
 	$do	$o('V'),	$snap	2
 
@@ -47,9 +47,9 @@ ieee754_128* $name
 
 tag	$set,129	p(1, 1)
 signs	$set	tag*/192-129*/-191
-tag	$set	tag--(signs**((1*/129)-1))
+tag	$set	tag--signs
 characteristic $set (tag/*113)-2
-	$do	tag**((1*/129-1)-1)=0,characteristic	$set	0
+	$do	tag=0,characteristic	$set	0
 
 	$do	$o('V'),	$snap	2
 

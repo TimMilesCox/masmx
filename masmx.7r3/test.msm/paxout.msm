@@ -1,4 +1,4 @@
-	$set_option	"G"
+	$set_option	"F"
 	$word		32
 	$characteristic,32	9
 	$characteristic,64	12

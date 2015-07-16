@@ -5447,18 +5447,13 @@ static void operand_round_down(int bytes, line_item *item)
 {
    unsigned short		 carry = 0,
 				 x = RADIX/8,
-				 y = RADIX/8,
-				 guard = 0xE0;
-
-
-   if (uselector['G'-'A']) guard &= 0xC0;
-   if (uselector['F'-'A']) guard &= 0xA0;
+				 y = RADIX/8;
    
    #ifdef ROUND3
 
    if (bytes == 3)
    {
-      carry = guard + item->b[RADIX/8-3];
+      carry = guard_pattern + item->b[RADIX/8-3];
       carry >>= 8;
       x = RADIX/8-3;
    }
@@ -5775,9 +5770,9 @@ static void floating_position(int bits, line_item *item)
    {
       carry = single_bit(RADIX - bits - 1, item);
 
-      #ifdef ROUND3
-      if (uselector['F'-'A'] == 0) carry |= single_bit(RADIX - bits - 2, item);
-      if (uselector['G'-'A'] == 0) carry |= single_bit(RADIX - bits - 3, item);
+      #ifdef ROUND3 
+      if (guard_pattern & 0x40) carry |= single_bit(RADIX - bits - 2, item);
+      if (guard_pattern & 0x20) carry |= single_bit(RADIX - bits - 3, item);
       #endif
 
       rshift(item, RADIX - bits);
@@ -7442,6 +7437,9 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		     if      ((x > 0x40) && (x < 0x5B))
                      {
                         uselector[x-'A'] = 1;
+                        if (x == 'E') guard_pattern = 0xE0;
+                        if (x == 'F') guard_pattern = 0xC0;
+                        if (x == 'G') guard_pattern = 0x80;
                      }
 		     else if ((x > 0x60) && (x < 0x7B))
                      {
@@ -8678,7 +8676,13 @@ main(int argc, char *_argv[])
          while (j = *b++)
          {
 	    if ((j > 0x60) && (j < 0x7b))  selector[j-'a'] = 1;
-	    if ((j > 0x40) && (j < 0x5b)) uselector[j-'A'] = 1;
+	    if ((j > 0x40) && (j < 0x5b))
+            {
+                uselector[j-'A'] = 1;
+                if (j == 'E') guard_pattern = 0xE0;
+                if (j == 'F') guard_pattern = 0xC0;
+                if (j == 'G') guard_pattern = 0x80;
+            }
             if (j == '+') list = 1;
          }
       }
@@ -8954,6 +8958,8 @@ main(int argc, char *_argv[])
          characteristic_width[9] = characteristic_width[10] = characteristic_width[11] = 24;
          characteristic_width[12] = characteristic_width[13] = characteristic_width[14] = 24;
          characteristic_width[15] = characteristic_width[16] = characteristic_width[17] = 24;
+
+         guard_pattern = 0xE0;
 
          *(flag_box *) selector = initial_flags;
          *(flag_box *) uselector = initial_uflags;

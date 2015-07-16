@@ -1,0 +1,5 @@
+	$cont_char	'|'
+	$set_option	"G"
+	$include	fieee754.def
+
+	+	fieee754_24(1.5), fieee754_24(-1.5), fieee754_24(0.1)t

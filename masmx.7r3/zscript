@@ -678,4 +678,6 @@ rm ../text.zo3/*
 ../masmz fieee754 ../test.zo3/fieee754 -lok > ../text.zo3/fieee754
 ../masmz paxout ../test.zo3/paxout -lok > ../text.zo3/paxout.txt
 ../masmz paxel16 ../test.zo3/paxel16 -lok > ../text.zo3/paxel16.txt
+../masmz gardenia ../test.zo3/gardenia -lok > ../text.zo3/gardenia.txt
+../masmz trag ../test.zo3/trag -lok > ../text.zo3/trag.txt
 

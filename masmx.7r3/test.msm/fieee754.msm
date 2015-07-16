@@ -1,6 +1,6 @@
 	$word		32
 	$cont_char	'|'
-	$set_option	"G"
+	$set_option	"F"
 
 	$list		2
 	$include	fieee754.def

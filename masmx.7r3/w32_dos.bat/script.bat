@@ -700,6 +700,8 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx fieee754 ..\test.o3\fieee754 -lyok > ..\text.o3\fieee754
 ..\masmx paxout ..\test.o3\paxout -lyok > ..\text.o3\paxout.txt
 ..\masmx paxel16 ..\test.o3\paxel16 -lyok > ..\text.o3\paxel16.txt
+..\masmx gardenia ..\test.o3\gardenia -lyok > ..\text.o3\gardenia.txt
+..\masmx trag ..\test.o3\trag -lyok > ..\text.o3\trag.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire
