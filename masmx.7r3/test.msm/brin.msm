@@ -31,6 +31,7 @@ $(0:64,pc/$azlit)
 	$xqt_i,#	0L-first+second
 
 	$xqt_fp,$ieee64	33.6*44.7
+
 	$xqt_fp,$ieee64	+(33.6*44.7)
 
 	$trace	$r($literal)

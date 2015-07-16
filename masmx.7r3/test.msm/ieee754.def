@@ -1,5 +1,9 @@
-	$floating_point	192
-	$characteristic	24
+
+	$floating_point	32
+	$characteristic	9
+	$characteristic,64 12
+	$characteristic,128 16
+	
 
 fieee754_32 $form 1, 8, 23
 fieee754_64 $form 1, 11, 52
@@ -8,83 +12,49 @@ fieee754_128 $form 1, 15, 112
 p       $proc
 ieee754_32* $name 0
 
-tag     $set	 p(1,1)
-sign    $set    tag/*191
-        
-        $if     sign
-tag     $set    ^tag        
-        $endif
+tag     $set,33	 p(1,1)
+signs   $set    tag*/192-33*/-191
+tag     $set    tag--(signs**((1*/33)-1))    
+characteristic $set (tag/*24)-2
+	$do	tag**((1*/33-1)-1)=0,characteristic	$set	0
 
-characteristic $set (((tag/*183)**128)++((tag/*168)**127))-2
-mantissa $set   ((tag**(1*/168)-1)+(7*/141))/*144
+	$do	$o('V'),	$snap	2
 
-	$nop	adjust any rounding outflow
-	$nop	indicated by a 25th bit
+        $nop	normalising bit truncated
 
-	$if	mantissa**1*/24
-mantissa $set	mantissa/*1
-characteristic $set characteristic+1
-	$endif
-
-        $nop	bits 166..144 -> bits 22..0. Normalising Bit 167 truncated
-
-	$do	tag=0,characteristic	$set	0
-
-        fieee754_32 sign, characteristic, mantissa 
+        fieee754_32 signs, characteristic, tag
         $end
 
 
 p       $proc
 ieee754_64* $name
 
-tag     $set	p(1,1)
-sign    $set    tag/*191
+tag     $set,65	p(1,1)
+signs	$set    tag*/192-65*/-191
+tag     $set	tag--(signs**((1*/65)-1))
+characteristic $set (tag/*53)-2
+	$do	tag**((1*/65-1)-1)=0,characteristic	$set	0
 
-        $if     sign
-tag     $set    ^tag        
-        $endif
+	$do	$o('V'),	$snap	2
 
-characteristic $set (((tag/*180)**1024)++((tag/*168)**1023))-2
-mantissa $set   ((tag**(1*/168)-1)+(7*/112))/*115
+        $nop	normalising bit truncated
 
-	$nop	adjust any rounding outflow
-	$nop	indicated by a 54th bit
-
-	$if	mantissa**(1*/53)
-mantissa $set	mantissa/*1
-characteristic $set characteristic+1
-	$endif
-
-        $nop	bits 166..115 -> bits 51..0. Normalising Bit 167 truncated
-
-	$do	tag=0,characteristic	$set	0
-        
-        fieee754_64 sign, characteristic, mantissa
+        fieee754_64 signs, characteristic, tag
         $end
 
 p	$proc
 ieee754_128* $name
 
-tag	$set	p(1, 1)
-sign	$set	tag/*191
+tag	$set,129	p(1, 1)
+signs	$set	tag*/192-129*/-191
+tag	$set	tag--(signs**((1*/129)-1))
+characteristic $set (tag/*113)-2
+	$do	tag**((1*/129-1)-1)=0,characteristic	$set	0
 
-	$do	sign,tag	$set	^tag
+	$do	$o('V'),	$snap	2
 
-characteristic $set (((tag/*176)**16384)++((tag/*168**16383))-2
-mantissa $set	((tag**(1*/168)-1)+(7*/52))/*55
+	$nop	normalising bit truncated
 
-	$nop	adjust any rounding outflow
-	$nop	indicated by a 114th bit
-
-	$if	mantissa**(1*/113)
-mantissa $set	mantissa/*1
-characteristic $set characteristic+1
-	$endif
-
-	$nop	bits 166..55 -> bits 111.0 Normalising bit 167 truncated
-
-	$do	tag=0,characteristic	$set	0
-
-	fieee754_128	sign, characteristic, mantissa
+	fieee754_128	signs, characteristic, tag
 	$end
 

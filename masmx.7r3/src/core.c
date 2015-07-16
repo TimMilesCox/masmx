@@ -5759,7 +5759,7 @@ static void floating_position(int bits, line_item *item)
    if (bits > RADIX) bits = RADIX / word * word;
    #endif
 
-   characteristic = characteristic_width[(bits-1)/word];
+   characteristic = characteristic_width[(bits-2)/word];
 
    if (characteristic < 24)
    {
@@ -6698,7 +6698,11 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 	    case SET:
 	       x = SET;
-	       if (subfunction > -1) x = subfunction;
+	       if      (subfunction > RADIX) x = subfunction;
+               else if (subfunction < 0)
+               {
+               }
+               else    transient_floating_bits = subfunction;
 
 	       if (thislabel)
 	       {

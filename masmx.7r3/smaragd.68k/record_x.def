@@ -4,10 +4,10 @@ retrieve* $name		1	. signed if field is flag signed
 retrieves* $name	2	. signed override
 retrieveu* $name	0	. unsigned override 
 
-SIGNED	$set	p(1, *5)+p(0, 0)/*1
-BITS	$set	p(1, 5)**0x7FFFFFFF	. -c option is in coldfire.def
-OFFSET	$set	p(1, 4)
-D_REG	$set,"$d_reg"	d0+p(2, 1)
+SIGNED	$equ	p(1, *5)+p(0, 0)/*1
+BITS	$equ	p(1, 5)**0x7FFFFFFF	. -c option is in coldfire.def
+OFFSET	$equ	p(1, 4)
+D_REG	$equ,"$d_reg"	d0+p(2, 1)
 
 	$do	BITS>$word,	$flag	use lretrieve for fields > $word bits
 
@@ -62,11 +62,11 @@ lretrieve* $name	1	. signed if field is flag signed
 lretrieves* $name	2	. signed override
 lretrieveu* $name	0	. unsigned override
 
-SIGNED	$set	p(1, *5)+p(0, 0)/*1
-BITS	$set	p(1, 5)
-OFFSET	$set	p(1, 4)
-D_REG	$set,"$d_reg"	d0+p(2, 1)
-D_REGA	$set,"$d_reg"	D_REG+1**7
+SIGNED	$equ	p(1, *5)+p(0, 0)/*1
+BITS	$equ	p(1, 5)
+OFFSET	$equ	p(1, 4)
+D_REG	$equ,"$d_reg"	d0+p(2, 1)
+D_REGA	$equ,"$d_reg"	D_REG+1**7
 
 	$do	BITS<$word+1,	$flag	use retrieve for fields <= $word bits
 

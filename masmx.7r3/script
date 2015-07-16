@@ -693,6 +693,7 @@ rm ../text.o3/*
 ../masmx quickly ../test.o3/quickly -lyok > ../text.o3/quickly.txt
 ../masmx signify ../test.o3/signify -lyok > ../text.o3/signify.txt
 ../masmx paxels ../test.o3/paxels -lyok > ../text.o3/paxels.txt
+../masmx fieee754 ../test.o3/fieee754 -lyok > ../text.o3/fieee754
 
 ../linkpart
 ../coldfire
