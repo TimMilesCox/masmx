@@ -567,10 +567,13 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 11. <a href="#afloat">Alternative Floating Formats</a>					11
     1.	<a href="#masmxfloat">masmx Floating Format</a>						11.1
-    2.	<a href="#ieeefloat">IEEE754 Floating Values</a>						11.2
+    2.  <a href="#fdemens">Floating Format Dimensions</a>					11.2
+	1.  <a href="#fdemens1">Floating Number Size</a>						11.2.1
+	2.  <a href="#fdemens2">Exponent Field Size</a>						11.2.2
+    3.	<a href="#ieeefloat">IEEE754 Floating Values</a>						11.3
 	1.  <a href="#fpdifferences">Differences between masmx Floating Format and IEEE754 Floating Formats</a>
-									11.2.1
-	2.  <a href="#ieeemacro">Macro Language Generation of IEEE754 Floating Constants</a>	11.2.2
+									11.3.1
+	2.  <a href="#ieeemacro">Macro Language generating IEEE754 Floating Constants</a>	11.3.2
 
 
 
@@ -769,7 +772,7 @@ MASMX 7r3
  
 </pre>
 The included macro package for generating IEEE754 constants is explained in<br>
-section <a href="#ieeefloat">11.2: IEEE754 Floating Formats</a>
+section <a href="#ieeefloat">11.3: IEEE754 Floating Values</a>
 
 
 <a      name="strip1"/>
@@ -2325,7 +2328,7 @@ can be escaped with macro language
 Macros supplied in this package generate IEEE754 floating constants. 
 
 <p>
-See <a href="#ieeefloat">11.2: IEEE754 Floating Values</a>
+See <a href="#ieeefloat">11.3: IEEE754 Floating Values</a>
 
 <p>
 This example generates storage constants of value 1.375e+1200000 in masmx-internal format typed in various source syntax.<br>
@@ -2510,7 +2513,7 @@ floating arrays
 For IEEE754 format,
 macro text requests each number from masmx one bit larger than the target field,<br>
 to force rounding on the true mantissa including the suppressed normalising bit.<br>
-See <a href="#ieeefloat">11.2: IEEE754 Floating Formats</a>
+See <a href="#ieeefloat">11.3: IEEE754 Floating Values</a>
 <pre>
 
 $ masmx -lnk fieee754
@@ -2527,32 +2530,35 @@ CONT_CHAR=|
   :                            1 
   :                            2 f		$func
   :                            3 fieee754_24*	$name	8*/8++24
-  :                            4 
-  :                            5 __BITS		$set	f(0, 0)**255
-  :                            6 __CHARACTERISTIC_BITS	$set	f(0, 0)/*8
-  :                            7 __MANTISSA_BITS	$set	__BITS-__CHARACTERISTIC_BITS
-  :                            8 
-  :                            9 		$nop	size and rounding are already done from the field size+1
-  :                            10 		$nop	isolate the sign and set exponent.mantissa to magnitude
+  :                            4 fieee754_32*	$name	9*/8++32
+  :                            5 fieee754_64*	$name	12*/8++64
+  :                            6 fieee754_128*	$name	16*/8++128
+  :                            7 
+  :                            8 __BITS		$set	f(0, 0)**255
+  :                            9 __CHARACTERISTIC_BITS	$set	f(0, 0)/*8
+  :                            10 __MANTISSA_BITS	$set	__BITS-__CHARACTERISTIC_BITS
   :                            11 
-  :                            12 __NUMBER	$set,__BITS+1	f(1, 1)
-  :                            13 __SIGNS		$set	__NUMBER*/191-__BITS*/-191
-  :                            14 __NUMBER	$set	__NUMBER--__SIGNS
-  :                            15 
-  :                            16 		$do	$o('V'),	$snap	2
-  :                            17 
-  :                            18 		$nop	adjust the characteristic magnitude
-  :                            19 		$nop	truncate the integer bit. slide the exponent over it
+  :                            12 		$nop	size and rounding are already done from the field size+1
+  :                            13 		$nop	isolate the sign and set exponent.mantissa to magnitude
+  :                            14 
+  :                            15 __NUMBER	$set,__BITS+1	f(1, 1)
+  :                            16 __SIGNS		$set	__NUMBER*/-__BITS
+  :                            17 __NUMBER	$set	__NUMBER--__SIGNS
+  :                            18 
+  :                            19 		$do	$o('V'),	$snap	2
   :                            20 
-  :                            21 		$do	__NUMBER^=0,__NUMBER	$set	__NUMBER-(2*/__MANTISSA_BITS+1)
-  :                            22 
+  :                            21 		$nop	adjust the characteristic magnitude
+  :                            22 		$nop	truncate the integer bit. slide the exponent over it
   :                            23 
+  :                            24 		$do	__NUMBER^=0,__NUMBER	$set	__NUMBER-(2*/__MANTISSA_BITS+1)
+  :                            25 
+  :                            26 
                                 		$return	__SIGNS**1*/__BITS-1++|
                                 			(__NUMBER/*__MANTISSA_BITS+1)*/__MANTISSA_BITS++|
-  :                            26 			__NUMBER**((1*/__MANTISSA_BITS)-1)
-  :                            27 
-  :                            28 		$end
-  :                            29 
+  :                            29 			__NUMBER**((1*/__MANTISSA_BITS)-1)
+  :                            30 
+  :                            31 		$end
+  :                            32 
   :                            7 
                                 	+	fieee754_24(-0.0), fieee754_24(1.6), fieee754_24(1.7), fieee754_24(1.8), |
 00:00000000 8000003F999A3FB3333FCCCD3FE667C00000400CCD3B999A
@@ -2560,7 +2566,6 @@ CONT_CHAR=|
   :                            10 
 *EOF*
 :$(00):00000000:00000006 
-
 
 </pre>
 
@@ -7942,7 +7947,7 @@ representation is the ones complement of the entire item.
 This is not IEEE 754 encoding. IEEE 754, or any 
 other encoding different from masmx default, is generated 
 with macros which use the <b>$set</b> directive to capture
-and manipulate a number argument. See section 11.2: IEEE754 Floating Values
+and manipulate a number argument. See section 11.3: IEEE754 Floating Values
 
 <p>
 Macro language does reversed byte order if needed. 
@@ -8884,7 +8889,7 @@ Sign-bit 1 indicates that all bits are inverted.
 
 <p>
 This is not IEEE 754 format. That is supported with macros.
-See Section 1.5: Any floating-point format, Section 11.2: IEEE754 Floating Formats
+See Section 1.5: Any floating-point format, Section 11.3: IEEE754 Floating Values
 
 
 <p>
@@ -15901,12 +15906,103 @@ but the scheme
 </pre>
 is only changed with macro language
 
+<a name="fdemens"/>
+<h2>11.2: Floating Format Dimensions</h2>
+
+<a name="fdemens1"/>
+<h3>11.2.1: Floating Number Size</h3>
+
+masmx rounds floating mantissa values according to field size
+derived from
+
+	<blockquote>
+	the default floating number size, or<br><br>
+
+	a words-given flag on a constant, or<br><br>
+
+	the fields size of a split number row, or<br><br>
+	
+	the subfunction 0..192 of a $set directive
+	</blockquote>
+
+These inputs are the total field size of the floating value.
+Examples of each total size derivation are
+
+<p>
+<b>the default floating number size</b>
+<pre>
+
+	$floating_point	120	. the default floating number size is 120
+
+</pre>
+<b>a words-given flag on a constant</b>
+<pre>
+
+	7.2qe1245000		. this constant is four words in size
+
+</pre>
+<b>the fields size of a split number row</b>
+<pre>
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$word	60
+	$awidth	24
+        -0.0, 1.5, -1.6, 2.5, -2.6, 3.5, -3.6, 4.6, -4.6x:t
+	. 9 * 20-bit floating constants
+	$end
+  :                            1  $word 60
+  :                            2  $awidth 24
+00:000000 FFFFF41C00BE33242A00BD59842E00BD19843934BC6CB
+                              +3         -0.0, 1.5, -1.6, 2.5, -2.6, 3.5, -3.6, 4.6, -4.6x:t
+  :                            4  . 9 * 20-bit floating constants
+  :                            5  $end
+:$(00):000000:000003 
+
+</pre>
+<b>the subfunction 0..192 of a $set directive</b>
+<pre>
+
+name	$set,65	1.6e4032	. 64-bit  value plus 1 extra bit
+				. cached in label <i>name</i>
+
+</pre>
+
+
+The mantissa size is this total field minus the
+characteristic field
+
+<a name="fdemens2"/>
+<h3>11.2.2: Exponent Field Size</h3>
+
+The exponent field size is the characteristic field size
+minus one sign bit
+
+<p>
+masmx caches a characteristic field width for each floating number size in words,<br>
+plus one characteristic width for compressed floating values which are any size
+less than one word
+
+<p>
+Directives here assign floating number dimension settings for PowerPC
+<pre>
+	
+	$word		32
+	$floating_point	64	# default is a double
+	$characteristic	12	# exponent field is 11 bits
+	$characteristic,32 9	# exponent field for a single is 8 bits
+	$characteristic,24 8 	# exponent field for fp number < 1 word is 7 bits
+
+</pre>
+
+
 <a      name="ieeefloat"/>
-<h2>11.2: IEEE754 Floating Values</h2>
+<h2>11.3: IEEE754 Floating Values</h2>
 
 
 <a      name="fpdifferences"/>
-<h3>11.2.1: Differences between masmx Floating Format at IEEE754 Floating Formats</h3>
+<h3>11.3.1: Differences between masmx Floating Format at IEEE754 Floating Formats</h3>
 
 <p>
 This package contains macros for assembling 128-bit,  64- and 32-bit
@@ -16012,14 +16108,14 @@ MASMX 7r2
 </pre>
 
 <a      name="ieeemacro"/>
-<h3>11.2.2: Macro-Language Generation of IEEE754 Floating Constants</h3>
+<h3>11.3.2: Macro-Language generating IEEE754 Floating Constants</h3>
 
 The macro language for generating IEEE754 floating values is shown here.
 
 <pre>
 
 
-$ cat ieee754.def
+$ cat ieee754.def 
 
 	$floating_point	32
 	$characteristic	9
@@ -16027,9 +16123,9 @@ $ cat ieee754.def
 	$characteristic,128 16
 	
 
-fieee754_32 $form 1, 8, 23
-fieee754_64 $form 1, 11, 52
-fieee754_128 $form 1, 15, 112
+"$fieee754_32"	$form	1, 8, 23
+"$fieee754_64"	$form	1, 11, 52
+"$fieee754_128"	$form	1, 15, 112
 
 p       $proc
 ieee754_32* $name 0
@@ -16038,7 +16134,10 @@ ieee754_32* $name 0
 	$nop	the normalising bit is suppressed on storage
 
 tag     $set,33	 p(1,1)
-signs   $set    tag*/192-33*/-191
+
+	$nop	extend the sign and XOR the number to a magnitude
+
+signs   $set    tag*/-32
 tag     $set    tag--signs
 characteristic $set (tag/*24)-2
 	$do	tag=0,characteristic	$set	0
@@ -16047,9 +16146,8 @@ characteristic $set (tag/*24)-2
 
         $nop	normalising bit truncated by copy to 23-bit field
 
-        fieee754_32 signs, characteristic, tag
+        $fieee754_32	signs, characteristic, tag
         $end
-
 
 
 p       $proc
@@ -16059,7 +16157,10 @@ ieee754_64* $name
 	$nop	the normalising bit is suppressed on storage
 
 tag     $set,65	p(1,1)
-signs	$set    tag*/192-65*/-191
+
+	$nop	extend the sign and XOR the number to a magnitude
+
+signs	$set    tag*/-64
 tag     $set	tag--signs
 characteristic $set (tag/*53)-2
 	$do	tag=0,characteristic	$set	0
@@ -16068,10 +16169,8 @@ characteristic $set (tag/*53)-2
 
         $nop	normalising bit truncated by copy to 52-bit field
 
-        fieee754_64 signs, characteristic, tag
+        $fieee754_64	signs, characteristic, tag
         $end
-
-
 
 p	$proc
 ieee754_128* $name
@@ -16080,7 +16179,10 @@ ieee754_128* $name
 	$nop	the normalising bit is suppressed on storage
 
 tag	$set,129	p(1, 1)
-signs	$set	tag*/192-129*/-191
+
+	$nop	extend the sign and XOR the number to a magnitude
+
+signs	$set	tag*/-128
 tag	$set	tag--signs
 characteristic $set (tag/*113)-2
 	$do	tag=0,characteristic	$set	0
@@ -16089,9 +16191,8 @@ characteristic $set (tag/*113)-2
 
 	$nop	normalising bit truncated by copy to 112-bit field
 
-	fieee754_128	signs, characteristic, tag
+	$fieee754_128	signs, characteristic, tag
 	$end
-
 
 </pre>
 IEEE754 format floating numbers are supported on many
@@ -16110,7 +16211,7 @@ and precision. The transient value is 192 bits in size
 The directive $SET,<i>number_size</i> caches the floating value
 in the label <i>tag</i>. For IEE754 an extra bit is requested from masmx,
 and this causes masmx to round on the true mantissa including the
-normalising bit, wbich macro code must suppress
+normalising bit, which macro code must suppress
 
 <p>
 The cached value in <i>tag</i> may be 1s-complement. If it is, XOR with
@@ -16119,18 +16220,19 @@ invert the sign bit for negative polarity, not the whole number.
 
 <p>
 sign, characteristic and mantissa are output under control of the
-form-template fieee754_32, fieee754_64 or fieee754_128.
+form-template <b>$fieee754_32</b>, <b>$fieee754_64</b> or <b>$fieee754_128</b>
 
 <p>
 Three $form templates organise the bit-fields of the floating values
 
+<p>
 This form
 <pre>
 
-fieee754_32	$form	1, 8, 23
+"$fieee754_32"	$form	1, 8, 23
 
 </pre>
-Causes the "instruction" fieee754_32 to construct its arguments in
+Causes the "instruction" <b>$fieee754_32</b> to construct its arguments in
 this layout:
 <pre>
 
@@ -16145,10 +16247,10 @@ this layout:
 This form
 <pre>
 
-fieee754_64	$form	1, 11, 52
+"$fieee754_64"	$form	1, 11, 52
 
 </pre>
-Causes the "instruction" fieee754_64 to construct its arguments in
+Causes the "instruction" <b>$fieee754_64</b> to construct its arguments in
 this layout:
 <pre>
 
@@ -16162,11 +16264,11 @@ this layout:
 This $form
 <pre>
 
-fieee754_128	$form	1, 15, 112
+"$fieee754_128"	$form	1, 15, 112
 
 </pre>
 <p>
-causes the "instruction" <b>fieee754_128</b> to construct its arguments in
+causes the "instruction" <b>$fieee754_128</b> to construct its arguments in
 this layout:
 <pre>
 
@@ -16714,7 +16816,7 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 
 
 	-D	translate \<i>ESCAPED</i> octal and hex sequences in "strings"
-		and in 'integers' in apostrophe according when
+		and in 'integers' in apostrophe if
 
 			-c is opted
 
@@ -16724,42 +16826,51 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 		translate only unescaped quoted symbols
 
 
+	-E	floating point rounding guard pattern is 111
+		this is the default
+
+		guard pattern is newly set to 111 on
+
+			$set_option "E"
+
 	-F	floating point rounding guard pattern is 110
 		instead of 111
 
-	-G	floating point rounding guard pattern is 101
+		guard pattern is newly set to 110 on
+
+			$set_option "F"
+
+	-G	floating point rounding guard pattern is 100
 		instead of 111
 
-		the mantissa is always generated longer than
-		it is stored. The guard pattern bits are added
-		to the most significant of the truncated bits
-		and may carry into the stored mantissa
+		guard pattern is newly set to 100 on
 
-		This sketch represents the mantissa before rounding
-		by means of the addition of guard bits. Of course the
-		mantissa may outflow as a result of rounding. In that
-		case the mantissa is shifted right one position to
+			$set_option "G"
+
+		the mantissa is always generated longer than
+		it is stored. The OR of three guard pattern bits 
+		AND their corresponding truncated bit is carried
+		into the mantissa
+
+		The mantissa may outflow as a result of rounding.
+		Then the mantissa is shifted right one position to
 		normalise again and the exponent is incremented
 
-		The representation is of a positive magnitude mantissa
-		with the value 1 at the normalising position
+		The guard pattern is added simply during repositioning
+		cycles when translating decimal scales
 
-		A mantissa of value +-zero cannot be normalised
-
-
-		 normalising value unless the mantissa value is zero
 		 ___________________________________________________
 		 |
 		 |    mantissa for storage        truncated part
 	_ _ _ _ _._______________________________________________
-	 	|1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|yyyyyyyyyyyyyyy|
-	exponent|0000000000000000000000000000000|101000000000000|+
+	 	|1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|yyyyyyyyyyyyyyy|*
+	exponent|0000000000000000000000000000000|111000000000000|*++
 	_ _ _ _ |_______________________________|_______________|
 						 | |
 						 |_|____________
 						 111
 						 110
-						 101
+						 100
 
 						 possible values of
 						 the three rounding
