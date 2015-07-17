@@ -1,6 +1,9 @@
 
 f		$func
 fieee754_24*	$name	8*/8++24
+fieee754_32*	$name	9*/8++32
+fieee754_64*	$name	12*/8++64
+fieee754_128*	$name	16*/8++128
 
 __BITS		$set	f(0, 0)**255
 __CHARACTERISTIC_BITS	$set	f(0, 0)/*8
