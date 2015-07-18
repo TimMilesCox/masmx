@@ -685,4 +685,7 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz gardenia ..\test.zo3\gardenia -lok > ..\text.zo3\gardenia.txt
 ..\masmz trag ..\test.zo3\trag -lok > ..\text.zo3\trag.txt
 ..\masmz craft ..\test.zo3\craft -lok > ..\text.zo3\craft.txt
+..\masmz funs ..\test.zo3\funs -lok > ..\text.zo3\funs.txt
+..\masmz aehnlich ..\test.zo3\aehnlich.txo -lok > ..\text.zo3\aehnlich.txt
+..\masmz overlap ..\test.zo3\overlap.txo -lok > ..\text.zo3\overlap.txt
 

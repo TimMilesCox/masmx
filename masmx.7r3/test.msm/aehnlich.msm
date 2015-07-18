@@ -1,0 +1,22 @@
+.	$include	../aside.dem/ppc64map.def
+	$word	32
+	$quantum 8
+	$awidth	32:64
+
+$(25::*000FC00A80000000)
+	+	globule1:d
+	+	globule2:d
+	+	globule3:d
+	+	globule4:d
+	+	tally:d
+$(25::*$)
+globule1	$res	3*/30
+$(25::*$)
+globule2	$res	3*/30
+$(25::*$)
+globule3	$res	3*/30
+$(25::*$)
+globule4	$res	3*/30
+$(25::*$)
+tally	+	99
+rally	$equ	$

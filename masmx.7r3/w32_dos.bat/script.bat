@@ -704,6 +704,9 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx trag ..\test.o3\trag -lyok > ..\text.o3\trag.txt
 ..\masmx raft ..\test.o3\raft -lyok > ..\text.o3\raft.txt
 ..\masmx craft ..\test.o3\craft -lyok > ..\text.o3\craft.txt
+..\masmx funs ..\test.o3\funs -lyok > ..\text.o3\funs.txt
+..\masmx aehnlich ..\test.o3\aehnlich.txo -lyok > ..\text.o3\aehnlich.txt
+..\masmx overlap ..\test.o3\overlap.txo -lyok > ..\text.o3\overlap.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

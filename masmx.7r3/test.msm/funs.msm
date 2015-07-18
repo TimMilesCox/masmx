@@ -1,0 +1,11 @@
+	$set_option		"Q"
+	$word	8
+	$awidth	16
+_	$equ,"$function"	"$"
+@*	$func
+	$return	_(1)
+	$end
+$(1:0)
+	$res	4096
+$(0:2048)
+	+	"@"
