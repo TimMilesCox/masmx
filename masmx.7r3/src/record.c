@@ -391,7 +391,9 @@ static int precord(object *l, char *line, char **data, int nest)
       {
          positions -= x;
          op = first_at(argument, " ");
+         transient_floating_bits = x;
          threshold = xpression(argument, op, NULL);
+         transient_floating_bits = 0;
 
          if (selector['q'-'a']) printf("[-%d=%d]\n", x, positions);
 

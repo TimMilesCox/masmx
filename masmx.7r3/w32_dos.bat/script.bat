@@ -702,6 +702,8 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx paxel16 ..\test.o3\paxel16 -lyok > ..\text.o3\paxel16.txt
 ..\masmx gardenia ..\test.o3\gardenia -lyok > ..\text.o3\gardenia.txt
 ..\masmx trag ..\test.o3\trag -lyok > ..\text.o3\trag.txt
+..\masmx raft ..\test.o3\raft -lyok > ..\text.o3\raft.txt
+..\masmx craft ..\test.o3\craft -lyok > ..\text.o3\craft.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

@@ -1,0 +1,5 @@
+	$word	16
+tight	$record		100.0 -1*+2 0.1 -0.1 
+?	$do	4,position(?)	24
+	$root
+

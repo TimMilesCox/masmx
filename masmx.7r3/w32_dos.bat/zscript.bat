@@ -684,4 +684,5 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz paxel16 ..\test.zo3\paxel16 -lok > ..\text.zo3\paxel16.txt
 ..\masmz gardenia ..\test.zo3\gardenia -lok > ..\text.zo3\gardenia.txt
 ..\masmz trag ..\test.zo3\trag -lok > ..\text.zo3\trag.txt
+..\masmz craft ..\test.zo3\craft -lok > ..\text.zo3\craft.txt
 

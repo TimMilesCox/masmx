@@ -6704,6 +6704,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		  insequate(x, thislabel, argument, param);
 	       }
 
+               transient_floating_bits = 0;
 	       break;
 
                #ifdef BLANK
