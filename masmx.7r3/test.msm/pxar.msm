@@ -1,0 +1,44 @@
+	$word		32
+	$cont_char	'|'
+	$do	$o('k')=0,	$exit	this assembly depends on option -k
+
+	$include	zones.def
+
+ROWS	$equ	2*64
+COLUMNS	$equ	3*64
+
+
+p	$proc
+muster*	$name
+
+p       $proc
+horizontal* $name
+
+p       $proc
+slice*  $name
+
+t*	$func
+area	$do	zone(?),				|
+	$do	!*24-24+t(1, 1)+1>zone(?, area)\1,	|
+	$do	!*24-24+t(1, 1)-1<zone(?, area)\2,	$return	zone(?,area)\3*+zone(?,area)\4
+	$return	DEFAULT
+	$end
+
+*       $record t(0) t(1) t(2) t(3) t(4) t(5) t(6) t(7)		|
+		t(8) t(9) t(10) t(11) t(12) t(13) t(14) t(15)	|
+		t(16) t(17) t(18) t(19) t(20) t(21) t(22) t(23)
+        $do     24,      24
+        $root
+        $end
+*       $record
+
+!       $do     COLUMNS/24,field(!)      slice
+        $root
+        $end
+*	$record
+?	$do	ROWS,row(?)	horizontal
+	$root
+	$end
+
+
+video	muster

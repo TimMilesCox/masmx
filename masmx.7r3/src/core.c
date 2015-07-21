@@ -6693,6 +6693,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 	    case SET:
 	       x = SET;
+               j = transient_floating_bits;
 	       if      (subfunction > RADIX) x = subfunction;
                else if (subfunction < 0)
                {
@@ -6704,7 +6705,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		  insequate(x, thislabel, argument, param);
 	       }
 
-               transient_floating_bits = 0;
+               transient_floating_bits = j;
 	       break;
 
                #ifdef BLANK

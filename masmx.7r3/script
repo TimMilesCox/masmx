@@ -703,6 +703,7 @@ rm ../text.o3/*
 ../masmx funs ../test.o3/funs -lyok > ../text.o3/funs.txt
 ../masmx aehnlich ../test.o3/aehnlich.txo -lyok > ../text.o3/aehnlich.txt
 ../masmx overlap ../test.o3/overlap.txo -lyok > ../text.o3/overlap.txt
+../masmx pxar ../test.o3/pxar -lyok > ../text.o3/pxar.txt
 
 ../linkpart
 ../coldfire

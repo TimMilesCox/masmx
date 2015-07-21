@@ -1,0 +1,4 @@
+DEFAULT	$set,24	1.0
+
+x	$do	40,zone(10+x-1, 1)	$equf	31-x, 60-x, 101-x, 1
+x	$do	12,zone(60+x-1, 1)	$equf	80-x, 90-x, 100.0
