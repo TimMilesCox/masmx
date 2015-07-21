@@ -6430,7 +6430,8 @@ The first part of the first macro examines
 The macro floating_string places the string pointer in a0 and calls s2double
 
 <p>
-s2double is shown among examples of masmx macro-language for ColdFire instruction code at Appendix F.3
+s2double is shown among examples of masmx macro-language for ColdFire instruction code at
+Appendix <a href="#coldfire">F.3.1: ColdFire</a>
 
 
 <p>
