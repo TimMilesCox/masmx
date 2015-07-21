@@ -319,7 +319,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    2.  <a href="#record_macro">Macro Code Access to Bit-Aligned Fields and Groups</a>	5.2.2.2
 	    3.	<a href="#record_overlay">Overlaid Structures $record,$branch</a>			5.2.2.3
 	    4.	<a href="#signed_bitfield">Signed Bit Fields</a>					5.2.2.4
-	    5.	<a href="#record_float">$record compressed floating constant arrays</a>			5.2.2.5
+	    5.	<a href="#record_float">$record compressed floating constant arrays</a>		5.2.2.5
 
 6.  <a href="#algors">Run-Time Algorithm Plotter</a>						6
 
