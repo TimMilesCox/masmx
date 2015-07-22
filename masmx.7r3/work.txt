@@ -996,7 +996,7 @@ See <a href="#sections">7: Constructing Program Sections</a>
 A label declared in quotes starts with anything and contains anything
 
 <p>
-Without case-sensitive option -k all labels and references are translated to uppercase
+Without case-sensitive <a href="#option_k">option -k</a> all labels and references are translated to uppercase
 
 <p>
 A label may have an arbitrary number of subscripts
@@ -1581,8 +1581,15 @@ QDELIM='
 See also <a href="#internalf">4.7: masmx Internal Functions in Detail</a>
 
 <p>
-Assembling with -k option,  directives, masmx-internal functions and all names supplied by masmx must be typed lowercase<br>
-Internal functions are in summary:
+
+<p>
+All labels internal to masmx, these internal function names and also
+<a href="#Directives">directives plus subcommand names</a>
+may always be referenced in lowercase.<br>
+With <a href="#option_k">option -k</a> masmx-supplied names may only be referenced in lowercase
+
+<p>
+Internal functions are in summary
 
 <pre>
 
@@ -1878,6 +1885,12 @@ Others govern conditional assembly
 And other directives frame macros
 
 <p>
+All labels internal to masmx, <a href="#Directives">directives plus subfunction names</a> and
+<a href="#ifunction">masmx internal functions</a> may always be referenced in lowercase.<br>
+With <a href="#option_k">option -k</a> masmx-supplied names may only be referenced in lowercase
+
+
+<p>
 All directives may  be aliased to other names using the $equ directive,
 and frequently are, for example
 <pre>
@@ -1916,7 +1929,9 @@ A token in the command field only begins with a quote if it is a <a href="#text_
 Directive names and macro names always are recognised in the command field without quotes
 
 <p>
-Assembling with -k option,  directives, masmx-internal functions and all names supplied by masmx must be typed lowercase
+All labels internal to masmx, <a href="#Directives">directives plus subfunction names</a> and
+<a href="#ifunction">masmx internal functions</a> may always be referenced in lowercase.<br>
+With <a href="#option_k">option -k</a> masmx-supplied names may only be referenced in lowercase
 
 <p>
 Number storage constants start with a digit, sign or single quote, or have the name
@@ -8895,7 +8910,7 @@ case_required $proc
 
 </pre>
 <p>
-The developer needed <b>-k</b> flag (case significant labels) to be set on the
+The developer needed <a href="#option_k">-k flag</a> (case significant labels) to be set on the
 command line. -k may not be opted with <b>$set_option</b> directive
 
 
@@ -10218,14 +10233,15 @@ This assembly is made more visible futher down. The ljmp/lcall macro
 and the nop/ret/reti macro are exposed.
 <pre>
 
-MASMX 7r2
+$ masmx forjoy -ln
+MASMX 7r3
 3/forjoy.msm
 CONT_CHAR=
 LTERM=;
 QDELIM='
 STERM=.
 *EOF*
-  :                            1:         $include        "8051_7r2.def"
+  :                            1:         $include        8051.def
   :                            2 
 00:0000 0203EB                +3         ljmp    for.joy
   :                            4         $res    1000
@@ -10238,8 +10254,6 @@ STERM=.
 00:03F0 22                    +11         ret
 *EOF*
 :$(00):0000:03F1 :$(01):0400:0400 
-forjoy.msm: object code 81 bytes: 0 errors: 0 undefined labels
-
 
 
 </pre>
@@ -16718,6 +16732,7 @@ The full set of masmx command line options are
     					Giant Address Spaces
 					Interfacing with GNU Tools
 	
+		<a	name="option_k"/>
 	-k      labels are case-significant
 
 	-l      list source and assembly when the $list setting is 
@@ -18455,15 +18470,15 @@ ________________________________________________________________________________
 
 LICENCE NOTE
 
-    Copyright Tim Cox, 2012
+    Copyright Tim Cox, 2015
     TimMilesCox@gmx.ch
 
-    This document describes the masmx.7r2 target-independent meta-assembler.
+    This document describes the masmx.7r3 target-independent meta-assembler.
 
     masmx.7r3 is free software. It is licensed
     under the GNU General Public Licence Version 3
 
-    You can redistribute it and/or modify masmx.7r2
+    You can redistribute it and/or modify masmx.7r3
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
@@ -18474,7 +18489,7 @@ LICENCE NOTE
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with masm.7r2.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+    along with masm.7r3.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
 
 </i>
 </pre>
