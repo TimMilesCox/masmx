@@ -63,7 +63,7 @@ The documentation proper is three directories down from here, in
 
 and	http:/TimMilesCox.github.io/masmx/masmx.html
 
-If you just want to use masmx.7r2 and the binary for your machine
+If you just want to use masmx.7r3 and the binary for your machine
 is already here, then you only need the second tree below this one
 
         masmx/masmx.7r3/masmx.7r3/
