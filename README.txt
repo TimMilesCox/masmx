@@ -1,24 +1,24 @@
 
-    copyright Tim Cox, 2012
+    copyright Tim Cox, 2015
     TimMilesCox@gmx.ch
 
-    This file is part of masmx.7r2
+    This file is part of masmx.7r3
 
-    mamsx.7r2 is a target-independent meta-assembler for all
+    mamsx.7r3 is a target-independent meta-assembler for all
     architectures
 
-    masmx.7r2 is free software: you can redistribute it and/or modify
+    masmx.7r3 is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    mamsx.7r2 is distributed in the hope that it will be useful,
+    mamsx.7r3 is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with masmx.7r2.  If not, see <http://www.gnu.org/licenses/>.
+    along with masmx.7r3.  If not, see <http://www.gnu.org/licenses/>.
 
     __________________________________________________________________
 
@@ -28,8 +28,8 @@
 
 
 _______________________________________________________________________________
-This is the freeware code tree
-masmx.7r2 documentation and downloads are at http://timmilescox.github.io/masmx
+This is the freeware code and tests tree
+masmx.7r3 documentation and downloads are at http://timmilescox.github.io/masmx
 _______________________________________________________________________________
 
 
@@ -38,17 +38,17 @@ _______________________________________________________________________________
 
 
 
-masmx.7r2
+masmx.7r3
 _________
 
-masmx.7r2 is a target-indendent meta-assembler for any target
+masmx.7r3 is a target-indendent meta-assembler for any target
 It is used by writing a file of macro code for defining the
 target architecture and including that in your source or in
 a wrapper which also includes your source
 
-masmx.7r2 runs from shell commmand lines
+masmx.7r3 runs from shell commmand lines
 
-masmx.7r2 macro language can understand source code syntaxes meant
+masmx.7r3 macro language can understand source code syntaxes meant
 for other assemblers
 
 
@@ -59,12 +59,14 @@ ______________________
 
 The documentation proper is three directories down from here, in
 
-        masmx/masmx.7r2/masmx.7r2/doc
+        masmx/masmx.7r3/masmx.7r3/doc
+
+and	http:/TimMilesCox.github.io/masmx/masmx.html
 
 If you just want to use masmx.7r2 and the binary for your machine
 is already here, then you only need the second tree below this one
 
-        masmx/masmx.7r2/masmx.7r2/
+        masmx/masmx.7r3/masmx.7r3/
 
 which contains
 
@@ -77,15 +79,27 @@ The ready-made binaries are in
 	hosts/osx.ppc
 	hosts/win32
 
+
+
 hosts contains the binaries and targets contains some macro language
 for target architectures
 
+Downloads
+_________
 
-Building
-________
+The downloads page for everything is
+
+	http:/TimMilesCox.github.io/masmx/
+
+There are a download for binaries and manuals
+and a much larger download for build and test
 
 
-	masmx/masmx.7r2/HOWTO.txt
+Building and Testing
+____________________
 
-has some information about building masmx.7r2 for new targets
+
+	masmx/masmx.7r3/src/README.txt
+
+has some information about building and asmx.7r3 for new targets
 
