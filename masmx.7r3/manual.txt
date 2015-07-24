@@ -455,7 +455,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 			word group in the text-encoded binary.
 
 			Stack an unresolved relocation tuple
-			for replay to the $MAP linking macro		8.39
+			for replay to the $map linking macro		8.39
 
     40.	<a href="#quantum">$quantum</a>	set address quantum				8.40
 
@@ -9335,7 +9335,7 @@ Linking Directive
 </pre>
 <p>
 Reads a text encoded binary and submits each text line in it to
-the developer-supplied link macro $MAP
+the developer-supplied link macro <b>$map</b>
 
 <p>
 The optional second argument selects and orders the segments to be taken
@@ -9383,7 +9383,7 @@ $(0:*4)
 Specific handling can be applied to each segment of each input file.
 See Sections 9.2.2 masmx Linking in Principle, 9.2.3: Demonstration
 Links (PowerPC).
-The link macro definition including $MAP macro must be already included.
+The link macro definition including <b>$map</b> macro must be already included.
 
 <p>
 The default file name extension is txo, as
@@ -9420,7 +9420,7 @@ Giant Address Spaces, Interfacing with GNU Tools</a>
 
 
 <a	name="info"/>
-<h2>8.25: $info       Linking Directive used within $MAP macro</h2>
+<h2>8.25: $info       Linking Directive used within $map macro</h2>
 <h3>8.25.1: $info, $offset     Replace Information at the Relocation Stack Top</h3>
 
 <p>
@@ -9495,7 +9495,7 @@ to the known field size and signed/unsigned attribute at the relocation
 stack top.
 
 <p>
-Version $range_check of range check is used where the $MAP macro
+<b>$range_check</b> is used where the <b>$map</b> macro
 maintains a 192-bit offset during the successive accumulation of
 relocation clauses for one field.
 
@@ -9504,7 +9504,7 @@ The check errors if the final value applied does not fit the field.
 See Sections 9.2.3.7-8, 9.10: Linking in Giant Space.
 
 <p>
-$range_check1 requests more stringent behaviour than $range_check:
+<b>$range_check1</b> requests more stringent behaviour than <b>$range_check</b>:
 where more than one relocation clause applies to one field of code
 
 <pre>
@@ -9512,8 +9512,8 @@ where more than one relocation clause applies to one field of code
 	$info,$range_check1	value
 
 </pre>
-$range_check1  also requests masmx linker to range check value for the
-field at the relocation stack top. In contrast to RANGE_CHECK, each
+<b>$range_check1</b> requests masmx to range check each new intermediate
+value at the relocation stack top. In contrast to <b>$range_check</b>, each
 addition of a successive relocation tuple (where they are more than one)
 to the target field must stay in range.
 
@@ -9871,7 +9871,7 @@ Linking Directive
 
 </pre>
 <p>
-is used in the developer-supplied $MAP macro to write updated code
+is used in the developer-supplied <b>$map</b> macro to write updated code
 to the new Text Encoded Binary output file.
 
 <p>
@@ -10752,7 +10752,7 @@ field	$set	value+(($data/*scale)**mask)
 <div	style="color:A0A0A0">
 <pre>
 index	$do	p(),	superword	p(index, 1)
-	$end	. of $MAP
+	$end	. of $map
 
 </pre>
 </div>
@@ -12871,7 +12871,7 @@ Linking begins when a Text Encoded Binary is included
 The second argument for picking and ordering segments is optional.
 
 <p>
-macro $MAP must be declared before any binary includes.
+macro <b>$map</b> must be declared before any binary includes.
 <pre>
 
 	$include		"map_macro.def"
@@ -12898,19 +12898,19 @@ relocatable code although not all must:
 </pre>
 <p>
 $include,$binary sends all the superwords in the Text Encoded Binary files
-to the $MAP macro, one line of superwords at a time.
+to the <b>$map</b> macro, one line of superwords at a time.
 
 <p>
-The $MAP macro is not part of the assembler. Definitions for PowerPC
+The <b>$map</b> macro is not part of the assembler. Definitions for PowerPC
 linking, <b>map_ppc.def</b> and <b>ppc64map.def</b>, are in this package
-and have a $MAP macro for PowerPC.
+and have a <b>$map</b> macro for PowerPC.
 
 <p>
 masmx itself uses the location lines and summary tables. Only the
-superwords of code go to $MAP macro.
+superwords of code go to <b>$map</b> macro.
 
 <p>
-$MAP macro uses some or all of these masmx linking features:
+<b>$map</b> macro uses some or all of these masmx linking features:
 <ul>	
 	directive	$set,$binary
 <pre>
@@ -13021,7 +13021,7 @@ to "this" field.
 
 <p>
 <b>$range_check1</b> is of higher stringency than <b>$range_check</b>. See
-Section 8.26.2, and Section 9.2.3: Link Examples. A $MAP macro using
+Section 8.26.2, and Section 9.2.3: Link Examples. A <b>$map</b> macro using
 <b>$range_check</b> maintains (where multiple relocation tuples may drive
 a field out of range and then again into range) intermediate results
 at 192-bit precision.
@@ -13091,7 +13091,7 @@ index	$do	p(),	superword	p(index, 1)	# send each superword to procedure superwor
 
 </pre>
 <p>
-<b>$MAP</b> macro is called for each line of Text Encoded Binary which
+<b>$map</b> macro is called for each line of Text Encoded Binary which
 contains any code superwords.
 
 <p>
@@ -13889,7 +13889,7 @@ function soso in soso.c has changed from "unknown" minus 00000044 to
 
 <p>
 The adjusted offset addend in FFFFFF28 is placed in the relocation
-stack by macro language in $MAP macro with the $info,$offset directive.
+stack by macro language in <b>$map</b> macro with the $info,$offset directive.
 
 <p>
 This step is necessary when three circumstances combine:
@@ -14683,7 +14683,7 @@ giant addresses can come from the link source or from the input
 Text Encoded Binary
 
 <p>
-The $MAP macro used in giant space has this structure.
+The <b>$map</b> macro used in giant space has this structure.
 
 <p>
 Where operand fields can relocate out of their range and then
@@ -14758,7 +14758,7 @@ field	$set	sum+(($data/*scale)**mask)
 	$end	. RELOCATE
 
 index	$do	p(),	word	p(index, 1)
-	$end	. $MAP
+	$end	. $map
 
 </pre>
 
