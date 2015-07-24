@@ -6921,8 +6921,8 @@ Absolute here means linker-absolute not physically relocated. The
 breakpoint address does not change code's view of the storage sections
 
 <p>
-The physical address HARDWARE_LOADA is not visible to the code but is
-used in the load strings.
+The physical address HARDWARE_LOADA is not visible to target code but is
+used in load strings.
 
 <p>
 Multi-bank images for relocating hardware can be generated in this way.
