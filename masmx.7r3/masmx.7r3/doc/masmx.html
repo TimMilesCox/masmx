@@ -6794,8 +6794,10 @@ $(3:40960)	. locator $(3) concerns addresses from 40960
 Listings show the program-logical addresses. To see the load
 addresses instead, use the -d flag as well as the -l flag
 
-Program code never accesses the physical load
-address except via masmx internal function $bank_index (Section 4.6.5)
+<p>
+Target code never accesses the physical load
+address except with masmx internal function <a href="#bix">$bank_index</a>
+<a href="#ifunction">(4.2.2.3 masmx Internal Functions)</a>
 
 <a      name="vbreakpt"/>
 <h4>7.1.2.2: Breakpointed Location Counters: -v Option</h4>
