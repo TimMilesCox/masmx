@@ -788,8 +788,8 @@ section <a href="#ieeefloat">11.3: IEEE754 Floating Values</a>
 <a      name="stridata"/>
 <h3>1.6.1:  Structured Data</h3>
 
-mamsx can construct complex hierarchical data. See section 4.6 Iterated Coded and
-Structured Data
+mamsx can construct complex hierarchical data.
+See <a href="#structure">5: Iterated Coded and Structured Data</a>
 
 
 <a      name="stribata"/>
@@ -4852,12 +4852,15 @@ Example
 
 <b>$do</b> directive repeats a line of code. An optional label is a count value ascending from 1.
 
-See also section <b>8.9: $do Directive</b>
+See also <a href="#do">8.9: $do</a> directive
 
 <p>
-It this example a routine generating floating constants with 11-bit exponent field uses a table to scale the floating number according to its decimally expressed exponent in the range &plusmn;307
+This $do example generates 615 floating constants with 11-bit exponent field.<br>
+A scan routine uses this table to scale a floating number by its decimally
+expressed exponent in the range &plusmn;307
 <pre>
 
+powers10_table
 scale	$do	615,	1*+scale-308	. 1.0e[-307..+307]
 
 </pre>
