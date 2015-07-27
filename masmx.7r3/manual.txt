@@ -84,10 +84,13 @@ can assemble and load code is
 of words or bytes, whichever the target address quantum is)
 
 <p>
-Memories this large are not immediately expected, but masmx
-calculates and labels numbers of this size.<br>
-There is no reason why an assembler for all targets should have
-less maximum address range than maximum number size
+Memories this large are not immediately expected.
+However very large address spaces are often partly populated,<br>
+with system memory at low-order addresses and boot or peripheral logic
+at the highest addresses.<br>No force of convention can prevent a a semiconductor supplier
+from devising, for example, a 72-bit address space<br> where the 8 high-order bits select
+memory and peripheral busses
+
 </blockquote>
 </div>
 
@@ -3868,7 +3871,8 @@ $(4:0400000,2)
   :                            4  $end
 :$(04):400000:400005 
 -INPUT>>: object code 44 bytes: 0 errors: 0 undefined labels
-Tim-Coxs-MacBook:~ timcox$ cat temp.txo
+
+$ cat temp.txo
 
 
 </pre>
@@ -5167,7 +5171,7 @@ transport.msm=0<00000003
 of code routines in the manner of block-structured languages
 <pre>
 
-Tim-Coxs-MacBook:test.msm timcox$ masmx -lnkx routines
+$ masmx -lnkx routines
 MASMX 7r3
 3/routines.msm
 CONT_CHAR=|
@@ -6613,7 +6617,7 @@ $(0:0)
 </pre>
 means switch to location counter 0 and initialise it 
 to absolute unrelocatable 0. This the default environment
-beginning of main assembly
+at the start of main assembly
 
 <p>
 Program sections addressing is initialised for example
@@ -6686,163 +6690,191 @@ segment have a tuple base+displacement attribute.
 <a      name="breakpoint"/>
 <h3>7.1.2: Breakpointed Location Counters</h3>
 
-Breakpointed location counters concern targets where software assigns
-memory blocks dynamically into windows of address space
+Breakpointed location counters concern targets with hardware relocation.<br>
+A physical or translated relocation value for a block of program space
+is known at assembly time
 <p>
 <i>breakpoint value</i> in the location counter switch identifies
-the load space for which the the current segment is assembling
+a load space
 <pre>
 
 $(id:logical_base_address:<i>breakpoint value</i>)
 
 </pre>
 
-The section identified by location counter may have many segments in
-different memory blocks. The segments may share program-visible addresses 
+Code only accesses program-absolute addresses. <i>breakpoint value</i> is
+not code-visible but can be retrieved to construct vector information
 
 <a      name="abreakpt"/>
 <h4>7.1.2.1 Physical Address Offset</h4>
 
-The breakpointed location counter may be used to describe the absolute
-locations of physically-relocated banks.
-
-<p>
-A locator with a breakpoint value has the syntax
+In this example of absolute relocation, code points at program-absolute
+addresses starting at zero and at 16384. Load strings are at 8192, 12288 and 65536.<br>
+Those memory blocks must be hardware-selected at runtime in address windows
+zero and 16K
 <pre>
 
-$(id:<i>logical_base_address</i>:<i>physical_address</i>)
+$ masmx -lnkx
+MASMX 7r3
+0/-INPUT>>
+	$word	16
+	$quantum 8      
+	$awidth	32
+
+PAGE2   $equ    8192
+PAGE3	$equ	12288
+PAGE16	$equ	65536
+
+$(0::PAGE2)
+	+	location(1)l
+
+$(0::PAGE3)
+	+	location(2)l
+
+$(5:16384:PAGE16)
+?	$do	2,location(?)	+	?*100
+	$end
+  :                            1  $word 16
+  :                            2  $quantum 8      
+  :                            3  $awidth 32
+  :                            4 
+  :                            5 PAGE2   $equ    8192
+  :                            6 PAGE3 $equ 12288
+  :                            7 PAGE16 $equ 65536
+  :                            8 
+  :                            9 $(0::PAGE2)
+00:00000000 00004000          +10  + location(1)l
+  :                            11 
+  :                            12 $(0::PAGE3)
+00:00000000 00004002          +13  + location(2)l
+  :                            14 
+  :                            15 $(5:16384:PAGE16)
+05:00004000 0064              +16 ? $do 2,location(?) + ?*100
+05:00004002 00C8              +16 
+  :                            17  $end
+PAGE2=2000
+PAGE3=3000
+PAGE16=00010000
+?=0002
+location(1)=$05:4000
+location(2)=$05:4002
+-INPUT>>=0<00000000
+:$(00):00000000:00000004 :$(05):00004000:00004004 
+-INPUT>>: object code 131 bytes: 0 errors: 0 undefined labels
+
+$ cat temp.txo
+
+$00:00002000
+00004000
+$00:00003000
+00004002
+$05:00010000
+0064 00C8
+:$00*00000000:00000000:00000004
+:$05*00000000:00004000:00004004
 
 </pre>
-Load addresses are computed from <i>physical_address</i> plus location 
-counter minus <i>logical_base_address</i>
 
 <p>
-Code references are relative to the logical base only (the first address).
-<pre>
-
-$(5::SEGMENT1)
-.
-.
-$(5::SEGMENT2)
-.
-.
-
-	_________________________
-	| physical SEGMENT1	|
-	| Logical Location 0	|
-	|			|
-	|			|
-	|_______________________|
-	| physical SEGMENT2	|
-	| Logical Location 0	|
-	|			|
-
-
-</pre>
-The segments must be loaded at the named physical locations at run time before reference.
+Physical PAGE2 and PAGE3 are both in address window zero, but not both at once
 
 <p>
-On simple hardware without MMU this effect is sometimes obtained
-by selecting part of memory with I/O operations.
+On simple hardware without MMU memory blocks are sometimes mapped
+to windows of address space by I/O operations.
 
 <p>
-All parts of all sections may be in one bank for loading. Loader
-depending the breakpoint addresses may be physical or relative
-to a physical load region
+All parts of all sections may be in one large region loading.
+Depending on the loader, the breakpoint addresses may relate
+to memory or to a load region
 
 <p>
-In this example the program has two loads in the first page of
-relative space $(0::) and will switch between them dynamically
-<pre>
-
-PHYS_PAGE1	$equ	1*4096
-PHYS_PAGE2	$equ	2*4096
-PHYS_PAGE3	$equ	3*4096
-PHYS_PAGE32	$equ	32*4096
-PHYS_PAGE36	$equ	36*4096
-
-$(0::PHYS_PAGE1)
-.	program address space 0..4095
-.
-$(0::PHYS_PAGE2)
-.	program address space 0..4095
-.
-$(5:20480:PHYS_PAGE3)
-.	program address space 20480..240575
-.
-$(4:16384:PHYS_PAGE32)
-.	program address space 16384..20479
-.
-$(8:32768:PHYS_PAGE36)
-.	program address space 32768..36863
-.
-
-
-</pre>
-In that example the pages of address space are mapped to corresponding locator
-numbers and this is convenient. The locator number does not however influence
-the address space. That is pointed by the base address. Here the correspondence
-with locator number is abandoned with less readable effect
-<pre>
-
-$(10:8192)	. locator $(10) concerns addresses from 8192
-
-$(3:40960)	. locator $(3) concerns addresses from 40960
-
-</pre>
-<p>
-Listings show the program-logical addresses. To see the load
-addresses instead, use the -d flag as well as the -l flag
+Flags -dl list load addresses instead of program-absolute addresses
 
 <p>
-Target code never accesses the physical load
-address except with masmx internal function <a href="#bix">$bank_index</a>
+masmx internal function <a href="#bix">$bank_index</a> retrieves the
+breakpoint value in order to construct vector information
 <a href="#ifunction">(4.2.2.3 masmx Internal Functions)</a>
 
 <a      name="vbreakpt"/>
 <h4>7.1.2.2: Breakpointed Location Counters: -v Option</h4>
 
-If -v option is applied, the treatment of breakpoint values is different.
-
-<p>
-The <i>breakpoint value</i> value in $(id:logical_start_address:<i>breakpoint value</i>)
+With -v option, the <i>breakpoint value</i> value in
+$(id:logical_start_address:<i>breakpoint value</i>)
 is not assumed to be an address and is not added to the load addresses
 
 <p>
 Instead, the value is prefixed before the load addresses in the
-text-encoded binary output. See Section 9.1: Output File Formats
+text-encoded binary output
 
 <p>
 The breakpoint value may be a memory granule or paragraph address,
-a page identifier or a virtual translation index. By prefixing it
-instead of adding it, masmx -v assigns the breakpoint abstract to
-separate interpretation
-
-<p>
-Listings show the program-logical addresses. To see the segment selectors
-and offsets instead, use the -d flag as well as the -lv flags
-
+a page identifier or a virtual translation index.<br>
+By prefixing it instead of adding it, masmx -v assigns the breakpoint value to
+separate interpretation. -d option also lists the page index
 <pre>
 
-$ masmx -lnkxyv
+
+$ masmx -lnkxdv
 MASMX 7r3
 0/-INPUT>>
-	$set_option	"d"
-$(4:04000:99)
-	$res	10
-	+	$
-	+$a
+	$word	16
+	$quantum 8      
+	$awidth	32:64
+
+PAGE2   $equ    8192
+PAGE3	$equ	12288
+PAGE16	$equ	65536
+
+$(0::PAGE2)
+	+	location(1)l
+
+$(0::PAGE3)
+	+	location(2)l
+
+$(5:16384:PAGE16)
+?	$do	2,location(?)	+	?*100
 	$end
-  :                            1  $set_option "d"
-  :                            2 $(4:04000:99)
-  :                            3  $res 10
-04:000063:00000A 00400A       +4  + $
-04:000063:00000B 00400B       +5  +$a
-  :                            6  $end
--INPUT>>=0<000000
-:$(04):004000:00400C 
+  :                            1  $word 16
+  :                            2  $quantum 8      
+  :                            3  $awidth 32:64
+  :                            4 
+  :                            5 PAGE2   $equ    8192
+  :                            6 PAGE3 $equ 12288
+  :                            7 PAGE16 $equ 65536
+  :                            8 
+  :                            9 $(0::PAGE2)
+00:00002000:00000000 00004000 +10  + location(1)l
+  :                            11 
+  :                            12 $(0::PAGE3)
+00:00003000:00000000 00004002 +13  + location(2)l
+  :                            14 
+  :                            15 $(5:16384:PAGE16)
+05:00010000:00000000 0064     +16 ? $do 2,location(?) + ?*100
+05:00010000:00000002 00C8     +16 
+  :                            17  $end
+PAGE2=2000
+PAGE3=3000
+PAGE16=00010000
+?=0002
+location(1)=$05:4000
+location(2)=$05:4002
+-INPUT>>=0<00000000
+:$(00):00000000:00000004 :$(05):00004000:00004004 
+-INPUT>>: object code 158 bytes: 0 errors: 0 undefined labels
+
+$ cat temp.txo
+
+$00:00002000:00000000
+00004000
+$00:00003000:00000000
+00004002
+$05:00010000:00000000
+0064 00C8
+:$00*00000000:00000000:00000004
+:$05*00000000:00004000:00004004
 
 </pre>
+
 
 <a      name="bdflat"/>
 <h3>7.1.3: Simple Location Counter without Breakpoint:
@@ -7112,7 +7144,9 @@ $(id:<i>base</i>:*<i>giant_breakpoint</i>[,base_register][/literal_pool_tag])
 
 </pre>
 <p>
-<i>giant_breakpoint</i> is an address expression up to 192 bits wide.
+<i>giant_breakpoint</i> is an address expression up to 192 bits wide. Giant breakpoints
+are steps in a large linear absolute address space and are a component of the program-visible 
+address reported in labels and in $ location counters
 
 <p>
 displacements within the breakpointed part may only reach four gigaquanta beyond <i>base</i>,
@@ -7503,7 +7537,7 @@ $(<i>id:*alignment[:initial_offset][,base_reg][/literal_pool_tag]</i>)
 containing power of 2. *alignment is recognised by leading asterisk.
 
 <p>
-<i>initial_offset</i> is optional. It declares a hole or unlabelled buffer
+<i>initial_offset</i> is optional. It declares an offset or unlabelled buffer
 at the front of the segment. initial_offset is usually absent = zero.
 
 <p>
@@ -7565,10 +7599,23 @@ STERM=.
 
 </pre>
 
+The final revising assembly or link may construct from relocatable segments
+sections which are
+
+	<blockquote>
+	<a href="#sabslocs">7.1.1 simple absolute</a><br><br>
+	<a href="#abreakpt">7.1.2.1 absolute with offset load address (breakpoint)</a><br><br>
+	<a href="#vbreakpt">7.1.2.2 absolute with translating load address (virtual breakpoint)</a><br><br>
+	<a href="#giantspace">7.1.6 giant (*breakpoint)</a>
+	</blockquote>
 
 <p>
-See also Section 9:	Output File Formats, Relocation and Linking,
-    			Giant Address Spaces, Interfacing with GNU Tools
+The link may instead produce new relocatable sections
+
+
+<p>
+See also <a href="#file_formats">9: Output File Formats, Relocation and Linking,
+    			Giant Address Spaces, Interfacing with GNU Tools</a>
 
 
 
@@ -10179,7 +10226,7 @@ directory.
 <p>
 Note that Microsoft operating systems recognise the path separator <b>/</b>
 as well as <b>\</b> when programs make file-open calls. Pathnames with <b>/</b>
-separator therefore work on all platforms where <b>masmx</b> suns
+separator therefore work on all developer platforms
 
 <a      name="plist">
 <h2>8.37: $plist             Set Depth for Listing Macro Expansion</h2>
