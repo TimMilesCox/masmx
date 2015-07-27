@@ -484,10 +484,10 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     47.	<a href="#set_option">$set_option</a>							8.47
 
-	1.		set option flags				8.47.1
+	1.		<a href="#set_option">set option flags</a>				8.47.1
 
-	2.		Interaction of Run Options
-			and List Directives				8.47.2
+	2.		<a href="#set_interact">Interaction of Run Options</a>
+			<a href="#set_interact">and $list / $plist Directives</a>			8.47.2
 
     48.	<a href="#snap">$snap</a>		list the label table				8.48
 
@@ -590,7 +590,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
 Appendix A: <a href="#commandline">masmx Command Line</a>
 	 A.a:	<a href="#clopts">Command Line Option Flags</a>
-	 A.b:	<a href="#uclopts">Developer Assembly Switch and Trace Option Flags</a>
+	 A.b:	<a href="#uclopts">Switch and Trace Option Flags for Developer Use</a>
 
 Appendix B: <a href="#whatsnew">What's new in 7r3?</a>
 Appendix C: <a href="#roadmap">The masmx Product Road Map</a>
@@ -1372,7 +1372,9 @@ Character value string tokens are available to expressions whatever the
 current number string notation
 
 <p>
-See also directives 8.1 $ascii, 8.8: $data_code and 8.5: $byte
+See also directives <a href="#ascii">8.1 $ascii</a>,
+<a href="#data_code">8.8: $data_code</a> and
+<a href="#byte">8.5: $byte</a>
 
 <p>
 If apostrophe has been chosen as the quote character, a command
@@ -7791,9 +7793,9 @@ welblech.msm=0<000003
 <p>
 $byte is defaulted to 8, and is only likely to be anything different
 if the target machine's address quantum is other than a byte, for
-example a word of 30 or 48 or 60 bits. See Section 8.41: $quantum,
-Appendix F.4: Byte-Addressing Machines with 32 and 64 Bit Bus: Managing 
-Alignments	
+example a word of 30 or 48 or 60 bits. See directive <a href="#quantum">8.41: $quantum</a>,
+<a href="#alignments">Appendix F.4: Byte-Addressing Machines with 32 and 64 Bit Bus: Managing 
+Alignments</a>
 
 <p>
 $byte also applies with +'symbols' bounded by single quote in number
@@ -7801,7 +7803,7 @@ expressions. ASCII is read in source code, but the +'expression' token
 has a value in the current character set and size.
 
 <p>
-See also 8.8: $data_code directive.
+See also <a href="#data_code">8.8: $data_code</a> directive.
 
 <p>
 Here is an example of an assembly for a 48-bit architecture generating
@@ -7811,13 +7813,13 @@ string constants first of 8-bit then 6-bit bytes.
 MASMX/-240 1r1X
 big48.msm 5
 *EOF*  :                        1:         $word   48
-  :                        2:         $quantum 48
+:                        2:         $quantum 48
 00:00000000 496E697469616C20537472696E6773206F6620382D626974
-			 +3         "Initial Strings of 8-bit data"
+		 +3         "Initial Strings of 8-bit data"
 00:00000004 206461746120  +3 
-  :                        4:         $byte   6
+:                        4:         $byte   6
 00:00000005 B21D25C80CF4CA9BA7CC0BE6034A67A34B39030863AE5900
-			 +5         "Later Strings of Tightly Packed Data"
+		 +5         "Later Strings of Tightly Packed Data"
 00:00000009 921D21000000  +5 
 *EOF*:$(00):0000000A 
 Object Code 150 Bytes: 0 Errors: 0 Undefined Labels
@@ -7830,15 +7832,15 @@ placing 6-bits right justified in the target field. Truncation then
 takes place if the target field is less than 6 bits.
 <pre>
 
-	________________________________________________________________|
-	|   0   |   d   |discard|   d   |   d   |   d   |   d   |   d   |
+________________________________________________________________|
+|   0   |   d   |discard|   d   |   d   |   d   |   d   |   d   |
 Input   |_______|_______|_______|_______|_______|_______|_______|_______|
-		    |               |       |       |       |       |   |
-		    |_______        |       |       |       |       |   |
-			____|_______|_______|_______|_______|_______|___|
-			|   d   |   d   |   d   |   d   |   d   |   d   |
+	    |               |       |       |       |       |   |
+	    |_______        |       |       |       |       |   |
+		____|_______|_______|_______|_______|_______|___|
+		|   d   |   d   |   d   |   d   |   d   |   d   |
 Receiving Field         |_______|_______|_______|_______|_______|_______|
-									|
+								|
 
 </pre>
 <p>
@@ -7853,17 +7855,17 @@ $ ../masmx qzuli -ln
 MASMX 7r2
 3/qzuli.msm
 *EOF*
-  :                            1         $set_option "e"
-  :                            2         $word   30
-  :                            3         $octal
-  :                            4         $byte   7
+:                            1         $set_option "e"
+:                            2         $word   30
+:                            3         $octal
+:                            4         $byte   7
 000:0000000000  3757677375 7677375767 7375767737 5767737576 7737576773 7576773757
-                              +5         "???????????????????????????????"
+		      +5         "???????????????????????????????"
 Note: qzuli.msm Line 5: trailing zero bits in last data word of string
 000:0000000006  6773757677 3750040200
-                              +5 
+		      +5 
 000:0000000010  3757677375 7677375767 7375767737 5767737576 7737576773 7576773757
-                              +6         "??????????????????????????":127:127:127:127
+		      +6         "??????????????????????????":127:127:127:127
 000:0000000016  7777777777     +6 
 *EOF*
 :$(0):0000000000:0000000017 
@@ -7910,13 +7912,13 @@ $ masmx ldes -ln
 MASMX 7r2
 3/ldes.msm
 *EOF*
-  :                            1         $word   32
-  :                            2         $quantum 8
-  :                            3         $byte   8
-  :                            4 label_descriptor $form  8, 8, 16, 4, 60   
-  :                            5 
+:                            1         $word   32
+:                            2         $quantum 8
+:                            3         $byte   8
+:                            4 label_descriptor $form  8, 8, 16, 4, 60   
+:                            5 
 00:00000000 0700FFF63404C4142454C310
-                              +6      label_descriptor 7,0,-10,3,"@LABEL1"
+		      +6      label_descriptor 7,0,-10,3,"@LABEL1"
 *EOF*
 :$(00):00000000:0000000C 
 ldes.msm: object code 70 bytes: 0 errors: 0 undefined labels
@@ -7936,15 +7938,15 @@ $ masmx ldes2 -ln
 MASMX 7r2
 3/ldes2.msm
 *EOF*
-  :                            1         $word   32
-  :                            2         $quantum 8
-  :                            3         $byte   8
-  :                            4 label_descriptor $form  8, 8, 16, 4, 60   
-  :                            5 
+:                            1         $word   32
+:                            2         $quantum 8
+:                            3         $byte   8
+:                            4 label_descriptor $form  8, 8, 16, 4, 60   
+:                            5 
 00:00000000 0700FFF6340564F4C3100000
-                              +6 	label_descriptor 7,0,-10,3,"@VOL1"
+		      +6 	label_descriptor 7,0,-10,3,"@VOL1"
 00:0000000C 0707000A740564F4C3220200
-                              +7 	label_descriptor 7,7, 0a,7,"@VOL2  "
+		      +7 	label_descriptor 7,7, 0a,7,"@VOL2  "
 *EOF*
 :$(00):00000000:00000018 
 ldes2.msm: object code 95 bytes: 0 errors: 0 undefined labels
@@ -7958,13 +7960,13 @@ references:
 MASMX/-240 1r1X
 bdw.msm 5
 *EOF*  :                        1: bdw     $form   24,12,6,6,48
-  :                        2: p       $proc   5
-  :                        3: bd      $name        
-  :                        4:         $byte   6
-  :                        5:         bdw     p(1, 1), 0, 0, p(1, 2), "p(1, 1)"
-  :                        6:         $byte   8
-  :                        7:         $end
-  :                        8: 
+:                        2: p       $proc   5
+:                        3: bd      $name        
+:                        4:         $byte   6
+:                        5:         bdw     p(1, 1), 0, 0, p(1, 2), "p(1, 1)"
+:                        6:         $byte   8
+:                        7:         $end
+:                        8: 
 00:00000000 0000000000038A1BAB440000+9         bd      bank1, 3
 00:00000004 0000000000078A1BAB450411+10         bd      bank1001, 7
 *EOF*:$(00):00000008 
@@ -7980,11 +7982,11 @@ The right half of the second structure contains the text "bank1001"
 compressed to 6-bit characters (bit 5 of each ASCII symbol is dropped):
 <pre>
 
-	    62     61     6e     6b     31     20     20     20
-	100010 100001 101110 101011 010001 000000 000000 000000
+    62     61     6e     6b     31     20     20     20
+100010 100001 101110 101011 010001 000000 000000 000000
 
-	    62     61     6e     6b     31     30     30     31
-	100010 100001 101110 101011 010001 010000 010000 010001
+    62     61     6e     6b     31     30     30     31
+100010 100001 101110 101011 010001 010000 010000 010001
 
 </pre>
 <p>
@@ -8010,8 +8012,8 @@ of floating constants. If $characteristic directive has a subcommand,
 for example
 <pre>
 
-	$characteristic,64      <i>SIZE</i>
-	
+$characteristic,64      <i>SIZE</i>
+
 </pre>
 <p>
 then <i>SIZE</i> is the characteristic size of a 64-bit floating point number
@@ -8029,23 +8031,23 @@ size 24 bits, and the mid-pointed exponent is 23 bits:
 <pre>
 
 
-	_______________________________________________________________
-	|s|94 exponent 72|71          mantissa                       0|
-	|_|______________|____________________________________________|
+_______________________________________________________________
+|s|94 exponent 72|71          mantissa                       0|
+|_|______________|____________________________________________|
 
 
 </pre>
 
 Default characteristic sizes are
 
-	<blockquote>
+<blockquote>
 
-	8 bits for a floating number less than one word in size<br><br>
-	8 bits for a floating number one word in size<br><br>
-	12 bits for a floating number two words in size<br><br>
-	24 bits for a floating number three words or more in size
+8 bits for a floating number less than one word in size<br><br>
+8 bits for a floating number one word in size<br><br>
+12 bits for a floating number two words in size<br><br>
+24 bits for a floating number three words or more in size
 
-	</blockquote>
+</blockquote>
 
 <p>
 $word is programmable and each possible constant size in words up to 192
@@ -8072,22 +8074,22 @@ $ masmx -ln dfp16
 MASMX 7r2
 3/dfp16.msm
 *EOF*
-  :                            1         $word   16
-  :                            2         $quantum 8
-  :                            3         $awidth 32
-  :                            4         $floating_point 32
-  :                            5         $characteristic 8
-  :                            6         $characteristic,64 12
-  :                            7         $characteristic,80 16
-  :                            8 $(2:*8:256)        
+:                            1         $word   16
+:                            2         $quantum 8
+:                            3         $awidth 32
+:                            4         $floating_point 32
+:                            5         $characteristic 8
+:                            6         $characteristic,64 12
+:                            7         $characteristic,80 16
+:                            8 $(2:*8:256)        
 02:00000100 41C00000          +9 one     +1.5
 02:00000104 401E000000000000  +10 two     +1.75:q
 02:0000010C 4001C000000000000000
-                              +11 three   +15.0e-1:p
+		      +11 three   +15.0e-1:p
 02:00000116 B837FFFF          +12 four    -100.0
 02:0000011A 47C80000          +13 	+100.0
 02:0000011E 438CC2DC14A740E08BDA
-                              +14 five    +33*+20000:p
+		      +14 five    +33*+20000:p
 *EOF*
 :$(02):00000000:00000128 
 dfp16.msm: object code 145 bytes: 0 errors: 0 undefined labels
@@ -8109,7 +8111,7 @@ representation is the ones complement of the entire item.
 This is not IEEE 754 encoding. IEEE 754, or any 
 other encoding different from masmx default, is generated 
 with macros which use the <a href="#set">$set</a> directive to capture
-and manipulate a number argument. See <a href+"#ieeefloat">11.3: IEEE754 Floating Values</a>
+and manipulate a number argument. See <a href="#ieeefloat">11.3: IEEE754 Floating Values</a>
 
 <p>
 Macro language does reversed byte order if needed. 
@@ -8131,23 +8133,23 @@ $ masmx hflo -lnky
 MASMX 7r3
 3/hflo.msm
 *EOF*
-  :                            1         $word   32
-  :                            2         $quantum 8
-  :                            3         $awidth 32
-  :                            4         $floating_point 32
+:                            1         $word   32
+:                            2         $quantum 8
+:                            3         $awidth 32
+:                            4         $floating_point 32
 00:00000000 41C00000          +5         +1.5
 00:00000004 401C000000000000  +6         +1.5d
 00:0000000C 400001C00000000000000000
-                              +7         +0.15t*+1
+		      +7         +0.15t*+1
 00:00000018 400001C0000000000000000000000000
-                              +8         +15:q*-1
+		      +8         +15:q*-1
 00:00000028 400001C000000000000000000000000000000000
-                              +9         +1.5p
+		      +9         +1.5p
 00:0000003C BFFFFE3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-                              +10         -1.5h
+		      +10         -1.5h
 Note: hflo.msm Line 11: floating number is maximum words
 00:00000054 400001C00000000000000000000000000000000000000000
-                              +11         +1.5o
+		      +11         +1.5o
 *EOF*
 :$(00):00000000:0000006C 
 
@@ -8164,15 +8166,15 @@ Floating point items are the default <a href="#floating_point">$floating_point</
 or a size words given immediately after the mantissa and before any scale
 <pre>
 
-	+(MANTISSA)[s d l t q p h o][{*+|*-}SCALE]
++(MANTISSA)[s d l t q p h o][{*+|*-}SCALE]
 
-	S for single (one word)
-	D or L for double 
-	T for triple
-	Q for quadword
-	P for pentaword
-	H for hexaword
-	O for octaword
+S for single (one word)
+D or L for double 
+T for triple
+Q for quadword
+P for pentaword
+H for hexaword
+O for octaword
 
 </pre>
 <p>
@@ -8180,13 +8182,13 @@ These trailing letters may be upper or lower case and may have a
 colon before them or parenthesis or quote
 <pre>
 
-	67.5t
+67.5t
 
-	+MANTISSA:q*+1200000
++MANTISSA:q*+1200000
 
-	+(MANTISSA)p*+800
++(MANTISSA)p*+800
 
-	+	20*"MANTISSA"d*+307
++	20*"MANTISSA"d*+307
 
 </pre>
 Period may only appear in a decimal digit string. Where period
@@ -8215,16 +8217,16 @@ on the next line:
 MASMX/-240 1r1X
 leggy.msm 5
 *EOF*00:00000000 00055555      +10         +       262144;
-       	       					  ++65536;
-	     					  ++16384;      
-						   ++4096;
-					  	   ++1024;
-					   	    ++256;
-					    	     ++64;
-		  				     ++16;
-						      ++4;
-		   				      ++1
-		 
+					  ++65536;
+					  ++16384;      
+					   ++4096;
+					   ++1024;
+					    ++256;
+					     ++64;
+					     ++16;
+					      ++4;
+					      ++1
+	 
 *EOF*:$(00):00000001 
 Object Code 25 Bytes: 0 Errors: 0 Undefined Labels
 
@@ -8240,8 +8242,8 @@ as comment character (and then period is immediately available for
 reassignment as substring terminator).
 <pre>
 
-	$cont_char      0
-	$lterm          ';'
+$cont_char      0
+$lterm          ';'
 
 </pre>
 <p>
@@ -8253,9 +8255,9 @@ then the $cont_char argument is not zero, but the value
 of the required character. All of these are tilde ~
 <pre>
 
-	$cont_char       '~'
-	$cont_char       07e
-	$cont_char       126
+$cont_char       '~'
+$cont_char       07e
+$cont_char       126
 
 </pre>
 <p>
@@ -8264,11 +8266,11 @@ continuation character, because leading whitespace on the next line
 is skipped:
 <pre>
 
-	$cont_char	'\'
+$cont_char	'\'
 
-	command		field1	\
-			field2	\
-			field3
+command		field1	\
+		field2	\
+		field3
 
 </pre>
 
@@ -9427,22 +9429,23 @@ $(0:*4)
 
 </pre>
 <p>
-Specific handling can be applied to each segment of each input file.
-See Sections 9.2.2 masmx Linking in Principle, 9.2.3: Demonstration
-Links (PowerPC).
+See <a href="#linkbasic">9.2.2 masmx Linking in Principle</a>,
+<a href="#linkdems">9.2.3: Demonstration Links</a>
+
+<p>
 The link macro definition including <b>$map</b> macro must be already included.
 
 <p>
-The default file name extension is txo, as
+The default text encoded binary file name extension is txo
 <pre>
 
-	$include,$binary	"rel_file.txo"
+	$include,$binary	rel_file[.txo|<i>extension</i>]
 
 </pre>
 <p>
-The binary includes must be Text Encoded Binary format. See Section 9:
-Output File Formats, Relocation and Linking,
-Giant Address Spaces, Interfacing with GNU Tools
+The binary includes must be Text Encoded Binary format.
+See <a href="#file_formats">9: Output File Formats, Relocation and Linking,
+Giant Address Spaces, Interfacing with GNU Tools</a>
 
 
 
@@ -9547,8 +9550,8 @@ maintains a 192-bit offset during the successive accumulation of
 relocation clauses for one field.
 
 <p>
-The check errors if the final value applied does not fit the field.
-See Sections 9.2.3.7-8, 9.10: Linking in Giant Space.
+The check errors if the final value does not fit the field.
+See <a href="#linkdems">9.2.3: Demonstration Links</a>
 
 <p>
 <b>$range_check1</b> requests more stringent behaviour than <b>$range_check</b>:
@@ -11371,7 +11374,7 @@ and <a href="#pushrel">8.39: $pushrel</a> directive
 <a      name="set_option"/>
 <h2>8.47: $set_option</h2>
 
-<h3>8.47.1:Set Option Flags</h3>
+<h3>8.47.1: Set Option Flags</h3>
 
 <pre>
 
@@ -11417,7 +11420,9 @@ The option letters are case significant.
 Flags <b>-ksy</b> are only actioned on the command line,
 not via <b>$set_option</b> directive
 
-<h3>8.47.1: Interaction of Run Options and List Directives</h3>
+
+<a	name="set_interact"/>
+<h3>8.47.2: Interaction of Run Options and List Directives</h3>
 
 
 <p>
@@ -11489,42 +11494,39 @@ The option values are listed in Section 3.1: The Command Line
 
 <p>
 $snap lists labels. Default behaviour is to list the fixed part 
-of the label table in load order, or sorted if <b>-y</b> flag has been opted.
-$snap may take an argument
+of the label table in load order,<br>
+or sorted if <b>-y</b> flag has been opted. $snap may take an argument
 <pre>
 
-	$snap	expression
+	$snap	[<i>expression</i>]
 
 </pre>
 <p>
+By default, $snap lists only labels. With the argument 3, $snap lists labels in the<br>
+fixed table in load order and if any of flags -pqr is opted, $snap 3 lists macro text
+<pre>
+
+	$snap	3
+
+</pre>
 $snap lists the fixed part of the label table unless the argument
-expression has the value 2
+has the value 2.<br>$snap 2 is placed inside macro text to list dynamic labels
 <pre>
 
-	$snap		2
-
-</pre>
-<p>
-With an argument of 2, $snap lists the labels which exist temporarily
-during macro expansion. The $snap directive is inside the macro text
-in order to achieve this
-<pre>
-
-mymacro* $proc
+macroname$* [$proc|$func]
 	.
 	.
-	$snap		2
+	$snap	2
 	.
 	.
 	$end
 
 </pre>
-<p>
-$snap is only actioned during the second assembly
-pass, unless it has a subcommand of 1 
+$snap is actioned during the second assembly pass, unless it has a subcommand of 1<pr>
+$snap,1 is actioned on the first assembly pass
 <pre>
 
-	$snap,1		[argument 0..2]
+	$snap,1		[<i>argument</i>]
 
 </pre>
 
@@ -11532,7 +11534,7 @@ pass, unless it has a subcommand of 1
 <a      name="sterm"/>
 <h2>8.49: $sterm             Change the Substring Sentinel Character</h2>
 
-See also 4.2.2.5 Macro Parameters
+See also <a href="#argument_ref">4.2.2.5 Macro Parameters</a>
 
 <pre>
 
@@ -12679,7 +12681,7 @@ To list the relocation information in a relocatable assembly,
 assemble with <b>-nl</b> flags.
 
 <p>
-<b>-l</b> is for list, <b>-n</b> for list relocation information:
+<b>-l</b> is for list, <b>-n</b> for list outstanding relocation information:
 <pre>
 
 	>masmx -ln zactor
@@ -14539,19 +14541,18 @@ whole addresses.
 <pre>
 
 
-$ ../masmx map7 -l
-
-MASMX 7r2
+$ masmx -ld map7
+MASMX 7r3
 3/map7.msm
-gsoso.txo:$(1) 168 bytes decimal from hexadecimal 00000000 to 000000A8
-gsoso.txo:$(3) 16 bytes decimal from hexadecimal 00000000 to 00000010
-gsoso.txo:$(5) 12 bytes decimal from hexadecimal 00000000 to 0000000C
-gsoso.txo:$(6) 4 bytes decimal from hexadecimal 00000000 to 00000004
-gsoso.txo:$(36) 32 bytes decimal from hexadecimal 00000000 to 00000020
-gfactor.txo:$(1) 160 bytes decimal from hexadecimal 000000A8 to 00000148
-gfactor.txo:$(3) 8 bytes decimal from hexadecimal 00000010 to 00000018
-gfactor.txo:$(6) 4 bytes decimal from hexadecimal 00000004 to 00000008
-gfactor.txo:$(36) 8 bytes decimal from hexadecimal 00000020 to 00000028
+gsoso.txo:$(1) 168 bytes decimal from hexadecimal 00000000 to 000000A8 +000A000000000000
+gsoso.txo:$(3) 16 bytes decimal from hexadecimal 00000000 to 00000010 +000B000000000000
+gsoso.txo:$(5) 12 bytes decimal from hexadecimal 00000000 to 0000000C +000B800000000000
+gsoso.txo:$(6) 4 bytes decimal from hexadecimal 00000000 to 00000004 +000C000000000000
+gsoso.txo:$(36) 32 bytes decimal from hexadecimal 00000000 to 00000020 +000A800000000000
+gfactor.txo:$(1) 160 bytes decimal from hexadecimal 000000A8 to 00000148 +000A000000000000
+gfactor.txo:$(3) 8 bytes decimal from hexadecimal 00000010 to 00000018 +000B000000000000
+gfactor.txo:$(6) 4 bytes decimal from hexadecimal 00000004 to 00000008 +000C000000000000
+gfactor.txo:$(36) 8 bytes decimal from hexadecimal 00000020 to 00000028 +000A800000000000
 *EOF*
   :                            1 __giant	$set		1
   :                            2 
@@ -14667,7 +14668,12 @@ gfactor.txo:$(36) 8 bytes decimal from hexadecimal 00000020 to 00000028
   :                            13 
   :                            14 	$store			image7
 *EOF*
-:$(01):00000000:00000148 :$(03):00000000:00000018 :$(05):00000000:0000000C :$(06):00000000:00000008 :$(24):00000000:00000028 
+
+@:000A000000000000:$(01):00000000:00000148 
+@:000B000000000000:$(03):00000000:00000018 
+@:000B800000000000:$(05):00000000:0000000C 
+@:000C000000000000:$(06):00000000:00000008 
+@:000A800000000000:$(24):00000000:00000028 
 map7.msm: object code 1448 bytes: 0 errors: 0 undefined labels
 
 $ cat image7.txo
@@ -14850,18 +14856,17 @@ zactor*
 
 	$store	gzactor
 
-$ ../masmx map8 -l
-
-MASMX 7r2
+$ masmx -ld map8
+MASMX 7r3
 3/map8.msm
-image7.txo:$(1) 328 bytes decimal from hexadecimal 00000000 to 00000148
-image7.txo:$(3) 24 bytes decimal from hexadecimal 00000000 to 00000018
-image7.txo:$(5) 12 bytes decimal from hexadecimal 00000000 to 0000000C
-image7.txo:$(6) 8 bytes decimal from hexadecimal 00000000 to 00000008
-image7.txo:$(36) 40 bytes decimal from hexadecimal 00000000 to 00000028
-gzactor.txo:$(1) 88 bytes decimal from hexadecimal 00000148 to 000001A0
-gzactor.txo:$(3) 4 bytes decimal from hexadecimal 00000018 to 0000001C
-gzactor.txo:$(36) 16 bytes decimal from hexadecimal 00000028 to 00000038
+image7.txo:$(1) 328 bytes decimal from hexadecimal 00000000 to 00000148 +000A000000000000
+image7.txo:$(3) 24 bytes decimal from hexadecimal 00000000 to 00000018 +000B000000000000
+image7.txo:$(5) 12 bytes decimal from hexadecimal 00000000 to 0000000C +000B800000000000
+image7.txo:$(6) 8 bytes decimal from hexadecimal 00000000 to 00000008 +000C000000000000
+image7.txo:$(36) 40 bytes decimal from hexadecimal 00000000 to 00000028 +000A800000000000
+gzactor.txo:$(1) 88 bytes decimal from hexadecimal 00000148 to 000001A0 +000A000000000000
+gzactor.txo:$(3) 4 bytes decimal from hexadecimal 00000018 to 0000001C +000B000000000000
+gzactor.txo:$(36) 16 bytes decimal from hexadecimal 00000028 to 00000038 +000A800000000000
 *EOF*
   :                            1 __giant	$set		1
   :                            2: 	$include	"ppc64map.def"
@@ -14874,7 +14879,12 @@ gzactor.txo:$(36) 16 bytes decimal from hexadecimal 00000028 to 00000038
   :                            9 
   :                            10 	$store			image8
 *EOF*
-:$(01):00000000:000001A0 :$(03):00000000:0000001C :$(05):00000000:0000000C :$(06):00000000:00000008 :$(24):00000000:00000038 
+
+@:000A000000000000:$(01):00000000:000001A0 
+@:000B000000000000:$(03):00000000:0000001C 
+@:000B800000000000:$(05):00000000:0000000C 
+@:000C000000000000:$(06):00000000:00000008 
+@:000A800000000000:$(24):00000000:00000038 
 map8.msm: object code 1756 bytes: 0 errors: 0 undefined labels
 
 $ cat image8.txo
@@ -15006,18 +15016,18 @@ $01:000A00F4
 The tenth link does a void include with giant addresses:
 
 <pre>
-$ ../masmx map10 -l
 
-MASMX 7r2
+$ masmx -ld map10
+MASMX 7r3
 3/map10.msm
-image7.txo:$(1) 328 bytes decimal from hexadecimal 00000000 to 00000148
-image7.txo:$(3) 24 bytes decimal from hexadecimal 00000000 to 00000018
-image7.txo:$(5) 12 bytes decimal from hexadecimal 00000000 to 0000000C
-image7.txo:$(6) 8 bytes decimal from hexadecimal 00000000 to 00000008
-image7.txo:$(36) 40 bytes decimal from hexadecimal 00000000 to 00000028
-gzactor.txo:$(1) 88 bytes decimal from hexadecimal 00000148 to 000001A0
-gzactor.txo:$(3) 4 bytes decimal from hexadecimal 00000018 to 0000001C
-gzactor.txo:$(36) 16 bytes decimal from hexadecimal 00000028 to 00000038
+image7.txo:$(1) 328 bytes decimal from hexadecimal 00000000 to 00000148 +000A000000000000
+image7.txo:$(3) 24 bytes decimal from hexadecimal 00000000 to 00000018 +000B000000000000
+image7.txo:$(5) 12 bytes decimal from hexadecimal 00000000 to 0000000C +000B800000000000
+image7.txo:$(6) 8 bytes decimal from hexadecimal 00000000 to 00000008 +000C000000000000
+image7.txo:$(36) 40 bytes decimal from hexadecimal 00000000 to 00000028 +000A800000000000
+gzactor.txo:$(1) 88 bytes decimal from hexadecimal 00000148 to 000001A0 +000A000000000000
+gzactor.txo:$(3) 4 bytes decimal from hexadecimal 00000018 to 0000001C +000B000000000000
+gzactor.txo:$(36) 16 bytes decimal from hexadecimal 00000028 to 00000038 +000A800000000000
 *EOF*
   :                            1 __giant	$set		1
   :                            2: 	$include	"ppc64map.def"
@@ -15055,7 +15065,12 @@ gzactor.txo:$(36) 16 bytes decimal from hexadecimal 00000028 to 00000038
   :                            7 
   :                            8 	$store			image10
 *EOF*
-:$(01):00000000:000001A0 :$(03):00000000:0000001C :$(05):00000000:0000000C :$(06):00000000:00000008 :$(24):00000000:00000038 
+
+@:000A000000000000:$(01):00000000:000001A0 
+@:000B000000000000:$(03):00000000:0000001C 
+@:000B800000000000:$(05):00000000:0000000C 
+@:000C000000000000:$(06):00000000:00000008 
+@:000A800000000000:$(24):00000000:00000038 
 map10.msm: object code 732 bytes: 0 errors: 0 undefined labels
 
 $ cat image10.txo
@@ -16710,7 +16725,7 @@ The full set of masmx command line options are
  
 		literal_pool_tag(the_literal)
 
-		-see section 5.2: Literals
+		-see <a href="#largument">4.4.2: Literal Arguments</a>, <a href="#literals">4.5: Literals</a>
 
 		<a	name="option_b"/>
 	-b	linker option: collate all input files by section
@@ -16741,18 +16756,17 @@ The full set of masmx command line options are
 		-c flag pads aligned quoted strings with zero.
 		Default behaviour is space fill. See also -z option
 
-	-d	list addresses including segment or offset information
+		<a	name="option_d"/>
+	-d	list load addresses or memory block index
 
 		of meaning when a breakpoint addresses are encoded
 		after start_addresses in a location counter declaration:
 
 		$(67:base_address:breakpoint)
 
-		-see Section 4.1.2.1:	Location Counter Controls
+		-see <a href="#breakpoint">7.1.2: Breakpointed Location Counters</a>
 
-		-see Section 9.1:	Text-Encoded Binary Format
-
-		-see also -v flag
+		-see also <a href="#option_v">-v flag</a>
 
 	-e      list generated code in one-word fields
 
@@ -16770,7 +16784,7 @@ The full set of masmx command line options are
 
 	-h	stop after the first assembly pass
 
-		-see also option -s
+		-see also <a href="#option_s">option -s</a>
 
 
 	-j      has meaning when using masmx as a cumulative linker:
@@ -16784,12 +16798,9 @@ The full set of masmx command line options are
 		a reference to offset+locator. The offset will later
 		be summed with the new file segment base per this locator.
 
-		-see section 8.24.2:	$include,$binary
+		-see <a href="#include_b">8.24.2: $include,$binary</a>
 
-		-see section 9: 	Output File Formats
-					Relocation and Linking
-    					Giant Address Spaces
-					Interfacing with GNU Tools
+		-see <a href="#file_formats">9: Output File Formats, Relocation and Linking...</a>
 	
 		<a	name="option_k"/>
 	-k      labels are case-significant
@@ -16821,13 +16832,13 @@ The full set of masmx command line options are
 		If $octal directive is issued leading zero means
 		instead octal, until $hex directive is issued.
 
-		Thus by default
+		Therefore by default
 
 		1000 and 03e8 both mean one thousand
 
 		However with -m flag $3e8 also gives the value 1000.
 
-		See also -c flag which may be asserted as well.
+		See also <a href="#option_c">-c flag</a> which may be asserted as well.
 
 		If -m flag is asserted and not -c, then 03e8 and $3e8
 		both mean a thousand.
@@ -16842,41 +16853,30 @@ The full set of masmx command line options are
 	-p      List $proc Text on Expansion when the $plist setting is
 		higher than the current macro subassembly nesting depth
 
-		-see Section 8.38: $plist Directive 
+		-see <a href="#plist">8.37: $plist Directive</a> 
 
-		-see Section 8.47.1:	Interaction of Run Options
-					and List Directives
+		-see <a href="#set_interact">8.47.2: Interaction of Run Options and $list / $plist Directives</a>
 
-	        -also list macro text when listing labels
+	        -list macro text when listing labels with <a href="#snap">8.48: $snap 3</a>
 
-		-see option flags -xy
-
-		-see Section 8.48: $snap directive 
 
 	-q      List $func Text on Expansion when the $plist setting is
 		higher than the current macro subassembly nesting depth
 
-		-see Section 8.38: $plist Directive 
+		-see <a href="#plist">8.37: $plist Directive</a>
 
-		-see Section 8.47.1:	Interaction of Run Options
-					and List Directives
+		-see <a href="#set_interact">8.47.2: Interaction of Run Options and $list / $plist Directives<a>
 
-	        -also list macro text when listing labels
+	        -list macro text when listing labels with <a href="#snap">8.48: $snap 3</a>
 
-		-see option flags -xy
-
-		-see Section 8.48: $snap directive 
 
 	-r	list $proc or $func text expansion during the first
 		assembly pass when the $plist setting is
 		higher than the current macro subassembly nesting depth
 
-	        -also list macro text when listing labels
+	        -list macro text when listing labels with <a href="#snap">8.48: $snap 3</a>
 
-		-see option flags -xy
-
-		-see Section 8.48: $snap directive 
-
+		<a	name="option_s"/>
 	-s      Generate a source file with all text translations
 		applied during the first assembly pass.
 
@@ -16889,18 +16889,13 @@ The full set of masmx command line options are
 
 		temp.msm is then read in the second assembly pass.
 
-		-see Section 8.52: $text translation directive
+		-see <a href="#text">8.52: $text translation directive</a>
 
 	-u      Treat unresolved labels as errors. 
 		Otherwise information requesting linker
 		resolution is placed in the output file.
 
-		-see section 9: 	Output File Formats
-					Relocation and Linking
-    					Giant Address Spaces
-					Interfacing with GNU Tools
-
-	
+                <a	name="option_v"/>	
 	-v	of meaning when a breakpoint addresses are encoded
 		after start_addresses in a location counter declaration:
 
@@ -16916,27 +16911,19 @@ The full set of masmx command line options are
 		(i.e. to apply absolute segment relocation
 		at assembly time)
 
-		-see Section 4.1.2.1:	Location Counter Controls
-
-		-see section 9: 	Output File Formats
-					Relocation and Linking
-    					Giant Address Spaces
-					Interfacing with GNU Tools
+		-see <a href="#sections">7: Constructing Program Sections</a>
 	
-		-see also -d flag
+		-see <a href="#option_d">-d flag</a>
 
 	-w	silent assembly, unless there are diagnostics.
 		Default behaviour is to list summary information	
 
 	-x      List Labels at the end of the assembly.
-		-see Section 8.48: $snap directive
-		-see Section 8.28: $list directive
-				   $list 0, masking names from list/export
+		-see also <a href="#snap">8.48: $snap directive</a>
+			  <a href="#list_0">8.27.2: $list 0, masking names from list/export</a>
 
-	-y      Sort the label list.
-		-see Section 8.48: $snap directive
-		-see Section 8.28: $list directive
-				   $list 0, masking names from list/export
+	-y      Sort the label list
+		-see also <a href="#list_0">8.27.2: $list 0, masking names from list/export</a>
 
 		<a	name="option_z"/>
 	-z	Pad aligned quoted strings with zero.
@@ -17142,7 +17129,7 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 </pre>
 
 <a	name="uclopts"/>
-<h2>Appendix A.b: Developer Assembly Switch and Trace Option Flags</h2>
+<h2>Appendix A.b: Switch and Trace Option Flags for Developer Use</h2>
 
 Flags -<b>VUOS</b> may be used to switch and trace assembly language code
 and may for this purpose also be opted at the command line. Code can examine
