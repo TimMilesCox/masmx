@@ -89,7 +89,7 @@ However very large address spaces are often partly populated,<br>
 with system memory at low-order addresses and boot or peripheral logic
 at the highest addresses.<br>No force of convention can prevent a a semiconductor supplier
 from devising, for example, a 72-bit address space<br> where the 8 high-order bits select
-memory and peripheral busses
+memory and peripheral buses
 
 </blockquote>
 </div>
@@ -361,10 +361,10 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    2.  <a href="#bdgiant">Very Large Load Address Base-Displacement Examples</a>	7.1.6.2
 
 		1.  <a href="#staticbdg">Giant Absolute Address Base-Displacement</a>
-		    <a href="#staticbdg">Static Reference Example</a>			7.1.6.2.1
+		    <a href="#staticbdg">Static Reference Example</a>				7.1.6.2.1
 
 		2.  <a href="#dynamicbdg">Giant Absolute Address Base-Displacement</a>
-		    <a href="#dynamicbdg">Dynamic Reference Example</a>			7.1.6.2.2
+		    <a href="#dynamicbdg">Dynamic Reference Example</a>				7.1.6.2.2
 
 	7.   <a href="#lptag">Literal Pool Tag</a>						7.1.7
 
@@ -526,7 +526,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
     1.	<a href="#txo">Text Encoded Binary Format, S-Records and Intel Hex Records</a>	9.1
 
     2.	<a href="#linking">Relocation, Linking, Giant Address Space</a>
-	and Interfacing with GNU Tools					9.2
+	<a href="#linking">and Interfacing with GNU Tools</a>					9.2
 
 	1.  <a href="#relinfo">Relocation Information in Text Encoded Binary</a>		9.2.1
 
@@ -543,18 +543,18 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 	    4.	<a href="#link4">Link an Output Relocatable</a>				9.2.3.4
 
 	    5.	<a href="#link5">Link an Accumulated Relocatable</a>
-		plus a New Relocatable					9.2.3.5
+		<a href="#link5">plus a New Relocatable</a>					9.2.3.5
 
 	    6.	<a href="#link6">Incremental Link</a>					9.2.3.6
 
 	    7.	<a href="#link7">Link in Giant Address Space</a>				9.2.3.7
 
-	    8.	<a href="#link8">Incremental Link in Giant Address Space</a>		9.2.3.8
+	    8.	<a href="#link8">Incremental Link in Giant Address Space</a>			9.2.3.8
 
 	    9.	<a href="#link9">Linking with Void Inclusion</a>				9.2.3.9
 
 	    10.	<a href="#link10">Linking with void Inclusion</a>
-		in Giant Address Space					9.2.3.10
+		<a href="#link10">in Giant Address Space</a>					9.2.3.10
 
 
 10. <a href="#describe">Describing Target Architecture in Text</a>				10
@@ -612,7 +612,7 @@ Appendix F: <a href="#targets">Target Descriptions</a>
 	 F.3:	<a href="#definitions">Definition Examples</a>
 	 F.3.1:	<a href="#coldfire">ColdFire</a>
 	 F.4:	<a href="#alignments">Byte-Addressing Machines with 32 and 64 Bit Bus</a>
-		Managing Alignments
+		<a href="#alignments">Managing Alignments</a>
 
 Appendix G: <a href="#disclaimer">Disclaimer and Contact</a>
 
@@ -921,7 +921,7 @@ A definition file included at the head of the assembly defines:
 
 See <a href="#describe1">10.1: Establishing Syntax</a>,
 <a href="#describe2">10.2: Describing Target Architecture</a>,
-<a href="#legacyx">Synthesising Legacy Macros</a>
+<a href="#legacyx">10.3: Synthesising Legacy Macros</a>
 
 <a      name="sourceline"/>
 <h1>4: The Assembly Language Source Line</h1>
@@ -1597,7 +1597,7 @@ See also <a href="#internalf">4.7: masmx Internal Functions in Detail</a>
 All labels internal to masmx, these internal function names and also
 <a href="#Directives">directives plus subcommand names</a>
 may always be referenced in lowercase.<br>
-With <a href="#option_k">option -k</a> masmx-supplied names may only be referenced in lowercase
+With <a href="#option_k">option -k</a> masmx-supplied names may <i>only</i> be referenced in lowercase
 
 <p>
 Internal functions are in summary
@@ -1649,7 +1649,7 @@ Internal functions are in summary
 			for relocatable sections
 
 	$rel(..)	relocation alignment of named program section
-			returns zero for absolute sections and nozero
+			returns zero for absolute sections and nonzero
 			for relocatable sections
 
 	$t(..)		label type
@@ -4311,7 +4311,7 @@ parentheses, and 1 is returned if the equivalent flag is on, for example:
 	$endif 
 
 </pre>
-Flags -<b>abcdefghjklmnopqrsuvwxyzDFGQYZ+</b> are set at any or several positions of
+Flags -<b>abcdefghjklmnopqrsuvwxyzDEFGQYZ+</b> are set at any or several positions of
 the <a href="#commandline">command line</a><br>
 or with the exception of flags -<b>ksy</b> with the <a href="#set_option">$set_option</a> directive
 
@@ -7171,6 +7171,10 @@ Load code and label references are in one linear space. Each breakpoint part may
 exact giant address reached in the previous part. This example is a linking assembly which
 catenates four relocatables each containing space of three gigabytes. Load code is distributed
 sparsely in this assembly
+
+<p>
+<a href="#option_d">Option -d</a> adds the giant step component to address summary information
+
 <pre>
 
 $ masmx globules -lnkydx
@@ -8449,7 +8453,7 @@ is not assembled.
 
 <p>
 $do can only iterate one line of code, but that line can be a macro call.
-See section 5.1 <a href="#domac">>$do Directive and $proc Macros</a>
+See section 5.1 <a href="#domac">$do Directive and $proc Macros</a>
 
 
 <a      name="else"/>
@@ -9646,8 +9650,7 @@ exported.
 
 <p>
 In this example
-<b>yasimi</b> is listed  and exported and <b>yadont</b> is not.
-<b>yasimi</b> and <b>yadont</b> are both available in this assembly
+<b>yasimi</b> is listed and exported and <b>yadont</b> is not
 <pre>
 
 $ cat yasimi.msm
@@ -9688,8 +9691,8 @@ $04:00000400
 
 <p>
 Here is an extract from a cumulative link source. The
-names in reloca.txo must be passed on. But here it is not wished or
-needed to list the text encoded binary code from reloca.txo
+names in reloca.txo must be passed on. 
+The binary code from reloca.txo is not listed
 <pre>
 
 	$list		0
@@ -9702,41 +9705,12 @@ needed to list the text encoded binary code from reloca.txo
 
 </pre>
 <p>
-The names in reloca.txo are catalogued and exported because -1
-is not zero. In fact the default <b>$list</b> value of 1 would have the
-same effect here, because <b>$list 1</b> does not list any files
-which are included in other files.
+The exported names in reloca.txo are included in label lists and
+re-exported because -1 is not zero
+
 
 <p>
-Whenever source is listed, so is any code generated from each 
-source line. The following assembled example generates 7500 
-labels which have the values name(1)..name(7500) and generates
-7500 constants with the value of each label.
-
-<p>
-Listing is turned off before name(3) and turned on again
-before name(7497)
-<pre>
-
-
-3/names.msm
-*EOF*
-  :                            1 
-  :                            2 this*  $proc
-  :                            3         $do     times=3,   $list 0
-  :                            4         $do     times=7497, $list 1
-  :                            5 name(times)*        +       name(times)
-  :                            6         $end
-  :                            7 
-00:000000 000000              +8 times  $do     7500,   this
-00:000001 000001              +8 
-00:001D48 001D48              +8 
-00:001D49 001D49              +8 
-00:001D4A 001D4A              +8 
-00:001D4B 001D4B              +8 
-*EOF*
-:$(00):000000:001D4C 
-names.msm: object code 52537 bytes: 0 errors: 0 undefined labels
+When source lines are listed, so is code generated from them.
 
 
 </pre>
@@ -14538,6 +14512,10 @@ The displayed summary information only shows the non-giant parts of
 the addresses, but the label values and the text-encoded binary
 (and the generated code listed because of <b>$list 2</b>) show the
 whole addresses.
+
+<p>
+<a href="#option_d">Option -d</a> adds the giant step component to address summary information
+
 <pre>
 
 
@@ -14822,7 +14800,13 @@ index	$do	p(),	word	p(index, 1)
 
 <p>
 The eighth link increments relocatable gzactor.txo on the end of the giant
-address absolute from the seventh link. 
+address absolute from the seventh link.
+
+<p>
+<a href="#option_d">Option -d</a> at the linking assembly adds the giant step component to address summary information
+
+
+ 
 <pre>
 
 $ ../cat gzactor.msm
@@ -15013,7 +14997,8 @@ $01:000A00F4
 
 
 <p>
-The tenth link does a void include with giant addresses:
+The tenth link does a void include with giant addresses.
+<a href="#option_d">Option -d</a> adds the giant step component to address summary information
 
 <pre>
 
@@ -16767,6 +16752,11 @@ The full set of masmx command line options are
 		-see <a href="#breakpoint">7.1.2: Breakpointed Location Counters</a>
 
 		-see also <a href="#option_v">-v flag</a>
+
+		in <a href="#giantspace">7.1.6: Giant Address Spaces</a>, -d option adds
+		the giant step component to address summary information
+
+		See also <a href="#link7">9.2.3.7: Giant Address Space Linking</a>, <a href="#link8">9.2.3.8</a>, <a href="#link10">9.2.3.10</a>
 
 	-e      list generated code in one-word fields
 
