@@ -1596,7 +1596,7 @@ See also <a href="#internalf">4.7: masmx Internal Functions in Detail</a>
 <p>
 All labels internal to masmx, these internal function names and also
 <a href="#Directives">directives plus subcommand names</a>
-may always be referenced in lowercase.<br>
+may <i>always</i> be referenced in lowercase.<br>
 With <a href="#option_k">option -k</a> masmx-supplied names may <i>only</i> be referenced in lowercase
 
 <p>
@@ -1890,6 +1890,7 @@ Others govern conditional assembly
 
 	$if		<i>CONDITION</i>
 	$elseif		<i>CONDITION</i>
+	$else
 	$endif
 
 </pre>
@@ -1897,8 +1898,8 @@ And other directives frame macros
 
 <p>
 All labels internal to masmx, <a href="#Directives">directives plus subfunction names</a> and
-<a href="#ifunction">masmx internal functions</a> may always be referenced in lowercase.<br>
-With <a href="#option_k">option -k</a> masmx-supplied names may only be referenced in lowercase
+<a href="#ifunction">masmx internal functions</a> may <i>always</i> be referenced in lowercase.<br>
+With <a href="#option_k">option -k</a> masmx-supplied names may <i>only</i> be referenced in lowercase
 
 
 <p>
@@ -1941,8 +1942,8 @@ Directive names and macro names always are recognised in the command field witho
 
 <p>
 All labels internal to masmx, <a href="#Directives">directives plus subfunction names</a> and
-<a href="#ifunction">masmx internal functions</a> may always be referenced in lowercase.<br>
-With <a href="#option_k">option -k</a> masmx-supplied names may only be referenced in lowercase
+<a href="#ifunction">masmx internal functions</a> may <i>always</i> be referenced in lowercase.<br>
+With <a href="#option_k">option -k</a> masmx-supplied names may <i>only</i> be referenced in lowercase
 
 <p>
 Number storage constants start with a digit, sign or single quote, or have the name
@@ -2133,9 +2134,9 @@ If the last token in the expression is a label instead of a number string
 then any length override must be preceded by colon, parenthesis or quote
 <pre>
 
-	+       expression:D
-	+(expression)q
-	+	"expression"h
+	+       <i>expression</i>:D
+	+(<i>expression</i>)q
+	+	"<i>label</i>"h
 
 </pre>
 Words flag D after a hex string also needs separation
@@ -2155,7 +2156,7 @@ MASMX 7r3
 :$(00):0000:0003 
 
 </pre>
-$suffix-determined number notation (<a href="#notate2">4.2.2.1: Number String Notation</a>)
+$suffix-determined number notation (<a href="#suffix">4.2.2.1.4</a>)
 masks length flags [d q h o]<br> if the length flag is not separated.
 Fraction strings containing decimal point are decimal and a suffix<br>
 is interpreted as size in words and not as notation
@@ -11023,7 +11024,8 @@ actual parameters.
 
 
 <p>
-An expression token in quotes is a label.
+An expression token in quotes is a label. Macro parameters may be
+joined inside quotes with extra symbols to synthesise new labels
 <pre>
 
 
@@ -11056,9 +11058,8 @@ substitution, +'label'=0000006c6162656c.
 <p>
 Therefore when $quote is an apostrophe or 0x27, 
 labels may only be included in expressions without 
-surrounding $quote. Consequently, labels in the 
-actual arguments may be referenced, but not catenated 
-with new symbols to construct new labels for reference:
+surrounding $quote.<br>Macros can synthesise and export new labels
+in apostrophes but cannot reference them
 <pre>
 
 MASMX 7r2
@@ -11359,7 +11360,7 @@ and <a href="#pushrel">8.39: $pushrel</a> directive
 </pre>
 <p>
 sets the option flags which can otherwise be set on the command line.<br>
-Options lowercase <b>-ksy</b> may only be set on the command line
+Options lowercase <b>-ksy</b> may <i>only</i> be set on the command line
 <pre>
 
        >masmx input [output] -a..z
@@ -17804,167 +17805,167 @@ STERM=.
   :                            19 $(0:262144,pc/$literal)
   :                            20 
   :                            21 s2double*
-00:00000000 F23A50801456      +22 	fmove.w		$literal(0), fp1
-  :                            23 s2dscanforit
-00:00000006 7000              +24 	moveq		#0, d0
-00:00000008 1018              +25 	move.b		(a0)+, d0
-00:0000000A 670000C6          +26 	beq		(eostringx).w
-00:0000000E B07C0020          +27 	cmp.w		#' ', d0
-00:00000012 67F2              +28 	beq		s2dscanforit	; walk any leading space
-  :                            29 					; if there are none it costs nothing
-  :                            30 
-00:00000014 0680FFFFFFD5      +31 	addi		#-'+', d0	; check for leading sign
-00:0000001A 671A              +32 	beq.b		read_1st_digit
-00:0000001C 0680FFFFFFFE      +33 	addi		#'+'-'-', d0
-00:00000022 6708              +34 	beq.b		s2dnegative
-00:00000024 0680FFFFFFF3      +35 	addi		#'-'-'0'-10, d0	; well was it a digit then?
-00:0000002A 6014              +36 	bra.b		check_1st_digit
-  :                            37 
-  :                            38 s2dnegative
-00:0000002C 6108              +39 	bsr.b		read_1st_digit	; read the number then switch polarity
-00:0000002E F23A50A3142A      +40 	fmul.w		$literal(-1), fp1 ; you can't just invert bits in fp1
-00:00000034 4E75              +41 	rts
-  :                            42 
-  :                            43 read_1st_digit
-00:00000036 7000              +44 	moveq		#0, d0
-00:00000038 1018              +45 	move.b		(a0)+, d0
-00:0000003A 0680FFFFFFC6      +46 	addi		#-'0'-10, d0	; first is it higher than '9' ?
-  :                            47 
-  :                            48 check_1st_digit
-00:00000040 655E              +49 	bcs.b		high
-00:00000042 06800000000A      +50 	addi		#10, d0		; was it then lower than '0' ?
-00:00000048 6420              +51 	bcc.b		low
-00:0000004A F20058A2          +52 integer	fadd.b		d0, fp1		; column 1 was in '0'..'9' and is now in 0..9
-00:0000004E 7000              +53 	moveq.l		#0, d0
-00:00000050 1018              +54 	move.b		(a0)+, d0	; read next column
-00:00000052 0680FFFFFFC6      +55 	addi		 #-'0'-10, d0	; is it higher than '9' ?
-00:00000058 6546              +56 	bcs.b		high		; if so it's the end of the integral part
-00:0000005A 06800000000A      +57 	addi		#10, d0		; was it lower than '0' ?
-00:00000060 6408              +58 	bcc.b		low
-00:00000062 F23A50A313F8      +59 	fmul.w		$literal(10), fp1 . multiply the accumulation so far
-00:00000068 60E0              +60 	bra		integer		; add the new stripped digit in 0..9
-  :                            61 
-  :                            62 	$if	'.'<'0'			; data code independent. If period < digit
-00:0000006A 068000000002      +63 low	addi		#'0'-'.', d0	; is this the decimal point?
-  :                            64 	$else
-  :                            65 high	addi		#'0'+10-'.', d0	; otherwise if period > digit was this . ?
-  :                            66 	$endif
-  :                            67 	
-00:00000070 6708              +68 	beq.b		fraction	; whatever the data code, was that decimal point
-00:00000072 0680FFFFFFC9      +69 	addi		#'.'-'e', d0	; if it wasn't is this an exponent string?
-00:00000078 602C              +70 	bra.b		estring?
-  :                            71 
-  :                            72 fraction				; decimal point has been found
-00:0000007A 7000              +73 	moveq.l		#0, d0		; read the fraction
-00:0000007C 1018              +74 	move.b		(a0)+, d0
-00:0000007E 0680FFFFFFC6      +75 	addi		#-'0'-10, d0	; higher than '9' ?
-00:00000084 651A              +76 	bcs.b		eofraction
-00:00000086 06800000000A      +77 	addi		#10, d0		; lower than '0' ?
-00:0000008C 6412              +78 	bcc.b		eofraction
-  :                            79 					; the accumulation attributes all columns to the
-00:0000008E D2BCFFFFFFFF      +80 	add		#-1, scale_10	; integral part, so keep track of the scale
-00:00000094 F23A50A313C6      +81 	fmul.w		$literal(10), fp1 ; multiply the accumulation by 10
-00:0000009A F20058A2          +82 	fadd.b		d0, fp1		; add the stripped digit to it
-00:0000009E 60DA              +83 	bra		fraction	
-  :                            84 
-  :                            85 	
-  :                            86 	$if	'.'<'0'			; data code independent, if period < digit
-  :                            87 high					; byte was higher than a digit
-  :                            88 eofraction
-00:000000A0 0680FFFFFFD5      +89 	addi		#'0'+10-'e', d0	; was it letter 'e'
-  :                            90 	$else				; periods are higher than digits
-  :                            91 low					; byte was lower than a digit
-  :                            92 eofraction
-  :                            93 	addi		#'0'-'e', d0	; so was it letter 'e' ?
-  :                            94 	$endif
-  :                            95 
-  :                            96 estring?
-  :                            97 	$if	'e'^='E'		; are there different code points for 'e' and 'E' ?
-00:000000A6 6708              +98 	beq.b		estring!	; if there are and it was an 'e' you've found it
-00:000000A8 068000000020      +99 	addi		#'e'-'E', d0	; otherwise was it an 'E' instead?
-  :                            100 	$endif
-  :                            101 
-00:000000AE 6606              +102 	bne.b		eostring	; it wasn't any 'e' or 'E'
-  :                            103 estring!
-00:000000B0 2F01              +104 	move.l		scale_10, -(a7)	; yes it was, add the e+- number
-00:000000B2 6128              +105 	bsr.b		string2i
-00:000000B4 D29F              +106 	add		(a7)+, scale_10	; to the scale we already have
-  :                            107 
-  :                            108 					; the exponent range [ -307 .. +307 ] (15 bits midpoint)
-  :                            109 					; is small enough to be handled in a table
-  :                            110 
-  :                            111 					; listing is off for the 615 constants at table_u
-  :                            112 					; generated with
-  :                            113 
-  :                            114 					; ?       $do     615,    ieee754_64      1.0e?-308
-  :                            115 
-  :                            116 					; you can't quite have
-  :                            117 					;	lea	(table_u+307*8-$-2, pc, scale_10.l*8), a0
-  :                            118 					; because table_u+307*8-$-2 is more than 255
-  :                            119 
-  :                            120 					; so we point a0 to the exponent factor in 2 instructions
-  :                            121 
-  :                            122 					; table_u is a base-displacement address
-  :                            123 					; with the meaning on reference
-  :                            124 					;	table_u-$-2, pc
-  :                            125 eostring
-00:000000B6 41FA0A00          +126 	lea		table_u+307*8, a0		; point to the table location 1.0e0
-00:000000BA 41F01E00          +127 	lea		(0, a0, scale_10.l*8), a0	; add the accumulated scale to it
-00:000000BE 427A0060          +128 	pea		table_u		; the table start is the minimum address
-00:000000C2 B1DF              +129 	cmpa		(a7)+, a0	; are you lower than that?
-00:000000C4 6B0E              +130 	bmi.b		outrange	; yes you are. NAN
-00:000000C6 427A1390          +131 	pea		table_u+615*8	; the table ends after the last instance
-00:000000CA B1DF              +132 	cmpa		(a7)+, a0	; are you lower than that?
-00:000000CC 6A06              +133 	bpl.b		outrange	; no you're not. NAN
-00:000000CE F21054A3          +134 	fmul.d		(a0), fp1	; the exponent is in range
-  :                            135 					; multiply by [ 1.0e-307 .. 1.0e+307 ]
+00:00000000 F23A50801458      +22 	fmove.w		$literal(0), fp1
+00:00000006 7200              +23 	moveq		#0, scale_10	; decimal scale is accumulated here
+  :                            24 s2dscanforit
+00:00000008 7000              +25 	moveq		#0, d0
+00:0000000A 1018              +26 	move.b		(a0)+, d0
+00:0000000C 670000C6          +27 	beq		(eostringx).w
+00:00000010 B07C0020          +28 	cmp.w		#' ', d0
+00:00000014 67F2              +29 	beq		s2dscanforit	; walk any leading space
+  :                            30 					; if there are none it costs nothing
+  :                            31 
+00:00000016 0680FFFFFFD5      +32 	addi		#-'+', d0	; check for leading sign
+00:0000001C 671A              +33 	beq.b		read_1st_digit
+00:0000001E 0680FFFFFFFE      +34 	addi		#'+'-'-', d0
+00:00000024 6708              +35 	beq.b		s2dnegative
+00:00000026 0680FFFFFFF3      +36 	addi		#'-'-'0'-10, d0	; well was it a digit then?
+00:0000002C 6014              +37 	bra.b		check_1st_digit
+  :                            38 
+  :                            39 s2dnegative
+00:0000002E 6108              +40 	bsr.b		read_1st_digit	; read the number then switch polarity
+00:00000030 F23A50A3142A      +41 	fmul.w		$literal(-1), fp1 ; you can't just invert bits in fp1
+00:00000036 4E75              +42 	rts
+  :                            43 
+  :                            44 read_1st_digit
+00:00000038 7000              +45 	moveq		#0, d0
+00:0000003A 1018              +46 	move.b		(a0)+, d0
+00:0000003C 0680FFFFFFC6      +47 	addi		#-'0'-10, d0	; first is it higher than '9' ?
+  :                            48 
+  :                            49 check_1st_digit
+00:00000042 655E              +50 	bcs.b		high
+00:00000044 06800000000A      +51 	addi		#10, d0		; was it then lower than '0' ?
+00:0000004A 6420              +52 	bcc.b		low
+00:0000004C F20058A2          +53 integer	fadd.b		d0, fp1		; column 1 was in '0'..'9' and is now in 0..9
+00:00000050 7000              +54 	moveq.l		#0, d0
+00:00000052 1018              +55 	move.b		(a0)+, d0	; read next column
+00:00000054 0680FFFFFFC6      +56 	addi		 #-'0'-10, d0	; is it higher than '9' ?
+00:0000005A 6546              +57 	bcs.b		high		; if so it's the end of the integral part
+00:0000005C 06800000000A      +58 	addi		#10, d0		; was it lower than '0' ?
+00:00000062 6408              +59 	bcc.b		low
+00:00000064 F23A50A313F8      +60 	fmul.w		$literal(10), fp1 . multiply the accumulation so far
+00:0000006A 60E0              +61 	bra		integer		; add the new stripped digit in 0..9
+  :                            62 
+  :                            63 	$if	'.'<'0'			; data code independent. If period < digit
+00:0000006C 068000000002      +64 low	addi		#'0'-'.', d0	; is this the decimal point?
+  :                            65 	$else
+  :                            66 high	addi		#'0'+10-'.', d0	; otherwise if period > digit was this . ?
+  :                            67 	$endif
+  :                            68 	
+00:00000072 6708              +69 	beq.b		fraction	; whatever the data code, was that decimal point
+00:00000074 0680FFFFFFC9      +70 	addi		#'.'-'e', d0	; if it wasn't is this an exponent string?
+00:0000007A 602C              +71 	bra.b		estring?
+  :                            72 
+  :                            73 fraction				; decimal point has been found
+00:0000007C 7000              +74 	moveq.l		#0, d0		; read the fraction
+00:0000007E 1018              +75 	move.b		(a0)+, d0
+00:00000080 0680FFFFFFC6      +76 	addi		#-'0'-10, d0	; higher than '9' ?
+00:00000086 651A              +77 	bcs.b		eofraction
+00:00000088 06800000000A      +78 	addi		#10, d0		; lower than '0' ?
+00:0000008E 6412              +79 	bcc.b		eofraction
+  :                            80 					; the accumulation attributes all columns to the
+00:00000090 D2BCFFFFFFFF      +81 	add		#-1, scale_10	; integral part, so keep track of the scale
+00:00000096 F23A50A313C6      +82 	fmul.w		$literal(10), fp1 ; multiply the accumulation by 10
+00:0000009C F20058A2          +83 	fadd.b		d0, fp1		; add the stripped digit to it
+00:000000A0 60DA              +84 	bra		fraction	
+  :                            85 
+  :                            86 	
+  :                            87 	$if	'.'<'0'			; data code independent, if period < digit
+  :                            88 high					; byte was higher than a digit
+  :                            89 eofraction
+00:000000A2 0680FFFFFFD5      +90 	addi		#'0'+10-'e', d0	; was it letter 'e' ?
+  :                            91 	$else				; periods are higher than digits
+  :                            92 low					; byte was lower than a digit
+  :                            93 eofraction
+  :                            94 	addi		#'0'-'e', d0	; so was it letter 'e' ?
+  :                            95 	$endif
+  :                            96 
+  :                            97 estring?
+  :                            98 	$if	'e'^='E'		; are there different code points for 'e' and 'E' ?
+00:000000A8 6708              +99 	beq.b		estring!	; if there are and it was an 'e' you've found it
+00:000000AA 068000000020      +100 	addi		#'e'-'E', d0	; otherwise was it an 'E' instead?
+  :                            101 	$endif
+  :                            102 
+00:000000B0 6606              +103 	bne.b		eostring	; it wasn't any 'e' or 'E'
+  :                            104 estring!
+00:000000B2 2F01              +105 	move.l		scale_10, -(a7)	; yes it was, add the e+- number
+00:000000B4 6128              +106 	bsr.b		string2i
+00:000000B6 D29F              +107 	add		(a7)+, scale_10	; to the scale we already have
+  :                            108 
+  :                            109 					; the exponent range [ -307 .. +307 ] (15 bits midpoint)
+  :                            110 					; is small enough to be handled in a table
+  :                            111 
+  :                            112 					; listing is off for the 615 constants at table_u
+  :                            113 					; generated with
+  :                            114 
+  :                            115 					; ?       $do     615,    ieee754_64      1.0e?-308
+  :                            116 
+  :                            117 					; you can't quite have
+  :                            118 					;	lea	(table_u+307*8-$-2, pc, scale_10.l*8), a0
+  :                            119 					; because table_u+307*8-$-2 is more than 255
+  :                            120 
+  :                            121 					; so we point a0 to the exponent factor in 2 instructions
+  :                            122 
+  :                            123 					; table_u is a base-displacement address
+  :                            124 					; with the meaning on reference
+  :                            125 					;	table_u-$-2, pc
+  :                            126 eostring
+00:000000B8 B2BCFFFFFECD      +127 	cmp.l		#-307, scale_10	; has the decimal exponent got too low?
+00:000000BE 6B16              +128 	bmi.b		outrange	; yes it has, NAN
+00:000000C0 B2BC00000134      +129 	cmp.l		#308, scale_10	; has it got too high?
+00:000000C6 6A0E              +130 	bpl.b		outrange	; yes it has, NAN
+  :                            131 							; the exponent is in range
+00:000000C8 41FA09F0          +132 	lea		table_u+307*8, a0		; point to the table location 1.0e0
+00:000000CC 41F01E00          +133 	lea		(0, a0, scale_10.l*8), a0	; add the accumulated scale to it
+00:000000D0 F21054A3          +134 	fmul.d		(a0), fp1	; multiply by [ 1.0e-307 .. 1.0e+307 ]
+  :                            135 
   :                            136 eostringx
-00:000000D2 4E75              +137 	rts
+00:000000D4 4E75              +137 	rts
   :                            138 outrange				; score a NAN
-00:000000D4 F23A54801388      +139 	fmove.d		$literal(-1q), fp1
-00:000000DA 4E75              +140 	rts
+00:000000D6 F23A54801388      +139 	fmove.d		$literal(-1q), fp1
+00:000000DC 4E75              +140 	rts
   :                            141 
   :                            142 string2i				; scan an integer for whatever purpose
-00:000000DC 7200              +143 	moveq		#0, d1		; there won't be leading space however
-00:000000DE 7000              +144 	moveq		#0, d0
-00:000000E0 1018              +145 	move.b		(a0)+, d0
-00:000000E2 0680FFFFFFD5      +146 	addi		#-'+', d0	; leading sign?
-00:000000E8 6716              +147 	beq.b		istring_next
-00:000000EA 0680FFFFFFFE      +148 	addi		#'+'-'-', d0
-00:000000F0 6708              +149 	beq.b		istring_minus
-00:000000F2 0680FFFFFFF3      +150 	addi		#'-'-'0'-10, d0	; well is it a digit?
-00:000000F8 6010              +151 	bra.b		istring_digit?
+00:000000DE 7200              +143 	moveq		#0, d1		; there won't be leading space however
+00:000000E0 7000              +144 	moveq		#0, d0
+00:000000E2 1018              +145 	move.b		(a0)+, d0
+00:000000E4 0680FFFFFFD5      +146 	addi		#-'+', d0	; leading sign?
+00:000000EA 6716              +147 	beq.b		istring_next
+00:000000EC 0680FFFFFFFE      +148 	addi		#'+'-'-', d0
+00:000000F2 6708              +149 	beq.b		istring_minus
+00:000000F4 0680FFFFFFF3      +150 	addi		#'-'-'0'-10, d0	; well is it a digit?
+00:000000FA 6010              +151 	bra.b		istring_digit?
   :                            152 
   :                            153 istring_minus				; scan the magnitude and negate it
-00:000000FA 6104              +154 	bsr.b		istring_next
-00:000000FC 4481              +155 	neg		d1
-00:000000FE 4E75              +156 	rts
+00:000000FC 6104              +154 	bsr.b		istring_next
+00:000000FE 4481              +155 	neg		d1
+00:00000100 4E75              +156 	rts
   :                            157 
   :                            158 istring_next
-00:00000100 7000              +159 	moveq		#0, d0
-00:00000102 1018              +160 	move.b		(a0)+, d0
-00:00000104 0680FFFFFFC6      +161 	addi		#-'0'-10, d0	; is it > '9' ?
+00:00000102 7000              +159 	moveq		#0, d0
+00:00000104 1018              +160 	move.b		(a0)+, d0
+00:00000106 0680FFFFFFC6      +161 	addi		#-'0'-10, d0	; is it > '9' ?
   :                            162 istring_digit?
-00:0000010A 6512              +163 	bcs.b		istring_end	; if so, not more
-00:0000010C 06800000000A      +164 	addi		#10, d0		; is it < '0' ?
-00:00000112 640A              +165 	bcc.b		istring_end	; if so no more
-00:00000114 E389              +166 	lsl		#1, d1		; multiply accumulation by 2
-00:00000116 D081              +167 	add		d1, d0		; add accumulation to stripped digit
-00:00000118 E589              +168 	lsl		#2, d1		; multiply accumulation by 4
-00:0000011A D280              +169 	add		d0, d1		; accumulation = accumulation * 10 + digit
-00:0000011C 60E2              +170 	bra		istring_next
+00:0000010C 6512              +163 	bcs.b		istring_end	; if so, not more
+00:0000010E 06800000000A      +164 	addi		#10, d0		; is it < '0' ?
+00:00000114 640A              +165 	bcc.b		istring_end	; if so no more
+00:00000116 E389              +166 	lsl		#1, d1		; multiply accumulation by 2
+00:00000118 D081              +167 	add		d1, d0		; add accumulation to stripped digit
+00:0000011A E589              +168 	lsl		#2, d1		; multiply accumulation by 4
+00:0000011C D280              +169 	add		d0, d1		; accumulation = accumulation * 10 + digit
+00:0000011E 60E2              +170 	bra		istring_next
   :                            171 
   :                            172 istring_end
-00:0000011E 4E75              +173 	rts
-  :                            174 
-  :                            175 table_u
+00:00000120 4E75              +173 	rts
+  :                            174 					; the table is not quadword-aligned
+  :                            175 table_u				; but is only read once per conversion
   :                            178 	$list
 *EOF*
-00:00001458+0000
-00:0000145a+FFFF
-00:0000145c+000A
-00:0000145e+FFFFFFFFFFFFFFFF
-:$(00):00040000:00041466 
+00:0000145a+0000
+00:0000145c+FFFF
+00:0000145e+000A
+00:00001460+FFFFFFFFFFFFFFFF
+:$(00):00040000:00041468 
 
 
 </pre>

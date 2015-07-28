@@ -20,6 +20,7 @@ $(0:262144,pc/$literal)
 
 s2double*
 	fmove.w		$literal(0), fp1
+	moveq		#0, scale_10	; decimal scale is accumulated here
 s2dscanforit
 	moveq		#0, d0
 	move.b		(a0)+, d0
@@ -86,7 +87,7 @@ fraction				; decimal point has been found
 	$if	'.'<'0'			; data code independent, if period < digit
 high					; byte was higher than a digit
 eofraction
-	addi		#'0'+10-'e', d0	; was it letter 'e'
+	addi		#'0'+10-'e', d0	; was it letter 'e' ?
 	$else				; periods are higher than digits
 low					; byte was lower than a digit
 eofraction
@@ -123,16 +124,15 @@ estring!
 					; with the meaning on reference
 					;	table_u-$-2, pc
 eostring
+	cmp.l		#-307, scale_10	; has the decimal exponent got too low?
+	bmi.b		outrange	; yes it has, NAN
+	cmp.l		#308, scale_10	; has it got too high?
+	bpl.b		outrange	; yes it has, NAN
+							; the exponent is in range
 	lea		table_u+307*8, a0		; point to the table location 1.0e0
 	lea		(0, a0, scale_10.l*8), a0	; add the accumulated scale to it
-	pea		table_u		; the table start is the minimum address
-	cmpa		(a7)+, a0	; are you lower than that?
-	bmi.b		outrange	; yes you are. NAN
-	pea		table_u+615*8	; the table ends after the last instance
-	cmpa		(a7)+, a0	; are you lower than that?
-	bpl.b		outrange	; no you're not. NAN
-	fmul.d		(a0), fp1	; the exponent is in range
-					; multiply by [ 1.0e-307 .. 1.0e+307 ]
+	fmul.d		(a0), fp1	; multiply by [ 1.0e-307 .. 1.0e+307 ]
+
 eostringx
 	rts
 outrange				; score a NAN
@@ -171,8 +171,8 @@ istring_digit?
 
 istring_end
 	rts
-
-table_u
+					; the table is not quadword-aligned
+table_u					; but is only read once per conversion
 	$list	0
 ?	$do	615,	ieee754_64	1.0e?-308
 	$list
