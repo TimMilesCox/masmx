@@ -5749,7 +5749,7 @@ Assemblers mostly resolve expressions whose tokens are all known at assembly tim
 <p>
 <b>$xqt_fp</b> and <b>$xqt_i</b> directives code an instruction plan in a<br>
 compiler-like fashion however, to solve expressions involving run-time variables<br>
-first resolving subexpressions whose tokens are known at assembly time
+first resolving sequences within the expression whose token values are known at assembly time
 
 <p>
 These instruction steps are planned with the support of target-specific macros with<br>
@@ -5764,8 +5764,8 @@ between constants at assembly time,<br> planning the fewest possible instruction
 for run time calculation
 
 <p>
-In this example the subexpression right of the OR operator <b>++</b> has been
-resolved at assembly time, but left of <b>++</b> a multiply, two adds and a
+In this example the sequence right of the OR operator <b>++</b> has been
+resolved at assembly time,<br> but left of <b>++</b> a multiply, two adds and a
 shift must take place at runtime
 
 <pre>
@@ -5819,9 +5819,12 @@ Directive <b>$xqt_i</b> surrounds constant sequences with parentheses, so that t
 which use automatic literals would generate the literals (16) and (12*/20)
 
 <p>
-Automatic literals are not opted in <b>coldfire.def</b> because this would disrupt the many parenthesised
-operand expressions in accepted source syntax. For ColdFire integer arithmetic furthermore, literals
-are unnecessary because 32-bit integer immediate operands indicated with prefix <b>#</b> are available
+Automatic literals are not opted in <b>coldfire.def</b> because this would disrupt<br>
+the many parenthesised operand expressions in accepted source syntax
+
+<p>
+For ColdFire integer arithmetic furthermore, literals are unnecessary because<br>
+32-bit integer immediate operands indicated with prefix <b>#</b> are available
 
 <p>
 The floated <b>#</b> yields in the two illustrated cases these two immediate operand clauses
@@ -6070,17 +6073,18 @@ p	$proc
 </pre>
 
 <p>
-This outline scheme can be included directly in conjunction with simple $proc macros which populate these names
-with instruction code which updates a designated result register
+This macro frame can be assembled for any target. It references
+simple target-specific $proc macros which populate the following names<br>
+and update designated result registers
 <pre>
 
 	LOAD		LOAD_NEGATIVE	TEST_EQUAL	TEST_NE		TEST_GREATER	TEST_LESS
-	SHIFT		SHIFT_RIGHT	OR		AND		XOR
+	SHIFT		SHIFT_RIGHT	OR		AND		XOR		REVERSE
 	ADD		SUBTRACT	MULTIPY		DIVIDE		DIVIDE_ROUNDED	MODULO
 
 </pre>
-These macros apply the given argument to a designated result register. Instructions in the four TEST_ macros have<br>
-a runtime result of one for true and zero for untrue
+Instructions in the four TEST_ macros have a runtime result
+of one for true and zero for untrue
 
 <p>
 The macro
@@ -6092,7 +6096,7 @@ The macro
 negates an accumulation in the result register to cover cases like
 <pre>
 
-	-(X*Y-Z)
+	-(<i>x*y-z</i>)
 
 </pre>
 There may be advantage in a different instruction sequence from simple LOAD_NEGATIVE
@@ -6107,7 +6111,7 @@ saves the result register either in a real stack or in a list of registers<br>
 managed at assembly time with macro text
 
 <p>
-The function
+The function macro
 <pre>
 
 	STACK_TOP
@@ -6124,26 +6128,33 @@ The macro
 </pre>
 for some targets needs no separate instructions and is void. POP is however
 separated in case the stacked value must be cleared,<br>
-because STACK_TOP may be  a function, and function macros in masmx may not generate code.
+because STACK_TOP is a function not a procedure,
+and function macros in masmx may not generate code.
 
 <p>
 Interim results may be in detail saved, retrieved and cleared a number of ways according
 to target architecture, for example
 <pre>
 
-;		In ColdFire saves/retrieves only PUSH macro generates an instruction
+;		In ColdFire saves/retrieves PUSH macro generates an instruction
+;		STACK_TOP function causes its associated operation to pop the stack
+;		without a separate instruction
+
 ;		LOAD and arithmetic macros must distinguish register / storage / immediate argument
 
-PUSH*		$proc			; ColdFire
-		move.l		d0, -(a7)
+PUSH*		$proc				; ColdFire
+		move.l			d0, -(a7)
 		$end
 
-STACK_TOP*	$equf		(a7)+	; ColdFire
-POP		$equ,$directive	$nop	; ColdFire
+STACK_TOP*	$equ,"$a_reg_@+"	"(a7)+"	; ColdFire
+POP		$equ,$directive	$nop		; ColdFire
 
 .		____________________________________
 
-#		in PowerPC saves/retrieves, only PUSH macro generates an instruction
+#		in PowerPC saves/retrieves, PUSH macro generates an instruction
+#		STACK_TOP function and POP macro designate and update an operand source
+#		without operating on hardware
+
 #		LOAD and arithmetic macros must distinguish register / storage / immediate argument
 #		arithmetic macros must load storage arguments to a GPR designated as threshold
 #		The threshold may be the next available set_aside register
@@ -6191,11 +6202,12 @@ of the program
 
 <p>
 The first simple algorithm has five inputs and is executed in five instructions, including
-operand acquisition from storage. Instructions follow masmx precedence order. Three of the
+operand acquisition from storage.<br>
+Operations follow masmx expression precedence order. Three of the
 five tokens are identifiers whose content is only known at runtime
 
 <p>
-The second algorith has a mixture of register, storage and pointer inputs
+The second algorithm has a mixture of register, storage and pointer inputs
 <pre>
 
 $ ~/masmx -lnky r2xample.msm 
