@@ -122,7 +122,7 @@ Anyone who understands the target architecture can do this.
 User interface is a shell or command prompt
 
 <p>
-Binaries for all popular platforms are downloadable. Installation = copy the binaries
+Binaries for all popular developer platforms are downloadable. Installation = copy the binaries
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 
@@ -735,7 +735,8 @@ Size, layout and representation of floating constants are programmable. Floating
 Macro code can achieve any representation
 
 <p>
-Supplied macros generate IEEE754 floating constants in 32-bit, 64-bit and 128-bit formats,<br>
+Supplied macros generate <a href="#ieeemacro">IEEE754</a> floating constants in 32-bit,
+64-bit and 128-bit formats,<br>
 and in the popular non-IEEE754 80-bit representation
 
 <p>
@@ -2308,12 +2309,12 @@ MASMX 7r3
 :$(00):00000000:0000000C 
 
 </pre>
-The directive $floating_point changes the default 96-bit total size of the
-stored floating-point constant.
+The directive <a href="#floating_point">$floating_point</a> changes the default
+96-bit total size of the stored floating-point constant
 
 <p>
-The $characteristic directive sets the characteristic size for a given
-floating <i>number_size</i>
+The <a href="#characteristic">$characteristic</a> directive sets the
+characteristic size for a given floating <i>number_size</i>
 <pre>
 
 	$characteristic,<i>number_size</i>	<i>characteristic_width</i>
@@ -4070,30 +4071,34 @@ The value of label base is 05000.
 <a      name="bix"/>
 <h3>4.7.4: $bank_index -absolute or virtual memory space identity</h3>
 
-$bank_index concerns targets which switch windows of address space between different memory blocks<br>
+$bank_index concerns targets with hardware relocation
+and program sections assembled to have translated load addresses<br>
 See <a href="#breakpoint">7.1.2</a>, <a href="#bdbreakpt">7.1.4</a>, Breakpointed Location Counters
 
 <p>
-$bank_index retrieves a load pointer which may be absolute or virtual for the memory block currently assembling.<br>
+$bank_index retrieves a load pointer which may be a physical load address
+or an encoded or translated identifier for the memory block currently assembling.<br>
 The load pointer is the <i>breakpoint_value</i> in the location counter switch statement
 <pre>
 
 $(locator_number:program_visible_base_address:<i>breakpoint_value</i>)
 
 </pre>
-If assembly flag -v is not set, <i>breakpoint_value</i> is an absolute load address.<br>
-A section defined by locator number may have many breakpoints, making many parts with different load addresses<br>
-of one program section. The parts may share program-visible address space
+If assembly flag -v is not set, <i>breakpoint_value</i> is a physical load address.<br>
+A section identified by location counter may have many breakpoints,
+making many parts of one program section with different load addresses
 
 <p>
-If assembly flag -v is set, <i>breakpoint_value</i> is an abstraction like a handle or block identifier,<br>
-and the binary output appends it to load string addresses without interpreting it. A section defined by location counter<br>
-may have many partss with different storage block identifiers.
+If assembly flag <a href="#option_v">-v</a> is set, <i>breakpoint_value</i> is an abstraction
+like a handle or block identifier,<br>
+and the binary output appends it to load string addresses without interpreting it.
+A section identified by location counter<br>
+may have many parts with different storage block identifiers.
 See <a href="#vbreakpt">7.1.2.2: Breakpointed Location Counters: -v Option</a>
 
 <p>
-Whether the section breakpoint address is absolute or a translatable value, $bank_index function retrieves the current breakpoint<br>
-value without the developer supplying it. Identifying the memory block allows macro code to export an entry point or vector
+$bank_index function retrieves the current breakpoint value whether physical or abstracted<br>
+and identifies the memory block automatically, allowing macro code to generate vector information
 <pre>
 
 
@@ -4725,7 +4730,10 @@ hi*	$func
 
 
 </pre>
-	
+
+Function macros are more often called by <a href="#name">$name</a> label than by $func label
+
+<p>
 See directive <a href="#func">8.21: $func</a>, <a href="#func_macro">4.2.2.4: Function Macro Reference</a> 
 
 <a      name="lt_form"/>
@@ -4772,13 +4780,14 @@ may be retrieved with function $t(..)
 
 <p>
 This accommodates the frequent practice with CISC
-targets like M68K of assigning one mnemonic name
-reflecting functionality to several instructions
+targets like ColdFire of assigning one mnemonic name
+reflecting functionality to several instructions<br>
 which have differing opcodes according to memory, register
 or immediate operand and according to operand size
+and transfer direction
 
 <p>
-Names like ADD and MOVE may be many different
+Names like <i>add</i> and <i>move</i> may be many different
 instructions which can only be fixed by understanding
 what sort of operands are addressed 
 
@@ -5823,11 +5832,11 @@ Automatic literals are not opted in <b>coldfire.def</b> because this would disru
 the many parenthesised operand expressions in accepted source syntax
 
 <p>
-For ColdFire integer arithmetic furthermore, literals are unnecessary because<br>
+For ColdFire integer arithmetic, literals are unnecessary because<br>
 32-bit integer immediate operands indicated with prefix <b>#</b> are available
 
 <p>
-The floated <b>#</b> yields in the two illustrated cases these two immediate operand clauses
+The floated <b>#</b> at line 12 is attached to these two immediate operand clauses
 <pre>
 
 	#(16)
@@ -6132,8 +6141,8 @@ because STACK_TOP is a function not a procedure,
 and function macros in masmx may not generate code.
 
 <p>
-Interim results may be in detail saved, retrieved and cleared a number of ways according
-to target architecture, for example
+Interim results are saved and retrieved in various ways according
+to target architecture
 <pre>
 
 ;		In ColdFire saves/retrieves PUSH macro generates an instruction
@@ -6153,7 +6162,7 @@ POP		$equ,$directive	$nop		; ColdFire
 
 #		in PowerPC saves/retrieves, PUSH macro generates an instruction
 #		STACK_TOP function and POP macro designate and update an operand source
-#		without operating on hardware
+#		without any operation taking place on hardware
 
 #		LOAD and arithmetic macros must distinguish register / storage / immediate argument
 #		arithmetic macros must load storage arguments to a GPR designated as threshold
@@ -7709,7 +7718,7 @@ The maximum size of the first or "net" part is 32 bits.
 The maximum size of the second or giant-stepped part is 192 bits.
 
 <p>
-See Section 4.1.2.1: Describing the Address Space: Location Counter Controls.
+See <a href="#sections">7: Constructing Program Sections</a>
 
 <p>
 See <a href="#file_formats">9: Output File Formats, Relocation and Linking,
@@ -9344,7 +9353,7 @@ Read and assemble a nested source file. Nesting can recurse
 to a depth of 16. 
 <pre>
 
-	$include        "target.def"
+	$include        target.def
 
 </pre>
 <p>
@@ -10988,13 +10997,14 @@ in the current size and character code, by default 8-bit ASCII.
 
 <p>
 In this assembly an unconventional label is declared sucessfully but
-can not be referenced. An integer value string
+can not be referenced. Reference to 'unconventional \ rough { label'
+generates a 192-bit integer containing the character values
 <pre>
 
-	+'entional \ rough { label'
+	'entional \ rough { label'
 
 </pre>
-the maximum 192 bits in size has been generated
+Truncation is at masmx maximum integer size 192 bits
 <pre>
 
 $ masmx vr -lx
@@ -11416,7 +11426,7 @@ not via <b>$set_option</b> directive
 
 
 <a	name="set_interact"/>
-<h3>8.47.2: Interaction of Run Options and List Directives</h3>
+<h3>8.47.2: Interaction of Run Options and $list / $plist Directives</h3>
 
 
 <p>
@@ -11698,7 +11708,7 @@ LTERM=;
 </pre>
 
 <p>
-See also 4.3.2 Number Constants
+See also <a href="#nconstant">4.3.3: Number Constants</a>
 
 <a      name="text"/>
 <h2>8.52: $text              Translate Input Text Patterns</h2>
@@ -11720,7 +11730,7 @@ in the assembly header. Any separated from the first block of
 them will not be used.
 
 <p>
-See also 10.1: Establishing your Syntax
+See also <a href="#describe1">10.1: Establishing your Syntax</a>
 
 <a      name="trace"/>
 <h2>8.53: $trace             Display Value</h2>
@@ -16916,10 +16926,9 @@ The full set of masmx command line options are
 		clauses of the text-encoded binary output.
 
 		Default behaviour is to compute load addresses
-		from logical address + breakpoint address - base_address.
-
-		(i.e. to apply absolute segment relocation
-		at assembly time)
+		from logical address + breakpoint address - base address,
+		i.e. to apply physical load address relocation
+		to load strings at assembly time
 
 		-see <a href="#sections">7: Constructing Program Sections</a>
 	
@@ -17142,7 +17151,7 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 <h2>Appendix A.b: Switch and Trace Option Flags for Developer Use</h2>
 
 Flags -<b>VUOS</b> may be used to switch and trace assembly language code
-and may for this purpose also be opted at the command line. Code can examine
+and may for this purpose also be opted at the command line.<br>Code can examine
 command line option flags with masmx function <a href="#oflag">4.7.7: $o()</a>
 
 
