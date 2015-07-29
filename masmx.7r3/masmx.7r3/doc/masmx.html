@@ -2258,6 +2258,13 @@ into the floating format of the target architecture
 floating_value	$set	16384.0e+1000000
 
 </pre>
+The exponent and mantissa sizes and rounding point of the <a href="#set">$set</a>
+floating default the current <a href="#floating_point">$floating_point</a><br>
+and <a href="#characteristic">$characteristic</a> values.
+A <a href="#set">$set,<i>subcommand</i></a> value can override the size and
+rounding position
+
+<p>
 masmx internal floating precision is 192 bits with 168-bit simple fraction and 23-bit<br>
 midpointed binary exponent equivalent in range to decimal exponents [+|-]1262611
 <pre>
