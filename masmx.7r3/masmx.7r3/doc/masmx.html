@@ -85,11 +85,11 @@ of words or bytes, whichever the target address quantum is)
 
 <p>
 Memories this large are not immediately expected.
-However very large address spaces are often partly populated,<br>
+However very large address spaces are often populated in part,<br>
 with system memory at low-order addresses and boot or peripheral logic
 at the highest addresses.<br>No force of convention can prevent a a semiconductor supplier
 from devising, for example, a 72-bit address space<br> where the 8 high-order bits select
-memory and peripheral buses
+among memory and peripheral buses
 
 </blockquote>
 </div>
@@ -491,9 +491,10 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 
     48.	<a href="#snap">$snap</a>		list the label table				8.48
 
-	1.  $snap		2nd pass				8.48.1
-	2.  $snap, 1		1st pass				8.48.2
-	3.  $snap[,1]	2	dynamic label table			8.48.3
+	1.  $snap		load order or -y sorted			8.48.1
+	2.  $snap,[1]	2	dynamic labels table			8.43.2
+	3.  $snap	3	list labels [and macro text]		8.48.3
+	4.  $snap, 1		1st pass				8.43.4
 
     49.	<a href="#sterm">$sterm</a>		set the substring sentinel symbol		8.49
     50.	<a href="#store">$store</a>		set the default output file name		8.50
@@ -578,7 +579,7 @@ UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
 11. <a href="#afloat">Alternative Floating Formats</a>					11
     1.	<a href="#masmxfloat">masmx Floating Format</a>						11.1
     2.  <a href="#fdemens">Floating Format Dimensions</a>					11.2
-	1.  <a href="#fdemens1">Floating Number Size</a>						11.2.1
+	1.  <a href="#fdemens1">Floating Number Size</a>					11.2.1
 	2.  <a href="#fdemens2">Exponent Field Size</a>						11.2.2
     3.	<a href="#ieeefloat">IEEE754 Floating Values</a>						11.3
 	1.  <a href="#fpdifferences">Differences between masmx Floating Format and IEEE754 Floating Formats</a>
@@ -853,7 +854,7 @@ Assembly examples in this document are captures from the Unix
 bash shell
 
 <p>
-masmx on Microsoft platforms runs with the simple command prompt
+masmx on Microsoft platforms runs with the simple shell
 sometimes called the DOS screen or command prompt
 
 <p>
@@ -881,7 +882,7 @@ existing source. File includes may be extensively nested
 
 	$list	0
 	$include	target.def
-	$list
+	$list	2
 	$include	existing_application.msm
 
 </pre>
@@ -962,7 +963,7 @@ A label starts in column one and ends in whitespace. A label may contain
 	letters digits $ _ ? ! @ :
 
 </pre>
-and starts with a letter or [ _ ? ! @ : ]
+and a label starts with a letter or [ _ ? ! @ : ]
 
 <p>
 : in this list of legal label characters represents the substring separator which is
@@ -981,10 +982,11 @@ then the list of legal label characters becomes
 	letters digits $ _ ? ! @ .
 
 </pre>
-and starts with a letter or [ _ ? ! @ . ]
+and a label starts with a letter or [ _ ? ! @ . ]
 
 <p>
-A reference containing substring separator may reference a simple label or a structured location
+A reference containing substring separator may reference a simple label or a structured location.
+See <a href="#stradata">5.2: Structured Data and Structured Code Name Spaces</a>
 
 <p>
 A label may also start with $ and is then declared in quotes
@@ -1167,8 +1169,7 @@ Operators by rank are
 	--<br>
 	++<br>
 	/*<br>
-	*/<br>
-	*/-<br>
+	*/ */-<br>
 	**<br>
 	*+ *-<br>
 	+ -<br>
@@ -1848,7 +1849,7 @@ address_B	$net_socket	172.29.6.8:23
 
 
 <a      name="command"/>
-<h3>4.3: The Command Field</h3>
+<h2>4.3: The Command Field</h2>
 
 
 The command field (the first field which is preceded by any
@@ -2613,7 +2614,10 @@ CONT_CHAR=|
 <a      name="text_string"/>
 <h3>4.3.5: Text Strings</h3>
 
+See also <a href="#cstring">4.2.2.1.2: C Language Number and String Notation</a> and
+<a href="#option_c">-c option</a>
 
+<p>
 Text strings are a row of bytes composed from
 <pre>
 
@@ -2626,6 +2630,29 @@ These line-continued parts produce
 <pre>
 
 	"text_in quotes":one_byte_expression
+
+</pre>
+<p>
+All strings begin with quote in the command field. The text part may be void
+<pre>
+
+$ masmx -lnkz
+MASMX 7r3
+0/-INPUT>>
+	$word	32
+CR	$equ	13
+LF	$equ	10
+
+	"":CR:LF  
+	$end
+  :                            1  $word 32
+  :                            2 CR $equ 13
+  :                            3 LF $equ 10
+  :                            4 
+00:00000000 0D0A0000          +5  "":CR:LF  
+  :                            6  $end
+:$(00):00000000:00000001 
+	
 
 </pre>
 Text substrings and one-byte integers may be combined without restriction. There is
@@ -3806,132 +3833,109 @@ relocatable
 <a      name="absolute_here"/>
 <h4>4.7.2.1: $a	current absolute address</h4>
 
-$a without parameter is the current absolute address. Here $a value is shown
-beside the displacement value in $
+$a retrieves an address constant within a base-displacement section, where $
+produces only a displacement
+<p>
+$a without parameter is the current absolute address. Here $ and $a
+can be compared
 <pre>
 
 $ masmx -lnk
 MASMX 7r3
 0/-INPUT>>
-	$word	16
+        $word   16
 $(44:0FC00,5)
-	$res	10
-	+	$, $a:L
-	$end
-  :                            1  $word 16
+        $res    10
+	+	$, $a:q
+        $end
+  :                            1         $word   16
   :                            2 $(44:0FC00,5)
-  :                            3  $res 10
-2C:000A 000AFC0A              +4  + $, $a:L
-  :                            5  $end
-:$(2C):FC00:FC0C 
-
+  :                            3         $res    10
+2C:000A 0000000A0000FC0A      +4         +       $, $a:q
+  :                            5         $end
+:$(2C):FC00:FC0E 
 
 </pre>
-<p>
-
-$a constants may be within macro text invoked in many different program sections
-with known or relocatable base address
 
 <p>
-$a also generates constants pointing to a base-displacement segment which is relocatable
+$a also retrieves relocatable addresses, as $ also does except in
+base-displacement sections
 
-<a      name="absolute_there"/>
-<h4>4.7.2.2: $a(..)	absolute value of expression</h4>
 <pre>
 
-$ masmx -lnkx
+$ masmx -lnk
 MASMX 7r3
 0/-INPUT>>
-$(15:*8, 9)	. relocation alignment 8, base register 9
-	$res	6
-here
-	+($a(here))d
+$(15:*8, 9)     . relocation alignment 8, base register 9
+        $res    6
+	+	$a:L
 	$end
-  :                            1 $(15:*8, 9) . relocation alignment 8, base register 9
-  :                            2  $res 6
-  :                            3 here
+  :                            1 $(15:*8, 9)     . relocation alignment 8, base register 9
+  :                            2         $res    6
 (+0f)30
-0F:000006 000000000006        +4  +($a(here))d
-  :                            5  $end
-here=$0F:000006,000009
--INPUT>>=0<000000
+0F:000006 000000000006        +3         +       $a:L
+  :                            4         $end
 :$(0F):000000:000008 
 
 </pre>
 A relocation request is attached to the $a reference. A storage constant or
 receiving field must be large enough to contain the linked absolute address
 
+<a      name="absolute_there"/>
+<h4>4.7.2.2: $a(..)     absolute value of expression</h4>
+
 <p>
-$a is also functional where the target address has a known absolute base but
-the containing section is base-displacement addressed. Constant expressions
-using $ or a base-displacement label retrieve the displacement from the start
-of a base-displacement section
+
+$a(<i>expression</i>) retrieves the absolute value of base-displacement identifiers
+
 
 <pre>
 
-$ masmx -ln
+$ masmx -lnkx
 MASMX 7r3
 0/-INPUT>>
+	+	$a(location4)
+	+	$a(location5)
+
 $(4:0400000,2)
-	$res	4
-	+	$
-        $end
-  :                            1 $(4:0400000,2)
-  :                            2  $res 4
-04:000004 000004              +3  + $
-  :                            4  $end
-:$(04):400000:400005 
--INPUT>>: object code 44 bytes: 0 errors: 0 undefined labels
+        $res    4
+location4
 
-$ cat temp.txo
-
-
-</pre>
-
-$a retrieves the address whether it is absolute or relocatable
-<pre>
-
-$ masmx -lnkx base_da
-MASMX 7r3
-3/base_da.msm
-*EOF*
-  :                            1 QUITE_LARGE_START_ADDRESS $equ	07FC000
-  :                            2 intervening_displacement $equ	120
+$(5:*8, 3)
+	$res	100
+location5
+	$end
+00:000000 400004              +1         +       $a(location4)
+(+05)18
+00:000001 000064              +2         +       $a(location5)
   :                            3 
-  :                            4 $(4:QUITE_LARGE_START_ADDRESS, 9)
-  :                            5 
-  :                            6 	$res	intervening_displacement
+  :                            4 $(4:0400000,2)
+  :                            5         $res    4
+  :                            6 location4
   :                            7 
-  :                            8 name
-04:000078 7FC078              +9 	+	$a(name)
-  :                            10 
-*EOF*
-QUITE_LARGE_START_ADDRESS=7FC000
-intervening_displacement=000078
-name=$04:000078,000009
-base_da.msm=0<000003
-:$(04):7FC000:7FC079 
+  :                            8 $(5:*8, 3)
+  :                            9         $res    100
+  :                            10 location5
+  :                            11        $end
+location4=$04:000004,000002
+location5=$05:000064,000003
+-INPUT>>=0<000000
+:$(00):000000:000002 :$(04):400000:400004 :$(05):000000:000064 
 
 </pre>
-name has the base+diplacement value 
-<pre>
 
-	intervening_displacement, 9
-
-</pre>
-$a(name) has the absolute value
-<pre>
-
-	QUITE_LARGE_ADDRESS+intervening_displacement
-
-</pre>
-$a has no function for addresses in void sections, where the base
-register value is not available at either assembly or link
+$a attached a relocation request to the reference to relocatable identifier location5.<br>
+Simple constants of base-displacement identifiers only retrieve the displacement
 
 <p>
-A breakpoint value in the locator declaration indicates a physical segment load address known in advance.<br>
-It can be seen here that in base-displacement $a(<i>location</i>) retrieves the program-absolute address,<br>
-<i>location</i> retrieves the displacement only, and the physical load address is not accessed
+$a has no function for addresses in void sections, where the base
+pointer value is not available at either assembly or link
+
+<p>
+A breakpoint value in the locator declaration concerns hardware address translation
+and is a load address or handle known at assembly time<br>
+$a(<i>location</i>) includes the program-absolute base address 0C000.
+The load address 0FC0000 is not accessed
 <pre>
 
 $ masmx -lnkyx
@@ -3956,8 +3960,7 @@ location=$0C:00000030,00000005
 :$(0C):0000C000:0000C030 
 
 </pre>
-A starred breakpoint address is not a load address translation value or index but part of program-visible<br>
-addresses in the section. $a retrieves the large absolute value
+A starred breakpoint is part of program-absolute addresses. $a retrieves the large absolute value
 <pre>
 
 $ masmx -lnkx
@@ -4179,10 +4182,10 @@ The macro was called with the name add with latent value 3
 Value 3 is in the first field and the operand value in the other field
 
 <p>
-$n can also be retrieved as parameter macro_label(0,0), in this example p(0, 0)
+$n can also be retrieved as parameter <i>macro_label</i>(0,0), in this example p(0, 0)
 
 <p>
-The size of macro_label(0, 0) is 192 bits.
+The size of <i>macro_label</i>(0, 0) is 192 bits.
 
 <p>
 The size $n is 32 bits.
@@ -4348,14 +4351,13 @@ location counter 0..71.
 
 
 <a      name="thatregion"/>
-<h4>4.7.8.2: $r(<i>location</i>)	location counter containing target <i>location</i></h4>
+<h4>4.7.8.2: $r(<i>expression</i>)	location counter containing identifier <i>expression</i></h4>
 
-identifies the program section where the named <i>location</i> is
+identifies the program section where the target identified by <i>expression</i> is
 
 <p>
-The first token in expression <i>location</i> must identifiably belong to
-a program section, as a location label does, in order for its section
-to be identified
+The first token in <i>expression</i> should be an identifier pertaining to
+a program section, or a macro argument paraform referencing an identifier
 				  
 				  
 <a      name="relocation"/>
@@ -6146,10 +6148,11 @@ to target architecture
 <pre>
 
 ;		In ColdFire saves/retrieves PUSH macro generates an instruction
+
 ;		STACK_TOP function causes its associated operation to pop the stack
 ;		without a separate instruction
 
-;		LOAD and arithmetic macros must distinguish register / storage / immediate argument
+;		LOAD and arithmetic macros need to distinguish register / storage / immediate arguments
 
 PUSH*		$proc				; ColdFire
 		move.l			d0, -(a7)
@@ -6160,13 +6163,16 @@ POP		$equ,$directive	$nop		; ColdFire
 
 .		____________________________________
 
-#		in PowerPC saves/retrieves, PUSH macro generates an instruction
-#		STACK_TOP function and POP macro designate and update an operand source
+#		in PowerPC saves/retrieves, PUSH macro generates a save instruction
+#		and designates without hardware action the next save location
+
+#		STACK_TOP function and POP macro identify and redesignate an operand source
 #		without any operation taking place on hardware
 
-#		LOAD and arithmetic macros must distinguish register / storage / immediate argument
-#		arithmetic macros must load storage arguments to a GPR designated as threshold
-#		The threshold may be the next available set_aside register
+#		LOAD and arithmetic macros need to distinguish register / storage / immediate arguments
+
+#		arithmetic macros must load storage operands to a GPR designated as threshold.
+#		The threshold may be the next designated set_aside register
 
 LISTP		$set	1		# PPC32
 SAVE(1)		$equ	r20
@@ -6651,24 +6657,6 @@ to absolute unrelocatable 0. This the default environment
 at the start of main assembly
 
 <p>
-Program sections addressing is initialised for example
-<pre>
-
-$(1:static_base_address)
-$(2:strings_base_address/literal_pool_name)
-
-</pre>
-Code or data is added to each section
-<pre>
-
-$(1)
-structure1      structure_macro_name
-buffer20        $res    20
-$(0)
-	load_address    r6, literal_pool_name("Long Text String":10)
-	call            copy_routine
-
-</pre>
 Sections can be named to match assembly language output from compilers
 <pre>
 
@@ -6689,8 +6677,8 @@ $(CODE)
 
 
 </pre>
-The explanation of each possible field in a location counter control
-is, for absolutely addressed segments:
+The possible fields in a location counter control
+are for absolutely addressed segments:
 <pre>
 
 $(id:address:breakpoint,base_register/literal_pool_tag)
@@ -6714,8 +6702,14 @@ $(id[,base_register][/literal_pool_tag])
 then addressing in this segment picks up where it last reached.
 
 <p>
-If the base register is specified, labels of locations in the
-segment have a tuple base+displacement attribute.
+If base register is specified, labels of locations in this
+section have base+displacement tuple values.<br>
+See <a href="#bdflat">7.1.3: Simple Base Displacement</a>,
+<a href="#bdbreakpt">7.1.4</a>, <a href="#bdgiant">7.1.6.2</a>
+<a href="#voidsection">7.1.5: Void Sections</a>,
+
+<p>
+See also <a href="#lptag">7.1.7: Literal Pool Tag</a>
 
 
 <a      name="breakpoint"/>
@@ -6737,9 +6731,9 @@ Code only accesses program-absolute addresses. <i>breakpoint value</i> is
 not code-visible but can be retrieved to construct vector information
 
 <a      name="abreakpt"/>
-<h4>7.1.2.1 Physical Address Offset</h4>
+<h4>7.1.2.1: Physical Address Offset</h4>
 
-In this example of absolute relocation, code points at program-absolute
+In this example of direct physical relocation, code points at program-absolute
 addresses starting at zero and at 16384. Load strings are at 8192, 12288 and 65536.<br>
 Those memory blocks must be hardware-selected at runtime in address windows
 zero and 16K
@@ -6834,7 +6828,7 @@ $(id:logical_start_address:<i>breakpoint value</i>)
 is not assumed to be an address and is not added to the load addresses
 
 <p>
-Instead, the value is prefixed before the load addresses in the
+Instead, the value is prefixed before the load string offset addresses in the
 text-encoded binary output
 
 <p>
@@ -6911,21 +6905,21 @@ $05:00010000:00000000
 <h3>7.1.3: Simple Location Counter without Breakpoint:
 	 Base+Displacement in Flat Address Spaces</h3>
 
-If the target runs with a large flat address space, or the segment is at
-a high relative address in a large bank, and part of the segment is beyond
-the immediate address scope of the instruction set, the developer may
-cause a base register to be loaded with the a base address at run-time.
+If a section is at a high address, and part of the section is beyond
+the direct address range of the instruction set,<br>
+the section may relate to a base register which is loaded with
+the section start address at run-time.
 
 <p>
-The locations in the segment are referenced as base+displacement
-tuples where the displacement does not include the large load address.
-But the large load address is included in the code load addresses:
+Identifier labels in the section are base+displacement tuples.
+Displacements start at zero, not at the section start address.
+Load string addresses start at the section start address
 <pre>
 
-$(35:big_address_where_it_loads,r15)
+$(35:<i>big_address_where_it_loads</i>,r15)
 
 </pre>
-Then big_address_where_it_loads must be placed in r15 at run-time.
+<i>big_address_where_it_loads</i> must be placed in r15 at run-time.
 
 <p>
 The following assembled base-displacement example shows: 
@@ -6975,15 +6969,16 @@ STERM=.
 <h3>7.1.4: Breakpointed Location Counters:
              Base+Displacement in Translated Address Spaces</h3>
 
-The following example has a base+displacement segment at a high
-logical address which will be loaded at a different high absolute
-address, i.e. a physical load address known at
-assembly time.
-
+Base-displacement operates identically with or without a load address breakpoint
 
 <p>
-Absolute here means linker-absolute not physically relocated. The
-breakpoint address does not change code's view of the storage sections
+The following example has a base+displacement section at a high
+program-absolute address which will be loaded at a different high physical<br>
+address known at assembly time. The physical load addresses do not affect
+base-displacement operation, which only concerns program-absolute addresses
+
+<p>
+The breakpoint address does not change code's view of storage
 
 <p>
 The physical address HARDWARE_LOADA is not visible to target code but is
@@ -7333,6 +7328,14 @@ the sum of the location counter plus step or giant breakpoint value.
 <a      name="bdgiant"/>
 <h4>7.1.6.2: Very Large Load Address Base-Displacement Examples</h4>
 
+A giant address breakpoint concerns absolute direct addressing. Program-visible addresses<br>
+start at <i>base</i> plus <i>*giant_breakpoint</i> and a base register contains this sum at runtime
+<pre>
+
+$(id:<i>base</i>:<i>giant_breakpoint</i>,base_register[/literal_pool_tag])
+
+</pre>
+
 <a      name="staticbdg"/>
 <h4>7.1.6.2.1: Giant Absolute Address Base-Displacement Static Reference Example</h4>
 
@@ -7413,10 +7416,10 @@ The base-displacement view and the code-generating section are declared
 separately in the following example
 
 <p>
-The base-displacement view <b>$(49)</b> is called dynamic because it maps
-to different array locations at different moments.<br>It is a void section
-with base register but no address, breakpoint address or relocation rule.
-See <a href="#voidsection">7.1.5: Void Sections</a>
+The base-displacement view <b>$(49)</b> is called dynamic because it may
+be mapped to to different array locations at different moments.<br>
+It is a void section with base register but no address, breakpoint address
+or relocation rule. See <a href="#voidsection">7.1.5: Void Sections</a>
 
 
 <pre>
@@ -7493,10 +7496,11 @@ Giant Address Spaces, Interfacing with GNU Tools</a>
 <a      name="lptag"/>
 <h3>7.1.7: Literal Pool Tag</h3>
 
-Literals may be generated in any sort of segment where code is
-allowed. The only other sort of segment is a void segment, sometimes known
-as a dsect. That is a base-displacement segment with no addresses
-and no relocation rule.
+Literals may be generated in any sort of section where code is
+allowed. The only other sort of segment is a void section,<br>
+sometimes known as a dsect. That is a base-displacement section
+with no addresses and no relocation rule.
+<a href="#voidsection">7.1.5:Void Sections</a>
 
 <p>
 Where <i>/literal_pool_tag</i> appears in the location counter control
@@ -7750,7 +7754,8 @@ entry_point
 
 <p>
 $branch is the start of a structure overlay. The following assembly
-with label listing shows an  example of overlaid storage definition
+with label listing shows an  example of overlaid storage definition.<br>
+See also <a href="#wstradata">5.2.1: Word-Aligned Structures $tree / $branch..$root</a>
 <pre>
 
 $ masmx welblech -lnkx
@@ -11174,6 +11179,7 @@ an expression and the label will be searched:
 <h2>8.42: $record</h2>
 <h3>8.42.1: $record		bit-aligned data structures</h3>
 
+
 <b>$record</b> directive heads a structure of bit-aligned fields and must have a label
 <pre>
 
@@ -11185,7 +11191,9 @@ field2	11s
 </pre>
 Where <b>$record</b> structures are nested, a new <b>$record</b> structure
 starts at the bit position which the immediately preceding <b>$record</b>
-srtucture reached.<br>See <a href="#bstradata">5.2.2: Bit-Aligned Structures</a>
+srtucture reached.<br>
+
+See also <a href="#bstradata">5.2.2: Bit-Aligned Structures</a>
 
 <a      name="record_b">
 <h3>8.42.1: $record,$branch	bit-aligned structure overlay</h3>
@@ -11319,8 +11327,9 @@ Functional results are 192 bits.
 
 <p>
 $root is the end of a structured name space.
-See <a href="#stradata">Structured Data and Structured Code Name Spaces</a>,
-<a href="#tree">8.54: $tree</a>, <a href="#record">8.42: $record</a>, <a href="#branch">8.4: $branch</a>
+See <a href="#wstradata">5.2.1: Word-Aligned Structures $tree / $branch..$root</a>,
+<a href="#tree">8.54: $tree</a>, <a href="#record">8.42: $record</a>, <a href="#branch">8.4: $branch</a>,
+<a href="#bstradata">5.2.2: Bit-Aligned Structures</a>
 
 
 
@@ -11496,7 +11505,7 @@ The option values are listed in Section 3.1: The Command Line
 <h2>8.48: $snap              List Label Table</h2>
 
 
-<p>
+<h3>8.48.1: Load Order or -y Sorted</h3>
 $snap lists labels. Default behaviour is to list the fixed part 
 of the label table in load order,<br>
 or sorted if <b>-y</b> flag has been opted. $snap may take an argument
@@ -11505,14 +11514,8 @@ or sorted if <b>-y</b> flag has been opted. $snap may take an argument
 	$snap	[<i>expression</i>]
 
 </pre>
-<p>
-By default, $snap lists only labels. With the argument 3, $snap lists labels in the<br>
-fixed table in load order and if any of flags -pqr is opted, $snap 3 lists macro text
-<pre>
 
-	$snap	3
-
-</pre>
+<h3>8.48.2: Dynamic Labels Table</h3> 
 $snap lists the fixed part of the label table unless the argument
 has the value 2.<br>$snap 2 is placed inside macro text to list dynamic labels
 <pre>
@@ -11520,12 +11523,23 @@ has the value 2.<br>$snap 2 is placed inside macro text to list dynamic labels
 macroname$* [$proc|$func]
 	.
 	.
-	$snap	2
+	$snap   2
 	.
 	.
 	$end
 
 </pre>
+
+<h3>8.48.3: List Labels [and Macro Text></h3>
+By default, $snap lists only labels. With the argument 3, $snap lists labels in the<br>
+fixed table in load order and if any of flags -pqr is opted, $snap 3 lists macro text
+<pre>
+
+	$snap	3
+
+</pre>
+
+<h3>8.48.4: 1st Pass</h3>
 $snap is actioned during the second assembly pass, unless it has a subcommand of 1<pr>
 $snap,1 is actioned on the first assembly pass
 <pre>
