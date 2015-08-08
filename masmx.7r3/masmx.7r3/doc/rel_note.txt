@@ -34,19 +34,10 @@ Documents in this directory masmx.7r3/doc are:
 
 	masmx.7r3/doc/masmx.html
 
-	masmx.7r3/doc/masmx.txt
-
-	masmx.7r3/doc/masmx_rta.txt
-
 	this release note
 
-masmx.html and masmx.txt contain the same information. They are the
-complete user manual for masmx.7r3
+	GNU General Public Licence Version 3
 
-This is a preliminary distribution and binaries for some developer
-platforms are for logistic reasons not yet tested
-
-Please note that ALL THE DOS BINARIES run on ALL 32-BIT WINDOWS PLATFORMS
 
 
 Status of Delivered Binaries
@@ -68,7 +59,6 @@ ____________________________
 
 	UBUNTU Linux / ix86		DELIVERED IN THIS PACKAGE
 
-	DEBIAN Linux / ix86		pending
 
 
 	Microsoft Platforms
@@ -99,20 +89,11 @@ imx converts the output of masmx and masmz to 16-bit address I-Records.
 mmx converts the output of masmx and masmz to 32-bit address S-Records.
 
 The masmx features absent from masmz are hierarchical data structure
-and runtime algorithm plotter
-.
-The directives $TREE $BRANCH $ROOT $RECORD $XQT_I $XQT_FPare therefore absent from masmz.
+and runtime algorithm plotter.
 
-The relocatable code model and internal linker are in both masmx
-and masmz for all developer platforms except 640K MS DOS.
+The directives $TREE $BRANCH $ROOT $RECORD $XQT_I $XQT_FP
+are therefore absent from masmz.
 
-All features of all binaries are available for Unix, Windows,
-
-Any binaries delivered for 640K DOS are the subset masmz, imx and mmx.
-masmz for 640K DOS does not have the internal linker. masmz for 640K DOS
-generates relocatable as well as absolute code for reasons of uniformity.
-
-Any binaries delivered for extended DOS have all features
 
 
 Assistance

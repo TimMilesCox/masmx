@@ -186,7 +186,9 @@ For assistance building macro definition text for a new target, contact masmx@gm
 
 <p>
 masmx may be hosted on MAC OS X PowerPC G4, MAC OS X Intel ix86, Sun SPARC Solaris,<br>
-UBUNTU and DEBIAN Linux x86, MS DOS and MS Windows 32-bit.
+Ubuntu Linux x86, MS DOS and MS Windows 32-bit.
+Consult the <a href="http://TimMilesCox.github.io/masmx/rel_note.txt">release note</a>
+for actual delivered binaries
 
 
 <pre>
@@ -1599,7 +1601,8 @@ See also <a href="#internalf">4.7: masmx Internal Functions in Detail</a>
 All labels internal to masmx, these internal function names and also
 <a href="#Directives">directives plus subcommand names</a>
 may <i>always</i> be referenced in lowercase.<br>
-With <a href="#option_k">option -k</a> masmx-supplied names may <i>only</i> be referenced in lowercase
+With <a href="#option_k">option -k</a> masmx-supplied names may <i>only</i>
+be referenced in lowercase
 
 <p>
 Internal functions are in summary
@@ -1607,11 +1610,11 @@ Internal functions are in summary
 <pre>
 
 
-	$		current location counter value
+	$		<a href="#location_c">current location counter value</a>
 
-	$(..)		named location counter value
+	$(..)		<a href="#alocator">named location counter value</a>
 
-	$a		absolute value of current location counter.
+	$a		<a href="#absolute">absolute value of current location counter</a>
 
 			$a is similar to $ except
 
@@ -1621,44 +1624,44 @@ Internal functions are in summary
 				an argument to $a(..) is an expression
  				not a location counter identity
 
-				the expression may reference a location counter: + $a($(5))
-				but more often references an identifier label:   + a(<i>label</i>)
+				an expression should start with
+				an identifier in the target section: + a(<i>label</i>)
 
-	$a(..)		absolute value of expression
+	$a(..)		<a href="#absolute_there">absolute value of expression</a>
                     	  
-	$b		start address of current program section
+	$b		<a href="#sectionbase">start address of current program section</a>
 
 			in link $include,$binary
 			$b is relocated start address of the segment
                     	  
-	$bank_index	current memory block identifier
+	$bank_index	<a href="#bix">current memory block identifier</a>
 			where breakpoint addresses are used
 
-	$n		macro call name
+	$n		<a href="#sname">macro call name</a>
 			retrieves low-order 32 bits of
 			<i>macro_label</i>(0, 0) value
 
-	$net(..)	unrelocated value of expression
+	$net(..)	<a href="#snet">unrelocated value of expression</a>
 
-	$o(..)		value of an option flag
+	$o(..)		<a href="#oflag">value of an option flag</a>
 
-	$r		current location counter identity
+	$r		<a href="#region">current location counter identity</a>
 
-	$r(..)		location counter identity of named address
+	$r(..)		<a href="#thatregion">location counter identity of named address</a>
 
-	$rel		relocation alignment of current program section
+	$rel		<a href="#relocation">relocation alignment of current program section</a>
 			returns zero for absolute sections and nonzero
 			for relocatable sections
 
-	$rel(..)	relocation alignment of named program section
+	$rel(..)	<a href="#relocat_there">relocation alignment of named program section</a>
 			returns zero for absolute sections and nonzero
 			for relocatable sections
 
-	$t(..)		label type
+	$t(..)		<a href="#labeltyp">label type</a>
 
-	$zenith		high address of current section + literals
+	$zenith		<a href="#zenith">high address of current section + literals</a>
 
-	$zenith(..)	high address of named section + literals
+	$zenith(..)	<a href="#azenith">high address of named section + literals</a>
 
 </pre>
 <a      name="func_macro"/>
@@ -3823,21 +3826,21 @@ The data word at location CONSTANT to contains the value 4103
 <a      name="absolute"/>
 <h3>4.7.2: $a	absolute address</h3>
 
-$a is the absolute address relative to the program space
+$a retrieves an absolute address value of a
+<a href="#bdflat">base-displacement</a> identifier,
+where $ produces only a displacement
+<p>
 
 <p>
-Constants of base-displacement labels and location counters only contain
+Constants of base-displacement identifiers and location counters only contain
 the displacement. $a adds the section base whether it is already known or
 relocatable
 
 <a      name="absolute_here"/>
 <h4>4.7.2.1: $a	current absolute address</h4>
 
-$a retrieves an address constant within a base-displacement section, where $
-produces only a displacement
-<p>
 $a without parameter is the current absolute address. Here $ and $a
-can be compared
+are in the left and right halves of a quadword storage constant
 <pre>
 
 $ masmx -lnk
@@ -3846,12 +3849,12 @@ MASMX 7r3
         $word   16
 $(44:0FC00,5)
         $res    10
-	+	$, $a:q
+	+	$, $a:Q
         $end
   :                            1         $word   16
   :                            2 $(44:0FC00,5)
   :                            3         $res    10
-2C:000A 0000000A0000FC0A      +4         +       $, $a:q
+2C:000A 0000000A0000FC0A      +4         +       $, $a:Q
   :                            5         $end
 :$(2C):FC00:FC0E 
 
@@ -3878,8 +3881,8 @@ $(15:*8, 9)     . relocation alignment 8, base register 9
 :$(0F):000000:000008 
 
 </pre>
-A relocation request is attached to the $a reference. A storage constant or
-receiving field must be large enough to contain the linked absolute address
+A relocation request is attached to the $a value. The receiving field of a
+storage constant must be large enough to contain the linked absolute address
 
 <a      name="absolute_there"/>
 <h4>4.7.2.2: $a(..)     absolute value of expression</h4>
@@ -3928,14 +3931,18 @@ $a attached a relocation request to the reference to relocatable identifier loca
 Simple constants of base-displacement identifiers only retrieve the displacement
 
 <p>
-$a has no function for addresses in void sections, where the base
-pointer value is not available at either assembly or link
+$a has no function for addresses in <a href="#voidsection">void sections</a>,
+where the base pointer value is not available at either assembly or link
+
 
 <p>
 A breakpoint value in the locator declaration concerns hardware address translation
-and is a load address or handle known at assembly time<br>
-$a(<i>location</i>) includes the program-absolute base address 0C000.
-The load address 0FC0000 is not accessed
+and is a load address or handle known at assembly time
+
+<p>
+$a(<i>location</i>) in this assembly includes the program-absolute base address 0C000.
+The load address 0FC0000 is not part of the program-absolute address.<br>
+See <a href="#bdbreakpt">7.1.4: Base+Displacement in Translated Address Spaces</a>
 <pre>
 
 $ masmx -lnkyx
@@ -3960,7 +3967,11 @@ location=$0C:00000030,00000005
 :$(0C):0000C000:0000C030 
 
 </pre>
-A starred breakpoint is part of program-absolute addresses. $a retrieves the large absolute value
+A starred breakpoint is part of program-absolute addresses
+(<a href ="#bdgiant">7.1.6.2: Giant Address Base-Displacement</a>)
+
+<p>
+$a retrieves the large absolute value
 <pre>
 
 $ masmx -lnkx
@@ -4886,7 +4897,7 @@ expressed exponent in the range &plusmn;307
 <pre>
 
 powers10_table
-scale	$do	615,	1*+scale-308	. 1.0e[-307..+307]
+scale	$do	615,	1d*+scale-308	. generate 615 multiplier constants ranged 1.0e[-307..+307]
 
 </pre>
 
@@ -5429,7 +5440,8 @@ STERM=.
 <h4>5.2.2.3: Bit-Aligned Structure Overlay and Overload: $record,$branch</h4>
 
 <b>$record</b> structures can may be overlaid or redefined with the addition of
-<b>,$branch</b> subfunction. The resulting unions are at bit-position precision.
+<b>,$branch</b> subfunction.<br>
+Each branch of the union starts at the same bit position
 <pre>
 
 $ masmx mfeuille -lnk
@@ -5664,8 +5676,8 @@ STERM=.
 
 
 </pre>
-Macro text may on access override the flagged signedness of a field. Here is an extract
-from a macro definition file with retrieval entry point names for default, unsigned
+Macro text may on access override the flagged signedness of a field. This macro<br>
+definition extract has retrieval entry point names for default, unsigned
 override and signed override
 <pre>
 
@@ -5688,7 +5700,7 @@ SIGNED  $set    p(2, *5)+p(0, 0)/*1
 <h4>5.2.2.5: $record compressed floating constant arrays</h4>
 
 Floating values targeted to bit-aligned fields have the exponent size and
-rounding position indicated for their bitsize. This routine generates an
+rounding position indicated for their bitsize.<br>This routine generates an
 array of 1572864 floating numbers compressed and rounded to 24 bits
 
 <pre>
@@ -6200,14 +6212,13 @@ LISTP**		$set	LISTP-1
 <h2>6.2: Run-Time Floating Algorithm Plotter</h2>
 
 <p>
-<b>$xqt_fp</b> includes constants as well as variables in expressions,
-but does not currently attempt assembly-time calculation of expression
-steps between floating constants
-
-<p>
 <b>$xqt_fp</b> directive scans an expression and calls macro code to write an
 instruction plan. The tokens which are constants appear as literals at the foot
 of the program
+
+<p>
+<b>$xqt_fp</b> does not currently attempt assembly-time calculation of expression
+steps between floating constants. Each floating operation is at runtime
 
 <p>
 <b>$xqt_fp</b> concerns four-function arithmetic only
@@ -6293,8 +6304,8 @@ STERM=.
 </pre>
 
 The third algorithm at line 31 has ColdFire syntax flags indicating that the inputs
-are respectively ColdFire word (16-bit integer) and and single (32-bit float). ColdFire
-floating instructions operate 64-bit float and carry out conversions on operand acquisition.
+are respectively ColdFire word (16-bit integer) and and single (32-bit float).<br>ColdFire
+floating instructions are 64-bit and carry out conversions on operand acquisition.
 
 <p>
 masmx expression syntax allows attribute text to follow a token before the next operator.
@@ -6307,19 +6318,19 @@ Macro language has been written to recognise a pointer by unary *
 To avoid confusion with multiply operator, the pointer reference is shielded in parentheses
 
 <p>
-The fourth algorithm at line 34 has any tokens with attribute [ b w l s d ] in parentheses,
+The fourth algorithm at line 32 has any tokens with attribute [ b w l s d ] in parentheses,
 because this may be easier to read
 
 <p>
 <b>xqt_fp</b> has already placed all constants in the expression within parentheses.
-Some target definitions use the parenthesised arguments directly as automatic literals,
+Some target definitions use these parenthesised arguments directly as automatic literals,<br>
 but this is not appropriate for ColdFire, because accepted assembly syntax has many
-operands which are not literals in parentheses. Automatic literals are not opted for
+operands which are not literals in parentheses. Automatic literals are not opted for<br>
 ColdFire, but <b>xqt_fp</b> prepends a literal pool tag or a function macro name from
 its subfunction field to constants
 
 <p>
-A function name $ieee64 will be prepended to any constants on line 32. ColdFire floating
+A function name $ieee64 is prepended to constants on lines 27 and 32. ColdFire floating<br>
 instructions have neither immediate operands, nor operands in directly addressed storage
 
 <p>
@@ -6328,13 +6339,13 @@ or from the program counter at (instruction + 2)
 
 <p>
 Two 64-bit ieee754 floating numbers can be seen at address (fp_routine + 0x0070).
-They are the constants 1.75*+307 and 3.0*-307 in the algorithm at line 27, where
-they are referenced aa (instruction @ 0x000A + 2 + 0x0064) and
+They are the constants 1.75*+307 and 3.0*-307 in the algorithm at line 27,<br>
+where they are referenced aa (instruction @ 0x000A + 2 + 0x0064) and
 (instruction @ 0x0016 + 2 + 0x0060)
 
 <p>
 A 32-bit ieee754 floating number can be seen at address (fp_routine + 0x0080).
-That is the constant 1.5 in the algorithm at line 32, where it is referenced as
+That is the constant 1.5 in the algorithm at line 32,<br>where it is referenced as
 (instruction @ 0x005A + 2 + 0x0024)
 
 <p>
@@ -6348,9 +6359,9 @@ flags like [ b w l s d ]
 
 <p>
 It is not easy to have an integer longer that 32 bits on ColdFire, and even harder
-to convert it to ieee754 64-bit. This may be one reason why ColdFire can add 8-bit
+to convert it to ieee754 64-bit. This may be one reason why ColdFire<br>can add 8-bit
 integers to 64-bit floating numbers. The ASCII string can be converted to floating
-without an interim conversion to long long integer. That does not of course have
+without an interim conversion to long long integer.<br>That does not of course have
 a direct hardware assist, but masmx can insert a conversion subroutine call into the stream
 of algorithm imstructions
 <pre>
@@ -6804,13 +6815,8 @@ $05:00010000
 Physical PAGE2 and PAGE3 are both in address window zero, but not both at once
 
 <p>
-On simple hardware without MMU memory blocks are sometimes mapped
+On simple hardware without MMU, memory blocks are sometimes mapped
 to windows of address space by I/O operations.
-
-<p>
-All parts of all sections may be in one large region loading.
-Depending on the loader, the breakpoint addresses may relate
-to memory or to a load region
 
 <p>
 Flags -dl list load addresses instead of program-absolute addresses
@@ -6835,7 +6841,7 @@ text-encoded binary output
 The breakpoint value may be a memory granule or paragraph address,
 a page identifier or a virtual translation index.<br>
 By prefixing it instead of adding it, masmx -v assigns the breakpoint value to
-separate interpretation. -d option also lists the page index
+separate interpretation. -dv options list breakpoint values
 <pre>
 
 
@@ -6935,6 +6941,11 @@ Lines 12..13 place the section start address in r15 at runtime
 Lines 14..16 retrieve operands which r15 covers.
 Identifiers in section $(48) are base-displacement. r15 is referenced automatically
 
+<p>
+Function <b>.absolute</b> at lines 9, 12, 13 is an equate of masmx internal function
+<a href="#absolute">$a</a>,<br>
+which retrieves the absolute value of a base-displacement identifier 
+
 <pre>
 
 $ masmx qplain -lnkyd
@@ -6990,6 +7001,13 @@ Multi-bank images for relocating hardware can be generated in this way.
 <p>
 The displacements used in operand reference do not reflect either
 HARDWARE_LOADA or SEGMENT, but SEGMENT is in r15
+
+<p>
+Function <b>.absolute</b> at lines 11, 14, 15 is an equate of masmx internal function
+<a href="#absolute">$a</a>,<br>
+which retrieves the program-absolute value of a base-displacement identifier.<br>
+The breakpoint address HARDWARE_LOADA is not part of program-absolute addresses
+
 
 <p>
 The assembly is run with -d Flag to show absolute load addresses.
@@ -7181,20 +7199,34 @@ but the section may have billions of breakpointed parts at locations up to
 or 4 giga-yotta-yottaquanta)
 
 <p>
-Linear load addresses in the breakpointed part start at <i>base</i> plus <i>giant_breakpoint</i>
+Linear addresses in the breakpointed part start at <i>base</i> plus <i>giant_breakpoint</i>
 
 <p>
-The radix of <i>giant_breakpoint</i> is the linear address space of the target architecture,
-for PowerPC64 64 bits
+The size of the giant part of the address
+is the second part of the $awidth declaration, in the example of PowerPC
 <pre>
 
-	$awidth	32:64
+        <a href="#awidth">$awidth</a>   32:64
 
 </pre>
-Load code and label references are in one linear space. Each breakpoint part may start at the
-exact giant address reached in the previous part. This example is a linking assembly which
-catenates four relocatables each containing space of three gigabytes. Load code is distributed
-sparsely in this assembly
+The first part of the $awidth value may
+not be more than 32. An address may not be higher than *breakpoint+0FFFFFFFF
+
+<p>
+Locations running from <i>base</i> may not reach more
+than 4 gigaquanta without being stepped. <i>base</i> may be zero
+<pre>
+
+$(id:<i>base</i>:*giant_breakpoint)
+$(id::*giant_breakpoint)
+
+</pre>
+The default value of the giant part of $awidth is 48 and the limit is 192.
+
+<p>
+Memory is referenced and labelled are in one linear space. Each breakpoint part may start at the
+exact giant address reached in the previous part.<br>This example is a linking assembly which
+catenates four relocatables each containing space of three gigabytes
 
 <p>
 <a href="#option_d">Option -d</a> adds the giant step component to address summary information
@@ -7321,8 +7353,12 @@ counter rightmost bit to rightmost bit to obtain absolute addresses
 
 
 </pre>
-The addresses values in location labels and in load strings are
+The address values in location labels and in load strings are
 the sum of the location counter plus step or giant breakpoint value.
+
+<p>
+See also <a href="#file_formats">9: Output File Formats, Relocation and Linking,
+Giant Address Spaces, Interfacing with GNU Tools</a>
 
 
 <a      name="bdgiant"/>
@@ -7350,25 +7386,7 @@ This example is called static because the base-displacement view
 does not move. It is mapped to the start of the code section
 
 <p>
-Base register r15 is loaded to point to the array start
-
-<p>
-A giant address breakpoint is flagged with * and may be a 192-bit pointer
-<pre>
-
-$(id:<i>base</i>:*<i>giant_breakpoint</i>,<i>register</i>[/literal_pool])
-
-</pre>
-Where <i>register</i> is also given base-displacement identifier labels are generated.
-
-<p>
-displacements within the breakpointed part may only reach four gigaquanta beyond <i>base</i>,
-but the section may have billions of breakpointed parts at locations up to
-0FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF:FFFFFFFF (4 tera-peta-peta-petaquanta
-or 4 giga-yotta-yottaquanta)
-
-<p>
-Linear load addresses in the breakpointed part start at <i>base</i> plus <i>giant_breakpoint</i>
+Base register r15 is first loaded to point to the array start
 
 <pre>
 
@@ -7469,28 +7487,6 @@ STERM=.
 qbig.msm: object code 213163 bytes: 0 errors: 0 undefined labels
 
 </pre>
-With *giant-stepped segments, the size of the giant part of the address
-is the second part of the $awidth declaration, for example
-<pre>
-
-	$awidth 32:64
-
-</pre>
-The first or "ordinary" part of the $awidth declaration may
-not be more than 32 bits, and that sets the 4-gigaquanta limit of base in
-<pre>
-
-$(id:base:
-
-</pre>
-Base + current location counter cannot accumulate to more
-than 4 gigaquanta without being stepped. The default of 
-the giant part of $awidth is 48 and the limit is 192.
-
-<p>
-See also <a href="#awidth">8.2: $awidth</a> directive<br>
-See also <a href="#file_formats">9: Output File Formats, Relocation and Linking,
-Giant Address Spaces, Interfacing with GNU Tools</a>
 
 
 <a      name="lptag"/>
@@ -7672,12 +7668,11 @@ values unchanged
 
 <p>
 Directives $ascii and $data_code switch text strings between unchanged input
-(ASCII / Roman-8 / Latin-1) and tabled byte translation values stored by $data_code
+(ASCII / Roman-8 / Latin-1 / UTF8)<br>and tabled byte translation values stored by $data_code
 for code points 0..255
 
 <p>
-Source input is is octets with ASCII in code points 0..127. Language elements
-outside of strings are assembled from ASCII simple
+Language elements outside of strings are composed from ASCII code points 0..126
 
 <p>
 Assembly initial setting is $ascii
@@ -8350,7 +8345,7 @@ Latin-1 in code points 0..255
 
 <p>
 $data_code directive allows "text strings" and +'character value constants'
-to be composed in a translated character code. Only single-octet values
+to be composed in a translated character code.<br>Only single-octet values
 can be translated. $data-code cannot meaningfully translate multi-byte values
 from for example UTF-8
 <pre>
@@ -16752,7 +16747,7 @@ The full set of masmx command line options are
 		literal when a literal pool tag is referenced outside
 		the literal:
  
-		literal_pool_tag(the_literal)
+		<a href="#lptag">literal_pool_tag</a>(the_literal)
 
 		-see <a href="#largument">4.4.2: Literal Arguments</a>, <a href="#literals">4.5: Literals</a>
 
@@ -17673,7 +17668,7 @@ mode field. Although this  outline is intended as conceptual, it coincides
 partly with instruction layout
 <pre>
 
-	 15				 5		 3		
+	 15				 5		 2		
 	_________________________________________________________________ _ _ _ _ _ _ _ _ _ _ _ _               _ _ _ _ _ _ _ _ _ _ _ _ _
 	|  instruction code / register	|      mode	|    register	|		address offset 16 or 32 bits or none		|
 	|_______________________________|_______________|_______________| _ _ _ _ _ _ _ _ _ _ _ _		_ _ _ _ _ _ _ _ _ _ _ _ |

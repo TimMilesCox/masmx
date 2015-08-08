@@ -405,10 +405,15 @@ static char *substitute(char *search, char *param)
    
    if (v > &subterfuge[4032])
    {
-      flag_either_pass("Excessive Parameter Substitution", "abandon");
+      flag_either_pass("Excessive Parameter Substitution, abandon", param);
       exit(0);
    }
-   
+
+   if (search < v)
+   {
+   }
+   else if (search < subterfuge + 4096) return search;
+
    while (symbol = *search++)
    {
       if (symbol == ESC)
@@ -648,7 +653,15 @@ static char *substitute(char *search, char *param)
       }
       else *v++ = symbol;
    }
+
    *v++ = 0;
+
+   if (v > &subterfuge[4096])
+   {
+      flag_either_pass("Excessive Parameter Substitution, abandon", sublime[masm_level - 1]);
+      exit(0);
+   }
+
    sublime[masm_level] = v;
    return sublime[masm_level - 1];
 }
