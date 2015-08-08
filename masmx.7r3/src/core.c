@@ -8798,15 +8798,29 @@ main(int argc, char *_argv[])
             {
                v = q->lroot;
 
-               if ((q->litlocator ^ v) && (q->loc ^ v))
+               if (q->loc ^ v)
                {
-                  flagz();
-                  printf("code longer on 2nd assembly pass");
+                  if (j = q->litlocator ^ v)
+                  {
+                     if (q->litlocator < q->loc) flagz();
+                     else                        notez();
+                  }
+                  else if (uselector['L'-'A'])
+                  {
+                     notez();
+                     printf("adjusting storage map\n");
+                     q->litlocator = q->loc;
+                  }
 
-                  if (octal)
-                  printf(": $(%o) :%0*lo:%0*lo\n", i, apw, q->lroot, apw, q->loc);
-                  else
-                  printf(": $(%2.2X) :%0*lX:%0*lX\n", i, apw, q->lroot, apw, q->loc);
+                  if (j | uselector['L'-'A'])
+                  {
+                     printf("code size changed on 2nd assembly pass");
+
+                     if (octal)
+                     printf(": $(%o) :%0*lo:%0*lo\n", i, apw, q->lroot, apw, q->loc);
+                     else
+                     printf(": $(%2.2X) :%0*lX:%0*lX\n", i, apw, q->lroot, apw, q->loc);
+                  }
                }
 
                q++;

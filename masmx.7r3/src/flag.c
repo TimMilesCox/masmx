@@ -17,6 +17,13 @@ static void flagz()
    printf("Error: %s Line %d: ", file_label[0]->l.name, ll[0]);
 }
 
+static void notez()
+{
+   if (!pass) return;
+
+   printf("Note: %s Line %d: ", file_label[0]->l.name, ll[0]);
+}
+
 static void flag(char *k)
 {
    if (!pass) return;

@@ -376,6 +376,8 @@ static char *substitute(char *search, char *param)
    int			 inquote, symbol;
    int			 inbe, btype;
 
+   char			*search_start = NULL;
+
    paraform_code	 sample;
 
    if (!search)
@@ -409,10 +411,15 @@ static char *substitute(char *search, char *param)
       exit(0);
    }
 
+   #if 1
    if (search < v)
    {
    }
-   else if (search < subterfuge + 4096) return search;
+   else if (search < subterfuge + 4096)
+   {
+      search_start = search;
+   }
+   #endif
 
    while (symbol = *search++)
    {
@@ -655,6 +662,15 @@ static char *substitute(char *search, char *param)
    }
 
    *v++ = 0;
+
+   if ((search_start) && (v > search_start))
+   {
+      if (selector['p'-'a'] | selector['q'-'a'])
+      {
+         note("parameter substutution accidentally overlapped");
+         if (pass) printf("%s\n", search_start);
+      }
+   }
 
    if (v > &subterfuge[4096])
    {

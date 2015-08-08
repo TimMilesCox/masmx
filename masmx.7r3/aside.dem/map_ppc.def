@@ -3,6 +3,8 @@
 	$quantum 8
 	$awidth	32:64
 
+	$do	$o('L'),	$exit	-L may not be opted for linking assemblies
+
 
 p	$proc
 "$map"*	$name
