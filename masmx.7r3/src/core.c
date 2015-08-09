@@ -509,7 +509,13 @@ static long rfunction(int v,
 
       case REGION:
 	 if (*s != '(') return counter_of_reference;
+
+         #if 0
+         d = s + 1;
+         #else
 	 d = substitute(s+1, param);
+         #endif
+
 	 l = findlabel(d, NULL);
 	 if ((!l)
 	 ||  (l->h.type != LABEL)
@@ -519,7 +525,11 @@ static long rfunction(int v,
 
       case TYPE:
 
+         #if 0
+         d = s + 1;
+         #else
 	 d = substitute(s+1, param);
+         #endif
 	 
 	 if (!d)
 	 {
@@ -563,17 +573,10 @@ static long rfunction(int v,
 	 return 0;
 
       case REL:
-         #ifdef NESTED_ISREL
-         s = substitute(s, param);
-         #endif
 
 	 if (*s++ == '(')
 	 {
-            #ifdef NESTED_ISREL
-            limit = fendbe(s);
-            #else
 	    limit = edge(s, ")");
-            #endif
 
 	    j = expression(s, limit, NULL);
 
@@ -750,7 +753,12 @@ static long rfunction(int v,
 
          if (*s == '(')
          {
+            #if 1
+            d = s + 1;
+            #else
             d = substitute(s+1, param);
+            #endif
+
             limit = fendbe(d);
 
             j = zxpression(d, limit, param);
