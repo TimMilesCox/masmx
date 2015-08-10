@@ -92,6 +92,7 @@ $(7::*000777000000,7)
 	+	$a
 zaporogets*
 	+	$a(zaporogets)
+	+	zaporogets
 	+	$a(0777777777777)
 	+	$a(0fedcba987654321)
 	+	$a

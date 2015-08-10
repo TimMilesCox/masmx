@@ -4,7 +4,7 @@ __giant	$set		 1
 
 __base36A	$set	0x00444400000f0000
 $(.literal::*__base36A,30/__literal)
-__base36* $equ	.	#	+__base36A
+__base36* $equ	.absolute	#	+__base36A
 
 $(.data::*0x00444400000e0000)
 gotcha*	$res	16

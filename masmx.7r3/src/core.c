@@ -397,7 +397,7 @@ static long rfunction(int v,
 		      char *s, char *param, char *mark, 
 		      object *tag)
 {
-   char			*limit, *d;
+   char			*limit, *d = NULL;
    long			 i, j;
    int			 h, symbol, x;
    object		*l;
@@ -439,7 +439,7 @@ static long rfunction(int v,
          mapx->m.l.rel = x | 128;
          #endif
 
-         if (q->flags & 1)
+         if ((q->flags & 129) == 1)
          {
             breakpoint_base = &((value *) q->runbank)->value;
             item = xpression(STACK_TOP_CLEAR, STACK_TOP_CLEAR, NULL);
@@ -511,17 +511,22 @@ static long rfunction(int v,
 	 if (*s != '(') return counter_of_reference;
 
          #if 0
+
          d = s + 1;
+         limit = fendbe(d);
+         j = zxpression(d, limit, param);
+         if (x = mapx->m.l.y) return x & 127;
+         return 0;
+
          #else
 	 d = substitute(s+1, param);
-         #endif
 
 	 l = findlabel(d, NULL);
 	 if ((!l)
 	 ||  (l->h.type != LABEL)
 	 ||  (l->l.valued == UNDEFINED)) return 0;
 	 return l->l.r.l.rel & 127;
-
+         #endif
 
       case TYPE:
 
@@ -559,7 +564,6 @@ static long rfunction(int v,
 
 
 	 return l->l.valued;
-
 
       case OPTION:
 	 if (*s++ == '(')
@@ -767,9 +771,14 @@ static long rfunction(int v,
             if ((mapx->m.l.y & 129) == 128) return j;
             #endif
 
-            l = findlabel(d, limit);
-
             #if 1
+            l = findlabel(d, limit);
+            if (x = mapx->m.l.rel) q = &locator[x & 127];
+            else return j;
+            #elif 0
+            printf("[%x]", mapx->m.l.rel);
+            printf("[%p]", l);
+            if (l) printf("[%x]", l->l.r.l.rel);
             if ((l) && (x = l->l.r.l.rel)) q = &locator[x & 127];
             else return j;
             #else
@@ -805,11 +814,11 @@ static long rfunction(int v,
                breakpoint_base = &((value *) q->runbank)->value;
                item = xpression(STACK_TOP_VALUE, NULL, NULL);
 
-               if ((q->flags & 128) || (!l))
+               if ((q->flags & 128) || (d == NULL))
                {
                   /*********************************************
 
-                  when $A has had no argument, zxpression has
+                  when $a has had no argument, zxpression has
                   also not been called. Somehow the stack top
                   returned here manages to be zero and not any
                   residual value.
@@ -8868,7 +8877,7 @@ main(int argc, char *_argv[])
             #endif
 
             if (q->flags & 1) ((value *) q->runbank)->offset = q->loc;
-            else                                       q->runbank = 0;
+            else                         q->runbank = 0;
 
 	    q->loc = 0;
 
