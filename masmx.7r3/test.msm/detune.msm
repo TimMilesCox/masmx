@@ -16,4 +16,3 @@ $(6)
 	$res	256
 
 	$include,$binary	../result.txo/factor
-

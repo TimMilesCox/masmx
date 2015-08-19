@@ -388,7 +388,7 @@ static void switch_locator(char *p, char *param)
    }
    #endif
    
-   actual->touch_base = 1;
+   actual->touch_base |= 1;
    outstanding = 1; /* outcounter(0); */
 }
 
@@ -8814,29 +8814,40 @@ main(int argc, char *_argv[])
             for (i = 0; i < LOCATORS; i++)
             {
                v = q->lroot;
+               high = q->loc;
 
-               if (q->loc ^ v)
+               #if 0
+               if (high == 0) high = v;
+               #endif
+
+               if (high > v)				/*	code has changed size	*/
                {
-                  if (j = q->litlocator ^ v)
+                  if (q->litlocator > v)
                   {
-                     if (q->litlocator < q->loc) flagz();
-                     else                        notez();
+                     flagz();				/*	there are literals	*/
+                     printf("2nd assembly pass code overload\n");	/*	resized code clashes	*/
+                     summarise_revision(q, v, high);
                   }
-                  else if (uselector['L'-'A'])
+               }
+               else if ((q->touch_base) && (high < v))
+               {
+                  if ((q->flags & 1) == 0)
                   {
-                     notez();
-                     printf("adjusting storage map\n");
-                     q->litlocator = q->loc;
-                  }
-
-                  if (j | uselector['L'-'A'])
-                  {
-                     printf("code size changed on 2nd assembly pass");
-
-                     if (octal)
-                     printf(": $(%o) :%0*lo:%0*lo\n", i, apw, q->lroot, apw, q->loc);
-                     else
-                     printf(": $(%2.2X) :%0*lX:%0*lX\n", i, apw, q->lroot, apw, q->loc);
+                     if (q->touch_base & 2)		/*	binary linker touch	*/
+                     {
+                        #if 1
+                        flagz();
+                        printf("segment missing on 2nd assembly pass\n");
+                        summarise_revision(q, v, high);
+                        #endif
+                     }
+                     else if (q->litlocator == v)	/*	there are no literals	*/
+                     {
+                        notez();
+                        printf("adjusting storage map\n");
+                        q->litlocator = high;
+                        summarise_revision(q, v, high);
+                     }
                   }
                }
 

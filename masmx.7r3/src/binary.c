@@ -1,4 +1,5 @@
-#ifdef BINARY
+#ifdef	BINARY
+#define	QSEMA33
 
 static long quartets(char *p)
 {
@@ -211,7 +212,12 @@ static int binary_switch_locator(char *p, short ordered,
 
    if (q) loc += q->segments.base[x];
 
+   #ifdef QSEMA33
+   actual->touch_base = 3;
+   #else
    actual->touch_base = 1;
+   #endif
+
    outstanding = 1;
    return 1;
 }
@@ -219,9 +225,11 @@ static int binary_switch_locator(char *p, short ordered,
 static int load_binary_summary(char *p)
 {
    int			 x = strict_formal_locator(p + 1, '*');
-   long			 alignment, low, high;
+   long			 alignment;
+   unsigned long	 low, high, size, base;
    location_counter	*q = &locator[x];
    value		*v = (value *) q->runbank;
+   xref_list		*xl  = file_label[depth]->l.down;
 
    #if 0
    if (pass)
@@ -231,8 +239,8 @@ static int load_binary_summary(char *p)
    #endif
 
    alignment = strict_address(p + 5);
-
    high = 1 << (address_size - 1);
+
    if (alignment & high)
    {
       high <<= 1;
@@ -248,14 +256,30 @@ static int load_binary_summary(char *p)
    #if 1
    if (pass)
    {
-      if ((unsigned long) high > (unsigned long) q->loc)
+      base = q->base;
+      if (xl) base = xl->segments.base[x];
+      size = high - low;
+      if (low < base) low += base;
+      high = low + size;
+
+      #if 0
+      printf("[$%x:%lx:%lx:%lx:%lx:%lx]", x, q->base, q->runbank, low, high, q->loc);
+      #endif
+
+      if (high > q->loc)
       {
          q->loc = high;
-         if ((x == counter_of_reference) && (q->flags & 1)) loc = high;
+         if ((x == counter_of_reference) /*&& (q->flags & 1)*/) loc = high;
       }
-      /*
+
+      #if 1
+      #ifdef QSEMA33
+      q->touch_base = 3;
+      #else
       q->touch_base = 1;
-      */
+      #endif
+      #endif
+      
       return x;
    }
    #endif
@@ -601,6 +625,7 @@ static void load_binary(char *p)
             break;
 
          case ':':
+
             if (ordered)
             {
                x = strict_formal_locator(&assembly[7], '*');
@@ -802,7 +827,11 @@ static void load_binary(char *p)
                putchar('\n');
             }
 
+            #ifdef QSEMA33
+            sample->touch_base = 3;
+            #else
             sample->touch_base = 1;
+            #endif
          }
 
          x = order[x];

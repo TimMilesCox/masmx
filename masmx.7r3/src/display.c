@@ -694,3 +694,13 @@ static void walktable(int order)
       }
    }
 }
+
+static void summarise_revision(location_counter *q, unsigned long v, unsigned long high)
+{
+   printf("[%x] code size changed on 2nd assembly pass", q->touch_base);
+
+   if (octal)
+   printf(": $(%o) :%0*lo:%0*lo\n", q - locator, apw, v, apw, high);
+   else
+   printf(": $(%2.2X) :%0*lX:%0*lX\n", q - locator, apw, v, apw, high);
+}
