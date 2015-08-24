@@ -263,7 +263,7 @@ static int load_binary_summary(char *p)
       high = low + size;
 
       #if 0
-      printf("[$%x:%lx:%lx:%lx:%lx:%lx]", x, q->base, q->runbank, low, high, q->loc);
+      printf("[$%x:%lx:%lx:%lx:%lx:%lx:%lx]", x, base, size, q->runbank, low, high, q->loc);
       #endif
 
       if (high > q->loc)
