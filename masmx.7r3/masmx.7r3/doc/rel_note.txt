@@ -5,6 +5,7 @@ ___________	_________	_________________________
 
         _________________________________________________
         |       Copyright Tim Cox, 2015			|
+	|	TimMilesCox@gmx.ch			|
         |                                               |
         |       This document describes the masmx.7r3   |
         |        target-independent meta-assembler      |
