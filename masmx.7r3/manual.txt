@@ -51,6 +51,15 @@ masmx is a freeware meta-assembler for any target
 Developed as a cross-assembler for embedded targets<br>
 masmx ready-made binaries run as 32-bit programs on all popular PCs<br>
 
+<div    style="color:A0A0A0">
+<blockquote>
+
+masmx saves electronics and energy, and may be used as the substance of thin-layer compilers.<br>
+masmx makes the miniature more possible, and can multiply the performance of giant servers up to fivefold.
+
+</blockquote>
+</div>
+
 <p>
 Freeware means free access to the downloadable source
 
@@ -147,15 +156,11 @@ as possible are executed.
 <div    style="color:A0A0A0">
 <blockquote>
 
-masmx saves electronics and energy, and may be used as the substance of thin-layer compilers.<br>
-masmx makes the miniature more possible, and can multiply the performance of giant servers up to fivefold.<br>
-<blockquote>
 Language compilers can be reinvented to generate a common macro-assembly language for all targets<br>
 See <a href="#roadmap">Appendix C: Road Map</a>, <a href="#languages">Appendix D: High Level Languages</a><br>
 Compiler/target portation becomes instantaneous<br>
 Language maps to macro code written in open text for instruction economy and efficiency<br>
 Any PC has a developer toolchain for any target
-</blockquote>
 </blockquote>
 </div>
 
@@ -1518,7 +1523,9 @@ Directive $suffix 1 defaults leading zero to hex
 
 <p>
 Storage constant numbers in all notations may also have a storage  
-words suffix [s d l t q p h o]. See <a href="#nconstant">4.3.3: Number Constants</a>
+words suffix [s d l t q p h o].<br>
+See <a href="#nconstant">4.3.3: Number Constants</a>
+and <a href="#suffix_directive">8.51: $suffix</a> directive
 
 
 <a      name="labelref"/>
@@ -2049,7 +2056,7 @@ $(12:65536)
 
 </pre>
 Number storage values are in canonical byte order, and the only way to change that is by implementing<br>
-pseudo-directives (often implemented with names like DW and DD) as macros.
+number constant commands (often with names like DW and DD) as macros.
 
 <p>
 Number constants may have trailing length overrides. Their meanings are
@@ -4996,15 +5003,15 @@ $(.text:524288,pc)
 ;	the high order two digits of the 12 are guaranteed "00"
 
 i2string
-	divu.w	#10000, d0
-	moveq	#0, d1				; high-order half must be zero
-	move.w	d0, d1				; quotient of first divide may be > 10000
-	divu.w	#10000, d1
-	swap	d0				; remainder to ls half d0
-	move.l	(table, pc, d0.w*4), d2		; low-order 4 digits
-	move.l	(table, pc, d1.w*4), d0 	; high-order 4 digits
-	swap	d1				; remainder to ls half d1
-	move.l	(table, pc, d1.w*4), d1		; 5th..8th digits
+	move.l	#100000000, d2
+	remu.l	d2, d1:d0			; separate the low-order 8 columns
+	divu.l	d2, d0				; separate the high-order 2 columns
+	divu.w	#10000, d1			; split to 4-column groups
+	swap	d1				; translate the low-order 4 columns
+	move.l	(table, pc, d1.w*4), d2
+	swap	d1				; translate the next 4 columns
+	move.l	(table, pc, d1.w*4), d1
+	move.l	(table, pc, d0.w*4), d0		; translate the high-order 2 columns
 	rts
 
 table
@@ -8151,7 +8158,7 @@ Macro language does reversed byte order if needed.
 
 <p>
 Code written for other assemblers has constant-generating
-pseudo-directives (for example, .float).
+commands (for example, .float).
 
 <p>
 Macros implement commands like DF or .float in masmx.
@@ -8308,7 +8315,7 @@ command		field1	\
 </pre>
 
 <p>
-Line continue character does not act if a nonspace token follows
+Line continue character does not act if a nonspace symbol follows
 it immediately:
 <pre>
 
@@ -9383,7 +9390,7 @@ The quote character is "
 
 <p>
 The comment character is initially period, but comment character period
-is never actioned if it is immediately followed by a nonspace token:
+is never actioned if it is immediately followed by a nonspace symbol
 <pre>
 
 	$include	file2.src	
@@ -10717,13 +10724,15 @@ value	$set	parameter_label
 
 </pre>
 
+
+<a	name="long_absolute"/>
 <p>
 When the absolute address space is between 33 and 192 bits, the
-large relocation value is retrieved with a second $pushrel and
-not from the label holding the parameter list:
+large relocation value is retrieved with a second $pushrel from
+the input binary superword
 <pre>
 
-value	$pushrel,$long_absolute		relocation_clause
+value	$pushrel,$long_absolute	superword
 
 </pre>
 
@@ -11581,29 +11590,34 @@ Paraform language in macros for retrieving subfields always has the separator :
 
 <pre>
 
-$ masmx -lnk
-MASMX 7r3
-0/-INPUT>>
-	$sterm	'.'
-STERM=.
-
-p	$proc
-extract* $name  
-	+	p(1, 1:2)
-	$end
-
-	extract	5.4.3
-	$end
-  :                            1  $sterm '.'
-  :                            2 
-  :                            3 p $proc
-  :                            4 extract* $name  
-  :                            5  + p(1, 1:2)
-  :                            6  $end
-  :                            7 
-00:000000 000004              +8  extract 5.4.3
-  :                            9  $end
-:$(00):000000:000001 
+  :                            1  $word 16
+  :                            2  $quantum 8
+  :                            3
+  :                            4 f       $func
+  :                            5 "$net_ipv4"* $name
+  :                            6
+  :                            7 net     $set    0
+  :                            8         $sterm  '.'
+  :                            9
+  :                            10 ?       $do     f(1, 1:),net     $set    net*/8++f(1, 1:?)
+  :                            11
+  :                            12         $sterm  ':'
+  :                            13
+  :                            14         $return net
+  :                            15         $end
+  :                            16
+  :                            17
+  :                            18 "$netp" $form   32, 16
+  :                            19
+  :                            20 p       $proc
+  :                            21 "$net_socket"* $name
+  :                            22         $netp   $net_ipv4(p(1, 1:1)), p(1, 1:2)
+  :                            23         $end
+  :                            24
+00:0000 AC1D07091F90          +25 address_A $net_socket 172.29.7.9:8080
+00:0006 AC1D06080017          +26 address_B $net_socket 172.29.6.8:23
+  :                            27  $end
+:$(00):0000:000C
 
 </pre>
 
@@ -11753,20 +11767,6 @@ Directive
 </pre>
 <p>
 Displays the value of its argument
-<pre>
-
-
-p       $proc
-add     $name   1
-subtract $name  2
-	aform   $n, p(1,1), p(1,2)
-	$trace  p(1, 1)
-	$end
-
-</pre>
-<p>
-That would show the left side operand of the add or subtract
-instruction.
 
 <p>
 To produce $trace on the first assembly pass, a subcommand
@@ -11817,17 +11817,13 @@ many    $do     p(),branch(many)   $res    4
 
 </pre>
 <p>
-In the following assembly, an 8051 system has four UARTs each
-with their eight register files located nearly adjacent at
-XRAM addresses 128..135, 144..151, 160..167, 176..191:
+In the following assembly, an 8051 controller drives four UARTs
+with register files in four address ranges
 
 <p>
-The input side of a device driver scans each receive channel.
-The code is generated using a structure with subscripted
-components. 30 bytes of code is generated to scan each UART
-for input. A developer might choose to do this with a variable
-pointer instead, but this sample shows how to do it with trees
-of structured names:
+30 bytes of code is generated to scan each UART
+for input. The unrolled routine controls four structures
+without varying a pointer or a counter
 <pre>
 
 
@@ -12641,7 +12637,7 @@ These lines of generated code and controls are
 
 	start location counter 48 at address 0047FC00<br><br>
 
-	an address constant pointing to the 16th byte of program section 48<br><br>
+	an address constant pointing to the byte 16 of program section 48<br><br>
 
 	start location counter 0 at address 00030000<br><br>
 
@@ -12791,7 +12787,7 @@ $01:00000000
 	    00000000 with the formula +32768/*16 (macro @ha).
 
 <pre></pre>
-	    That is reflected in this linker information: 00008000/*10
+	    That is reflected in this linker information: 00008000/*10<br>
 	    The rounding addition is because of sign extension on
 	    base-displacement references
 
@@ -12802,7 +12798,7 @@ $01:00000000
 	There is one relocation clause on the second superword:
 <ul>
 	    [0000]10-: means add the value of unknown name FACTOR
-	    to 16 bits of instruction code 80090000. The trailing
+	    to 16 bits of instruction code 80090000.<br>The trailing
 	    minus means: range checking not required, truncation
 	    is expected.
 
@@ -12824,7 +12820,7 @@ $01:00000000
 	    +32768/*16 (macro @ha).
 
 <pre></pre>
-	    That is reflected in this linker information: 00008000/*10
+	    That is reflected in this linker information: 00008000/*10<br>
 	    The rounding addition is because of sign extension on
 	    base-displacement references
 
@@ -13131,7 +13127,7 @@ limit   $set    1*/bits
 mask    $set    limit-1
 unmask  $set    ^(mask*/scale)
 
-	$if	descant<0		# shall there be a manipluation after relocation?
+	$if	descant<0		# shall there be a manipulation after relocation?
 field	$set	value+offset		# add relocating value to offset from relocation clause
 	$info,$range_check1	field	# write a new relocation tuple if the field remains relocatable
 	$info,$offset		field	# write a new offset part of the tuple if the field remains relocatable
@@ -14083,11 +14079,6 @@ In order to see all over the large address space, the entry sequence
 to external-visible routines bases a literal pool, which contains
 64-bit pointers to 64K parts of storage.
 
-<p>
-It would be possible to base the assembly's own static along with its
-literal pool, if  components like zero-initial static, nonzero
-initial static and public data were placed in one section.
-
 <pre>
 
 MASMX 7r2
@@ -14546,11 +14537,7 @@ gfactor.msm: object code 847 bytes: 0 errors: 1 undefined labels
 
 
 <p>
-The seventh link places relocatables in giant absolute address space.
-The displayed summary information only shows the non-giant parts of
-the addresses, but the label values and the text-encoded binary
-(and the generated code listed because of <b>$list 2</b>) show the
-whole addresses.
+The seventh link places relocatables in giant absolute address space
 
 <p>
 <a href="#option_d">Option -d</a> adds the giant step component to address summary information
@@ -14749,30 +14736,31 @@ $24:00000020
 </pre>
 <p>
 Segments are always gathered by section with giant addresses. The
-giant addresses can come from the link source or from the input
-Text Encoded Binary
+giant addresses are retrieved from the link control source or the
+text encoded binary input
 
 <p>
-The <b>$map</b> macro used in giant space has this structure.
+The <b>$map</b> macro used in giant space has the structure illustrated
+below
 
 <p>
-Where operand fields can relocate out of their range and then
-relocate back into range again, because of multiple relocation
-clauses for relative address calculations, a value <b>sum</b> is
-maintained at 192-bits precision.
+Where operand fields may relocate out of their target field range
+and then relocate back into range again as multiple relocation
+clauses are applied, a value <b>sum</b> is maintained at 192-bits precision.
 
 <p>
-The $info subcommand $range_check requires only the last written
-value to be in field range.
+The <a href="#info_range">$info</a> subcommand <a href="#info_range">$range_check</a>
+requires only the final value to be in field range
 
 <p>
-The $pushrel subcommand $long_absolute allows a segment base value
-or external label value 192 bits in size to be retrieved
+The <a href="#pushrel">$pushrel</a> subcommand <a href="#long_absolute">$long_absolute</a>
+allows a segment base value or external label value 192 bits in size to be retrieved
 <pre>
 
 p	$proc
 "$map"*	$name
 
+<div	style="color:blue">
 p	$proc
 superword* $name
 parts	$set	p(1,1:)
@@ -14780,10 +14768,12 @@ parts	$set	p(1,1:)
 
 column	$set	$bits
 
-part	$do	parts-1,	relocate	p(1, 1:part)
+part	$do	parts-1,	<a style="color:red">relocate	p(1, 1:part)</a>
 	$load,$bits	$data
 	$end	. SUPERWORD
+</div>
 
+<a	style="color:red">
 p	$proc
 relocate* $name
 
@@ -14826,8 +14816,10 @@ field	$set	sum+(($data/*scale)**mask)
 "$data"* $set	(field*/scale)++($data**unmask)
 
 	$end	. RELOCATE
+</a>
 
-index	$do	p(),	word	p(index, 1)
+
+index	$do	p(),	<a style="color:blue">superword	p(index, 1)</a>
 	$end	. $map
 
 </pre>
@@ -14978,13 +14970,22 @@ $24:00000028
 <h4>9.2.3.9: Linking with Void Inclusion</h4>
 
 <p>
-The ninth and tenth links have void inclusions. A void inclusion integrates
-the new code onto the referenced absolute without including the referenced
-absolute. So the new Text Encoded Binary knows the addresses in the
-referenced absolute, but is a separate load.
+The ninth and tenth links have void inclusions
 
 <p>
-relocatable zactor.txo is integrated with absolute image2 = soso + factor:
+A void inclusion retrieves addresses from another binary without
+including its code. The new text-encoded binary is a separate load
+
+
+<p>
+relocatable zactor.txo is incremented onto the storage map of absolute
+image2 = soso + factor and imports its export labels, but does not include
+image2
+
+<p>
+A link with void inclusions may import labels but have an otherwise 
+independent storage map
+
 <pre>
 
 $ ../masmx map9 -l
@@ -15143,9 +15144,8 @@ When masmx starts running,
 	period is line termination (comment)
 <pre></pre>
 
-	period does not terminate the line
-	if it is followed immediately with a nonspace
-	token, as
+	period does not terminate the line if it is
+	followed immediately with a nonspace symbol
         <pre>
 
 		$include	file.name
@@ -15178,9 +15178,12 @@ When masmx starts running,
 
 </ul>
 <p>
-If you don't want semicolon to mean line continuation
-that's the first thing you change. If you don't want
-line continuations at all
+
+If semicolon shall not be line continuation
+<a href="#cont_char">$cont_char</a> should be changed first
+
+<p>
+For no line continuation at all
 <pre>
 
 	$cont_char       0
@@ -15188,7 +15191,7 @@ line continuations at all
 </pre>
 <p>
 Continuation character is not recognised if if is followed immediately
-by a nonspace token
+by a nonspace symbol
 <pre>
 
 $ masmx -ln
@@ -15210,130 +15213,126 @@ CONT_CHAR=\
 
 </pre>
 <p>
-If you want comment to be semicolon
+For semiciolon as comment character
 <pre>
 
 	$lterm  ';'
 
 </pre>
 <p>
-If you want text strings to be bounded by apostrophe
+For strings to be bounded by apostrophe
 <pre>
 
 	$quote  027
 
 </pre>
 <p>
-or maybe
+or
 <pre>
 
 	$quote  ''''
 
 </pre>
 <p>
-However macro language does not recognise parameterised label
-references inside single quotes-see Section 8.42: $quote directive.
+See <a href="#text_string">4.3.5: Text Strings</a>
+and <a href="#notate2">4.2.2.1: Number Strings</a>
 
 <p>
-If you want substring delimiter to be period
+Macro language resolve paraform references only inside
+default quotes " and not between apostrophes.
+See <a href="#quote">8.42: $quote directive</a>
+
+<p>
+For substring delimiter to be period
 <pre>
 
-	$sterm  '.'
+	<a href="#sterm">$sterm</a>  '.'
 
 </pre>
 <p>
-If you want inputs with leading zero to be octal and
-displays to be octal
+<a href="#octal">$octal</a> directive switches
+number strings with leading zero to octal.
+Listing shows addresses and generated code in octal
 <pre>
 
 	$octal
 
 </pre>
 <p>
-If you change your mind
+<a href="#hex">$hex</a> directive switches to default binary
+notation.<br> Number strings with leading zero are hexadecimal.
+Listing shows addresses and generated code in hexadecimal
 <pre>
 
 	$hex
 
 </pre>
 <p>
-If you have number strings in your code with trailing 
-flags like 123q or 0abaH 
-<pre>
-
-	$suffix 2
-
-</pre>
-<p>
-If you want leading 0... to be octal and leading 0x... to be hex
-<pre>
-
-	$set_option     "c"
-
-</pre>
-If you want leading $... to be hex
-<pre>
-
-	$set_option     "m"
-
-</pre>
-If you want both
-<pre>
-
-	$set_option     "mc"
-
-</pre>
-<p>
-If you've done that and you still want to access masmx-supplied
-functions like location counter "$" and identity of location
-counter "$r" without using quotes, you alias masmx 
-function names (It's assumed here you've changed $sterm to period):
-<pre>
-
-.           $equ,"$function"    "$"
-.locator_id $equ,"$function"    "$r"
-.class      $equ,"$function"    "$t"
-
-</pre>
-<p>
-This equates
-<pre>
-
-	.		to location counter function		"$"
-
-	.locator_id	to function yielding id of
-			current counter of reference	    	"$r"
-
-	.class		to function yielding label type		"$t"
-
-
-</pre>
-<p>
-if "$" "$r" "$t" are in quotes as shown. This retrieves the functional
-identities of
-<pre>
-
-	"$"		for	. 
-
-	"$r" 		for	.locator_id
-
-	"$t"		for	.class
-
-
-</pre>
-<p>
-Without the quotes $ $r $t return their functional value instead
-of their identity.
+See also option<a href="#option_c">-c</a> C language notation
+and option <a href="#option_m">-m</a> Motorola old notation
 
 <p>
-The quotes are necessary to give "$" "$r" "$t" the new names
-. .locator_id .class
+For leading 0... to be octal and leading 0x... to be hex
+<pre>
+
+	<a href="#set_option">$set_option</a>     <a href="#option_c">"c"</a>
+
+</pre>
+For leading $... to be hex
+<pre>
+
+	<a href="#set_option">$set_option</a>     <a href="#option_m">"m"</a>
+
+</pre>
 
 <p>
-Directives beginning with $ when Motorola Hex <a href="#option_m">option flag -m</a> is
-asserted are still recognised in the command field, but not
-in the subcommand or argument fields. If your code has many
-directives with other names, you may alias masmx directives:
+If source code contains number strings with notation
+suffix like 123q or 0abaH
+<pre>
+
+        <a href="#suffix">$suffix</a> 2
+
+</pre>
+
+
+<a href="#option_m">Option -m</a> masks labels which start with $
+unless they are referenced in quotes
+
+<p>
+masmx internal function names start with $
+
+<p>
+Source code may already use different names for internal macros
+which in masmx are for example
+<a href="#location_c">$</a> location counter and
+<a href="#labeltyp">$t</a> label type
+
+<pre>
+
+            $lterm		';'
+            $sterm		'.'	; period can be in labels
+					; and structure joins
+
+.           $equ,"$function"    "$"	; . is location counter
+.locator_id $equ,"$function"    "$r"	;
+.class      $equ,"$function"    "$t"	; .class is label type
+
+</pre>
+Referenced Without the quotes, $ $r $t return their functional value instead
+of their identity. See also <a href="#option_q">option -Q</a>
+
+<p>
+Quotes are necessary to give "$" "$r" "$t" new names
+
+<p>
+Directives and other names beginning with $ are always recognised in the command
+field and no command name may be typed in quotes.<br>When Motorola old notation
+<a href="#option_m">flag -m</a> is opted, labels starting with $ are only
+recognised within quotes in the subcommand and argument fields
+
+<p>
+Code may already invoke directives with different names.
+Masmx directives may be assigned alias names
 <pre>
 
 .equ    $equ,"$directive"       "$equ"
@@ -15346,8 +15345,8 @@ directives with other names, you may alias masmx directives:
 
 </pre>
 <p>
-If your code has directives with no masmx equivalent, you write
-the required directives as macros.
+If code issues directives with no masmx equivalent, they may
+be implemented as macros.
 <pre>
 
 .org*   .macro
@@ -15366,14 +15365,18 @@ granule $set   1*/.align(1,1)
 </pre>
 
 <p>
-If your code contains operators that aren't
+<a href="#text">$text</a> directive searches and translates text sequences
+in source code
+
+<p>
+If code contains operators which are not
 <pre>
 
 = ^= > < -- ++ /* */ ** + - /// // / * *+ *- ^ ()
 
 </pre>
 <p>
-you need to translate some text on input
+them the operators need text translation on source code read, for example
 <pre>
 
 	$text   /!=/^=/
@@ -15389,7 +15392,7 @@ you need to translate some text on input
 
 </pre>
 <p>
-or perhaps
+or
 <pre>
 
 	$text   / EQ /=/
@@ -15409,9 +15412,9 @@ or perhaps
 
 </pre>
 <p>
-All $text directive lines must be together in your header.
-masmx will only search one sequence of $text in the label
-table, for efficiency.
+All $text directive lines must be adjacent. For efficiency 
+masmx will only search one sequence of $text directives in
+the label table
 
 <a      name="describe2"/>
 <h2>10.2: Describing the Target Architecture</h2>
@@ -15420,7 +15423,7 @@ table, for efficiency.
 <p>
 The directives which are central to masmx are described here
 in related groups and described in alphabetical order in
-Section 8: Directives.
+<a href="#directives">8: Directives</a>
 
 <p>
 All directives appear in the instruction field of the assembly 
@@ -15433,8 +15436,9 @@ language line.
 
 	       
 <p>
-It's nowhere assumed that your machine has a word size like
-8, 16, 32 or 64, or that its address quantum is an 8-bit byte.
+No assumption that the machine has a word size like
+8, 16, 32 or 64, or that its address quantum is an 8-bit byte.<br>
+That information is retrieved from macro text in header files
 
 <p>
 These four directives describe the basics of the machine
@@ -15442,18 +15446,21 @@ to masmx.
 <pre>
 
 
-	$word   bits_in_computer_word
+	<a href="#word">$word</a>   bits_in_computer_word
 
 </pre>
 <p>
 $word defines the smallest amount of code that can be generated 
-from one source line. See also $quantum. One guide to selecting 
+from one source line. See also <a hef="#quantum">$quantum</a>. One guide to selecting 
 word is the size of the smallest instruction in the instruction
-set. If the machine has single-octet instructions $word must be
-8. 32 is suitable for PowerPC, 16 for m68k or ColdFire.
+set. If the machine has single-octet instructions, or can fetch
+instructons from any octet address, $word must be 8
+
+<p>
+$word 32 is for example suitable for PowerPC, $word 16 for m68k or ColdFire.
 <pre>
 
-	$byte   bits_per_character
+	<a href="#byte">$byte</a>   bits_per_character
 
 </pre>
 <p>
@@ -15461,7 +15468,7 @@ $byte defaults to 8. It can be set to anything and character
 strings are packed accordingly.
 <pre>
 
-	$quantum  bits_in_addressable_location
+	<a href="#quantum">$quantum</a>  bits_in_addressable_location
 
 </pre>
 <p>
@@ -15478,7 +15485,7 @@ $quantum and $awidth. For PowerPC and Alpha:
 are suitable settings.
 <pre>
 
-	$awidth         bits_in_address
+	<a href="#awidth">$awidth</a>         bits_in_address
 
 </pre>
 <p>
@@ -15510,8 +15517,8 @@ be constructed to a size of 4 gigaquanta, but an array
 of either may be constructed up to 2 power 192 in size
 
 <p>
-See also section 9:	Output File Formats, Relocation and Linking,
-			Giant Address Spaces, Interfacing with GNU Tools
+See also <a href="#file_formats">9: Output File Formats, Relocation and Linking,
+			Giant Address Spaces, Interfacing with GNU Tools</a>
 
 
 <a      name="macro"/>
@@ -15526,7 +15533,7 @@ instructions and architectural descriptors.
 <h4>10.2.2.1: The $form Template</h4>
 <pre>
 
-label   $form   bit_field_width, ...,bit_field_width
+label   <a href="#form">$form</a>   bit_field_width, ...,bit_field_width
 
 </pre>
 <p>
@@ -15543,7 +15550,7 @@ instructions for PowerPC have the layout
 <h4>10.2.2.2: The $proc Header</h4>
 <pre>      
 
-label   $proc
+label   <a href="#proc">$proc</a>
 
 </pre>
 <p>
@@ -15586,7 +15593,7 @@ p(1, 1) the first argument subfield. See Section
 <h4>10.2.2.3: The $name Entry Point</h4>
  <pre> 
 
-label*   $name   value
+label*   <a href="#name">$name</a>   value
 
 </pre>
 <p>
@@ -15610,7 +15617,7 @@ $name entry points.
 <h4>10.2.2.4: The $end Macro Footer</h4>
 
 <p>
-$end ends a subassembly (the macro or the main assembly).
+<a href="#end">$end</a> ends a subassembly (the macro or the main assembly).
 
 
 <a      name="usample"/>
@@ -15918,23 +15925,23 @@ Object Code 58 Bytes: 0 Errors: 0 Undefined Labels
 
 </pre>
 <p>
-However you may need to generate little-endian.
+The target may need little-endian integers or some other
+non-canonical number format  
 
 <a      name="legacycom"/>
 <h3>10.3.2: Synthesising Legacy Command Macros</h3>
 
 <p>
-masmx generates big-endian number values. Pseudo-instructions which
-little-endian assemblers have for constant-generation (DW, DD etc)
-are implemented as macros for masmx.
+masmx generates big-endian number values. Commands like DW, DD
+which other assemblers have for generating constants are macros
+in masmx
 
 <p>
-For example, 8051 developers are used to a pseudo-directive <b>DW</b>
-from other assemblers.
+8051 developers use for example an integer-generating command <b>DW</b>
 
 <p>
-That <b>DW</b> generates 16-bits little-endian. So we implement <b>DW</b>
-here to do the same thing:
+A command <b>DW</b> is implemented in masmx macro text to generate
+16-bit little-endian integer constants
 <pre>
 
 
@@ -16139,6 +16146,8 @@ derived from
 	a words-given flag on a constant, or<br><br>
 
 	the fields size of a split number row, or<br><br>
+
+	a field size in bits in a $record structure, or<br><br>
 	
 	the subfunction 0..192 of a $set directive
 	</blockquote>
@@ -16221,7 +16230,7 @@ For default $characteristic assignments per floating number size see
 
 
 <a      name="fpdifferences"/>
-<h3>11.3.1: Differences between masmx Floating Format at IEEE754 Floating Formats</h3>
+<h3>11.3.1: Differences between masmx Floating Format and IEEE754 Floating Formats</h3>
 
 <p>
 This package contains macros for assembling 128-bit,  64- and 32-bit
@@ -16630,8 +16639,8 @@ following whitespace
 
 The filename may be in quotes but need not be. When comment character
 is the default period, it does not terminate the line if a nonspace
-token FOLLOWS.IT immediately. This allows floating point expressions
-and filenames:
+symbol follows immediately. This allows floating point expressions
+and filenames
 <pre>
 
 	$include	file.name
@@ -16657,7 +16666,7 @@ will read afile.msm
 The filename must otherwise be given exactly and in full
 
 <p>
-Input file can be stdin, for example, to list nested macro expansion
+Input file can be stdin
 <pre>
 
 prompt% masmx -lpq
@@ -18016,15 +18025,15 @@ The following kernel assembly lists header file excerpts to show
 	assembly to pick the correct instruction code for storage operands and for multiple
 	categories of registers
 <p>
-	Macro language declares, references and tests in quotes labels which are otherwise not
-	recognisable as labels
+	Macro language uses quotes to declare and reference labels which could not otherwise
+	be intentified
 <pre>
 
 	"-(a7)"		$equ,"$a_reg_@-" 	7
 
 	"w*4"		$equ,$special_reg	0*/2++2
 
-	$do		$t("p(1, 1)")="$a_reg_@+",	$formX	p(0, 0), p(1, 2), 3, +"p(1, 1)"
+			$do	$t("p(1, 1)")="$a_reg_@+",	$formX	p(0, 0), p(1, 2), 3, +"p(1, 1)"
 
 </pre>
 <p>
