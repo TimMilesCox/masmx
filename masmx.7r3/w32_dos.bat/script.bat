@@ -708,6 +708,7 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx aehnlich ..\test.o3\aehnlich.txo -lyok > ..\text.o3\aehnlich.txt
 ..\masmx overlap ..\test.o3\overlap.txo -lyok > ..\text.o3\overlap.txt
 ..\masmx pxar ..\test.o3\pxar -lyok > ..\text.o3\pxar.txt
+..\masmx targ ..\test.o3\targ -lyok > ..\text.o3\targ.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

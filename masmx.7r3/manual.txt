@@ -1530,7 +1530,7 @@ Flag -m interprets
 <h4>4.2.2.1.4:  Suffix-Determined Number Notation</h4>
 
 Directive $suffix 2 interprets a notation flag
-[<a style="color:blue">H h O o Q o B b D d</a>] after the number string
+[<a style="color:blue">H h O o Q q B b D d</a>] after the number string
 <pre>
 
 	trailing H as hex
@@ -4370,11 +4370,11 @@ the <a href="#commandline">command line</a><br>
 or with the exception of flags -<b>ksy</b> with the <a href="#set_option">$set_option</a> directive
 
 <p>
-Flags used by masmx are listed at <a href="#clopts">A.a: Command Line Option Flags</a>
+Flags used by masmx are listed at <a href="#clopts">Appendix A.a: Command Line Option Flags</a>
 
 <p>
 Flags -<b>VUOS</b> may be used to switch and trace assembly language code
-and may for this purpose also be opted at the command line
+
 
 
 <a      name="region"/>
@@ -11424,22 +11424,26 @@ and <a href="#pushrel">8.39: $pushrel</a> directive
 
 
 
-	$set_option     "a..z"
+	$set_option     "a..zA..Z"
 
 </pre>
 <p>
 sets the option flags which can otherwise be set on the command line.<br>
-Options lowercase <b>-ksy</b> may <i>only</i> be set on the command line
+
+<p>
+Flags <b>-ksy</b> are only actioned on the command line,
+not via <b>$set_option</b> directive
+
 <pre>
 
-       >masmx input [output] -a..z
+       > masmx [input] [output] -a..zA..Z
 
 </pre>
 <p>
-Therefore if the command line is
+If the command line is
 <pre>
 
-       >masmx source1 -klm
+       > masmx source1 -klm
 
 </pre>
 <p>
@@ -11453,16 +11457,12 @@ and source1.msm contains
 The total effect is the same as
 <pre>
 
-       >masmx source1 -klmnop
+       > masmx source1 -klmnop
 
 </pre>
 <p>
 The option letters are case significant.
 <b>-QZ</b> are different options from <b>-qz</b>
-
-<p>
-Flags <b>-ksy</b> are only actioned on the command line,
-not via <b>$set_option</b> directive
 
 
 <a	name="set_interact"/>
@@ -11686,8 +11686,8 @@ $suffix setting can be set to 0, 1 or 2, and the default is 0.
 <pre>
 
 
-	$suffix 0       ; suffix letters are not used
-			; for interpreting number strings
+	$suffix 0       ; number string notation is not
+			; determined by a suffix letter
 
 	$suffix 1       ; suffix letters ..D ..d	= DECIMAL
 			;                ..H ..h 	= HEX
@@ -11711,11 +11711,12 @@ Default with first digit 1..9 is decimal
 When $suffix is 2, any number string without a suffix is decimal
 
 <p>
-Any words suffix [s d l t q p h o] is after any notation suffix [d o q h b] 
+Any words suffix [<a style="color:blue">s d l t q p h o</a>]
+is after any notation suffix [<a style="color:red">d o q h b</a>] 
 
 <p>
-Words suffix [d q h o] needs separation from a number string with
-suffix-determined notation
+Words suffix [<a style="color:blue">d q h o</a>] needs separation
+from a number string with suffix-determined notation
 
 <pre>
 
@@ -15265,8 +15266,8 @@ See <a href="#text_string">4.3.5: Text Strings</a>
 and <a href="#notate2">4.2.2.1: Number Strings</a>
 
 <p>
-Macro language resolve paraform references only inside
-default quotes " and not between apostrophes.
+Macro language resolves paraform references inside
+default quotes " but not between apostrophes.
 See <a href="#quote">8.42: $quote directive</a>
 
 <p>

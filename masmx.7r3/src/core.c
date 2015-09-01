@@ -4657,6 +4657,8 @@ static int encode(char *x, char *f, char *n)
    char symbol = 0, sentinel = *n, prior;
    char *c, *w, *t = x;
 
+   char		 insiquo = 0;
+
 
    for (;;)
    {
@@ -4667,7 +4669,7 @@ static int encode(char *x, char *f, char *n)
       w = t;
       *t++ = symbol;
 
-      if (symbol == qchar)
+      if ((symbol == qchar) && (insiquo == 0))
       {
          for (;;)
          {
@@ -4712,11 +4714,14 @@ static int encode(char *x, char *f, char *n)
          continue;
       }
 
+      if (symbol == '\'') insiquo ^= 1;
+
       if ((selector['k'-'a'] == 0) 
       &&  (symbol > 0x60)
       &&  (symbol < 0x7B)) symbol &= 0x5F;
 
       if ((symbol == sentinel)
+      &&  (insiquo == 0)
       &&  (!(((prior > 0x40) && (prior < 0x5B))
            ||((prior > 0x60) && (prior < 0x7B))  
            ||((prior > 0x2F) && (prior < 0x3A))  

@@ -688,4 +688,5 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz funs ..\test.zo3\funs -lok > ..\text.zo3\funs.txt
 ..\masmz aehnlich ..\test.zo3\aehnlich.txo -lok > ..\text.zo3\aehnlich.txt
 ..\masmz overlap ..\test.zo3\overlap.txo -lok > ..\text.zo3\overlap.txt
+..\masmz targ ..\test.zo3\targ -lok > ..\text.zo3\targ.txt
 
