@@ -640,6 +640,7 @@ Target architecture is described to masmx in macro language. See
 	<blockquote>
 	<a href="#start">3:  Getting Started</a><br><br>
 
+	<a href="#describe2">10.2: Describing the Target Architecture</a><br><br>
 	<a href="#describe">10: Describing Target Architecture in Text</a>
 	</blockquote>
 
@@ -800,7 +801,7 @@ section <a href="#ieeefloat">11.3: IEEE754 Floating Values</a>
 <a      name="stridata"/>
 <h3>1.6.1:  Structured Data</h3>
 
-mamsx can construct complex hierarchical data.
+masmx can construct complex hierarchical data.
 See <a href="#structure">5: Iterated Coded and Structured Data</a>
 
 
@@ -816,8 +817,7 @@ masmx solves a problem which has produced noticeable difficulty for compiler wri
 <a      name="bitaccess"/>
 <h3>1.6.3: Accessing Bit-Aligned Structured Data</h3>
 
-masmx naming techniques allow a single set of macros for a given target architecture
-to enable any application<br>to access complex bit-aligned data.
+masmx naming techniques allow macro code to read and write complex bit-aligned data.
 See <a href="#record_macro">5.2.2.2: Macro Code Access to Bit-Aligned Structures</a><br>
 This feature handles bit-field structures and overlays of any complexity consistently and efficiently
 
@@ -1318,25 +1318,44 @@ MASMX 7r3
 <h4>4.2.2.1.1: masmx Default Number and String Notation</h4>
 
 Native masmx interprets number strings with leading zero as hex or
-octal, depending $octal or default $hex directives. Leading digit
+octal, depending <a href="#octal">$octal</a>
+or default <a href="#hex">$hex</a> directives. Leading digit
 1..9 means decimal
 
 <p>
 By default 1000 and 03e8 mean one thousand
 
 <p>
-With directive <a href="#octal">$octal</a> 1000 and 01750 mean one thousand
+With directive $octal <a href="#octal">$octal</a> 1000 and 01750 mean one thousand
+<pre>
 
+	$octal		.	numbers with leading zero are octal
+	.
+	.
+	$hex		.	numbers with leading zero are hex again
+
+</pre>
 <p>
 character strings are space filled to containing word in absence
 of -z Flag. Escaped values are typed as integers between quoted
-substrings as "substring":INTEGER_EXPRESSION:"substring"
+substrings as
+<pre>
 
-<p>
-If the substring delimiter is changed with for example $sterm '.'
-then escape sequence is "substring".INTEGER_EXPRESSION."substring"
+	"substring":INTEGER_EXPRESSION:"substring"
 
-<p>
+</pre>
+If the substring delimiter is changed with for example
+<pre>
+
+	$sterm	'.'
+
+</pre>
+then escape sequence is
+<pre>
+
+	"substring".INTEGER_EXPRESSION."substring"
+
+</pre>
 A digit string starting \ is bit-pattern
 <pre>
 
@@ -1510,13 +1529,14 @@ Flag -m interprets
 <a      name="suffix"/>
 <h4>4.2.2.1.4:  Suffix-Determined Number Notation</h4>
 
-Directive $suffix 2 interprets upper or lowercase last column of the number string
+Directive $suffix 2 interprets a notation flag
+[<a style="color:blue">H h O o Q o B b D d</a>] after the number string
 <pre>
 
 	trailing H as hex
 	trailing O or Q as octal
 	trailing B as bit image
-	trailing D as decimal default
+	trailing D as decimal <a style="color:blue">default</a>
 
 </pre>
 Directive $suffix 1 defaults leading zero to hex
@@ -5279,6 +5299,9 @@ routines.msm=0<00000003
 <b>$record</b>..<b>$root</b> structures are bit aligned
 
 <p>
+masmx naming techniques allow macro code to read and write complex bit-aligned data
+
+<p>
 <b>$record</b> structures may be more or less complex. Fields which are not accessed
 do not need a label. All fields need a length. <b>$record</b> requires a label
 
@@ -5867,6 +5890,10 @@ The floated <b>#</b> at line 12 is attached to these two immediate operand claus
 Target specific macros required for $xqt_i and $xqt_fp have the names called from this target-independent
 outline scheme
 
+<p>
+The target specific parts like LOAD and LOAD_NEGATIVE are fewer in number 
+than these wrappers which $xqt_i and $xqt_fp call
+
 <pre>
 
 $ cat espresso.def
@@ -6110,7 +6137,7 @@ and update designated result registers
 
 	LOAD		LOAD_NEGATIVE	TEST_EQUAL	TEST_NE		TEST_GREATER	TEST_LESS
 	SHIFT		SHIFT_RIGHT	OR		AND		XOR		REVERSE
-	ADD		SUBTRACT	MULTIPY		DIVIDE		DIVIDE_ROUNDED	MODULO
+	ADD		SUBTRACT	MULTIPLY	DIVIDE		DIVIDE_ROUNDED	MODULO
 
 </pre>
 Instructions in the four TEST_ macros have a runtime result
@@ -12950,8 +12977,8 @@ relocatable code although not all must:
 	$include		"map_macro.def"
 
 	$include,$binary	absolute
-	$include,$binary	relative1
-	$include,$binary	relative2
+	$include,$binary	relocatable1
+	$include,$binary	relocatable2
 
 </pre>
 <p>
@@ -16439,7 +16466,7 @@ and precision. The transient value is 192 bits in size
 The directive $set,<i>number_size</i> caches the floating value
 in the label <i>tag</i>. For IEE754 an extra bit is requested from masmx,
 and this causes masmx to round on the true mantissa including the
-normalising bit, which macro code must suppress
+normalising bit, which macro code must suppress on storage
 
 <p>
 The cached value in <i>tag</i> may be 1s-complement. If it is, XOR with
@@ -16448,7 +16475,7 @@ invert the sign bit for negative polarity, not the whole number.
 
 <p>
 sign, characteristic and mantissa are output under control of the
-form-template <b>$fieee754_32</b>, <b>$fieee754_64</b> or <b>$fieee754_128</b>
+$form template <b>$fieee754_32</b>, <b>$fieee754_64</b> or <b>$fieee754_128</b>
 
 <p>
 Three $form templates organise the bit-fields of the floating values
