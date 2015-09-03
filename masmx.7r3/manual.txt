@@ -228,7 +228,7 @@ for actual delivered binaries
 	1.  <a href="#operator">Operators</a>							4.2.1
 	2.  <a href="#xtoken">Tokens</a>							4.2.2
 	    1.	<a href="#notate2">Number Strings</a>						4.2.2.1
-		1.  <a href="#nstring">masmx Default Number and String Notation</a>		4.2.2.1.1
+		1.  <a href="#nstring">masmx Native Number and String Notation</a>		4.2.2.1.1
 		2.  <a href="#cstring">C Language Number and String Notation</a>		4.2.2.1.2
 		3.  <a href="#motorola">Motorola Old Number Notation</a>			4.2.2.1.3
 		4.  <a href="#suffix">Suffix-Determined Number Notation</a>			4.2.2.1.4
@@ -1315,7 +1315,7 @@ MASMX 7r3
 <h4>4.2.2.1: Number Strings</h4>
 
 <a      name="nstring"/>
-<h4>4.2.2.1.1: masmx Default Number and String Notation</h4>
+<h4>4.2.2.1.1: masmx Native Number and String Notation</h4>
 
 Native masmx interprets number strings with leading zero as hex or
 octal, depending <a href="#octal">$octal</a>
@@ -7718,7 +7718,7 @@ Assembly initial setting is $ascii
 
 <p>
 $awidth governs the width of addresses placed in the output file
-for inclusion in load string formats. If it is a different value from
+for inclusion in load strings. If it is a different value from
 $word it must be submitted to the assembly later than $word. For
 example, a suitable $word value for 8-bit microcontrollers is 8, but
 a suitable $awidth is 16:
@@ -8379,9 +8379,12 @@ Latin-1 in code points 0..255
 
 <p>
 $data_code directive allows "text strings" and +'character value constants'
-to be composed in a translated character code.<br>Only single-octet values
-can be translated. $data-code cannot meaningfully translate multi-byte values
-from for example UTF-8
+to be composed in a translated character code.
+
+<p>
+256 code points are translated to values up to 32 bits in size, but
+only single-octet input values may be translated.<br>$data_code cannot
+meaningfully translate multi-byte values from for example UTF-8
 <pre>
 
 MASMX/-240 1r1X

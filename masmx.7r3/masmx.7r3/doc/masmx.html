@@ -228,7 +228,7 @@ for actual delivered binaries
 	1.  <a href="#operator">Operators</a>							4.2.1
 	2.  <a href="#xtoken">Tokens</a>							4.2.2
 	    1.	<a href="#notate2">Number Strings</a>						4.2.2.1
-		1.  <a href="#nstring">masmx Default Number and String Notation</a>		4.2.2.1.1
+		1.  <a href="#nstring">masmx Native Number and String Notation</a>		4.2.2.1.1
 		2.  <a href="#cstring">C Language Number and String Notation</a>		4.2.2.1.2
 		3.  <a href="#motorola">Motorola Old Number Notation</a>			4.2.2.1.3
 		4.  <a href="#suffix">Suffix-Determined Number Notation</a>			4.2.2.1.4
@@ -1315,7 +1315,7 @@ MASMX 7r3
 <h4>4.2.2.1: Number Strings</h4>
 
 <a      name="nstring"/>
-<h4>4.2.2.1.1: masmx Default Number and String Notation</h4>
+<h4>4.2.2.1.1: masmx Native Number and String Notation</h4>
 
 Native masmx interprets number strings with leading zero as hex or
 octal, depending <a href="#octal">$octal</a>
@@ -1530,7 +1530,7 @@ Flag -m interprets
 <h4>4.2.2.1.4:  Suffix-Determined Number Notation</h4>
 
 Directive $suffix 2 interprets a notation flag
-[<a style="color:blue">H h O o Q o B b D d</a>] after the number string
+[<a style="color:blue">H h O o Q q B b D d</a>] after the number string
 <pre>
 
 	trailing H as hex
@@ -4370,11 +4370,11 @@ the <a href="#commandline">command line</a><br>
 or with the exception of flags -<b>ksy</b> with the <a href="#set_option">$set_option</a> directive
 
 <p>
-Flags used by masmx are listed at <a href="#clopts">A.a: Command Line Option Flags</a>
+Flags used by masmx are listed at <a href="#clopts">Appendix A.a: Command Line Option Flags</a>
 
 <p>
 Flags -<b>VUOS</b> may be used to switch and trace assembly language code
-and may for this purpose also be opted at the command line
+
 
 
 <a      name="region"/>
@@ -7718,7 +7718,7 @@ Assembly initial setting is $ascii
 
 <p>
 $awidth governs the width of addresses placed in the output file
-for inclusion in load string formats. If it is a different value from
+for inclusion in load strings. If it is a different value from
 $word it must be submitted to the assembly later than $word. For
 example, a suitable $word value for 8-bit microcontrollers is 8, but
 a suitable $awidth is 16:
@@ -8379,9 +8379,12 @@ Latin-1 in code points 0..255
 
 <p>
 $data_code directive allows "text strings" and +'character value constants'
-to be composed in a translated character code.<br>Only single-octet values
-can be translated. $data-code cannot meaningfully translate multi-byte values
-from for example UTF-8
+to be composed in a translated character code.
+
+<p>
+256 code points are translated to values up to 32 bits in size, but
+only single-octet input values may be translated.<br>$data_code cannot
+meaningfully translate multi-byte values from for example UTF-8
 <pre>
 
 MASMX/-240 1r1X
@@ -11172,6 +11175,45 @@ quo3.msm: object code 68 bytes: 0 errors: 0 undefined labels
 
 
 </pre>
+
+A second example shows actual parameter substitution in a string
+whatever symbol is used for a quote mark, here apostrophe
+
+<pre>
+
+$ masmx -lnk
+MASMX 7r3
+0/-INPUT>>
+	$quote	''''
+
+p*	$proc
+QDELIM='
+	'p(1, 1)'
+	'"p(1, 1)"'
+	$end
+
+	p	abc
+	p	xyz
+
+	$end
+  :                            1  $quote ''''
+  :                            2 
+  :                            3 p* $proc
+  :                            4  'p(1, 1)'
+  :                            5  '"p(1, 1)"'
+  :                            6  $end
+  :                            7 
+00:000000 616263              +8  p abc
+00:000001 226162632220        +8 
+00:000003 78797A              +9  p xyz
+00:000004 2278797A2220        +9 
+  :                            10 
+  :                            11  $end
+:$(00):000000:000006 
+
+
+</pre>
+
 <p>
 A field of a $form all in quotes also means a string, and in a 
 macro expansion, parameter substitution takes place:
@@ -11424,22 +11466,26 @@ and <a href="#pushrel">8.39: $pushrel</a> directive
 
 
 
-	$set_option     "a..z"
+	$set_option     "a..zA..Z"
 
 </pre>
 <p>
 sets the option flags which can otherwise be set on the command line.<br>
-Options lowercase <b>-ksy</b> may <i>only</i> be set on the command line
+
+<p>
+Flags <b>-ksy</b> are only actioned on the command line,
+not via <b>$set_option</b> directive
+
 <pre>
 
-       >masmx input [output] -a..z
+       > masmx [input] [output] -a..zA..Z
 
 </pre>
 <p>
-Therefore if the command line is
+If the command line is
 <pre>
 
-       >masmx source1 -klm
+       > masmx source1 -klm
 
 </pre>
 <p>
@@ -11453,16 +11499,12 @@ and source1.msm contains
 The total effect is the same as
 <pre>
 
-       >masmx source1 -klmnop
+       > masmx source1 -klmnop
 
 </pre>
 <p>
 The option letters are case significant.
 <b>-QZ</b> are different options from <b>-qz</b>
-
-<p>
-Flags <b>-ksy</b> are only actioned on the command line,
-not via <b>$set_option</b> directive
 
 
 <a	name="set_interact"/>
@@ -11686,8 +11728,8 @@ $suffix setting can be set to 0, 1 or 2, and the default is 0.
 <pre>
 
 
-	$suffix 0       ; suffix letters are not used
-			; for interpreting number strings
+	$suffix 0       ; number string notation is not
+			; determined by a suffix letter
 
 	$suffix 1       ; suffix letters ..D ..d	= DECIMAL
 			;                ..H ..h 	= HEX
@@ -11711,11 +11753,12 @@ Default with first digit 1..9 is decimal
 When $suffix is 2, any number string without a suffix is decimal
 
 <p>
-Any words suffix [s d l t q p h o] is after any notation suffix [d o q h b] 
+Any words suffix [<a style="color:blue">s d l t q p h o</a>]
+is after any notation suffix [<a style="color:red">d o q h b</a>] 
 
 <p>
-Words suffix [d q h o] needs separation from a number string with
-suffix-determined notation
+Words suffix [<a style="color:blue">d q h o</a>] needs separation
+from a number string with suffix-determined notation
 
 <pre>
 
@@ -15262,12 +15305,8 @@ or
 </pre>
 <p>
 See <a href="#text_string">4.3.5: Text Strings</a>
-and <a href="#notate2">4.2.2.1: Number Strings</a>
-
-<p>
-Macro language resolve paraform references only inside
-default quotes " and not between apostrophes.
-See <a href="#quote">8.42: $quote directive</a>
+<a href="#notate2">4.2.2.1: Number Strings</a>
+<a href="#quote">8.42: $quote directive</a>
 
 <p>
 For substring delimiter to be period
