@@ -1220,9 +1220,9 @@ The operators are
 	|	**	|	AND		|			
 	|_______________|_______________________|		
 	|	*+	|      +decimal exponent|
-	|_______________|_______________________|
-	|	*-	|      -decimal exponent|
-	|_______________|_______________________|
+	|_______________|_______________________|	decimal scale operators *+ *- exponentiate
+	|	*-	|      -decimal exponent|	one integer value decimally by another, or
+	|_______________|_______________________|	a fraction string by a decimal scale
 	|	+	|	PLUS		|
 	|_______________|_______________________|
 	|	-	|	MINUS		|
@@ -2082,14 +2082,15 @@ number constant commands (often with names like DW and DD) as macros.
 Number constants may have trailing length overrides. Their meanings are
 <pre>
 
-	:s or S = 1 * word size 
-	:d or D = 2 * word size
-	:l or L = 2 * word size
-	:t or T = 3 * word size
-	:q or Q = 4 * word size
-	:p or P = 5 * word size
-	:h or H = 6 * word size
-	:o or O = 8 * word size
+
+<a style="color:red">s S</a> for single (one word)
+<a style="color:red">d D l L</a> for double
+<a style="color:red">t T</a> for triple
+<a style="color:red">q Q</a> for quadword
+<a style="color:red">p P</a> for pentaword
+<a style="color:red">h H</a> for hexaword
+<a style="color:red">o O</a> for octaword
+
 
 </pre>
 Integers occupy their containing number of words in the absence of a length suffix
@@ -2231,56 +2232,90 @@ LTERM=;
 
 
 </pre>
-Floating numbers do not self size. Their default size is determined with
-directive $floating_point
+<p>
+Floating point items are not auto-sized like integers.
 
 <p>
-A floating number length override follows the fraction, not the exponent
+Floating point items are the default <a href="#floating_point">$floating_point</a> size,
+or a size in words given immediately after the mantissa and before any scale
+<pre>
+
+        +(MANTISSA)[<a style="color:red">s d l t q p h o</a>][{*+|*-}SCALE]
+
+<a style="color:red">s S</a> for single (one word)
+<a style="color:red">d D l L</a> for double
+<a style="color:red">t T</a> for triple
+<a style="color:red">q Q</a> for quadword
+<a style="color:red">p P</a> for pentaword
+<a style="color:red">h H</a> for hexaword
+<a style="color:red">o O</a> for octaword
+
+</pre>
+<p>
+These trailing letters may be upper or lower case and may have a
+colon before them or parenthesis or quote, to avoid catenation
+with label references
+<pre>
+
+67.5t
+
+        +MANTISSA:<a style="color:red">q</a>*+1200000
+
+        +(MANTISSA)<a style="color:red">p</a>*+800
+
+        20*"MANTISSA"<a style="color:red">d</a>*+307
+
+</pre>
+Period may only appear in a decimal digit string. Where period
+appears the scale notation [ e e+ e- E E+ E- ] can be typed in
+place of the masmx scale operator <b>*+</b> or <b>*-</b>
+
 <pre>
 
 $ masmx -lnk
 MASMX 7r3
 0/-INPUT>>
-	$word		16
-	$quantum	8
-	$awidth		32
-        $characteristic,64	16
+        $word           16
+        $quantum        8
+        $awidth         32
+        $characteristic,64      16
 
-expression	$equ	100
-downscale	$equ	2
+expression      $equ    100
+downscale       $equ    2
 
-	1.6384d*+4
-	+	expression:q*-downscale
-	+	1.000000006768:pe+1200000
-	$end
+        1.6384d*+4
+        +       expression:q*-downscale
+        +       1.000000006768:pe+1200000
+        $end
   :                            1  $word  16
   :                            2  $quantum 8
   :                            3  $awidth  32
   :                            4         $characteristic,64 16
-  :                            5 
+  :                            5
   :                            6 expression $equ 100
   :                            7 downscale $equ 2
-  :                            8 
+  :                            8
 00:00000000 40F80000          +9  1.6384d*+4
 00:00000004 4001800000000000  +10  + expression:q*-downscale
 00:0000000C 7CD38AD1F1D10E50078D
                               +11  + 1.000000006768:pe+1200000
   :                            12  $end
-:$(00):00000000:00000016 
+:$(00):00000000:00000016
 
 
 </pre>
-Floating numbers contain a digit string with decimal point 
-or the decimal scale operator, *+ *- or both
+<p>
+Where period does not appear, only <b>*+</b> or <b>*-</b> scale
+operator and not [ e e+ e- E E+ E- ] indicates a floating point number.
+
 <pre>
 
-	1.75
-	175*-2
+        1.75
+        175*-2
 
-	298.5e1262611
+        298.5e1262611
 
 </pre>
-The scale punctuation [e[+] | e-] is also recognised after a fraction string
 
 <p>
 Floating numbers can be cached as label values and manipulated bitwise
@@ -2290,11 +2325,9 @@ into the floating format of the target architecture
 floating_value	$set	16384.0e+1000000
 
 </pre>
-The exponent and mantissa sizes and rounding point of the <a href="#set">$set</a>
-floating default the current <a href="#floating_point">$floating_point</a><br>
-and <a href="#characteristic">$characteristic</a> values.
-A <a href="#set">$set,<i>subcommand</i></a> value can override the size and
-rounding position
+A <a href="#set">$set,<i>subcommand</i></a> value can override the default
+floating number size and mantissa rounding position.<br>
+See also <a href="#fdemens">11.2: Floating Format Dimensions</a>
 
 <p>
 masmx internal floating precision is 192 bits with 168-bit simple fraction and 23-bit<br>
@@ -7944,7 +7977,7 @@ qzuli.msm: object code 162 bytes: 0 errors: 0 undefined labels
 <b>$octal</b> directive shows the 30-bit words and adresses in octal.
 
 <p>
-In line 4, the assembler added three 7-bit space characters to fill the
+In line 5, the assembler added three 7-bit space characters to fill the
 last data word, but still needed to add two trailing zero bits.
 
 <p>
@@ -7952,13 +7985,12 @@ The first 30 characters had exactly filled seven data words, but the last
 character left 23 bits.
 
 <p>
-Space fill in the last word is added without comment. <b>-c</b> or
+Space fill in the last word is added. <b>-c</b> or
 <b>-z</b> flag causes zero fill instead of space.
 <b>-zc</b> flags combined fill with space
 
 <p>
 Slack bits remaining after the last character position are zeroed
-and a message is output
 
 <p>
 The constant in line 6 exactly fills 210 bits or seven data words.
@@ -8020,7 +8052,7 @@ ldes2.msm: object code 95 bytes: 0 errors: 0 undefined labels
 
 </pre>
 <p>
-A quoted string in a macro macro expansion may contain parameter
+A quoted string in a macro expansion may contain parameter
 references:
 <pre>
 
@@ -8079,7 +8111,7 @@ of floating constants. If $characteristic directive has a subcommand,
 for example
 <pre>
 
-$characteristic,64      <i>SIZE</i>
+	$characteristic,64      <i>SIZE</i>
 
 </pre>
 <p>
@@ -8090,7 +8122,8 @@ Without the subcommand, SIZE is the characteristic size of a
 default-size floating point item. 
 
 <p>
-A default-size floating point item is 96 bits unless $floating_point directive has changed it.
+A default-size floating point item is 96 bits unless
+<a href="#floating_point">$floating_point</a> directive has changed it.
 
 <p>
 The default 96-bit floating point item has the default characteristic
@@ -8121,9 +8154,14 @@ $word is programmable and each possible constant size in words up to 192
 bits has a separate $characteristic size
 
 <p>
-$characteristic directive changes characteristic size for one size only of constant
-and is separately applied to any number size where the default characteristic size
-is inappropriate
+$characteristic directive changes characteristic size for one word size, expressed
+in bits
+
+<p>
+The developer applies a characteristic size for each number size where
+the masmx default characteristic field is not the required size. See
+also  <a href="#fdemens2">11.2.2: Exponent Field Size</a>
+
 
 <p>
 In the following example, a default sized floating constant
@@ -8181,7 +8219,7 @@ with macros which use the <a href="#set">$set</a> directive to capture
 and manipulate a number argument. See <a href="#ieeefloat">11.3: IEEE754 Floating Values</a>
 
 <p>
-Macro language does reversed byte order if needed. 
+Macro language reverses byte order if required
 
 <p>
 Code written for other assemblers has constant-generating
@@ -8224,52 +8262,6 @@ Note: hflo.msm Line 11: floating number is maximum words
 <p>
 The request to generate an octaword item only resulted in
 a hexaword, because 192 bits is the limit of a number size in masmx.
-
-<p>
-Floating point items are not auto-sized like integers.
-
-<p>
-Floating point items are the default <a href="#floating_point">$floating_point</a> size, 
-or a size words given immediately after the mantissa and before any scale
-<pre>
-
-+(MANTISSA)[s d l t q p h o][{*+|*-}SCALE]
-
-S for single (one word)
-D or L for double 
-T for triple
-Q for quadword
-P for pentaword
-H for hexaword
-O for octaword
-
-</pre>
-<p>
-These trailing letters may be upper or lower case and may have a
-colon before them or parenthesis or quote
-<pre>
-
-67.5t
-
-+MANTISSA:q*+1200000
-
-+(MANTISSA)p*+800
-
-+	20*"MANTISSA"d*+307
-
-</pre>
-Period may only appear in a decimal digit string. Where period
-appears the scale notation [ e e+ e- E E+ E- ] can be typed in
-place of the masmx scale operator <b>*+</b> or <b>*-</b>
-
-<p>
-Where period does not appear, only <b>*+</b> or <b>*-</b> scale
-operator and not [ e e+ e- E E+ E- ] indicates a floating point number.
-
-<p>
-To generate floating values using every type of expression token,
-see 4.2.2.2.5: The Decimal Scale Operator
-<b>*+ *-</b>
 
 
 <a      name="cont_char"/>
@@ -9844,112 +9836,10 @@ The places where automatic literals may be generated are:
 <pre>
 
 		+       (0ffffff0000000000)
-		+       (1*/90), 10:d
-
 
 </pre>
 </ul>
-<p>
-Line 3 in the following assembly allows automatic literals.
 
-<p>
-Lines 5..12 define a minimal instruction set and register set.
-
-<p>
-Line 14 defines an address too large to place in the 16-bit
-operand address field of the instructions.
-
-<p>
-Line 16 initialises location counter 7 to absolute 07000 hex.
-
-<p>
-Line 17 switches to location counter 0 and initialises it at 64.
-
-<p>
-Line 19 specifies that automatic literals are generated at the
-end of locator 7.
-
-<p>
-Line 21 loads the address of the literal 00fffc0000000000 into
-R11. The assembler first generates the literal 00fffc0000000000
-at the address 07000, then places 07000 in the operand field
-of the LOAD instruction.
-
-<p>
-Line 22 loads the 64-bit value 00fffc0000000000 into R11 from
-the address 07000 which had been loaded into R11.
-
-<p>
-Line 24 is 64-bit integer value 00fffc0000000000 generated
-inline.
-
-<p>
-Line 25 is the same as line 24. The parentheses do not make a 
-literal, because the leading parenthesis is not the first symbol 
-in the expression. The unary plus is.
-
-<p>
-In line 26, + signals an integer item, but the expression
-when it is encountered begins with a parenthesis. The integer
-literal 00fffc0000000000 is found at 00007000 and the item
-generated inline is 00007000. The literal is not new, It was
-generated at line 21.
-
-<p>
-In line 27, the comma between the expressions causes two 16-bit
-values to be placed in one 32-bit item. The first of the two
-expressions is the literal (00fffc0000000000) which is the literal
-at 07000. 07000 is placed in the left half of the word. The
-right half is 15 or 000F.
-
-<p>
-Line 28 is another pair of 16-bit values. The first is not a
-literal because +(0xffee), begins with plus not parenthesis. 
-The second is a literal (0xffee) generated at 7008. The
-inline result is 0ffee7008.
-<pre>
-
-
-MASMX 7r2
-3/lit.msm
-*EOF*
-  :                            1         $word   32
-  :                            2         $quantum 8
-  :                            3         $set_option     "a"
-  :                            4 
-  :                            5 instruction     $form   8, 4, 4, 16
-  :                            6 
-  :                            7 r11     $equ    11
-  :                            8 
-  :                            9 p       $proc
-  :                            10 load*   $name   99
-  :                            11         instruction     $n, p(1,1), p(1,3), p(1, 2)
-  :                            12         $end
-  :                            13 
-  :                            14 with_a_very_high_address $equ   00fffc0000000000
-  :                            15 
-  :                            16 $(7:07000)
-  :                            17 $(0:64)
-  :                            18 
-  :                            19         $lit    7
-  :                            20 
-00:00000040 63B07000          +21         load    r11, (with_a_very_high_address)
-00:00000044 63BB0000          +22         load    r11,,r11
-  :                            23 
-00:00000048 00FFFC0000000000  +24         +       00fffc0000000000
-00:00000050 00FFFC0000000000  +25         +(00fffc0000000000)
-00:00000058 00007000          +26         +       (00fffc0000000000)
-00:0000005C 7000000F          +27         +       (00fffc0000000000), 15
-00:00000060 FFEE7008          +28         +       +(0ffee), (0ffee)
-  :                            29 
-*EOF*
-07:00007000+00FFFC0000000000
-07:00007008+0000FFEE
-:$(00):00000040:00000064 :$(07):00007000:0000700C 
-lit.msm: object code 196 bytes: 0 errors: 0 undefined labels
-
-
-</pre>
 <a      name="load"/>
 <h2>8.29: $load		Output Text Encoded Binary</h2>
 
@@ -9968,7 +9858,7 @@ to the new Text Encoded Binary output file.
 The subcommand is the code size in bits of the written superword.
 
 <p>
-$load is the counterpart of $set,$binary which caches Text Encoded
+$load is the counterpart of <a href="#set">$set,$binary</a> which caches Text Encoded
 Binary Input in a label and automatically sets label <b>$bits</b> to the
 size of the superword which has been read:
 <pre>
@@ -9983,7 +9873,10 @@ data_label	$set,$binary	superword_parameter
 </pre>
 <p>
 
-The same size superword must be written as read. $bits contains the size
+The same size superword must be written as read. Automatic label $bits contains the size
+
+<p>
+See <a href="#linkbasic">9.2.2: Linking in Principle</a>
 
 
 <a      name="lterm"/>
@@ -10320,19 +10213,19 @@ A $proc line must be matched with a $end line:
 <pre>
 
 aname   $proc
-entry*  $name   value        
+visible_name*  $name   value        
 	.
 	.
 	$end
 
 </pre>
 <p>
-When a promoted* label of $proc or $name is in the instruction 
+When a promoted* label of $proc or $name is in the command
 field of a source line, the macro is subassembled.
 
 <p>
-This assembly is made more visible futher down. The ljmp/lcall macro
-and the nop/ret/reti macro are exposed.
+This sample program assembles instructions <a style="color:blue">ljmp lcall reti nop ret</a>
+ 
 <pre>
 
 $ masmx forjoy -ln
@@ -10360,91 +10253,62 @@ STERM=.
 
 </pre>
 <p>
-One macro defines LJMP and LCALL instructions. The other
-defines RET, RETI and NOP instructions.
+The two $proc macros which generate these five instructions are shown
+in a more expanded assembly below
 
 <p>
-Macros don't need unique $proc names unless they are invoked
-by their $proc names. Both macros in this sample are called 
-P. They can only be called by their $name entry points, and then
-only because the * asterisks make the names* visible.
-
-<p>
-Line 165 directs the assembler to start listing lines
-from the included 8051 definition header file.
+Both $proc macros shown are called p. The macros reference actual
+parameters as p(x, y), but are called by their exported $name
+labels <a style="color:blue">ljmp lcall reti nop ret</a>
 
 <p>
 Line 166 is the bit layout template or $form for long jump instructions.
 
 <p>
-Line 168, not shown, directs the assembler to stop listing 
-the include file.
+Line 416 advertises the $name label lcall* with a latent value
+of 18. This value may be retrieved as parameter p(0, 0)
+or the masmx internal function <b>$n</b>
 
 <p>
-Line 414 directs the assembler to start listing the include file.
+Line 417 advertises the $name label ljmp* with a latent value 2,
+which can be retrieved as parameter p(0, 0) or <b>$n</b>
 
 <p>
-Line 415 starts declaring a procedural macro called P
-
-<p>
-Line 416 declares that if this macro is called by the name
-LCALL, it has an nominal value of 18. This value may be retrieved
-via the parameter reference p(0,1) or p(0, 0) or the masmx internal
-function <b>$n</b>
-
-<p>
-Line 417 declares that if this macro is called by the name
-LJMP, it has a nominal value of 2, and 2 will be returned
-for p(0, 1) or p(0, 0) or <b>$n</b>
-
-<p>
-Line 418 will generate a 24-bit structure with the nominal call
-value <b>$n</b> in the first 8 bits whenever the macro is expanded.
+Line 418 generates a 24-bit instruction with the callname latent
+<b>$n</b> or p(0, 0) in the first 8 bits
 
 <p>
 The second field of the i$long_jump form is given the value of the
-first actual argument subfield. That is macro name plus numbers: p(1, 1)
+first actual argument subfield,  p(1, 1)
 
 <p>
-Line 419 ends the macro.
+Line 419 ends the $proc macro
 
 <p>
-Line 421 is not listed because it directed the assembler
-to stop listing.
+Line 523 starts another $proc macro called p
 
 <p>
-Line 522 directs the assembler to list the include file.
+Line 524: callname nop has a latent value 0
 
 <p>
-Line 523 declares another procedural macro called P
+Line 525: callname ret has a latent value 34
 
 <p>
-Line 524 says that if P is called by the name NOP, $n is 0.
+Line 526: callname reti has a latent value 50.
 
 <p>
-Line 525 says that if P is called by the name RET, $n is 34.
-
-<p>
-Line 526 says that if P is called by the name RETI, $n is 50.
-
-<p>
-Line 527 generates one data word with the value $n.
-The data word is 8 bits in size.
+Line 527 generates one 8-bit data word with latent callname value
+$n or p(0, 0)
 
 <p>
 Line 528 ends of the macro.
 
 <p>
-Line 530 is not listed. It directed the assembler to stop
-listing the include file.
-
-<p>
 The line numbers step down because they are line numbers
-of the main file, not an include file.
+of the main file, not the include file which is longer
 
 <p>
-Line 3 is an LJMP (long jump, direct address) to location
-for.joy.
+Line 3 is a long jump to location for.joy
 
 <p>
 Line 4 is a buffer of 1000*address quantum, = 1000 bytes.
@@ -10454,14 +10318,13 @@ Line 6 is for.joy which is 1000+3 bytes beyond the start
 of the assembly. for.joy calls for.more
 
 <p>
-Line 9 is for.more
-<p>
-Line 10 is a 8051 hardware NOP instruction (not a $nop directive).
-<p>
-Line 11 is a RET (return) instruction.
+Line 10 is a 8051 hardware nop instruction (not a $nop directive)
 
 <p>
-Line 7 is a RETI (interrupt return instruction).
+Line 11 is a return instruction
+
+<p>
+Line 7 is an interrupt return instruction
 <pre>
 
 
@@ -10486,7 +10349,7 @@ STERM=.
   :                        524: nop*    $name   0        
   :                        525: ret*    $name   022
   :                        526: reti*   $name   032
-  :                        527:         +       $n
+  :                        527:         +       $n:s
   :                        528:         $end
   :                        529:         
   :                        2: 
@@ -10506,22 +10369,24 @@ Object Code 89 Bytes: 0 Errors: 0 Undefined Labels
 </pre>
 <p>
 A new layer or frame of the label table is constructed in
-subassembly, and removed at the end of subassembly. Labels
+subassembly, and removed at the end of subassembly.<br>Labels
 declared in the macro expansion are not visible to more 
-inclusive assembly layers except by design. Labels are 
-unique in their subassembly layer (macro depth). 
+inclusive assembly layers except by design.<br>Labels are 
+unique within their subassembly layer (macro depth). 
 
 <p>
-Where more than one assembly layer has declared a label with
-the same name, references to the label resolve to the declaration
-in the most deeply nested macro.
+Where more than one assembly layer has declared a label
+with the same name,<br>references resolve to the synonym
+at the most deeply nested macro level
 
 <p>
-The subassembly can access all the labels that currently exist.
+The subassembly has in scope all the labels that currently exist,
+and can set labels at less deep macro depth than itself,<br>
+but on reference only sees the synonym closest in depth to itself
 
 <p>
 To make a label more permanent than the macro expansion 
-which declares it, asterisk(s) are suffixed to the label, 
+which declares it, asterisk(s) are suffixed to the label,<br>
 one for each subassembly layer to which the label is promoted:
 <pre>
 
@@ -10554,12 +10419,12 @@ Actual parameters can be included in labels names in quotes.
 It has one more asterisk than the macro depth.
 
 <p>
-"labely" isn't visible outside the macro expansion.
+"labely" is not visible outside the macro expansion.
 
 
 <p>
 If a $proc macro has forward references to local labels, the macro must
-be scanned twice on the second assembly pass. These $procs are called
+be scanned twice on the second assembly pass.<br>These $procs are called
 two-pass $procs. They are marked by an asterisk argument of asterisk *
 on the $proc line:
 <pre>
@@ -10576,8 +10441,8 @@ StackOk:
 </pre>
 <p>
 The label StackOK is not exported from the macro expansion. Therefore
-it stopped existing when the macro exited on the first assembly pass.
-So the macro needs a preliminary pass on the second main assembly pass.
+it stopped existing when the macro exited on the first assembly pass.<br>
+The macro needs a preliminary pass on the second main assembly pass.
 See also  <a href="#u2passproc">10.2.2.6: The Two-pass $proc</a>
 
 <p>
@@ -15502,7 +15367,7 @@ language line.
 
 	       
 <p>
-No assumption that the machine has a word size like
+No assumption is made that the machine has a word size like
 8, 16, 32 or 64, or that its address quantum is an 8-bit byte.<br>
 That information is retrieved from macro text in header files
 
@@ -16215,7 +16080,7 @@ derived from
 
 	a field size in bits in a $record structure, or<br><br>
 	
-	the subfunction 0..192 of a $set directive
+	the subcommand 0..192 of a $set directive
 	</blockquote>
 
 These inputs are the total field size of the floating value.
