@@ -1929,7 +1929,8 @@ Others govern conditional assembly
 And other directives frame macros
 
 <p>
-All labels internal to masmx, <a href="#Directives">directives plus subfunction names</a> and
+All labels internal to masmx,
+<a href="#Directives">directives plus masmx-supplied subcommand names</a> and
 <a href="#ifunction">masmx internal functions</a> may <i>always</i> be referenced in lowercase.<br>
 With <a href="#option_k">option -k</a> masmx-supplied names may <i>only</i> be referenced in lowercase
 
@@ -3128,7 +3129,7 @@ See <a href="#plist">8.38: $plist Directive</a>,
 
 <p>
 An actual argument to a <b>$proc</b> macro may be placed in the command
-field of it is a command, for example a further macro name.
+field if it is a command, for example a further macro name.
 
 <p>
 This extract is from macro language illustrated at
@@ -3159,8 +3160,8 @@ $proc macros are also described in <a href="#proc">8.38 $proc Directive</a> and
 <a      name="xargument"/>
 <h3>4.4.1 Argument Expressions</h3>
 
-An argument expression generates a value which fits a target field,
-for example an operand field of an instruction
+An argument expression generates a value,
+for example an instruction operand address
 <pre>
 
 		lwz	r6, STORAGE_WORD_ADDRESS	; r6 and STORAGE_WORD_ADDRESS are operand expressions
@@ -3169,11 +3170,14 @@ for example an operand field of an instruction
 
 <p>
 Argument field expressions may have any tokens and operators which
-constant expressions have, except for words-size tags
+constant expressions have
 
 <p>
-The size of the expression value is its target field size in the
-instruction or structure at the command field
+The size of the expression value is determined by the target field size
+within the instruction or structure named at the command field
+
+<p>
+Assembly macro text and link macro text may range-check the argument value
 
 
 <a      name="largument"/>
@@ -3187,8 +3191,15 @@ of a literal operand is placed in the address field of the instruction
 
 </pre>
 
-The instruction contains the <i>address</i> of the 64-bit constant 0FFFC0000A000C000.<br>
+The instruction contains the <i>address</i>
+of the 64-bit constant 0FFFC0000A000C000
+
+<p>
 The constant is generated at the end  of the program section where ".literal_pool_name" is declared.
+
+<p>
+Assembly macro text and link macro text may range-check the literal
+address against the size of the instruction operand address field
 
 <p>
 See <a href="#sections">7: Constructing Program Sections</a>,
@@ -18503,7 +18514,7 @@ LICENCE NOTE
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with masm.7r3.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+    along with masmx.7r3.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
 
 </i>
 </pre>
