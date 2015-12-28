@@ -7489,6 +7489,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         if (x == 'E') guard_pattern = 0xE0;
                         if (x == 'F') guard_pattern = 0xC0;
                         if (x == 'G') guard_pattern = 0x80;
+                        if (x == 'H') guard_pattern = 0;
                      }
 		     else if ((x > 0x60) && (x < 0x7B))
                      {
@@ -8731,6 +8732,7 @@ main(int argc, char *_argv[])
                 if (j == 'E') guard_pattern = 0xE0;
                 if (j == 'F') guard_pattern = 0xC0;
                 if (j == 'G') guard_pattern = 0x80;
+                if (j == 'H') guard_pattern = 0;
             }
             if (j == '+') list = 1;
          }
@@ -9037,6 +9039,11 @@ main(int argc, char *_argv[])
 
          *(flag_box *) selector = initial_flags;
          *(flag_box *) uselector = initial_uflags;
+
+         if (uselector['E'-'A']) guard_pattern = 0xE0;
+         if (uselector['F'-'A']) guard_pattern = 0xC0;
+         if (uselector['G'-'A']) guard_pattern = 0x80;
+         if (uselector['H'-'A']) guard_pattern = 0;
 
          #ifdef ZERO_CODE_POINT
          zero_code_point = DEFAULT_ZERO_CODE_POINT;

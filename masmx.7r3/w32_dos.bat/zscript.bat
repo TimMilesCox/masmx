@@ -690,4 +690,6 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz overlap ..\test.zo3\overlap.txo -lok > ..\text.zo3\overlap.txt
 ..\masmz targ ..\test.zo3\targ -lok > ..\text.zo3\targ.txt
 ..\masmz tarq ..\test.zo3\tarq -lok > ..\text.zo3\tarq.txt
+..\masmx rounders ..\test.zo3\roundere -lokE > ..\text.zo3\roundere.txt
+..\masmx rounders ..\test.zo3\rounderg -lokG > ..\text.zo3\rounderg.txt
 

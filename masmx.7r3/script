@@ -706,6 +706,8 @@ rm ../text.o3/*
 ../masmx pxar ../test.o3/pxar -lyok > ../text.o3/pxar.txt
 ../masmx targ ../test.o3/targ -lyok > ../text.o3/targ.txt
 ../masmx tarq ../test.o3/tarq -lyok > ../text.o3/tarq.txt
+../masmx rounders ../test.o3/roundere -lyokE > ../text.o3/roundere.txt
+../masmx rounders ../test.o3/rounderg -lyokG > ../text.o3/rounderg.txt
 
 ../linkpart
 ../coldfire
