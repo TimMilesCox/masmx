@@ -96,9 +96,7 @@ of words or bytes, whichever the target address quantum is)
 Memories this large are not immediately expected.
 However very large address spaces are often populated in part,<br>
 with system memory at low-order addresses and boot or peripheral logic
-at the highest addresses.<br>No force of convention can prevent a a semiconductor supplier
-from devising, for example, a 72-bit address space<br> where the 8 high-order bits select
-among memory and peripheral buses
+at the highest addresses
 
 </blockquote>
 </div>
@@ -159,7 +157,7 @@ as possible are executed.
 Language compilers can be reinvented to generate a common macro-assembly language for all targets<br>
 See <a href="#roadmap">Appendix C: Road Map</a>, <a href="#languages">Appendix D: High Level Languages</a><br>
 Compiler/target portation becomes instantaneous<br>
-Language maps to macro code written in open text for instruction economy and efficiency<br>
+Language maps to target-independent macro names. These macro names map to target-specific macro text<br>
 Any PC has a developer toolchain for any target
 </blockquote>
 </div>
@@ -17220,6 +17218,7 @@ with the <b>$equf</b> directive
 <p>
 Labels of type <b>$equf</b> are generated in bit-aligned structures <b>$record</b>..<b>$root</b>
 
+<p>
 Each bit-aligned field is labelled with address, bit offset, bit size, signed attribute
 and optionally base-displacement pointer with a single label
 
@@ -17506,6 +17505,7 @@ The following example concerns a target architecture with
 more than one instruction size for operands in register or
 address space, with or without pointer offset
 
+<p>
 Instruction formats have changed on the second pass as a result
 of function macros which were not expanded on the first path.
 There is then a conflict between the literal table start address
@@ -17522,7 +17522,9 @@ __FORMAT* $set	7*/3++2
 
 </pre>
 
-In this case the function  must be a two-pass function and then the
+In this case the function must assemble on the first assembly pass
+as well as the second (the argument of a single * on <b>$func</b>
+directive suppressed first-pass assembly). Then the
 second assembly pass generates code matching the size estimated in
 the first assembly pass
 <pre>
@@ -18484,7 +18486,7 @@ Assistance can be requested at masmx@gmx.ch
 <p>
 Tim Cox
 <p>
-+41 78 629 86 11
++41 76 383 33 49
 <p>
 24. April 2015
 
