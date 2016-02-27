@@ -3959,16 +3959,22 @@ static void lproduce(int bits, char unary, line_item *item, txo *image)
 
 static void record_bits(int bits)
 {
-   object		*p = insert_qltable("$bits", bits, SET);
+   int			 aside = masm_level;
+   object		*p;
 
+   masm_level = 0;
+   p = insert_qltable("$bits", bits, SET);
 
    if (p)
    {
       p->l.valued = SET;
+      p->l.r.i = 0;
       p->l.value = zero_o;
       quadinsert(bits, &p->l.value);
    }
    else flag("$bits not added");
+
+   masm_level = aside;
 }
 
 
