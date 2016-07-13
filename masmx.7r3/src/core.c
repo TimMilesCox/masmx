@@ -9222,6 +9222,12 @@ main(int argc, char *_argv[])
       low = q->base;
       high = q->loc;
 
+      if ((selector['d'-'a']) && ((q->flags | q->relocatable) == 0) && (q->breakpoint))
+      {
+         low += q->runbank - q->base;
+         high += q->runbank - q->base;
+      }
+
       #ifdef GBASIS
       if (((q->flags & 129) == 128)
       &&  ( q->relocatable  ==   0))
