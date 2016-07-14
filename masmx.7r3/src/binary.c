@@ -323,7 +323,8 @@ static int load_binary_summary(char *p)
    if (((selector['b'-'a']) && ((q->flags & 1) == 0))
    ||  (q->bias)) q->runbank += q->loc;
 
-   if (selector['d'-'a']) q->base = low;
+   if ((selector['d'-'a']) && ((q->flags | q->relocatable) == 0)) q->base = low;
+
    q->loc = high;
 
    if ((x == counter_of_reference) && (q->flags & 1)) loc = high;
