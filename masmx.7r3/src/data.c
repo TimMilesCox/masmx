@@ -523,7 +523,6 @@ static object		*pointer_array[HASH];
 #endif
 
 #ifdef SYNONYMS
-static int		 stem_index;
 #ifdef STRUCTURE_DEPTH
 static object		*stem_pointer;
 

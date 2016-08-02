@@ -796,6 +796,12 @@ movea.w* $name	3
 movea.l* $name	2
 movea*	$name	movea.l
 
+"$GO"	$set	$iform(p(1, 2))
+"$HO"	$set	$GO**7	
+"$AO"	$set	$GO/*3
+
+	$trace	$t(p(1, 2))
+
 	$if	$t(p(1, 2))=$a_reg
 "$FO"	$set	$iform(p(1, 1))
 "$MO"	$set	$FO**7
@@ -828,6 +834,8 @@ movea*	$name	movea.l
 	$flag	anomaly no operand style
 	$endif
 	$else
+	$trace	$HO
+	$trace	$AO
 	$flag	movea destination must be a0..a7
 	$endif
 	$end

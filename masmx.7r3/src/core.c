@@ -742,21 +742,21 @@ static long rfunction(int v,
             {
                if (memcmp(d, l->l.name, h))
                {
+                  if (selector['q'-'a']) printf("miss %s\n", l->l.name);
                }
                else
                {
+                  if (selector['q'-'a']) printf("hit %s\n",  l->l.name);
+
                   limit = "";
 
                   if (symbol == '(')
                   {
                      limit = edge(&l->l.name[h], ",)");
                   }
-                  else
+                  else if (l->l.name[h] == ',')
                   {
-                     if (l->l.name[h] == ',')
-                     {
-   	                limit = edge(&l->l.name[h+1], ",)");
-                     }
+   	             limit = edge(&l->l.name[h+1], ",)");
                   }
 
                   if (*limit == ')') i++;

@@ -81,11 +81,17 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
 
    char			*candidate, *tabled, *forward = name2;
 
-   register int		 symbol;
+   int			 symbol;
+
    int			 b4 = name2 - name;
+   int			 indication = 0;
 
+   object		*indicated = NULL;
 
+   #if 0
    stem_pointer = NULL;
+   stem_length = 0;
+   #endif
 
    while (sr)
    {
@@ -109,9 +115,10 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
       {
 	 if (*label_margin == '(')
 	 {
-
-            stem_pointer = sr;
 	    load_qualifier(label_margin, margin);
+
+            indication = label_highest_byte;
+            /* if (indicated == NULL) */ indicated = sr;
 
 	    if ((*label_margin == sterm) && (label_margin != margin))
             {
@@ -139,8 +146,8 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
 	       symbol = *forward++;
 	       if (!symbol)
 	       {
-		  if (!(symbol ^= *tabled)) return sr;
-		  break;
+                  if (*tabled) break;
+		  return sr;
 	       }
 	       if (symbol ^= *tabled++) break;
 	    }
@@ -151,9 +158,11 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
 	    {
 	       if (*label_margin == '(')
 	       {
-                  stem_pointer = sr;
 		  load_qualifier(label_margin, margin);
-		     
+   
+                  indication = label_highest_byte;
+                  /* if (indicated == NULL) */ indicated = sr;
+   
 		  if ((*label_margin == sterm) && (label_margin != margin))
 		  {
      	             load_trailer(label_margin, margin);
@@ -187,11 +196,14 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
       sr = (object *) sr->l.along;
    }
 
-   if (stem_pointer)
+   #ifdef SYNONYMS
+   if (indication)
    {
       stem_length = label_highest_byte - b4;
+      stem_pointer = indicated;
       return (object *) &child_synonyms;
    }
+   #endif
 
    return NULL;
 }
