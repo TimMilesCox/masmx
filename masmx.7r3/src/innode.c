@@ -84,14 +84,9 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
    int			 symbol;
 
    int			 b4 = name2 - name;
-   int			 indication = 0;
 
    object		*indicated = NULL;
 
-   #if 0
-   stem_pointer = NULL;
-   stem_length = 0;
-   #endif
 
    while (sr)
    {
@@ -117,8 +112,7 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
 	 {
 	    load_qualifier(label_margin, margin);
 
-            indication = label_highest_byte;
-            /* if (indicated == NULL) */ indicated = sr;
+            indicated = sr;
 
 	    if ((*label_margin == sterm) && (label_margin != margin))
             {
@@ -160,8 +154,7 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
 	       {
 		  load_qualifier(label_margin, margin);
    
-                  indication = label_highest_byte;
-                  /* if (indicated == NULL) */ indicated = sr;
+                  indicated = sr;
    
 		  if ((*label_margin == sterm) && (label_margin != margin))
 		  {
@@ -197,7 +190,7 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
    }
 
    #ifdef SYNONYMS
-   if (indication)
+   if (indicated)
    {
       stem_length = label_highest_byte - b4;
       stem_pointer = indicated;
