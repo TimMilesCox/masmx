@@ -6097,7 +6097,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                
                if (pass)
                {
-                  if (j != BLANK) checkwave(&item, thislabel);
+                  if (j != BLANK) checkwave(&item, thislabel, x);
                }
 
                thislabel->l.value = item;

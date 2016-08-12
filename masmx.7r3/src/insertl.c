@@ -21,29 +21,68 @@
 *******************************************************************/
 
 
-
-
-static unsigned long checkwaver(line_item *v, object *o)
+static void checkwaveb(line_item *v, object *o)
 {
-   unsigned long		check = (v->i[0] ^ o->l.value.i[0])
-				      | (v->i[1] ^ o->l.value.i[1])
-				      | (v->i[2] ^ o->l.value.i[2])
-				      | (v->i[3] ^ o->l.value.i[3])
-				      | (v->i[4] ^ o->l.value.i[4])
-				      | (v->i[5] ^ o->l.value.i[5]);
-
-   return check;
-}
-
-static void checkwave(line_item *v, object *o)
-{
-   unsigned long		 check = checkwaver(v, o);
+   unsigned long		 check = (v->i[4] ^ o->l.value.i[4])
+				       | (v->i[5] ^ o->l.value.i[5]);
 
    if (check)
    {
       printf("\n");
-      print_item(&o->l.value);
-      print_item(v);
+
+      if (octal)
+      {
+         printf("%0*lo, %lo\n", apw, qextractv(o), quadextractx(&o->l.value, 2));
+         printf("%0*lo, %lo\n", apw, quadextract(v), quadextractx(v, 2));
+      }
+      else
+      {
+         printf("%0*lX, %lX\n", apw, qextractv(o), quadextractx(&o->l.value, 2));
+         printf("%0*lX, %lX\n", apw, quadextract(v), quadextractx(v, 2));
+      }
+  
+      flagp(o->l.name, "base + displacement altered");
+   }
+}
+
+static unsigned long checkwaver(line_item *v, object *o)
+{
+   unsigned long		 check = (v->i[0] ^ o->l.value.i[0])
+				       | (v->i[1] ^ o->l.value.i[1])
+				       | (v->i[2] ^ o->l.value.i[2])
+				       | (v->i[3] ^ o->l.value.i[3])
+				       | (v->i[4] ^ o->l.value.i[4])
+				       | (v->i[5] ^ o->l.value.i[5]);
+
+   return check;
+}
+
+static void checkwave(line_item *v, object *o, int section_flags)
+{
+   unsigned long		 check = (section_flags & 1) ?
+				 checkwaver(v, o) : (v->i[5] ^ o->l.value.i[5]);
+
+   if (check)
+   {
+      if (section_flags & 1)
+      { 
+         printf("\n");
+         print_item(&o->l.value);
+         print_item(v);
+      }
+      else
+      {
+         if (octal)
+         {
+            printf("%0*lo\n", apw, qextractv(o));
+            printf("%0*lo\n", apw, quadextract(v));
+         }
+         else
+         {
+            printf("%0*lX\n", apw, qextractv(o));
+            printf("%0*lX\n", apw, quadextract(v));
+         }
+      }
 
       flagp(o->l.name, "displacement altered");
    }
@@ -423,10 +462,8 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
       {
          if (background_pass)
          {
-            if ((type == LOCATION) || (base_displacement))
-            {
-               checkwave(v, o);
-            }
+            if       (type == LOCATION) checkwave(v, o, actual->flags);
+            else if (base_displacement) checkwaveb(v, o); 
          }
          else
          {

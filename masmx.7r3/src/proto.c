@@ -148,6 +148,7 @@ static void record_bits(int bits);
 static void brake(char *what, char *why);
 static void pack_ltable(object *toplabel);
 static void embed_procedure(int type, char *line, char *argument);
+static unsigned long checkwaver(line_item *v, object *o);
 
 /**************************************************************************
 
