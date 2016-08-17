@@ -1,6 +1,8 @@
 	$path		../smaragd.68k
+	$list		0
 	$include	coldfire.def
 	$include	record_x.def
+	$list
 	$path
 
 p	$proc

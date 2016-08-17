@@ -529,6 +529,14 @@ static int record(object *l, char *data, int subfunction)
    if (selector['p'-'a']) printf("$record %s nest %d active %d origin %ld\n",
        l->l.name, nest, active_x, origin);
 
+   if ((actual->flags & 129) == 1)
+   {
+      note("assembling $record data in giant address space without automatic base index");
+      note("caution: data names in a $record do not contain giant adresses");
+      note("load and use a base index override referencing these data names:  NAME,Rx");
+      note("point the base index register to the start of the $record structure");
+   }
+
    nest++;
 
    for (;;)
