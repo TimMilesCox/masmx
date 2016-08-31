@@ -257,10 +257,22 @@ static void switch_locator(char *p, char *param)
                      = (long) apply_value(counter_of_reference);
                   }
 
+                  forward_reference = 0;
+
                   ((value *) actual->runbank)->value
                   = *xpression(limit2+1, limit, NULL);
 
-                  actual->flags |= 3;
+                  if (forward_reference)
+                  {
+                      flagp1("forward reference may not be used as giant section origin");
+                  }
+
+                  if (mapx->m.l.y)
+                  {
+                      flag("relocatable value may not be used as giant section origin");
+                  }
+ 
+                 actual->flags |= 3;
                }
             }
             else
@@ -773,7 +785,7 @@ static long rfunction(int v,
 
          q = actual;
          j = loc;
-         x = counter_of_reference;
+         x = counter_of_reference | 128;
          h = 0;
          l = NULL;
 
@@ -836,7 +848,7 @@ static long rfunction(int v,
                breakpoint_base = &((value *) q->runbank)->value;
                item = xpression(STACK_TOP_VALUE, NULL, NULL);
 
-               if ((q->flags & 128) || (d == NULL))
+               if ((q->flags & 128) || (d == NULL) || ((x) && (l) && (l->l.valued == EQUF)))
                {
                   /*********************************************
 
@@ -3284,7 +3296,16 @@ static line_item *xpression(char *s, char *e, char *param)
    }
 
 
-   if (!pass) return sp;
+   if (!pass)
+   {
+      if (l)
+      {
+         if (l->l.valued == UNDEFINED) forward_reference = 1;
+      }
+      else forward_reference = 1;
+
+      return sp;
+   }
 
    if (l)
    {
@@ -4973,7 +4994,7 @@ static void embed_procedure(int type, char *line, char *argument)
 
    for (;;)
    {
-      i = getline(slipline, 250);
+      i = getline(slipline, 252);
       if (!i) continue;
          
       if (i < 0)
@@ -4982,6 +5003,8 @@ static void embed_procedure(int type, char *line, char *argument)
          flag_either_pass(name[0], "procedure auto end. assembly abandoned");
          exit(-112);
       }
+
+      if (i > 250) brake(slipline, "macro text line > 250 characters, assembly abandoned");
          
       directive = getop(slipline);
       j = TEXT_IMAGE;
@@ -6031,7 +6054,11 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
          }
 
          #ifdef RECORD
-         if (known == RECORD) x = EQUF;
+         if (known == RECORD)
+         {
+            if ((subfunction ^ BRANCH)
+            ||  (loc ^ branch_restart)) branch_record &= (1 << active_x)-1;
+         }
          #endif
       }
 
@@ -6045,7 +6072,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
       &&  (known ==    BRANCH)
       &&  (branch_present & (1 << active_x))
       &&  (loc == branch_high[active_x])
-      &&  (depx = active_instance[active_x])) loc = qextractv(depx);
+      &&  (depx = active_instance[active_x])) loc = active_origin[active_x];
 
       #endif
 	    
@@ -7545,16 +7572,24 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                   if ((branch_present & (1 << active_x))
                   &&  (sr = active_instance[active_x])
-                  &&  (loc == qextractv(sr))
+                  &&  (loc == active_origin[active_x]) 
                   &&  (thislabel))
                   {
                      outstanding = 1;
+                     if ((pass) && (selector['p'-'a']))
+                     {
+                        printf("[%lx %s %x %x]\n", loc, sr->l.name, sr->l.valued, active_x);
+                     }
                   }
 
                   branch_present |= (1 << active_x);
                }
 
-               if (thislabel) active_instance[active_x++] = thislabel;
+               if (thislabel)
+               {
+                  active_origin[active_x] = loc;
+                  active_instance[active_x++] = thislabel;
+               }
                else flagp1("trees and branches must have names");
 
 	       break;
@@ -7574,6 +7609,10 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                   if (branch_present & (1 << active_x))
                   {
+                     if ((pass) && (selector['p'-'a']))
+                     {
+                        printf("[%lx ? %lx:%x]\n", loc, branch_high[active_x], active_x);
+                     }
                      if (loc > branch_high[active_x])
                      {
                         branch_high[active_x] = loc;
@@ -8256,8 +8295,13 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                #ifdef RECORD
             case RECORD:
+
                if (masm_level) fields(param);
-               argument = substitute_alternative(argument, param);
+
+               #if 1
+               if (argument) argument = substitute_alternative(argument, param);
+               #endif
+
                record(thislabel, argument, subfunction);
                break;
                #endif

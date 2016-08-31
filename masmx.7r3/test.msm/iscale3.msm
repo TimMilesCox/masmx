@@ -9,12 +9,17 @@
 
 $(1::*"$base(1)")
 $(3::*"$base(3)")
-$(36::*__end1)
+. $(36::*__end1)
 
-	$include,$binary	../result.txo/gframe2
+	$include,$binary	../result.txo/gframe2	$(1,3)
 
-	$include,$binary	../result.txo/gscale23
-	$include,$binary 	../result.txo/gscale24
+	$include,$binary	../result.txo/gscale23	$(1,3)
+	$include,$binary 	../result.txo/gscale24	$(1,3)
 	$store			"../test.o3/iscale3.txo"
 $(1)
 __end1
+$(36::*__end1)
+	$include,$binary	../result.txo/gframe2	$(36)
+	$include,$binary	../result.txo/gscale23	$(36)
+	$include,$binary	../result.txo/gscale24	$(36)
+

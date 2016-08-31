@@ -420,10 +420,11 @@ static int		 label_highest_byte;
 
 
 #ifdef STRUCTURE_DEPTH
-static int active_x, branch_present;
-static object *active_instance[STRUCTURE_DEPTH];
-static unsigned long  branch_high[STRUCTURE_DEPTH];
-static int treeflag;
+static int		 active_x, branch_present;
+static object		*active_instance[STRUCTURE_DEPTH];
+static unsigned long	 active_origin[STRUCTURE_DEPTH];
+static unsigned long	 branch_high[STRUCTURE_DEPTH];
+static int		 treeflag;
 #endif
 
 static int masm_level, pass, background_pass;
@@ -562,11 +563,18 @@ static line_item		 ostac[XPRESSION+1];
 static line_item		*sp = &ostac[XPRESSION];
 #endif
    
+static int			 forward_reference;
+
 static int		 	 file_arguments;
 static char			*filename[FILE_ARGUMENTS];
 
 static char			 path[120];
 
+#ifdef RECORD
+static int			 branch_record;
+static int			 record_nest;
+static long			 branch_restart;
+#endif
 
 
 /**************************************************************************

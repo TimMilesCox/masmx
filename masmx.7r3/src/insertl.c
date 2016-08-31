@@ -352,7 +352,7 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
    #ifdef STRUCTURE_DEPTH
 
    if ((active_x) && ((type == LOCATION)
-                   || (type == EQUF) /* || (type == BLANK) */))
+                   || (type == EQUF) || (type == RECORD) /* || (type == BLANK) */))
    {
       o = findlabel_in_node();
       #ifdef UNDERWATER_DEBRIS
@@ -438,6 +438,21 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
 
       *************************************/
  
+      #ifdef RECORD
+      if (type == RECORD)
+      {
+         if ((branch_record == 0) && (record_nest == 0)) base_displacement = 1;
+         type = EQUF;
+
+         if (actual->flags & 128)
+         {
+            vnew = *v;
+            v = &vnew;
+            v->b[RADIX/8-5] = actual->rbase;
+         }
+      }
+      #endif
+
       if ((x = o->l.valued) && (x ^ BLANK))
       {
          if (type ^ x)
@@ -556,7 +571,8 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
          #ifdef STRUCTURE_DEPTH
          if ((active_x)
          && ((type == LOCATION)
-          || (type == EQUF) /* || (type == BLANK) */))
+         || (type == EQUF)
+         || (type == RECORD) /* || (type == BLANK) */ ))
          {
             inslabel(o);
          }

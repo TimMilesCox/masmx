@@ -29,10 +29,10 @@
 static int precord(object *l, char *line, char **data, int nest)
 {
    static long		 bits;
+   static int		 rbase;
    static int		 positions;
    static int		 cache_line;
    static long		 address;
-   static long		 rbase;
    static linkage	 rflags;
    static line_item	 stage;
 
@@ -55,6 +55,12 @@ static int precord(object *l, char *line, char **data, int nest)
    char                 *argument;
    char			*p;
 
+   long			 branch_mask = (1 << active_x) - 1;
+
+   long			 pointer;
+
+   int			 position;
+
 
    if (line == NULL)
    {
@@ -65,7 +71,7 @@ static int precord(object *l, char *line, char **data, int nest)
       #ifdef RECORD_BRANCH
       if (data)
       {
-         bits = (long) data;
+         bits = (long) data & 0x7FFFFFFF;
          if (nest < 0)
          {
             if (y = cache_line - positions)
@@ -288,14 +294,29 @@ static int precord(object *l, char *line, char **data, int nest)
 
    x = expression(op, argument, NULL);
 
+   #ifdef BRANCH
+   if (x) branch_record &= branch_mask;
+
+   /*****************************************************
+
+	an intervening displacement means
+	a following nest $record,$branch
+	may not be a branch overlay on a
+	previous $record,$branch
+	
+   *****************************************************/
+   #endif
+
    if ((y = line[0]) && (y ^ ' '))
    {
-      k = insert_qltable(line, bits / word * quanta + address, EQUF);
+      pointer = bits / word * quanta + address;
+      position = bits % word;
+      k = insert_qltable(line, pointer, EQUF);
 
       k->l.r = rflags;
-      quadinsert1(rbase,       &k->l.value);         
-      quadinsert3(bits % word, &k->l.value);
-      quadinsert4(x,           &k->l.value);
+      quadinsert1(rbase,    &k->l.value);         
+      quadinsert3(position, &k->l.value);
+      quadinsert4(x,        &k->l.value);
       y = uselector['Y'-'A'];
       if (symbol == 's') y = 1;
       if (symbol == 'u') y = 0;
@@ -460,10 +481,7 @@ static int precord(object *l, char *line, char **data, int nest)
 
 static int record(object *l, char *data, int subfunction)
 {
-   static int            nest;
-
    #ifdef RECORD_BRANCH
-   static int		 branch_record;
    static long		 offset[STRUCTURE_DEPTH];
    static long		 record_high[STRUCTURE_DEPTH];
    #endif
@@ -477,7 +495,7 @@ static int record(object *l, char *data, int subfunction)
    object		*o;
    char			*p;
 
-   char                  line[124];
+   char                  line[256];
 
    int			 active_b4 = active_x;
 
@@ -507,14 +525,21 @@ static int record(object *l, char *data, int subfunction)
 
    if (subfunction == BRANCH)
    {
-      if (selector['p'-'a']) printf("[SF]");
+      if (selector['p'-'a'] )
+      {
+         printf("[$%x:%lx:%lx:]\n", counter_of_reference,
+                                       loc,
+                                       record_high[active_x]);
+      }
+
       if ((branch_record & (1 << active_x))
+      &&  (loc == branch_restart)
       &&  (o = active_instance[active_x]))
       {
          l->l.value = o->l.value;
          loc = qextractv(o);
          outstanding = 1;
-         startp.p = offset[active_x]; 
+         startp.p = offset[active_x] | 0x80000000 ;
       }
 
       branch_record |= 1 << active_x;
@@ -522,12 +547,13 @@ static int record(object *l, char *data, int subfunction)
    else branch_record &= (-1 ^ (1 << active_x));
    #endif
 
+
    active_instance[active_x] = l;
-   offset[active_x] = origin = precord(l, NULL, startp.q, nest);
+   offset[active_x] = origin = precord(l, NULL, startp.q, record_nest);
    active_x++;
 
    if (selector['p'-'a']) printf("$record %s nest %d active %d origin %ld\n",
-       l->l.name, nest, active_x, origin);
+       l->l.name, record_nest, active_x, origin);
 
    if ((actual->flags & 129) == 1)
    {
@@ -537,7 +563,7 @@ static int record(object *l, char *data, int subfunction)
       note("point the base index register to the start of the $record structure");
    }
 
-   nest++;
+   record_nest++;
 
    for (;;)
    {
@@ -548,11 +574,12 @@ static int record(object *l, char *data, int subfunction)
          o = (object *) ((long) o + y);
          next_image[masm_level] = o;
          p = o->t.text;
+         y = o->t.length;
          y -= 2;
       }
       else
       {
-         y = getline(line, 122);
+         y = getline(line, 250);
          p = line;
       }
 
@@ -565,7 +592,7 @@ static int record(object *l, char *data, int subfunction)
 
       if (selector['p'-'a']) printf("%s>\n", p);
 
-      x = precord(l, p, &data, nest);
+      x = precord(l, p, &data, record_nest);
 
       if (x < 0) break;
    }
@@ -574,11 +601,12 @@ static int record(object *l, char *data, int subfunction)
    branch_record &= (1 << active_x) - 1;
    #endif
 
-   nest--;
+   record_nest--;
    active_x--;
    if (x == 0x80000000) x = 0;
+
    if (selector['p'-'a']) printf("%ld %d action complete nest %d active %d\n",
-                                  origin,  x, nest, active_x);
+                                  origin,  x, record_nest, active_x);
 
    if (active_x ^ active_b4)
    {
@@ -607,7 +635,7 @@ static int record(object *l, char *data, int subfunction)
          outstanding = 1;
       }
 
-      if (nest == 0) loc = qextractv(l) - (y - word + 1) / word * quanta;
+      if (record_nest == 0) loc = qextractv(l) - (y - word + 1) / word * quanta;
       else precord(l, NULL, (char **) (long) -y, -1);
 
       /*************************************************************
@@ -621,7 +649,13 @@ static int record(object *l, char *data, int subfunction)
    quadinsert4(-x, &l->l.value);
 
    l->l.valued = EQUF;
-   if (selector['p'-'a']) printf("end\n");
+   if (selector['p'-'a'])
+   {
+      if (octal) printf("%0*lo end\n", apw, loc);
+      else       printf("%0*lx end\n", apw, loc);
+   }
+
+   branch_restart = loc;
    return 0;
 }
 

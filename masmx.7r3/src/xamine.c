@@ -99,8 +99,8 @@ static void print_macrotext(int x, char *p, char *macro)
    char			 symbol;
    char			*q = (macro) ? macro : "sub";
 
-   if (skipping) printf("(skipped):::");
-   else          printf(":macro text:");
+   if (skipping) printf("[%d](skipped):::", x);
+   else          printf("[%d]:macro text:", x);
 
    while (x--)
    {

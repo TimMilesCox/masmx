@@ -206,7 +206,7 @@ extern unsigned _stklen = 32*1024;
 #endif
 
 #define	DISPLAY_Q
-#define ARRAY 8
+#define ARRAY 32
 
 #define DPA 24
 
