@@ -6598,22 +6598,25 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                   if (mapx->m.l.y & 128)
                   {
-                     flag("transfer target must be code "
-                          "loaded in this assembly");
+                     flag("transfer target must be a code "
+                          "location in this assembly");
 
                      return END;
                   }
 
                   x = mapx->m.l.rel;
-                  x &= 127;
 
                   if ((!x)
+                  /*
                   &&  (!(mapx->m.l.y & 1))
+                  */
                   &&  (locator[0].relocatable))
                   {
-                     flag("absolute transfer address in relocatable $(0)");
+                     flag("absolute transfer address assigned to relocatable $(0)");
                      return END;
                   }
+
+                  x &= 127;
 
                   #else
 
@@ -6845,6 +6848,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                            }
 
                            if (mapx->m.l.y) thislabel->l.r = mapx->m;
+                           thislabel->l.r.l.rel = mapx->m.l.rel;
 
                            if (mapx - b4)
                            {
@@ -9197,9 +9201,7 @@ main(int argc, char *_argv[])
    
 	    i = RADIX/8 - bytes;
 
-            if ((sr->l.r.l.rel)
-            ||  (sr->l.r.l.y)
-            ||  (!locator[0].relocatable))
+            if ((sr->l.r.l.rel) ||  (sr->l.r.l.y))
             {
                write(ohandle, "$", 1);
 	       pushh2(sr->l.r.l.rel & 127);
