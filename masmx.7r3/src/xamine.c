@@ -348,6 +348,51 @@ static char *first_at(char *data, char *mask)
    {
       if (!squote)
       {
+         #ifdef SQUARE
+         if (d == '(')
+         {
+            btype &= (1 << bdepth) - 1;
+            bdepth++;
+         }
+
+         if (d == ')')
+         {
+            if (bdepth)
+            {
+               bdepth--;
+               if (btype & (1 << bdepth)) flag("balancing brace is [ not (");
+               #if 1
+               data++;
+               continue;
+               #endif
+            }
+            #if 0
+            else flag("( missing before )");
+            #endif
+         }
+                  
+         if (d == '[')
+         {
+            btype |= (1 << bdepth);
+            bdepth++;
+         }
+
+         if (d == ']')
+         {
+            if (bdepth)
+            {
+               bdepth--;
+               if ((btype & (1 << bdepth)) == 0) flag("balancing brace is ( not [");
+               #if 1
+               data++;
+               continue;
+               #endif
+            }
+            #if 0
+            else flag("[ missing before ]");
+            #endif
+         }
+         #else
          if (btype == '[')
          {
             if (d == ']') btype = 0;
@@ -370,6 +415,7 @@ static char *first_at(char *data, char *mask)
          {
             if (d == '[') btype = '[';
          }
+         #endif
       }
 
       if (d == qchar)
@@ -384,7 +430,11 @@ static char *first_at(char *data, char *mask)
          }
       }
 
+      #ifdef SQUARE
+      if ((bdepth | squote) == 0)
+      #else
       if ((bdepth | squote | btype) == 0)
+      #endif
       {
 	 f = mask;
 	 while (e = *f++)

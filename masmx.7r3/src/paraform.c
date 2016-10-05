@@ -468,11 +468,49 @@ static char *substitute(char *search, char *param)
                      }
                   }
 
+                  #ifdef SQUARE
+                  if (symbol == '(')
+                  {
+                     btype &= (1 << inbe) - 1;
+                     inbe++;
+                  }
+
+                  if (symbol == ')')
+                  {
+                     if (inbe)
+                     {
+                        inbe--;
+                        if (btype & (1 << inbe)) flag("1:balancing brace is [ not (");
+                     }
+                     #if 0
+                     else flag("1:( missing before )");
+                     #endif
+                  }
+
+                  if (symbol == '[')
+                  {
+                     btype |= (1 << inbe);
+                     inbe++;
+                  }
+
+                  if (symbol == ']')
+                  {
+                     if (inbe)
+                     {
+                        inbe--;
+                        if ((btype & (1 << inbe)) == 0) flag("1:balancing brace is ( not [");
+                     }
+                     #if 0
+                     else flag("1:[ missing before ]");
+                     #endif
+                  }
+                  #else
                   if (!inquote)
                   {
                      if (symbol == '(') inbe++;
                      if (symbol == ')') inbe--;
                   }
+                  #endif
 
 	          if ((inquote | inbe) == 0)
 	          {
@@ -501,11 +539,50 @@ static char *substitute(char *search, char *param)
 
                inbe = 0;
                btype = 0;
+               inquote = 0;
 
 	       while (symbol = *vv++)
 	       {
                   if (!inquote)
                   {
+                     #ifdef SQUARE
+                     if (symbol == '(')
+                     {
+                        btype &= (1 << inbe) - 1;
+                        inbe++;
+                     }
+
+                     if (symbol == ')')
+                     {
+                        if (inbe)
+                        {
+                           inbe--;
+                           if (btype & (1 << inbe)) flag("2:balancing brace is [ not (");
+                        }
+                        #if 0
+                        else flag("2:( missing before )");
+                        #endif
+                     }
+                  
+                     if (symbol == '[')
+                     {
+                        btype |= (1 << inbe);
+                        inbe++;
+                     }
+
+                     if (symbol == ']')
+                     {
+                        if (inbe)
+                        {
+                           inbe--;
+                           if ((btype & (1 << inbe)) == 0) flag("2:balancing brace is ( not [");
+                        }
+                        #if 0
+                        else flag("2:[ missing before ]");
+                        #endif
+                     }
+                     #else
+
                      if (btype == '[')
                      {
                         if (symbol == ']') btype = 0;
@@ -519,6 +596,7 @@ static char *substitute(char *search, char *param)
                      {
                         if (symbol == '[') btype = '[';
                      }
+                     #endif
                   }
 
 	          if (symbol == qchar)
@@ -533,7 +611,11 @@ static char *substitute(char *search, char *param)
                      }
                   }
 
+                  #ifdef SQUARE
+                  if ((inquote | inbe) == 0)
+                  #else
 		  if ((inquote | inbe | btype) == 0)
+                  #endif
 	          {
 		     if (symbol ==   ' ') break;
 		     if (symbol ==   ',') break;
@@ -566,8 +648,46 @@ static char *substitute(char *search, char *param)
 		  {
                      if (!inquote)
                      {
+                        #ifdef SQUARE
+                        if (symbol == '(')
+                        {
+                           btype &= (1 << inbe) - 1;
+                           inbe++;
+                        }
+
+                        if (symbol == ')')
+                        {
+                           if (inbe)
+                           {
+                              inbe--;
+                              if (btype & (1 << inbe)) flag("3:balancing brace is [ not (");
+                           }
+                           #if 0
+                           else flag("3:( missing before )");
+                           #endif
+                        }
+
+                        if (symbol == '[')
+                        {
+                           btype |= (1 << inbe);
+                           inbe++;
+                        }
+
+                        if (symbol == ']')
+                        {
+                           if (inbe)
+                           {
+                              inbe--;
+                              if ((btype & (1 << inbe)) == 0) flag("3:balancing brace is ( not [");
+                           }
+                           #if 0
+                           else flag("3:[ missing before ]");
+                           #endif
+                        }
+                        #else
                         if (symbol == '(') inbe++;
                         if (symbol == ')') inbe--;
+                        #endif
                      }
 
 		     if (symbol == qchar)

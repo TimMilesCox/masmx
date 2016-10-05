@@ -135,7 +135,7 @@ static void switch_locator(char *p, char *param)
 
    if (*limit == ':')
    {
-      line_label = limit+1;
+      line_label = limit + 1;
       
       limit = first_at(line_label, ",:/)");
 
