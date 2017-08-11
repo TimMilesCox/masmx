@@ -1,16 +1,22 @@
-Preliminary	masmx.7r3	Distribution 01 July 2015
-___________	_________	_________________________
+Preliminary	masmx.7r3A	Distribution 10 August 2017
+___________	__________	___________________________
 
 
+
+
+	masmx.7r3A revises and makes more consistent
+	the assembly of hierarchically structured and
+	named code and data.
+	Earlier application code needs no changes
 
         _________________________________________________
         |       Copyright Tim Cox, 2015			|
 	|	TimMilesCox@gmx.ch			|
         |                                               |
-        |       This document describes the masmx.7r3   |
-        |        target-independent meta-assembler      |
+        |       This document describes the masmx.7r3A  |
+        |       target-independent meta-assembler       |
         |                                               |
-        |       The masmx.7r3 meta-assembler is free    |
+        |       The masmx.7r3A meta-assembler is free   |
         |       software licensed with the GNU General  |
         |       Public Licence Version 3                |
         |                                               |
@@ -111,9 +117,9 @@ LICENCE NOTE
     Copyright Tim Cox, 2015
     TimMilesCox@gmx.ch
 
-    This document describes the masmx.7r3 target-independent meta-assembler.
+    This document describes the masmx.7r3A target-independent meta-assembler.
 
-    masmx.7r3 is free software. It is licensed
+    masmx.7r3A is free software. It is licensed
     under the GNU General Public Licence Version 3
 
     You can redistribute it and/or modify masmx.7r3
@@ -121,12 +127,12 @@ LICENCE NOTE
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    masmx.7r3 is distributed in the hope that it will be useful,
+    masmx.7r3A is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with masmx.7r3.  If not, see <http://www.gnu.org/licenses/>.
+    along with masmx.7r3A.  If not, see <http://www.gnu.org/licenses/>.
 
 

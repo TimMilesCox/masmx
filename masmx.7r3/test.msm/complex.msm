@@ -3,18 +3,20 @@
 p	$proc
 one*	$name
 *	$tree
-left	two1
+way	two1
 index	$do	6,spray(index)	two2
 	$root
 	$end
 
 p	$proc
 two1*	$name
-*	$branch
+*	$tree
+left	$branch
 index	$do	4,bud(index)	three1
         $root
 right	$branch
 cusp	three2
+	$root
 	$root
 	$end
 
@@ -43,21 +45,21 @@ $(3:03000)
 first_high_index $set	stem()
 	+	first_high_index
 	+	stem(first_high_index)
-	+	stem(first_high_index):left:bud()
-second_high_index $set stem(first_high_index):left:bud()
+	+	stem(first_high_index):way:left:bud()
+second_high_index $set stem(first_high_index):way:left:bud()
 	+	second_high_index
-	+	stem(first_high_index):left:bud(second_high_index)
+	+	stem(first_high_index):way:left:bud(second_high_index)
 
-	+	stem(first_high_index):left:bud(second_high_index):;
+	+	stem(first_high_index):way:left:bud(second_high_index):;
 		shoot()
 
 third_high_index $set	;
-		stem(first_high_index):left:bud(second_high_index):;
+		stem(first_high_index):way:left:bud(second_high_index):;
 		shoot()
 
 	+	third_high_index
 
-	+	stem(first_high_index):left:bud(second_high_index):;
+	+	stem(first_high_index):way:left:bud(second_high_index):;
 		shoot(third_high_index)
 
 	+	stem(first_high_index):spray()
@@ -88,7 +90,7 @@ third_high_index $set	;
 
  + stem(first_high_index):spray(second_high_index):tendril(third_high_index)
 
-	+	stem(first_high_index):right:cusp:blossom()
-second_high_index $set stem(first_high_index):right:cusp:blossom()
+	+	stem(first_high_index):way:right:cusp:blossom()
+second_high_index $set stem(first_high_index):way:right:cusp:blossom()
 	+	second_high_index
-	+ stem(first_high_index):right:cusp:blossom(second_high_index)
+	+ stem(first_high_index):way:right:cusp:blossom(second_high_index)

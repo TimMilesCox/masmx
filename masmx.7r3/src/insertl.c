@@ -332,6 +332,14 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
    int			 x, size;
    int			 base_displacement = 0;
 
+   #ifdef STRUCTURE_DEPTH
+   object		*adhesionp
+			= (active_x) ? active_instance[active_x - 1]
+                                     : NULL;
+
+   int			 adhesion_level = -1;
+   int			 b4 = type;
+   #endif
 
    if (type == UNDEFINED) global = 0;
    else
@@ -351,15 +359,17 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
 
    #ifdef STRUCTURE_DEPTH
 
-   if ((active_x) && ((type == LOCATION)
-                   || (type == EQUF) || (type == RECORD) /* || (type == BLANK) */))
+   if ((adhesionp) && (global == adhesionp->l.passflag)
+   &&  (type) && (type ^ SET) && (type ^ BLANK))
    {
       o = findlabel_in_node();
-      #ifdef UNDERWATER_DEBRIS
-      global = 0;
-      #else
-      global = active_instance[active_x - 1]->l.r.l.xref;
-      #endif
+      adhesion_level = adhesionp->l.r.l.xref;
+      if (adhesion_level < 0) adhesion_level = 0;
+      global = adhesion_level;
+      if (uselector['B'-'A'])
+      printf("[L%x:A%x:G%x:V%x]%s:%s\n",
+              masm_level, adhesion_level, global, type,
+              adhesionp->l.name, name);
    }
 
    else
@@ -431,6 +441,15 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
    {
       if (type == BLANK) return o;
 
+      x = o->l.valued;
+
+      if (x == BLANK)
+      {
+         o->l.valued = type;
+         o->l.value = *v;
+         return o;
+      }
+
       /*************************************
 
 	$blank does not alter any label
@@ -453,7 +472,7 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
       }
       #endif
 
-      if ((x = o->l.valued) && (x ^ BLANK))
+      if (x)
       {
          if (type ^ x)
          {
@@ -482,20 +501,13 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
          }
          else
          {
-            if (o->l.valued == BLANK)
-            {
-               o->l.valued = type;
-            }
+            #ifdef BINARY
+            if (o->l.valued == UNDEFINED) o->l.valued = type;
             else
+            #endif
             {
-               #ifdef BINARY
-               if (o->l.valued == UNDEFINED) o->l.valued = type;
-               else
-               #endif
-               {
-                  flagp1p(o->l.name, "may not be restated");
-                  return o;
-               }
+               flagp1p(o->l.name, "may not be restated");
+               return o;
             }
          }
       }
@@ -569,16 +581,10 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
       else
       {
          #ifdef STRUCTURE_DEPTH
-         if ((active_x)
-         && ((type == LOCATION)
-         || (type == EQUF)
-         || (type == RECORD) /* || (type == BLANK) */ ))
-         {
-            inslabel(o);
-         }
+         if ((active_x) && (global == adhesion_level)
+         &&  (b4) && (b4 ^ SET) && (b4 ^ BLANK)) inslabel(o);
          else
          #endif
-
          {
             #ifdef HASH
 

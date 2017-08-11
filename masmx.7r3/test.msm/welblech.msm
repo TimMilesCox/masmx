@@ -1,12 +1,12 @@
 p	$proc
 yooz*	$name
 *	$tree
-yo*	$branch
+yo	$branch
 	+	7
 	+	8
 	+	9
 	$root
-ho*	$branch
+ho	$branch
 	+	12
 	$root
 	$root

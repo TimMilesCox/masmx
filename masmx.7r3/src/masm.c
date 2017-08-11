@@ -201,7 +201,7 @@ extern unsigned _stklen = 32*1024;
 #define VERSION	"7"
 
 #ifdef	SUPERSET
-#define REVISION "3"
+#define REVISION "3A"
 #else
 #define REVISION "3Z"
 #endif

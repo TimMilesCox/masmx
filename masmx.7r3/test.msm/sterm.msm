@@ -7,7 +7,7 @@ p3.1    $equ    32+1
 
 p*      $proc
 *       $tree
-times   $do     p(1),branch(times)*  q p(1, times), -p(1, times)
+times   $do     p(1),branch(times)  q p(1, times), -p(1, times)
         $root
         $end
 

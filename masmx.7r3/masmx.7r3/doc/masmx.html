@@ -10,7 +10,7 @@ The Next Revolution is Efficient Code
 
 <center>
 
-<h1>masmx.7r3</h1>
+<h1>masmx.7r3A</h1>
 
 <div	style="color:C0C0FF;font-family:optima;font-size:24">
 The Watchmaker's Craft of Programming
@@ -21,9 +21,9 @@ The Watchmaker's Craft of Programming
 <i>
 Copyright Tim Cox, 2015<br>
 
-This document describes the masmx.7r3 target-independent meta-assembler
+This document describes the masmx.7r3A target-independent meta-assembler
 <br>
-The masmx.7r3 meta-assembler is free software licensed with the GNU General Public Licence Version 3
+The masmx.7r3A meta-assembler is free software licensed with the GNU General Public Licence Version 3
 <br>
 The same licence encompasses all accompanying software and documentation <br>
 The full licence text is included with these materials<br>
@@ -44,8 +44,18 @@ masmx is a freeware meta-assembler for any target
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 
-<a href="http://timmilescox.github.io/masmx/">Downloads Page-----&gt;</a>
+<a	href="http://timmilescox.github.io/masmx/">-----&gt;masm7r3A Downloads Page</a>
+<a	style="color:FF0000;right:100pt;position:absolute">
+        <u>Changes from 7r3 to 7r3A</u><br>
+        masmx.7r3A revises and makes more consistent the assembly<br>
+        of hierarchically structured and named code and data. Earlier<br>
+        application code needs no changes<br>
 
+<a	href="#strools"
+	style=right:100pt;position:absolute>
+	Structured Code
+</a>
+</a>
 
 <p>
 Developed as a cross-assembler for embedded targets<br>
@@ -322,18 +332,20 @@ for actual delivered binaries
 
     2.	<a href="#stradata">Structured Data and Structured Code Name Spaces</a>			5.2
 
-	1.  <a href="#wstradata">Word-Aligned Structures $tree / $branch..$root</a>		5.2.1
-	    1.  <a href="#tree_root">Structures $tree..$root</a>					5.2.1.1
-	    2.  <a href="#branch_root">Overlaid Structures $branch..$root</a>			5.2.1.2
-	    4.  <a href="#name_space">Structured Code Name Spaces</a>				5.2.1.3
+	1. <a href="#strools">Rules of Structured Spaces</a>					5.2.1
+
+	2.  <a href="#wstradata">Word-Aligned Structures $tree / $branch..$root</a>		5.2.2
+	    1.  <a href="#tree_root">Structures $tree..$root</a>					5.2.2.1
+	    2.  <a href="#branch_root">Overlaid Structures $branch..$root</a>			5.2.2.2
+	    4.  <a href="#name_space">Structured Code Name Spaces</a>				5.2.2.3
 		    
 
-	2.  <a href="#bstradata">Bit-Aligned Structures</a>					5.2.2
-	    1.	<a href="#record_root">Bit-Aligned Data $record..$root</a>				5.2.2.1
-	    2.  <a href="#record_macro">Macro Code Access to Bit-Aligned Fields and Groups</a>	5.2.2.2
-	    3.	<a href="#record_overlay">Overlaid Structures $record,$branch</a>			5.2.2.3
-	    4.	<a href="#signed_bitfield">Signed Bit Fields</a>					5.2.2.4
-	    5.	<a href="#record_float">$record compressed floating constant arrays</a>		5.2.2.5
+	3.  <a href="#bstradata">Bit-Aligned Structures</a>					5.2.3
+	    1.	<a href="#record_root">Bit-Aligned Data $record..$root</a>				5.2.3.1
+	    2.  <a href="#record_macro">Macro Code Access to Bit-Aligned Fields and Groups</a>	5.2.3.2
+	    3.	<a href="#record_overlay">Overlaid Structures $record,$branch</a>			5.2.3.3
+	    4.	<a href="#signed_bitfield">Signed Bit Fields</a>					5.2.3.4
+	    5.	<a href="#record_float">$record compressed floating constant arrays</a>		5.2.3.5
 
 6.  <a href="#algors">Run-Time Algorithm Plotter</a>						6
 
@@ -808,7 +820,7 @@ See <a href="#structure">5: Iterated Coded and Structured Data</a>
 
 masmx can construct and label complex hierarchical data which does not map to the target architecture<br>
 but instead groups and overlays bit-fields of arbitrarily large size.
-See <a href="#bstradata">5.2.2: Bit-Aligned Structures</a><br>
+See <a href="#bstradata">5.2.3: Bit-Aligned Structures</a><br>
 masmx solves a problem which has produced noticeable difficulty for compiler writers
 
 
@@ -816,7 +828,7 @@ masmx solves a problem which has produced noticeable difficulty for compiler wri
 <h3>1.6.3: Accessing Bit-Aligned Structured Data</h3>
 
 masmx naming techniques allow macro code to read and write complex bit-aligned data.
-See <a href="#record_macro">5.2.2.2: Macro Code Access to Bit-Aligned Structures</a><br>
+See <a href="#record_macro">5.2.3.2: Macro Code Access to Bit-Aligned Structures</a><br>
 This feature handles bit-field structures and overlays of any complexity consistently and efficiently
 
 <a      name="strip2"/>
@@ -831,7 +843,7 @@ See <a href="#structure">5.1: $do and Macros</a> and <a href="#labels">4.1:Label
 
 
 Hierarchic label structures can be used to compartment name spaces like languages structured by function.<br>
-See <a	href="#name_space">5.2.1.4: Structured Code Name Spaces</a>
+See <a	href="#name_space">5.2.2.4: Structured Code Name Spaces</a>
 
 
 
@@ -5091,11 +5103,196 @@ units		$do	10,	'0'+thousands-1, '0'+hundreds-1, '0'+tens-1, '0'+units-1L
 <a	name="stradata">
 <h2>5.2: Structured Data and Structured Code Name Spaces</h2>
 
+<a	name="strools">
+<h3>5.2.1: Rules of Structured Spaces</h3>
+
+masmx.7r3A applies a set of rules to the construction of hierarchical labelled code
+
+<p>
+Structures start <b>$tree</b> or <b>$branch</b> or <b>$record</b> or <b>$record,$branch</b>.
+Structures end <b>$root</b>
+<pre>
+
+		$tree		$branch		$record		$record,$branch
+		.		.		.		.
+		$root		$root		$root		$root
+
+</pre>
+<b>$branch</b> redefines, or maps the same memory multiple times. <b>$tree</b> and <b>$branch</b>
+construct word-aligned spaces. <b>$record</b> constructs bit-aligned spaces
+
+<p>
+Structures made with these directives are not templates but instances. Templates can be made
+by describing structures in procedural macros
+<pre>
+
+	p	$proc			p	$proc
+	callname* $name			rectype* $name
+	*	$tree			*	$record
+	left	$branch			left	$record,$branch
+		.				.
+		$root				$root
+	right	$branch			right	$record,$branch
+		.				.
+		$root				$root
+		$root				$root
+		$end				$end
+
+</pre>
+Macro programming can link complex hierarchical structures together. A macro
+claiming the label of the macro call for a <b>$tree</b> or <b>$branch</b> or
+<b>$record</b> adds itself to the calling structure
+<pre>
+
+
+									p	$proc
+	p	*proc			p	$proc			second_view $name
+	upper*	*name			first_view* $name		*	$record	p(1, 1) p(1, 5)
+	*	$tree			*	$record	p(1, 1)		ahead	12
+	word10	+	p(1, 1)		field_a	5			left	$record, $branch p(1, 2)
+	word11	+	p(1, 2)			$root			field_y	23
+	first	$branch				$end				$root
+	view1	first_view p(2)						right	$record, $branch p(1, 3) p(1, 4)
+		$root							field1	19s
+	second	$branch							field2	118
+	view2	second_view p(3)						$root
+		$root								7
+		$root							beyond	4
+		$end								$root
+										$end
+
+</pre>
+
+Code structuring rules can begin to be demonstrated by setting these sample macros to work
+<pre>
+
+$ masmx -lnkxz
+MASMX 7r3A
+0/-INPUT>>
+	$include	constru.def
+$(4:04000)
+table   upper	10,11 6 14,8191,63,"not very aligned",15
+	$end
+  :                            1  $word 16
+  :                            2 
+  :                            3 p       $proc
+  :                            4 upper*  $name
+  :                            5 *       $tree
+  :                            6 word10  +       p(1, 1)
+  :                            7 word11  +       p(1, 2)
+  :                            8 first   $branch
+  :                            9 view1   first_view       p(2) 
+  :                            10         $root 
+  :                            11 second  $branch
+  :                            12 view2 second_view       p(3)
+  :                            13         $root
+  :                            14         $root
+  :                            15         $end
+  :                            16 
+  :                            17 p       $proc
+  :                            18 first_view* $name
+  :                            19 *       $record         p(1, 1) 
+  :                            20 field_a 5
+  :                            21         $root
+  :                            22         $end
+  :                            23 
+  :                            24 p       $proc
+  :                            25 second_view* $name
+  :                            26 *       $record         p(1, 1) p(1, 5)
+  :                            27 ahead   12
+  :                            28 left    $record,$branch p(1, 2)
+  :                            29 field_y 23
+  :                            30         $root
+  :                            31 right   $record,$branch p(1, 3) p(1, 4)
+  :                            32 field1  19s
+  :                            33 field2  118
+  :                            34         $root
+  :                            35         7
+  :                            36 beyond  4
+  :                            37         $root
+  :                            38         $end
+  :                            39 
+  :                            40 $(4:04000)
+04:4000 000A                  +41 table   upper 10,11 6 14,8191,63,"not very aligned",15
+04:4001 000B                  +41 
+04:4002 3000                  +41 
+04:4002 00E003FFE000          +41 
+04:4002 0000007EDCDEE840ECCAE4F240C2D8D2CEDC0000
+                              +41 
+04:400B 00F0                  +41 
+  :                            42  $end
+upper=:N129:P:0:0000
+first_view=:N129:P:0:0000
+second_view=:N129:P:0:0000
+table=$04:4000
+table:word10=$04:4000
+table:word11=$04:4001
+table:first=$04:4002
+table:first:view1=$04:4002,,,,0005
+table:first:view1:field_a=$04:4002,,,,0005
+table:second=$04:4002
+table:second:view2=$04:4002,,,,00A0
+table:second:view2:ahead=$04:4002,,,,000C
+table:second:view2:left=$04:4002,,,000C,0017
+table:second:view2:left:field_y=$04:4002,,,000C,0017
+table:second:view2:right=$04:4002,,,000C,0089
+table:second:view2:right:field1=$04:4002,,,000C,*0013
+table:second:view2:right:field2=$04:4003,,,000F,0076
+table:second:view2:beyond=$04:400B,,,000C,0004
+constru.def=1<0004
+-INPUT>>=0<0000
+:$(04):4000:400C 
+
+
+</pre>
+
+For simplicity this example has a word size and address quantum both of 16 bits
+
+<p>
+Features are principally a named data or code hierarchy which for word aligned<br>
+leaf items (at the start of this example structure) have at most two attributes,<br>
+address and optional index base register. Items in bitfield structures have<br>
+additionally a bit offset attribute and a bit size with signedness flag. Code<br>
+within a substructure references local names without hierarchic preamble
+
+<p>
+Rules are
+
+	<ol>
+	<li>structure directives {$tree | $branch | $record } .. { $root }<br>
+	    may be used without macro programming</li><br>
+
+	<li>directives { $tree | $branch | $record } declare a structure instance not a template</li><br>
+
+	<li>macro programming concerns templates</li><br>
+
+	<li>parts nested textually inline without macro programming are in the structure</li><br>
+
+	<li>parts connected by label inheritance from one $proc macro to another are in the structure</li><br>
+
+        <li>every branch and leaf in the structure is at the same macro nesting level<br>
+	    which is most often zero or main assembly, notwithstanding deeply nested macros<br>
+	    may generate items in the structure</li><br>
+
+	<li>an exported label of an entire structure has a negative macro-nesting depth as have<br>
+	    other exported names, but its members have main assembly level zero</li><br>
+
+        <li>$equ labels are included in the structure</li><br>
+
+        <li>$set labels are not included in the structure</li><br>
+
+        <li>a nested macro call which does not inherit the label of its invoking call<br>
+	    may declare location labels which remain independent of the structure.<br>
+	    Therefore instruction code within a structured namespace may contain two-pass<br>
+	    macros containing forward reference to macro-local storage location labels</li>
+	</ol>
+
+
 <a      name="wstradata">
-<h3>5.2.1: Word-Aligned Structures $tree / $branch..$root</h3>
+<h3>5.2.2: Word-Aligned Structures $tree / $branch..$root</h3>
 
 <a      name="tree_root">
-<h4>5.2.1.1: Structures $tree..$root</h4>
+<h4>5.2.2.1: Structures $tree..$root</h4>
 
 <p>
 $tree is used to structure a name space containing data or code.
@@ -5133,7 +5330,7 @@ Other examples can be found in <a href="#tree">8.54: $tree Directive</a>
 
 
 <a      name="branch_root">
-<h4>5.2.1.2: Overlaid Structures $branch..$root</h4>
+<h4>5.2.2.2: Overlaid Structures $branch..$root</h4>
 
 
 <p>
@@ -5266,7 +5463,7 @@ transport.msm=0<00000003
 </pre>
 
 <a      name="name_space">
-<h4>5.2.1.4: Structured Code Name Spaces</h4>
+<h4>5.2.2.3: Structured Code Name Spaces</h4>
 
 <b>$tree..$root</b> construct may be used to compartment the local names
 of code routines in the manner of block-structured languages
@@ -5333,10 +5530,10 @@ routines.msm=0<00000003
 </pre>
 
 <a      name="bstradata"/>
-<h3>5.2.2: Bit-Aligned Structures</h3>
+<h3>5.2.3: Bit-Aligned Structures</h3>
 
 <a      name="record_root"/>
-<h4>5.2.2.1: Bit-Aligned Data $record..$root</h4>
+<h4>5.2.3.1: Bit-Aligned Data $record..$root</h4>
 
 <b>$record</b>..<b>$root</b> structures are bit aligned
 
@@ -5431,7 +5628,7 @@ $proc macros can assign actual arguments to any nested $record in their scope
 
 
 <a      name="record_macro"/>
-<h4>5.2.2.2: Macro Code Access to Bit-Aligned Fields and Groups</h4>
+<h4>5.2.3.2: Macro Code Access to Bit-Aligned Fields and Groups</h4>
 
 
 <p>
@@ -5509,7 +5706,7 @@ STERM=.
 
 
 <a      name="record_overlay"/>
-<h4>5.2.2.3: Bit-Aligned Structure Overlay and Overload: $record,$branch</h4>
+<h4>5.2.3.3: Bit-Aligned Structure Overlay and Overload: $record,$branch</h4>
 
 <b>$record</b> structures can may be overlaid or redefined with the addition of
 <b>,$branch</b> subfunction.<br>
@@ -5676,7 +5873,7 @@ moreover.msm=0<00000003
 
 
 <a      name="signed_bitfield"/>
-<h4>5.2.2.4: Signed Bit Fields</h4>
+<h4>5.2.3.4: Signed Bit Fields</h4>
 
 Option <b>-Y</b> causes bit fields to be flagged as signed unless the length is marked
 with trailing <b>u</b>
@@ -5769,7 +5966,7 @@ SIGNED  $set    p(2, *5)+p(0, 0)/*1
 
 <a name="record_float"/>
 
-<h4>5.2.2.5: $record compressed floating constant arrays</h4>
+<h4>5.2.3.5: $record compressed floating constant arrays</h4>
 
 Floating values targeted to bit-aligned fields have the exponent size and
 rounding position indicated for their bitsize.<br>This routine generates an
@@ -7826,7 +8023,7 @@ entry_point
 <p>
 $branch is the start of a structure overlay. The following assembly
 with label listing shows an  example of overlaid storage definition.<br>
-See also <a href="#wstradata">5.2.1: Word-Aligned Structures $tree / $branch..$root</a>
+See also <a href="#wstradata">5.2.2: Word-Aligned Structures $tree / $branch..$root</a>
 <pre>
 
 $ masmx welblech -lnkx
@@ -11140,7 +11337,7 @@ Where <b>$record</b> structures are nested, a new <b>$record</b> structure
 starts at the bit position which the immediately preceding <b>$record</b>
 srtucture reached.<br>
 
-See also <a href="#bstradata">5.2.2: Bit-Aligned Structures</a>
+See also <a href="#bstradata">5.2.3: Bit-Aligned Structures</a>
 
 <a      name="record_b">
 <h3>8.42.1: $record,$branch	bit-aligned structure overlay</h3>
@@ -11158,7 +11355,7 @@ recordB	$record,$branch	[<i>values</i>]
 	$root
 
 </pre>
-See <a href="#record_overlay">5.2.2.3: Overlaid Structures $record,$branch</a>
+See <a href="#record_overlay">5.2.3.3: Overlaid Structures $record,$branch</a>
 
 
 <a      name="res">
@@ -11274,9 +11471,9 @@ Functional results are 192 bits.
 
 <p>
 $root is the end of a structured name space.
-See <a href="#wstradata">5.2.1: Word-Aligned Structures $tree / $branch..$root</a>,
+See <a href="#wstradata">5.2.2: Word-Aligned Structures $tree / $branch..$root</a>,
 <a href="#tree">8.54: $tree</a>, <a href="#record">8.42: $record</a>, <a href="#branch">8.4: $branch</a>,
-<a href="#bstradata">5.2.2: Bit-Aligned Structures</a>
+<a href="#bstradata">5.2.3: Bit-Aligned Structures</a>
 
 
 
@@ -17075,7 +17272,7 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 
 		field-name	5s
 
-		See 5.2.2.4: Signed Bit Fields
+		See 5.2.3.4: Signed Bit Fields
 
 
         -Z      zero fill buffers declared with $res directive
@@ -18500,23 +18697,23 @@ LICENCE NOTE
     Copyright Tim Cox, 2015
     TimMilesCox@gmx.ch
 
-    This document describes the masmx.7r3 target-independent meta-assembler.
+    This document describes the masmx.7r3A target-independent meta-assembler.
 
-    masmx.7r3 is free software. It is licensed
+    masmx.7r3A is free software. It is licensed
     under the GNU General Public Licence Version 3
 
-    You can redistribute it and/or modify masmx.7r3
+    You can redistribute it and/or modify masmx.7r3A
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    masmx.7r3 is distributed in the hope that it will be useful,
+    masmx.7r3A is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with masmx.7r3.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+    along with masmx.7r3A.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
 
 </i>
 </pre>

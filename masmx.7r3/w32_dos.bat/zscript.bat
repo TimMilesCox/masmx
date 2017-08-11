@@ -546,7 +546,6 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz trees ..\test.zo3\trees.txo -lo> ..\text.zo3\trees.txt
 ..\masmz tribit ..\test.zo3\tribit.txo -lo> ..\text.zo3\tribit.txt
 ..\masmz tricki ..\test.zo3\tricki.txo -lo> ..\text.zo3\tricki.txt
-..\masmz trinsic ..\test.zo3\trinsic.txo -lo> ..\text.zo3\trinsic.txt
 ..\masmz trip ..\test.zo3\trip.txo -lo> ..\text.zo3\trip.txt
 ..\masmz trivs ..\test.zo3\trivs.txo -lo> ..\text.zo3\trivs.txt
 ..\masmz trtab ..\test.zo3\trtab.txo -lo> ..\text.zo3\trtab.txt

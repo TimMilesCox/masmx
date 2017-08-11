@@ -543,7 +543,6 @@ rm ../text.o3/*
 ../masmx trees ../test.o3/trees.txo -loy > ../text.o3/trees.txt
 ../masmx tribit ../test.o3/tribit.txo -loy > ../text.o3/tribit.txt
 ../masmx tricki ../test.o3/tricki.txo -loy > ../text.o3/tricki.txt
-../masmx trinsic ../test.o3/trinsic.txo -loy > ../text.o3/trinsic.txt
 ../masmx trip ../test.o3/trip.txo -loy > ../text.o3/trip.txt
 ../masmx trivs ../test.o3/trivs.txo -loy > ../text.o3/trivs.txt
 ../masmx trtab ../test.o3/trtab.txo -loy > ../text.o3/trtab.txt
