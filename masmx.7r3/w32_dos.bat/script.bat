@@ -711,6 +711,7 @@ lstring -b ..\test.o3\straling.txo ..\test.o3\straling
 ..\masmx tarq ..\test.o3\tarq -lyok > ..\text.o3\tarq.txt
 ..\masmx rounders ..\test.o3\roundere -lyokE > ..\text.o3\roundere.txt
 ..\masmx rounders ..\test.o3\rounderg -lyokG > ..\text.o3\rounderg.txt
+..\masmx roundown ..\test.o3\roundown -lyok > ..\text.o3\roundown.txt
 
 call ..\w32_dos.bat\linkpart
 call ..\w32_dos.bat\coldfire

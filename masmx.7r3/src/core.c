@@ -5819,7 +5819,7 @@ static void floating_position(int bits, line_item *item)
    int			 characteristic;
 
    #ifdef ROUNDING
-   int			 carry, xlow_1, xlow_2;	
+   int			 carry = 0, xlow_1, xlow_2;	
    #endif
 
    int			 x = bits / word;
@@ -5841,7 +5841,7 @@ static void floating_position(int bits, line_item *item)
 
    if (bits < RADIX)
    {
-      carry = single_bit(RADIX - bits - 1, item);
+      if (guard_pattern & 0x80) carry = single_bit(RADIX - bits - 1, item);
 
       #ifdef ROUND3 
       if (guard_pattern & 0x40) carry |= single_bit(RADIX - bits - 2, item);

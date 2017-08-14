@@ -691,4 +691,5 @@ lstring -b ..\test.zo3\straling.txo ..\test.zo3\straling
 ..\masmz tarq ..\test.zo3\tarq -lok > ..\text.zo3\tarq.txt
 ..\masmx rounders ..\test.zo3\roundere -lokE > ..\text.zo3\roundere.txt
 ..\masmx rounders ..\test.zo3\rounderg -lokG > ..\text.zo3\rounderg.txt
+..\masmz roundown ..\test.zo3\roundown -lok > ..\text.zo3\roundown.txt
 

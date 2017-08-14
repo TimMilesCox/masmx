@@ -749,6 +749,11 @@ and 168-bit fractional mantissa
 Negative polarity is represented with the entire value in 1s complement
 
 <p>
+Floating constants are by default rounded with three guard bits 111. This rounding pattern can be<br>
+replaced on the command line and during assembly with one the the four option flags <a href="#optro">-EFGH</a>.<br>
+Asserting one of these options overrides the previously opted rounding pattern
+
+<p>
 Size, layout and representation of floating constants are programmable. Floating constant values are<br>
  derived from masmx 192-bit internal floating values. There is no restriction on target representations.<br>
 Macro code can achieve any representation
@@ -7328,9 +7333,14 @@ relocatable and has a base register
 Data is described in a void section but not generated. It reserves
 no storage but is a map of storage. Labels in a void section map
 to displacements on the base register
+
+<p>
+It is an advantage to type two colons :: in a void section control,
+specifying a blank start address and a zero breakpoint address
+
 <pre>
 
-$(id:0,rX)
+$(id::,rX)
 
 </pre>
 <p>
@@ -17166,22 +17176,22 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 		when $data_code is asserted but -D is not opted
 		translate only unescaped quoted symbols
 
-
-	-E	floating point rounding guard pattern is 111
+		<a name="optro">
+	-E	floating constants are rounded with guard pattern 111
 		this is the default
 
 		guard pattern is newly set to 111 on
 
 			$set_option "E"
 
-	-F	floating point rounding guard pattern is 110
+	-F	floating constants are rounded with guard pattern 110
 		instead of 111
 
 		guard pattern is newly set to 110 on
 
 			$set_option "F"
 
-	-G	floating point rounding guard pattern is 100
+	-G	floating constants are rounded with guard pattern 100
 		instead of 111
 
 		guard pattern is newly set to 100 on
@@ -17212,10 +17222,22 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 						 111
 						 110
 						 100
+						 000
 
 						 possible values of
 						 the three rounding
 						 guard bits
+
+
+
+	-H	floating constants are rounded with guard pattern 000
+		instead of 111
+
+		guard pattern is newly set to 000 on
+
+			$set_option "H"
+
+		rounding is towards zero or truncation
 
 
 
