@@ -99,8 +99,8 @@ static void print_macrotext(int x, char *p, char *macro)
    char			 symbol;
    char			*q = (macro) ? macro : "sub";
 
-   if (skipping) printf("[%d](skipped):::", x);
-   else          printf("[%d]:macro text:", x);
+   if (skipping) printf("%d[%d](skipped):::", masm_level, x);
+   else          printf("%d[%d]:macro text:", masm_level, x);
 
    while (x--)
    {
@@ -119,6 +119,7 @@ static void print_macrohead(int x, char *p, char *style)
 {
    char			 symbol;
 
+   fprintf(stdout, "%d|", masm_level);
    if (skipping) fputs("(skipped):::", stdout);
    else          fputs(style, stdout);
 

@@ -568,7 +568,7 @@ static int			 forward_reference;
 static int		 	 file_arguments;
 static char			*filename[FILE_ARGUMENTS];
 
-static char			 path[120];
+static char			 path[204];
 
 #ifdef RECORD
 static int			 branch_record;

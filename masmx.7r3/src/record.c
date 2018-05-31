@@ -520,6 +520,8 @@ static int record(object *l, char *data, int subfunction)
       brake("", "abandon");
    }
 
+   l->l.passflag = masm_level;
+
    #ifdef RECORD_BRANCH
    if (!(branch_record & (1 << active_x))) record_high[active_x] = 0;
 

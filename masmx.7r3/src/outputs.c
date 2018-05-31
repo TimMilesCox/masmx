@@ -284,7 +284,7 @@ static void produce(int bits, char dflag, line_item *item, txo *a_image)
 
       #ifndef DOS
       if ((selector['n'-'a'])
-      &&  (selector['L'-'A'])
+      &&  (selector['l'-'a'])
       &&  (list > depth)
       &&  (pass)
       &&  (!a_image))

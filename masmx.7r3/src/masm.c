@@ -221,7 +221,9 @@ extern unsigned _stklen = 32*1024;
 #define MAPSTACK RECURSION
 #define PROMOTE_UNARY
 #define LROOT
-#define FILENAME_LIMIT 64
+#define FILENAME_LIMIT (250 - sizeof(label) + PARAGRAPH)
+/*	255 - ZEROBYTE - 4BYTE.ext	*/
+
 #define INCLUDE_MAXDEPTH 12
 
 #ifdef	DOS

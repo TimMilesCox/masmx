@@ -96,6 +96,17 @@ static void flag_either_pass(char *name, char *k)
    ecount++;
 }
 
+static void flag_file_access()
+{
+   int x = depth;
+
+   if (x) x--;
+   printf("Error: %s Line %d: file missing: %s\n",
+           file_label[x]->l.name,
+           ll[x],
+           name);
+}
+
 #ifdef CLEATING
 static void cleat(int context, object *p)
 {
@@ -122,7 +133,7 @@ static void uflag(char *k)
    if (!pass) return;
    if (skipping) return;
 
-   if (!selector['U'-'A']) return;
+   if (!selector['u'-'a']) return;
 
    printf("undefined name in %s on Line %d: %s\n", 
 	   file_label[depth]->l.name,

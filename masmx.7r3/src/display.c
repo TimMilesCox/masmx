@@ -85,7 +85,7 @@ static void illustrate(long location,
                                  x = RADIX/8,
                                  words = (bits + word - 1) / word;
 
-   if ((list > depth) && (pass) && (selector['L'-'A']))
+   if ((list > depth) && (pass) && (selector['l'-'a']))
    {
       if (octal)
       {

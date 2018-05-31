@@ -367,8 +367,9 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
       if (adhesion_level < 0) adhesion_level = 0;
       global = adhesion_level;
       if (uselector['B'-'A'])
-      printf("[L%x:A%x:G%x:V%x]%s:%s\n",
+      printf("[L%x:A%x:G%x:V%x:P%X]%s:%s\n",
               masm_level, adhesion_level, global, type,
+              adhesionp->l.passflag,
               adhesionp->l.name, name);
    }
 
@@ -606,6 +607,12 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
    else o->l.value = *v;
 
    o->l.passflag = masm_level;
+
+   if ((uselector['L'-'A']) && (masm_level))
+   {
+      printf("[%x<-%x:%x:%s:%d:%s]\n", masm_level, global, type,
+              file_label[depth]->l.name, ll[depth], o->l.name);
+   }
 
    if ((type == LOCATION) || (type == BLANK))
    {

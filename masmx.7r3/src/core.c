@@ -53,6 +53,10 @@ static int length_mark(int symbol)
       case 'H':
          return word * 6;
 
+      case 'z':
+      case 'Z':
+         return word * 7;
+
       case 'o':
       case 'O':
          return word * 8;
@@ -1293,7 +1297,7 @@ static object *compose_filename(char *from, char *extension, int prefix)
 
    while (symbol = *from++)
    {
-      if (length == FILENAME_LIMIT-5) break;
+      if (length == FILENAME_LIMIT) break;
       if (symbol == '.') extended = '.';
       
       if (!bounded)
@@ -1364,7 +1368,7 @@ static object *compose_filename(char *from, char *extension, int prefix)
 
 static void loadfile(char *arg, char *qual)
 {
-   if ((lix) && (pass) && (list > depth) && (selector['L'-'A']))
+   if ((lix) && (pass) && (list > depth) && (selector['l'-'a']))
       printf("  :                            %d: %s\n", ll[depth], plix);
 
    lix = 0;
@@ -1388,7 +1392,7 @@ static void loadfile(char *arg, char *qual)
 
    if (handle[depth] < 0)
    {
-      flag_either_pass(file_label[depth]->l.name, "file missing");
+      flag_file_access();
       exit(0);
    }
 
@@ -2156,12 +2160,16 @@ static line_item *xpression(char *s, char *e, char *param)
       flagg("expression too deep\n");
       return sp;
    }
+
+   if (sp == &ostac[XPRESSION]) floating_conversion = 0;
    #else
    if ( sp <  &o[2])
    {
       flagg("expression too deep\n");
       return sp;
    }
+
+   if (sp == &o[XPRESSION]) floating_conversion = 0;
    #endif
 
    if (d = contains(s, e, "=\0"))
@@ -2563,16 +2571,15 @@ static line_item *xpression(char *s, char *e, char *param)
 
       if (pass)
       {
-         floating_conversion = 0;
+//         floating_conversion = 0;
          xpression(s, margin, param);
          sp--;
          i -= expression(d+2, e, param);
          if (*(d + 1) == '-') i = 0 - i;
          sp++;
 
-         if (floating_conversion) flag("overloaded floating conversion "
-                                       "caused by expression nesting "
-                                       "between fraction and exponent");
+         if (floating_conversion) flag("overloaded floating conversion");
+         floating_conversion++;
 
          if (sp->b[0] & 128)
          {
@@ -2991,7 +2998,7 @@ static line_item *xpression(char *s, char *e, char *param)
       return sp;
    }
 
-   if (selector['M'-'A'])
+   if (selector['m'-'a'])
    {
       if (*s == '$')
       {
@@ -3012,7 +3019,7 @@ static line_item *xpression(char *s, char *e, char *param)
       }
    }
  
-   if (selector['C'-'A'])
+   if (selector['c'-'a'])
    {
       if (*s == '0')
       {
@@ -3666,7 +3673,7 @@ static long expression(char *s, char *e, char *param)
       return i;
    }
 
-   if (selector['M'-'A'])
+   if (selector['m'-'a'])
    {
       if (*s == '$')
       {
@@ -3687,7 +3694,7 @@ static long expression(char *s, char *e, char *param)
       }
    }
     
-   if (selector['C'-'A'])
+   if (selector['c'-'a'])
    {
       if (*s == '0')
       {
@@ -4507,7 +4514,7 @@ static int getline(char *k, int max)
    char *p;
 
    #ifdef PRINTBYREAD
-   if ((lix) && (pass) && (list > depth) && (selector['L'-'A']))
+   if ((lix) && (pass) && (list > depth) && (selector['l'-'a']))
       printf("  :                            %d %s\n", ll[depth], plix);
 
    #endif
@@ -4531,7 +4538,7 @@ static int getline(char *k, int max)
 
    if (tsubs) x = text_substitute(x, k);
 
-   if (selector['S'-'A'])
+   if (selector['s'-'a'])
    {
       known = -1;
       p = getop(k);
@@ -4548,7 +4555,7 @@ static int getline(char *k, int max)
    ll[depth]++;
    plix[lix] = 0;
 
-   if ((!x) && (pass) && (list > depth) && (selector['L'-'A']))
+   if ((!x) && (pass) && (list > depth) && (selector['l'-'a']))
    {
       printf("  :                            %d %s\n", ll[depth], plix);
       lix = 0;
@@ -6769,11 +6776,12 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		  insequate(x, thislabel, argument, param);
 	       }
 
+               transient_floating_bits = 0;
 	       break;
 
 	    case SET:
 	       x = SET;
-               j = transient_floating_bits;
+               /*	j = transient_floating_bits;	*/
 	       if      (subfunction > RADIX) x = subfunction;
                else if (subfunction < 0)
                {
@@ -6785,7 +6793,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 		  insequate(x, thislabel, argument, param);
 	       }
 
-               transient_floating_bits = j;
+               transient_floating_bits = 0;	/*	j;	*/
 	       break;
 
                #ifdef BLANK
@@ -6986,7 +6994,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                while (symbol = *argument++) 
                {
-                  if (x > 117) break;
+                  if (x > 200) break;
                   path[x++] = symbol;
                }
 
@@ -7591,6 +7599,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                if (thislabel)
                {
+                  thislabel->l.passflag = masm_level;
                   active_origin[active_x] = loc;
                   active_instance[active_x++] = thislabel;
                }
@@ -8410,7 +8419,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
          if (plist > masm_level)
          {
-	    if (((pass) && (selector['P'-'A']))
+	    if (((pass) && (selector['p'-'a']))
             || ((!pass) && (selector['r'-'a'])))
 	    {
 	       printf("::::PROC:::: %s [%s]\n", sr->l.name,  v_argument);
@@ -8537,7 +8546,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                
 	       if (plist > masm_level)
                {
-	          if (((pass) && (selector['P'-'A']))
+	          if (((pass) && (selector['p'-'a']))
                   || ((!pass) && (selector['r'-'a'])))
 	          {
                      print_macrotext(txp->t.length, txp->t.text, sr->l.name);
@@ -8562,7 +8571,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
          if (plist > masm_level)
          {
-            if (((pass) && (selector['P'-'A']))
+            if (((pass) && (selector['p'-'a']))
             || ((!pass) && (selector['r'-'a'])))
             {
                 printf(":::end proc:%s\n", txp->t.text);
@@ -8838,7 +8847,7 @@ main(int argc, char *_argv[])
 
    if (handle[0] < 0) return 0;   
 
-   if (selector['S'-'A'])
+   if (selector['s'-'a'])
    {
       #ifdef MS
       nhandle = open(OSYM, O_CREAT|O_TRUNC|O_RDWR, S_IREAD|S_IWRITE);
@@ -8855,12 +8864,11 @@ main(int argc, char *_argv[])
       if (i < 0)
       {
       }
-      else
-      i = assemble(line, NULL, NULL, NULL);
+      else i = assemble(line, NULL, NULL, NULL);
 
       #ifndef PRINTBYREAD
 
-      if ((lix) && (pass) && (list > depth) && (selector['L'-'A']))
+      if ((lix) && (pass) && (list > depth) && (selector['l'-'a']))
       {
          printf("  :                            %d %s\n", ll[depth], plix);
       }
@@ -8871,7 +8879,7 @@ main(int argc, char *_argv[])
       {
          #ifdef PRINTBYREAD
 
-         if ((lix) && (pass) && (list > depth) && (selector['L'-'A']))
+         if ((lix) && (pass) && (list > depth) && (selector['l'-'a']))
          {
             printf("  :                            %d %s\n",
                                            ll[depth], plix);
@@ -8993,7 +9001,7 @@ main(int argc, char *_argv[])
 	 plix[0] = 0;
 	 ll[0] = 0;
 	 
-	 if (selector['S'-'A'])
+	 if (selector['s'-'a'])
 	 {
             #ifdef BLOCK_WRITE
             block_write(nhandle, NULL, 0);
@@ -9254,7 +9262,7 @@ main(int argc, char *_argv[])
    #endif
    
    
-   if (selector['X'-'A']) walktable(0);
+   if (selector['x'-'a']) walktable(0);
    
    for(i = 0; i <  LOCATORS; i++)
    {
@@ -9374,7 +9382,7 @@ main(int argc, char *_argv[])
    }
 
    if (ecount) return -1;
-   if ((ucount) && (selector['U'-'A'])) return -1;
+   if ((ucount) && (selector['u'-'a'])) return -1;
 
    if (filename[1]) save_object(filename[1]);
 

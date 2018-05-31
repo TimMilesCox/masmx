@@ -9,6 +9,6 @@ rm *.txo
 ../masmz part2.map o 		$1	$2
 ../masmz part33.map z4		$1	$2
 ../masmz z5.map z5		$1	$2
-diff -w ../test.msm/z4right.txo z4.txo
-diff -w ../test.msm/z5right.txo z5.txo
+diff -ws ../test.msm/z4right.txo z4.txo
+diff -ws ../test.msm/z5right.txo z5.txo
 

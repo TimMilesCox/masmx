@@ -157,7 +157,7 @@ static line_item *extract_xparam(char *s, char *gparam)
                   limit = first_at(p, " ,");
 
                   #ifdef AUTOMATIC_LITERALS
-                  if ((*p == '(') && (selector['A'-'A']))
+                  if ((*p == '(') && (selector['a'-'a']))
                   {
    	             z = literal(p, gparam, litloc);
                      quadinsert(z, v);

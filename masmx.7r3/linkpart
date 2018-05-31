@@ -1,7 +1,9 @@
 pushd ../test.map
 ./mverify	-wy
+cp z4.txo ../test.o3/z4left.txo
 cp z5.txo ../test.o3/z5left.txo
 ./zferify	-w	-j
+cp z4.txo ../test.o3/z4right.txo
 cp z5.txo ../test.o3/z5right.txo
 #	cd ../test3.map
 #	./sure34	-wy

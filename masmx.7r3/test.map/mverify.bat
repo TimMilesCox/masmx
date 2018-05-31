@@ -9,8 +9,8 @@ del *.txo
 ..\masmx part2.map o  		%1	%2	-y
 ..\masmx part33.map z4 		%1	%2	-y
 ..\masmx z5.map z5  		%1	%2	-y
-copy	z4.txo	..\test.o3
-copy	z5.txo	..\test.o3
-fc /L /W ..\result.txo\z4.txo z4.txo
-fc /L /W ..\result.txo\z5left.txo z5.txo
+copy	z4.txo	..\test.o3\z4left.txo
+copy	z5.txo	..\test.o3\z5right.txo
+seeif -as ..\result.txo\z4left.txo z4.txo
+seeif -as ..\result.txo\z5left.txo z5.txo
 
