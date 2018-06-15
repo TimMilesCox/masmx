@@ -2105,6 +2105,7 @@ Number constants may have trailing length overrides. Their meanings are
 <a style="color:red">q Q</a> for quadword
 <a style="color:red">p P</a> for pentaword
 <a style="color:red">h H</a> for hexaword
+<a style="color:red">z Z</a> for heptaword
 <a style="color:red">o O</a> for octaword
 
 
@@ -2256,7 +2257,7 @@ Floating point items are the default <a href="#floating_point">$floating_point</
 or a size in words given immediately after the mantissa and before any scale
 <pre>
 
-        +(MANTISSA)[<a style="color:red">s d l t q p h o</a>][{*+|*-}SCALE]
+        +(MANTISSA)[<a style="color:red">s d l t q p h z o</a>][{*+|*-}SCALE]
 
 <a style="color:red">s S</a> for single (one word)
 <a style="color:red">d D l L</a> for double
@@ -2264,6 +2265,7 @@ or a size in words given immediately after the mantissa and before any scale
 <a style="color:red">q Q</a> for quadword
 <a style="color:red">p P</a> for pentaword
 <a style="color:red">h H</a> for hexaword
+<a style="color:red">z Z</a> for heptaword
 <a style="color:red">o O</a> for octaword
 
 </pre>

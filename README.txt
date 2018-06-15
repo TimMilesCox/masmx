@@ -28,7 +28,7 @@
 
 
 _______________________________________________________________________________
-This is the freeware code and tests tree
+This is the freeware development and tests tree
 masmx.7r3 documentation and downloads are at http://timmilescox.github.io/masmx
 _______________________________________________________________________________
 

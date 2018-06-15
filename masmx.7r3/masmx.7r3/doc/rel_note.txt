@@ -1,12 +1,19 @@
-Preliminary	masmx.7r3A	Distribution 10 August 2017
-___________	__________	___________________________
+Preliminary	masmx.7r3A	Build 3	Distribution 15 June 2018
+___________	__________	_______	_________________________
 
 
 
 
 	masmx.7r3A revises and makes more consistent
 	the assembly of hierarchically structured and
-	named code and data.
+	named code and data
+
+	added -H option, allows unrounded floating constants<br><br>
+
+	addition of :z suffix on number constants for 7-word constants<br>
+	size-suffixes may be used to position floating exponent field in label-equated values<br>
+	in addition to overriding self-sizing in integers<br><br>
+
 	Earlier application code needs no changes
 
         _________________________________________________
@@ -86,17 +93,43 @@ ____________________________
 Product Components
 __________________
 
+
 All the binaries delivered are standalone programs.
 
-Delivered binary masmx contains all the features described in the
-manual.
+	masmx is the assembler with all features
 
-imx converts the output of masmx and masmz to 16-bit address I-Records.
+	masmz is the assembler with a subset of features
 
-mmx converts the output of masmx and masmz to 32-bit address S-Records.
+masmx.7r3a manual describes masmx command line
+
+	imx converts the output of masmx and masmz to 16-bit address I-Records
+
+		imx	file.txo irec_file
+
+	mmx converts the output of masmx and masmz to 32-bit address S-Records
+
+		mmx	file.txo srec_file
+
+	symbol extracts exported names from assembled programs
+	so that the names may be captured as environmental variables
+
+		symbol	< file.txo [export|set] > capture[.bat]
+		source	capture
+
+        one word like export or set may be output in front of each
+        extracted label. The keyword
+                
+                all
+        
+        causes externalised names of storage locations to be extracted.
+        By default symbol only extracts symbols which are not addresses.
+        Values are output in decimal
+
+
+masmx contains all the features described in the manual
 
 The masmx features absent from masmz are hierarchical data structure
-and runtime algorithm plotter.
+and runtime algorithm plotter
 
 The directives $TREE $BRANCH $ROOT $RECORD $XQT_I $XQT_FP
 are therefore absent from masmz.

@@ -89,14 +89,14 @@ ubuntu	BINARIES SUPPLIED ../masmx.7r3/hosts/ubuntu.x86/
         gcc -m32 -funsigned-char -DINTEL -DSUSE -o ../masmz masm.c
 
 
-There are four binaries for each platform
+There are five binaries for each platform
 _________________________________________
 
-	masmx	masmz	mmx	imx
+	masmx	masmz	mmx	imx	symbol
 
-The sources of mmx and imx are in this directory src/
+The sources of mmx, imx and symbol are in this directory src/
 
-They are s_record format converter and i_record format converter
+mmx and imx are s_record format converter and i_record format converter
 
 For Microsoft
 _____________
@@ -114,7 +114,35 @@ _____________________
 gcc -m32 -funsigned-char -o../mmx mmx.c
 gcc -m32 -funsigned-char -o../imx imx.c
 
-There are no endian issues in mmx or imx. Keyword DOS conerns C header includes
+
+
+
+There are no endian issues in mmx or imx. Keyword DOS concerns C header includes
+
+
+
+
+symbol utility build for all platforms
+______________________________________
+
+symbol extracts exported names from assembly output txo files
+in order to capture the names and values as environmental variables
+
+symbol command line is in the release note rel_note.txt
+
+build for POSIX systems is
+
+        gcc -m32 -funsigned-char -o $MASMX_BINARY_PATH/symbol symbol.c
+
+build for MS Windows is
+
+        cl /J /Fe%MASMX_BINARY_PATH%\symbol symbol.c
+
+
+
+64-Bit Ubuntu
+_____________
+
 
 	REBUILDING on 64-BIT Ubuntu
 
