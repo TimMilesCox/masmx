@@ -5690,7 +5690,7 @@ static void characterise(long places, line_item *item)
       rshift(item, 1);
    }
  
-   if (bias & 0xFF800000) note(" Floating Exponent Overflow ");
+   if (bias & 0xFF800000) flag(" Floating Exponent Overflow ");
 
    item->b[0] = bias >> 16;
    item->b[1] = bias >>  8;
