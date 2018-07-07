@@ -51,9 +51,42 @@ There has been no recent opportunity to build and test for SPARC
 
 
 
+Easy to Use Build Scripts
+_________________________
+
+Directory src now has scripts for constructing updated masmx and masmz
+on and for platforms osx.x86 osx.ppc ubuntu.x86 win32
+
+	./bosx86
+	./ppcbosx
+	./bubuntu 
+	./bw32
+
+These builds are all for 32-bit targets. They also display guidance
+for executing test suites
+
+The following calls are used for platforms and compiler systems which
+have so far constructed masmx
+
+	-DINTEL	is necessary for any little endian target
+		whether similar to x86 or quite different like ARM
+
+		INTEL switch indicates a byte-swapping platform data bus
+
+		options for Microsoft MS assert INTEL automatically
+
+	-DSUSE	is necessary for any Linux to avoid a function name clash
+
+	unsigned char is necessary
+	unsigned char options on platforms so far are
+	
+		-funsigned-char		gcc
+		-K			bcc	Borland
+		/J			cl	Microsoft
 
 Use no optimisation options. They go wrong and aren't needed
 
+The compile lines known so far are
 
 
 sparc

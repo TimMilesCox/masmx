@@ -1,20 +1,47 @@
-Preliminary	masmx.7r3A	Build 3	Distribution 15 June 2018
-___________	__________	_______	_________________________
+Preliminary	masmx.7r3A	Build 4	Distribution 9 July 2018
+___________	__________	_______	________________________
 
 
 
 
-	masmx.7r3A revises and makes more consistent
+	masmx.7r3A
+	__________
+
+	revises and makes more consistent
 	the assembly of hierarchically structured and
 	named code and data
 
 	added -H option, allows unrounded floating constants<br><br>
 
-	addition of :z suffix on number constants for 7-word constants<br>
-	size-suffixes may be used to position floating exponent field in label-equated values<br>
-	in addition to overriding self-sizing in integers<br><br>
+	Build 4
+	_______
+
+	Addition of :z tag to construct integer and floating constants seven storage words in size
+	Size tags exist already for [1|2|3|4|5|6||8|]-word number constants and they override
+	integer self-sizing and floating selectable default size
+
+	Floating exponent underflow / overflow now marks the assembly in error.
+	Exponent underflow / overflow in an assembled storage expression was previously remarked
+	but is now error-flagged
 
 	Earlier application code needs no changes
+
+
+	Easy to Use Build Scripts
+	_________________________
+
+	Directory src now has scripts for constructing updated masmx and masmz
+	on and for platforms osx.x86 osx.ppc ubuntu.x86 win32
+
+		./bosx86
+		./ppcbosx
+		./bubuntu
+		./bw32
+
+	These builds are all for 32-bit targets. They also display guidance
+	for executing test suites
+
+
 
         _________________________________________________
         |       Copyright Tim Cox, 2015			|
