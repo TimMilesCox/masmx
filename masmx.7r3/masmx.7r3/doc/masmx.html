@@ -2100,12 +2100,12 @@ Assembly selects a default size for floating constants but the constant may be t
 <pre>
 
 	<i>expression:</i><a style = color:red>s</a>            . one storage word
-	<i>expression:</i><a style = color:red>d</a>            . two storage words: or expression:<a style = color:red>L</a>
+	<i>expression:</i><a style = color:red>d</a>            . two storage words: alternatively <i>expression:</i><a style = color:red>L</a>
 	<i>expression:</i><a style = color:red>t</a>            . three storage words
 	<i>expression:</i><a style = color:red>q</a>            . four storage words
 	<i>expression:</i><a style = color:red>p</a>            . five storage words
 	<i>expression:</i><a style = color:red>h</a>            . six storage words
-	<i>expression:</i><a style = color:red>Z</a>            . seven storage words
+	<i>expression:</i><a style = color:red>z</a>            . seven storage words
 	<i>expression:</i><a style = color:red>o</a>            . eight storage words
 
 </pre>
@@ -2116,12 +2116,22 @@ Size tags are case-independent irrespective of -k option.<br>
 	the last token in the expression is a label
 
 	the last token in the expression is hexadecimal
-	and the targeted storage two words
+	and the targeted storage is two words
+
+	binary notation is determined by <a href="#suffix">$suffix</a>
 
 </pre>
 It is never wrong to include : colon.
 Parentheses round expressions and quotes round label references
 can also disambiguate
+
+<pre>
+
+        +       <i>expression</i>:D
+        +(<i>expression</i>)q
+        +       "<i>label</i>"h
+
+</pre>
 
 Integers occupy their containing number of words in the absence of a length tag
 <pre>
@@ -2193,15 +2203,6 @@ MASMX 7r3
 
 </pre>
 
-If the last token in the expression is a label instead of a number string
-then any length override must be preceded by colon, parenthesis or quote
-<pre>
-
-	+       <i>expression</i>:D
-	+(<i>expression</i>)q
-	+	"<i>label</i>"h
-
-</pre>
 Words flag D after a hex string also needs separation
 <pre>
 
@@ -2266,38 +2267,49 @@ LTERM=;
 Floating point items are not auto-sized like integers.
 
 <p>
-Assembly selects a default size in words for floating constants <a href="#floating_point">$floating_point</a>.<br>
-A size tag after the mantissa overrides the default
+
+Assembly selects a default size for floating constants but the fraction may be tagged to determine a different number of words
+for the floating value
 <pre>
 
-        +(MANTISSA)[<a style="color:red">s d l t q p h z o</a>][{*+|*-}SCALE]
-
-<a style="color:red">s S</a> for single (one word)
-<a style="color:red">d D l L</a> for double
-<a style="color:red">t T</a> for triple
-<a style="color:red">q Q</a> for quadword
-<a style="color:red">p P</a> for pentaword
-<a style="color:red">h H</a> for hexaword
-<a style="color:red">z Z</a> for heptaword
-<a style="color:red">o O</a> for octaword
+        <i>fraction:</i><a style = color:red>s</a><i>*&plusmn;scale</i>            . one storage word
+        <i>fraction:</i><a style = color:red>d</a><i>*&plusmn;scale</i>            . two storage words: alternatively <i>fraction:</i><a style = color:red>L</a><i>*&plusmn;scale</i>
+        <i>fraction:</i><a style = color:red>t</a><i>*&plusmn;scale</i>            . three storage words
+        <i>fraction:</i><a style = color:red>q</a><i>*&plusmn;scale</i>            . four storage words
+        <i>fraction:</i><a style = color:red>p</a><i>*&plusmn;scale</i>            . five storage words
+        <i>fraction:</i><a style = color:red>h</a><i>*&plusmn;scale</i>            . six storage words
+        <i>fraction:</i><a style = color:red>z</a><i>*&plusmn;scale</i>            . seven storage words
+        <i>fraction:</i><a style = color:red>o</a><i>*&plusmn;scale</i>            . eight storage words
 
 </pre>
-<p>
-These trailing letters may be upper or lower case and may have a
-colon before them or parenthesis or quote, to avoid catenation
-with label references
+Size-suffixes are case-independent irrespective of -k option.<br>
+: colon is only necessary to disambiguate where
 <pre>
 
-67.5t
+        the last token in the fraction is a label
 
-        +MANTISSA:<a style="color:red">q</a>*+1200000
+        the last token in the fraction is hexadecimal
+        and the targeted storage two words
 
-        +(MANTISSA)<a style="color:red">p</a>*+800
-
-        20*"MANTISSA"<a style="color:red">d</a>*+307
+        binary notation is determined by <a href="#suffix">$suffix</a>
 
 </pre>
-Period may only appear in a decimal digit string. Where period
+It is never wrong to include : colon.
+Parentheses round expressions and quotes round label references
+can also disambiguate, for example
+
+<pre>
+
+	67.5t		. no ambiguity
+
+        +MANTISSA:<a style="color:red">q</a>*+1200000	. separate MANTISSA from <a style="color:red">q</a>
+
+        +(MANTISSA)<a style="color:red">p</a>*+800	. separate MANTISSA from <a style="color:red">p</a>
+
+        20*"MANTISSA"<a style="color:red">d</a>*+307	. separate MANTISSA from <a style="color:red">d</a>
+
+</pre>
+Period may only appear in a decimal fraction string. Where period
 appears the scale notation [ e e+ e- E E+ E- ] can be typed in
 place of the masmx scale operator <b>*+</b> or <b>*-</b>
 

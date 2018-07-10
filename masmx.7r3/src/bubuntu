@@ -1,0 +1,13 @@
+echo this should be ubuntu.x86
+
+gcc -m32 -funsigned-char -DINTEL -DSUSE -DSUPERSET -o ../masmx masm.c
+gcc -m32 -funsigned-char -DINTEL -DSUSE -o ../masmz masm.c
+cp ../masmx ../masmx.7r3/hosts/ubuntu.x86
+cp ../masmz ../masmx.7r3/hosts/ubuntu.x86
+cp ../masmx.7r3/hosts/ubuntu.x86/imx ..
+cp ../masmx.7r3/hosts/ubuntu.x86/mmx ..
+echo	cd ../test.msm
+echo	chmod 0755 ugo
+echo	run ./ugo
+echo	run ./alltests
+
