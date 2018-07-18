@@ -3,11 +3,11 @@ call	.\mverify	-wy
 copy z5.txo ..\test.o3\z5left.txo
 call	.\zferify	-w	-j
 copy z5.txo ..\test.o3\z5right.txo
-cd ..\test3.map
-call	.\sure34	-wy
-copy p44.txo ..\test.o3\p44left.txo
-call	.\zure34	-w	-j
-copy p44.txo ..\test.o3\p44right.txo
+rem cd ..\test3.map
+rem call	.\sure34	-wy
+rem copy p44.txo ..\test.o3\p44left.txo
+rem call	.\zure34	-w	-j
+rem copy p44.txo ..\test.o3\p44right.txo
 cd ..\test.gcc
 call	.\dothis	-wy
 copy outerm.txo ..\test.o3

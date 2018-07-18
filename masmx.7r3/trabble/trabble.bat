@@ -1,4 +1,4 @@
-del *.txo
+del /Q  *.txo
 ..\masmx	tribble	%1
 ..\masmx	trabble	%1
 ..\masmx	trybble	%1

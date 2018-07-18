@@ -1,4 +1,4 @@
-del	*.txo
+del /Q 	*.txo
 ..\masmx soso	%1	-y
 ..\masmx factor %1	-y
 ..\masmx zactor	zactor %1	-y

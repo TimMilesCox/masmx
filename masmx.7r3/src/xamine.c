@@ -312,7 +312,35 @@ static char *contains(char *s, char *e, char *list)
    }
 
    return rightmost;
-} 
+}
+
+static char *operates(char *s, char *e, char *list)
+{
+   char		*candidate = NULL,
+		*rewind;
+
+   int		 symbol;
+
+   while (candidate = contains(s, e, list))
+   {
+      rewind = candidate;
+      e = candidate;
+
+      while (rewind > s)
+      {
+         rewind--;
+         symbol = *rewind;
+         if (symbol == '*') break;
+         if (symbol == '/') break;
+         if (symbol == '+') break;
+         if (symbol == '-') break;
+         if (symbol ^  ' ') return candidate;
+      }
+   }
+
+   return candidate;
+}
+
 
 static char  *getop(char  *l)
 {

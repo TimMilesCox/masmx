@@ -1,5 +1,5 @@
-del ..\test.o3\*
-del ..\text.o3\*
+del /Q  ..\test.o3\*
+del /Q  ..\text.o3\*
 ..\masmx 1101 ..\test.o3\1101.txo -loy > ..\text.o3\1101.txt
 ..\masmx 1103 ..\test.o3\1103.txo -loy > ..\text.o3\1103.txt
 ..\masmx 14 ..\test.o3\14.txo -loy > ..\text.o3\14.txt

@@ -2152,6 +2152,8 @@ static line_item *xpression(char *s, char *e, char *param)
    mapx->scale = 0;
    #endif
 
+   while ((s < e) && (*s == ' ')) s++;
+
    if (s == e) return sp;
    
    #ifdef VERY_STACKED_XPRESSION
@@ -2601,7 +2603,7 @@ static line_item *xpression(char *s, char *e, char *param)
    }
    #endif       /*      FP_EARLIER        */
 
-   if (d = contains(s, e, "-\0+\0"))
+   if (d = operates(s, e, "-\0+\0"))
    {
       /*******************************************************
          this precaution here allows unary signs to follow
@@ -2609,12 +2611,15 @@ static line_item *xpression(char *s, char *e, char *param)
          getting mistaken for add/subtract operators
       *******************************************************/
 
+      #if 0	/* operates function does this */
       symbol = *(d-1);
       if ((symbol != '*')
       &&  (symbol != '/')
       &&  (symbol != '+')
       &&  (symbol != '-'))
       {
+      #endif
+
 	 if (*d == '+')
 	 {
 	    left = xpression(s, d, param);
@@ -2624,7 +2629,7 @@ static line_item *xpression(char *s, char *e, char *param)
 	    left_side = mapx->m;
             #endif
 
-	    right = xpression(d+1, e, param);
+	    right = xpression(d + 1, e, param);
 	    operand_add(left, right);
 	    sp++;
 
@@ -2680,7 +2685,7 @@ static line_item *xpression(char *s, char *e, char *param)
 	    left_side = mapx->m;
             #endif
             c = transient_floating_bits;
-	    right = xpression(d+1, e, param);
+	    right = xpression(d + 1, e, param);
 
             if (floating_field)
             {
@@ -2768,11 +2773,13 @@ static line_item *xpression(char *s, char *e, char *param)
 
 	    return sp; 
 	 }
+      #if 0	/*	operates() function did that	*/
       }
+      #endif
    }
    
 
-   if (d = contains(s, e, "///\0//\0/\0*\0"))
+   if (d = operates(s, e, "///\0//\0/\0*\0"))
    {
       sp--;
       left = xpression(s, d, param);
@@ -2856,6 +2863,22 @@ static line_item *xpression(char *s, char *e, char *param)
       {
       }
       else operand_addcarry(twoscomp, sp);
+
+      #ifdef RELOCATION
+      #ifdef MULTUPLES
+      if (mapx->m.l.y)
+      {
+         /*****************************************
+		if a relocation tuple applies
+		it only needs -polarity 
+         *****************************************/
+
+         mapx->m.l.y |= 8;
+         mapx->recursion = maprecursion;
+      }
+      #endif
+      #endif
+
       return sp;
    }
 
@@ -3452,6 +3475,8 @@ static long expression(char *s, char *e, char *param)
    location_counter		*q;
    #endif
 
+   while ((s < e) && (*s == ' ')) s++;
+
    if (s == e) return 0;
    
    if (d = contains(s, e, "=\0"))
@@ -3503,7 +3528,7 @@ static long expression(char *s, char *e, char *param)
    if (d = contains(s, e, "**\0")) return expression(s, d, param)
 					& expression(d+2, e, param);
 
-   if (d = contains(s, e, "-\0+\0"))
+   if (d = operates(s, e, "-\0+\0"))
    {
       /*******************************************************
          this precaution here allows unary signs to follow
@@ -3511,21 +3536,25 @@ static long expression(char *s, char *e, char *param)
          getting mistaken for add/subtract operators
       *******************************************************/
 
+      #if 0
       symbol = *(d-1);
       if ((symbol != '*')
       &&  (symbol != '/')
       &&  (symbol != '+')
       &&  (symbol != '-'))
       {
+      #endif
 	 if (*d == '+') return expression(s, d, param)
-			     + expression(d+1, e, param);
+			     + expression(d + 1, e, param);
       
 	 if (*d == '-') return expression(s, d, param)
-			     - expression(d+1, e, param);
+			     - expression(d + 1, e, param);
+      #if 0
       }
+      #endif
    }
    
-   if (d = contains(s, e, "///\0//\0/\0*\0"))
+   if (d = operates(s, e, "///\0//\0/\0*\0"))
    {
       if (*d == '*') return expression(s, d, param)
 			  * expression(d+1, e, param);

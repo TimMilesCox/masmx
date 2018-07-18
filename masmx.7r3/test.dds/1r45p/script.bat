@@ -1,4 +1,4 @@
-del abs\*
+del /Q  abs\*
 ..\..\masmz dt.asm abs\dt
 ..\..\imx abs\dt.txo abs\dt.hex
 ..\..\masmx dt.asm abs\aside

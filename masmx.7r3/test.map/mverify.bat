@@ -1,4 +1,4 @@
-del *.txo
+del /Q  *.txo
 ..\masmx soso soso		%1	-y
 ..\masmx factor factor		%1	-y
 ..\masmx wolverine wolverine	%1	-y

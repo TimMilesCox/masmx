@@ -109,19 +109,23 @@ static void i_xpress(char *s, char *e, char *tag)
 
    if (storage_addresses(s, e))
    {
+      #if 0
       if ((unary == '+') || (unary == '-')
       ||  (unary == '*') || (unary == '^')) q++;
+      #endif
 
       if ((p = contains(q, e, "=\0^=\0"))
       ||  (p = contains(q, e, ">\0<\0"))
       ||  (p = contains(q, e, "--\0++\0"))
       ||  (p = contains(q, e, "/*\0*/\0"))
       ||  (p = contains(q, e, "**\0"))
-      ||  (p = contains(q, e, "+\0-\0"))
-      ||  (p = contains(q, e, "/\0//\0///\0*\0")))
+      ||  (p = operates(q, e, "+\0-\0"))
+      ||  (p = operates(q, e, "/\0//\0///\0*\0")))
       {
          this_operator = oper_ator(p, e - p);
          q = p + ufield[this_operator];
+
+         while (*q == ' ') q++;
 
          symbol = 0;
          if (ofield > 1) symbol = *(p + 1);

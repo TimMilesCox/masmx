@@ -1,6 +1,6 @@
 pushd ..\smaragd.ppc
-del .\*.txo
-del smaragd.ppc
+del /Q  .\*.txo
+del /Q  smaragd.ppc
 ..\masmx yield -w
 ..\masmx idle -w
 ..\masmx smaragd.map -w

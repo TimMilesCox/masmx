@@ -1,5 +1,5 @@
-del ..\test.zo3\*
-del ..\text.zo3\*
+del /Q  ..\test.zo3\*
+del /Q  ..\text.zo3\*
 ..\masmz 1101 ..\test.zo3\1101.txo -lo> ..\text.zo3\1101.txt
 ..\masmz 1103 ..\test.zo3\1103.txo -lo> ..\text.zo3\1103.txt
 ..\masmz 14 ..\test.zo3\14.txo -lo> ..\text.zo3\14.txt

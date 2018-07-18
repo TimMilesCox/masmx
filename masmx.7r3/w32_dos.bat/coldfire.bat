@@ -1,5 +1,5 @@
 pushd ..\smaragd.68k
-del .\*.txo
+del /Q  .\*.txo
 ..\masmx coldfire -wy
 ..\masmx coldfir@ -wy
 fc /w yield.txo yield@.txo

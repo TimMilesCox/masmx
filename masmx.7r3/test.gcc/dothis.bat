@@ -1,4 +1,4 @@
-del *.txo
+del /Q  *.txo
 ..\masmx lobank lobank %1
 ..\masmx vitest %1
 ..\masmx vitest2 %1

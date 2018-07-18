@@ -219,12 +219,16 @@ static void fp_xpress(char *s, char *e, char *tag)
    int			 x;
 
 
+   #if 0
    if ((unary == '+') || (unary == '-') || (unary == '*')) q++;
+   #endif
 
-   if ((p = contains(q, e, "+\0-\0"))
-   ||  (p = contains(q, e, "/\0*\0")))
+   if ((p = operates(q, e, "+\0-\0"))
+   ||  (p = operates(q, e, "/\0*\0")))
    {
       q = p + 1;
+
+      while (*q == ' ') q++;
 
       if (complex(q, e))
       {
