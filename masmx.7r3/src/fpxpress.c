@@ -110,9 +110,11 @@ static int complex_beyond(char *s, char *e, char *list)
 static int number(char *s, char *e)
 {
    object		*l;
+   int		 symbol = *s;
 
-   if (*s == '*') return 0;
-   if (*s == '(') return number(s+1, e-1);
+   if (symbol == '*') return 0;
+   if (symbol == '(') return number(s + 1, e - 1);
+   if ((symbol == '-') || (symbol == '+')) return number(s + 1, e);
 
    if (s < e) l = findlabel(s, e);
    else                  return 1;
@@ -129,7 +131,7 @@ static int number(char *s, char *e)
    if (l->l.valued == EQUF) return 0;
    if (l->l.valued & 128) return 0;
 
-   return 1;
+   return 2;
 }
 
 static void fpxpress_assemble(char *name, char *start, char *end, char *tag)
@@ -156,12 +158,21 @@ static void fpxpress_assemble(char *name, char *start, char *end, char *tag)
       }
 
       *p++ = '(';
+
+      if ((__literal == 2) && (twoscomp) && (start != end))
+      {
+//	printf("[%x]\n", __literal);
+         symbol = *start++;
+         if (symbol == '-') symbol = '^';
+         *p++ = symbol;
+      }
    }
    
    while ((start != end) && (symbol = *start++)) *p++ = symbol;
    if (__literal)           *p++ = ')';
 
    *p = 0;
+//	if (__literal == 2) printf("[%s]\n", assembly);
 
    masm_level++;
 
@@ -232,6 +243,7 @@ static void fp_xpress(char *s, char *e, char *tag)
 
       if (complex(q, e))
       {
+//	printf("[_%c_]\n", *p);
          fp_xpress(q, e, tag);
 
          switch (*p)
@@ -262,6 +274,7 @@ static void fp_xpress(char *s, char *e, char *tag)
                   s = q + ufield[x];
                }
 
+//	printf("[%x %s]", x, s);
                trailing_fp_operation(x, s, p, tag);
                break;
 
@@ -294,6 +307,7 @@ static void fp_xpress(char *s, char *e, char *tag)
       }
       else
       {
+//	printf("[%c]\n", *p);
          fp_xpress(s, p, tag);
          if (*q == '(') q++;
 

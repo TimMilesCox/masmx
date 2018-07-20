@@ -5,7 +5,7 @@ rm abs/*
 ../../imx abs/aside.txo abs/aside.hex
 #	../../../masmx.4r1/src/masmx dt.asm abs/aside2
 #	../../imx abs/aside2.txo abs/aside2.hex
-diff -w 1r45pq.hex abs/dt.hex
-cmp abs/dt.hex abs/aside.hex
+diff -ws --brief 1r45pq.hex abs/dt.hex
+diff -ws --brief abs/dt.hex abs/aside.hex
 #	cmp abs/dt.hex abs/aside2.hex
 
