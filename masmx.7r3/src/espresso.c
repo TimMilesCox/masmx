@@ -31,6 +31,12 @@ static int storage_addresses(char *s, char *e)
 
    while (s < e)
    {
+      if (*s == ' ')
+      {
+         s++;
+         continue;
+      }
+
       if (*s == '(')
       {
          p = fendb(s, e);
@@ -41,7 +47,7 @@ static int storage_addresses(char *s, char *e)
       if (*s == '+') return storage_addresses(s + 1, e);
       if (*s == '-') return storage_addresses(s + 1, e);
 
-      if (p = next_operator(s, e, NULL, 0))
+      if (p = next_binary_operator(s, e, NULL, 0))
       {
          if (number(s, p) == 0) return 1;
          s = p + ofield;
@@ -107,6 +113,10 @@ static void i_xpress(char *s, char *e, char *tag)
    int			 this_operator;
 
 
+   #if 0
+   while (*s == ' ') *s++;
+   #endif
+
    if (storage_addresses(s, e))
    {
       #if 0
@@ -114,11 +124,11 @@ static void i_xpress(char *s, char *e, char *tag)
       ||  (unary == '*') || (unary == '^')) q++;
       #endif
 
-      if ((p = contains(q, e, "=\0^=\0"))
-      ||  (p = contains(q, e, ">\0<\0"))
-      ||  (p = contains(q, e, "--\0++\0"))
-      ||  (p = contains(q, e, "/*\0*/\0"))
-      ||  (p = contains(q, e, "**\0"))
+      if ((p = operates(q, e, "=\0^=\0"))
+      ||  (p = operates(q, e, ">\0<\0"))
+      ||  (p = operates(q, e, "--\0++\0"))
+      ||  (p = operates(q, e, "/*\0*/\0"))
+      ||  (p = operates(q, e, "**\0"))
       ||  (p = operates(q, e, "+\0-\0"))
       ||  (p = operates(q, e, "/\0//\0///\0*\0")))
       {
@@ -304,6 +314,8 @@ static void i_xpress(char *s, char *e, char *tag)
          {
             i_xpress(s, p, tag);
             if (*q == '(') q++;
+
+            while (*q == ' ') q++;
 
             switch (this_operator)
             {

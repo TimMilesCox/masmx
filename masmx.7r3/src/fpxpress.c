@@ -58,7 +58,8 @@ static int complex(char *s, char *e)
       p = q;
    }
 
-   if (next_operator(s, e, "*+\0*-\0", EXCLUDE_OPERATORS)) return 1;
+   p = next_binary_operator(s, e, "*+\0*-\0", EXCLUDE_OPERATORS);
+   if (p) return 1;
 
    return 0;
 }
@@ -161,7 +162,6 @@ static void fpxpress_assemble(char *name, char *start, char *end, char *tag)
 
       if ((__literal == 2) && (twoscomp) && (start != end))
       {
-//	printf("[%x]\n", __literal);
          symbol = *start++;
          if (symbol == '-') symbol = '^';
          *p++ = symbol;
@@ -172,7 +172,6 @@ static void fpxpress_assemble(char *name, char *start, char *end, char *tag)
    if (__literal)           *p++ = ')';
 
    *p = 0;
-//	if (__literal == 2) printf("[%s]\n", assembly);
 
    masm_level++;
 
@@ -243,7 +242,6 @@ static void fp_xpress(char *s, char *e, char *tag)
 
       if (complex(q, e))
       {
-//	printf("[_%c_]\n", *p);
          fp_xpress(q, e, tag);
 
          switch (*p)
@@ -274,7 +272,6 @@ static void fp_xpress(char *s, char *e, char *tag)
                   s = q + ufield[x];
                }
 
-//	printf("[%x %s]", x, s);
                trailing_fp_operation(x, s, p, tag);
                break;
 
@@ -307,7 +304,6 @@ static void fp_xpress(char *s, char *e, char *tag)
       }
       else
       {
-//	printf("[%c]\n", *p);
          fp_xpress(s, p, tag);
          if (*q == '(') q++;
 
