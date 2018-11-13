@@ -3825,15 +3825,111 @@ f       $func
 <a      name="fmacode"/>
 <h3>4.6.3: Code Generated During Function Evaluation</h3> 
 
-Code may not be generated inline to the current
-location counter during a <b>$func</b>. That is treated
-as an error, although the functional result may determine
-more or less code generated inline
+Code may be generated with values supplied by a function macro, for example
+<pre>
+
+	$ masmx 2log.msm -lnke
+	MASMX 7r3A Build 5
+	3/2log.msm
+	*EOF*
+	  :                            1 f	$func
+	  :                            2 LOG*	$name
+	  :                            3 fulcrum	$set	f(1, 1)-1
+	  :                            4 ?	$do	23,	$do	1*/?-1>fulcrum,	$return	?-1
+	  :                            5 	$return	-1
+	  :                            6 	$end
+	  :                            7 
+	  :                            8 $(3:03000)
+	03:003000  000005              +9 	+	LOG(30)
+	03:003001  000005              +10 	+	LOG(31)
+	03:003002  000005              +11 	+	LOG(32)
+	03:003003  000006              +12 	+	LOG(33)
+	  :                            13 
+	*EOF*
+	:$(03):003000:003004 
+	2log.msm: object code 65 bytes: 0 errors: 0 undefined labels
+
+	$
+
+</pre>
+
+
+Code may not be generated inline to the current location counter
+inside the expanded text of a function macro, for example
+<pre>
+
+	$ masmx liable -lnke
+	MASMX 7r3A Build 5
+	3/liable.msm
+	*EOF*
+	  :                            1 f*      $func
+	  :                            2         +       99
+	  :                            3 one     +       100
+	  :                            4 two     +       101
+	  :                            5 three   +       102
+	  :                            6         $snap   2
+	  :                            7         $return 103
+	  :                            8         $end
+	00:000000  000063              +9         +       f()
+	00:000001  000064              +9 
+	00:000002  000065              +9 
+	00:000003  000066              +9 
+	one=$00:000001
+	two=$00:000002
+	three=$00:000003
+	Error: liable.msm Line 9: Function Adding Code Inline
+	00:000004  000067              +9 
+	*EOF*
+	:$(00):000000:000005 
+	liable.msm: object code 72 bytes: 1 errors: 0 undefined labels
+
+	$
+
+</pre>
+This restriction is intended to avoid accidental inclusion of
+data constants in instruction streams.<br>
+It is consistent with the purpose of function macros, generating values not code
+
+<p>
+Assembly option flag -I releases this restriction
+<pre>
+
+	$ masmx viable -lnkeI
+	MASMX 7r3A Build 5
+	3/viable.msm
+	*EOF*
+	  :                            1 f*       $func
+	  :                            2         +       99
+	  :                            3 one     +       100
+	  :                            4 two     +       101
+	  :                            5 three   +       102
+	  :                            6         $snap   2
+	  :                            7         $return 103
+	  :                            8         $end
+	00:000000  000063              +9         +       f()
+	00:000001  000064              +9 
+	00:000002  000065              +9 
+	00:000003  000066              +9 
+	one=$00:000001
+	two=$00:000002
+	three=$00:000003
+	00:000004  000067              +9 
+	  :                            10         $snap   2
+	*EOF*
+	:$(00):000000:000005 
+	viable.msm: object code 72 bytes: 0 errors: 0 undefined labels
+
+	$
+
+</pre>
 
 <p>
 Here function <i>f</i> calls a macro <i>generate</i>
-to construct a data item out of line (in locator 42), and  
+to construct a data item out of line (in section 42), and  
 attach a label to it
+
+<p>
+masmx assembler allows this unconditionally
 <pre>
 
 f*      $func	*
@@ -17192,11 +17288,16 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 :$(00):00000000:00000004 
 a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 
+	-B	display owner and macro level of label added to $tree or $record structure
+
+		<b>[L</b><i>macro_level</i><b>:A</b><i>owner_macro_level</i><b>:G</b><i>macro_level_this_label</i><b>:V</b><i>label_type</i><b>:P</b><i>macro_passes</i><b>]</b><i>owner_name</i><b>:</b><i>name</i>
 
 	-D	translate \<i>ESCAPED</i> octal and hex sequences in "strings"
 		and in 'integers' in apostrophe if
 
 			-c is opted
+
+				and
 
 			$data_code is asserted
 
@@ -17225,17 +17326,13 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 
 			$set_option "G"
 
-		the mantissa is always generated longer than
-		it is stored. The OR of three guard pattern bits 
-		AND their corresponding truncated bit is carried
-		into the mantissa
+		the mantissa is generated longer than its storage size
+		with appended signs XOR guard pattern
 
 		The mantissa may outflow as a result of rounding.
 		Then the mantissa is shifted right one position to
 		normalise again and the exponent is incremented
 
-		The guard pattern is added simply during repositioning
-		cycles when translating decimal scales
 
 		 ___________________________________________________
 		 |
@@ -17267,6 +17364,13 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 		rounding is towards zero or truncation
 
 
+
+	-I	allow function macros to generate code inline to the current location counter
+
+
+	-L	display type and macro level of added label
+
+		<b>[</b><i>macro_level</i><b>&lt;-</b><i>macro_level_this_label</i><b>:</b><i>label_type</i><b>:</b><i>filename</i><b>:</b><i>inclusion_depth</i><b>:</b><i>label_name</i>]
 
 		<a	name="option_Q"/>
         -Q      execute a function name encountered in an
@@ -17322,6 +17426,8 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 		field-name	5s
 
 		See 5.2.3.4: Signed Bit Fields
+
+		macro language reads signedness of bit fields to determine manipulation
 
 
         -Z      zero fill buffers declared with $res directive

@@ -1,0 +1,18 @@
+chmod 0755 alltests
+chmod 0755 ../script
+chmod 0755 ../zscript
+chmod 0755 ../test.dds/2r1/script
+chmod 0755 ../test.dds/1r45p/script
+chmod 0755 ../linkpart
+chmod 0755 ../test.map/mverify
+chmod 0755 ../test.map/zferify
+chmod 0755 ../test.gcc/dothis
+chmod 0755 ../trabble/trabble
+chmod 0755 ../aside.dem/sgen
+chmod 0755 bojo
+chmod 0755 ../coldfire
+chmod 0755 ../ppc_kern
+chmod 0755 ../imx
+chmod 0755 ../mmx
+chmod 0766 ../masmx.7r3/hosts/suse.x86/*
+

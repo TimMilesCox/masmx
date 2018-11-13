@@ -153,6 +153,8 @@ extern unsigned _stklen = 32*1024;
 
 #endif	/***************** End of Developer Platform choices ************/
 
+#include <errno.h>
+
 #ifdef SUSE
 #define getline getaline
 #endif

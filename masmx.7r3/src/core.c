@@ -1213,7 +1213,11 @@ static line_item *external_function(char *s, char *param, char *mark,
                #endif
 
                function_scope = scope;
-               if (loc != start) flag("Function Adding Code Inline");
+
+               if (uselector['I'-'A'] == 0)
+               {
+                  if (loc != start) flag("Function Adding Code Inline");
+               }
 
                if (plist > (masm_level + 1))
                {
@@ -1255,7 +1259,12 @@ static line_item *external_function(char *s, char *param, char *mark,
    function_scope = scope;
 
    if (!skipping) note("Automatic Function Return Value");
-   if (loc != start) flag("Function Adding Code Inline");
+
+   if (uselector['I'-'A'] == 0)
+   {
+      if (loc != start) flag("Function Adding Code Inline");
+   }
+
    return &zero_o;
 }
 
@@ -5299,7 +5308,7 @@ static void save_object(char *arg)
    int		 i = close(ohandle);
    object	*l;
 
-   if (i) printf("file state %d problem writing output\n", i);
+   if (i < 0) printf("file state %d %d problem writing output\n", i, errno);
    
    l = compose_filename(arg, ".txo", 0);
    i = qextractv(l);
@@ -5308,7 +5317,7 @@ static void save_object(char *arg)
    {   
       remove(l->l.name);
       i = rename(OBIN, l->l.name);
-      if (i) printf("file state %d problem storing %s\n", i, l->l.name);
+      if (i < 0)  printf("file state %d %d problem storing %s\n", i, errno, l->l.name);
       return;
    }
 
@@ -8770,7 +8779,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
    return 0;
 }
 
-main(int argc, char *_argv[])
+int main(int argc, char *_argv[])
 {
    int			 i = 1, j, bits, bytes;
    
@@ -8883,6 +8892,12 @@ main(int argc, char *_argv[])
       #else
       nhandle = open(OSYM, O_CREAT|O_TRUNC|O_RDWR, S_IREAD|S_IWRITE|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
       #endif
+
+      if (nhandle < 0)
+      {
+	 printf("temp symbolic cannot be written %d\n", errno);
+	 return 0;
+      }
    }
    
    for (;;)
@@ -9060,6 +9075,9 @@ main(int argc, char *_argv[])
          handle[0] = open(OSYM,                  O_RDONLY);
          else
 	 handle[0] = open(file_label[0]->l.name, O_RDONLY);
+
+         if (handle[0] < 0) printf("temp symbolic cannot be read %d\n", errno);
+
 	 quadza(handle[0], &file_label[0]->l.value);
 	 
 	 selector['s'-'a'] = 0;
@@ -9072,7 +9090,7 @@ main(int argc, char *_argv[])
 
 	 if (ohandle < 1)
 	 {
-	    printf("No Otable\n");
+	    printf("temp binary cannot be written %d\n", errno);
 	    return -96;
 	 }
 

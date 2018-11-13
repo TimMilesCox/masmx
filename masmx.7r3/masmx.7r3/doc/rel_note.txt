@@ -1,5 +1,5 @@
-Preliminary	masmx.7r3A	Build 4	Distribution 10 July 2018
-___________	__________	_______	_________________________
+Preliminary	masmx.7r3A	Build 5	Distribution 14 November 2018
+___________	__________	_______	_____________________________
 
 
 
@@ -12,6 +12,16 @@ ___________	__________	_______	_________________________
 	named code and data
 
 	added -H option, allows unrounded floating constants<br><br>
+
+
+	Build 5
+	_______
+
+	displays errno if an input or an output file cannot be accessed
+	pointing to cause of problem
+
+	option flag -I legalises inline code generation from $func macros
+
 
 	Build 4
 	_______
@@ -27,15 +37,15 @@ ___________	__________	_______	_________________________
 	Earlier application code needs no changes
 
 
-	Easy to Use Build Scripts
-	_________________________
+	Easy to Use Build Scripts for Updated or Ported masmx
+	_____________________________________________________
 
 	Directory src now has scripts for constructing updated masmx and masmz
 	on and for platforms osx.x86 osx.ppc ubuntu.x86 win32
 
 		./bosx86
 		./ppcbosx
-		./bubuntu
+		./bsuse
 		./bw32
 
 	These builds are all for 32-bit targets. They also display guidance
@@ -90,7 +100,7 @@ ____________________________
 
 	Mac OS X / PowerPC G4		DELIVERED IN THIS PACKAGE
 
-	Mac OS X / ix86			DELIVERED IN THIS PACKAGE
+	Mac OS X / x86			DELIVERED IN THIS PACKAGE
 
 	Sun Sparc Solaris		pending
 
@@ -98,7 +108,9 @@ ____________________________
 	Linux Platforms
 	_______________
 
-	UBUNTU Linux / ix86		DELIVERED IN THIS PACKAGE
+	openSUSE Linux / x86		DELIVERED IN THIS PACKAGE
+
+	UBUNTU Linux / x86		replaced by openSUSE
 
 
 
@@ -127,7 +139,7 @@ All the binaries delivered are standalone programs.
 
 	masmz is the assembler with a subset of features
 
-masmx.7r3a manual describes masmx command line
+masmx.7r3a manual describes programming with masmx and the masmx command line
 
 	imx converts the output of masmx and masmz to 16-bit address I-Records
 

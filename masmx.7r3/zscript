@@ -568,7 +568,7 @@ rm ../text.zo3/*
 ../masmz var ../test.zo3/var.txo -lo> ../text.zo3/var.txt
 ../masmz vast ../test.zo3/vast.txo -lo> ../text.zo3/vast.txt
 ../masmz vector ../test.zo3/vector.txo -lo> ../text.zo3/vector.txt
-../masmz viable ../test.zo3/viable.txo -lo> ../text.zo3/viable.txt
+../masmz viable ../test.zo3/viable.txo -loI> ../text.zo3/viable.txt
 ../masmz victim ../test.zo3/victim.txo -lo> ../text.zo3/victim.txt
 ../masmz visobar ../test.zo3/visobar.txo -lo> ../text.zo3/visobar.txt
 ../masmz vitest ../test.zo3/vitest.txo -lo> ../text.zo3/vitest.txt

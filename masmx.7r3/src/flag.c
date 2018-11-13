@@ -101,7 +101,8 @@ static void flag_file_access()
    int x = depth;
 
    if (x) x--;
-   printf("Error: %s Line %d: file missing: %s\n",
+   printf("Error %d: %s Line %d: file missing: %s\n",
+           errno,
            file_label[x]->l.name,
            ll[x],
            name);
