@@ -51,25 +51,30 @@ masmx is a freeware meta-assembler for any target
 	Improvement to hierarchically structured and named code and data.<br>
 	Earlier application code needs no changes<br><br>
 
-	Assembly option flag -X allows data binary computational values up to 192 bits in size<br>
-        to be passed from one assembly to another as labels, accelerating just-in-realtime assembly.<br>
+	Assembly flag -X allows data binary computational values<br>
+	up to 192 bits in size to be passed from one assembly to another<br>
+	as labels, accelerating just-in-realtime assembly.<br>
         Only storage addresses could previously be imported<br><br>
 
-	Addition of :z tag to construct integer and floating constants seven storage words in size.<br>
-        Size tags override self-sizing for integers and default size for floating point.<br>
-        Tags exist already to specify single / double / triple / quad / penta- / hexa- / octaword<br><br>
+	Addition of :Z tag to construct integer and floating constants<br>
+	seven storage words in size.<br>
+        Size tags override integer self-sizing and floating point default size.<br>
+        The assembler already has flags to specify a number constant size of<br>
+	one / two / three / four / five / six / eight words<br><br>
 
 	other recent features see Release Note or intro page
 
 <a	href="#flag_XX"
-	style="right:100pt;top:375pt;position:absolute">import data binary values</a>
+	style="right:20pt;top:388pt;position:absolute">import data binary values</a>
 
+<a	href="#floating_tag"
+	style="right:20pt;top:468pt;position:absolute">number size tag</a>
 
 <a	href="index.html"
-	style="right:100pt;top:455pt;position:absolute">intro page</a>
+	style="right:20pt;top:498pt;position:absolute">intro page</a>
 
 <a	href="#strools"
-	style="right:100pt;position:absolute">
+	style="right:20pt;top:324pt;position:absolute">
 	Structured Code
 </a>
 </a>
@@ -2116,8 +2121,10 @@ Number storage values are in canonical byte order, and the only way to change th
 number constant commands (often with names like DW and DD) as macros.
 
 <p>
+<a	name="size_tag"/>
 Integer constants are self-sizing but may be tagged to determine their size in target storage.<br>
-Assembly selects a default size for floating constants but the constant may be tagged to determine a different size
+Assembly selects a default size for <a href="#floating_tag">floating constants</a>
+but the constant may be tagged to determine a different size
 <pre>
 
 	<i>expression:</i><a style = color:red>s</a>            . one storage word
@@ -2285,7 +2292,8 @@ LTERM=;
 
 </pre>
 <p>
-Floating point items are not auto-sized like integers.
+<a	name="floating_tag"/>
+Floating point constants are not auto-sized like <a href="#size_tag">integers</a>
 
 <p>
 
