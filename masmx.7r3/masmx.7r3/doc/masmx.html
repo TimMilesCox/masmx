@@ -46,13 +46,30 @@ masmx is a freeware meta-assembler for any target
 
 <a	href="http://timmilescox.github.io/masmx/">-----&gt;masm7r3A Downloads Page</a>
 <a	style="color:FF0000;right:100pt;position:absolute">
-        <u>Changes from 7r3 to 7r3A</u><br>
-        masmx.7r3A revises and makes more consistent the assembly<br>
-        of hierarchically structured and named code and data. Earlier<br>
-        application code needs no changes<br>
+        <u>recent features</u><br><br>
+
+	Improvement to hierarchically structured and named code and data.<br>
+	Earlier application code needs no changes<br><br>
+
+	Assembly option flag -X allows data binary computational values up to 192 bits in size<br>
+        to be passed from one assembly to another as labels, accelerating just-in-realtime assembly.<br>
+        Only storage addresses could previously be imported<br><br>
+
+	Addition of :z tag to construct integer and floating constants seven storage words in size.<br>
+        Size tags override self-sizing for integers and default size for floating point.<br>
+        Tags exist already to specify single / double / triple / quad / penta- / hexa- / octaword<br><br>
+
+	other recent features see Release Note or intro page
+
+<a	href="#flag_XX"
+	style="right:100pt;top:375pt;position:absolute">import data binary values</a>
+
+
+<a	href="index.html"
+	style="right:100pt;top:455pt;position:absolute">intro page</a>
 
 <a	href="#strools"
-	style=right:100pt;position:absolute>
+	style="right:100pt;position:absolute">
 	Structured Code
 </a>
 </a>
@@ -431,9 +448,13 @@ for actual delivered binaries
 				process its relocation information
 				output the linked code			8.24.2
 
+	    <a href="#flag_XX">$include,{$binary|$void}</a>
+				import labels holding computational values
+				retrieve data binary values as labels	8.24.3
+
 	3.  <a href="#include_v">$include,$void</a>	linking directive:
 				include addresses from a text-encoded
-				binary file, but no code from it	8.24.3
+				binary file, but no code from it	8.24.4
 
     25.	<a href="#info">$info</a>			linking directive:			8.25
 
@@ -456,7 +477,7 @@ for actual delivered binaries
 			optionally declare literal tag			8.28
 
     29.	<a href="#load">$load</a>		linking directive:
-			write revised binary information in
+			write revised binary information to
 			output text-encoded binary file			8.30
 
     30.	<a href="#lterm">$lterm</a>		change comment character			8.30
@@ -8968,6 +8989,23 @@ label   $equ    10*44*/180
 A label is equated on the second assembly pass if it does not yet exist.
 
 <p>
+A label may be equated to a computational value, an address relocatable or absolute, an assembler command (directive), to an assembler internal function like $ (location counter) or to a type assigned by the developer
+
+<p>
+Equates may like all labels be exported
+<pre>
+
+$(0)
+routine
+
+entry*	$equ	routine		. label exports a storage location in program section $(0)
+
+dividend* $equ	3.666666999999333333666666999999333333666666z*+1250000	. label exports a data binary computational value
+
+</pre>
+See also <a href="#set">8.46: $set</a> and <a href="#flag_XX">$include,{$binary|$void}</a>
+
+<p>
 Labels cannot be changed between types location, $equ, $set,
 and cannot except for $set labels be redefined.
 See <a href="#set">8.46:$set Directive</a>
@@ -9848,10 +9886,30 @@ The binary includes must be Text Encoded Binary format.
 See <a href="#file_formats">9: Output File Formats, Relocation and Linking,
 Giant Address Spaces, Interfacing with GNU Tools</a>
 
+<a	name="flag_XX"/>
+<h3>8.24.3: $include,{$binary|$void}	Include Data Binary Values as Labels</h3>
+
+Assembly with option flag <a href="#flag_X">-X</a> may retrieve data binary values
+up to 192 bits in size as labels exported from an earlier assembly
+<pre>
+
+	$include,$binary	earlier_assembly[.txo]
+
+	$include,$void		imports[.txo]
+
+</pre>
+Data binary values are not associated with a location counter and are typically floating numbers or integers,
+for example
+<pre>
+
+floating_dividend*	$set,192	3.666666999999333333666666999999333333666666*+1200000
+floating_divisor*	$equ		3q*-60000
+
+</pre>
 
 
 <a      name="include_v"/>
-<h3>8.24.3: $include,$void		Bind to an Independent Text Encoded Binary</h3>
+<h3>8.24.4: $include,$void		Bind to an Independent Text Encoded Binary</h3>
 
 <p>
 Linking Directive. The default filename extension is .txo
@@ -11655,7 +11713,18 @@ with directive <a href="#characteristic">8.6: $characteristic</a><br>
 See also <a href="#fdemens2">11.2.2: Exponent Field Size</a>
 
 <p>
-Subcommand <b>$binary</b> is used with $set directive.
+Integers and floating numbers may be exported as data binary computational values
+for inclusion in subsequent assemblies, for example
+<pre>
+
+dividend*	$set,192	3.6666666999999333333666666999999333333666666*+12500000
+divisor*	$set,96		3*-100000
+
+</pre>
+See also <a href="#equ">8.14: equ</a> and <a href="#flag_XX">8.24.3: $include,{$binary|$void}</a>
+
+<p>
+Subcommand <b>$binary</b> is used with $set directive when linking binary code.
 See <a href="#map_ppc">9.2.2: masmx Linking in Principle</a>
 and <a href="#pushrel">8.39: $pushrel</a> directive
 
@@ -17292,6 +17361,8 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 
 		<b>[L</b><i>macro_level</i><b>:A</b><i>owner_macro_level</i><b>:G</b><i>macro_level_this_label</i><b>:V</b><i>label_type</i><b>:P</b><i>macro_passes</i><b>]</b><i>owner_name</i><b>:</b><i>name</i>
 
+
+
 	-D	translate \<i>ESCAPED</i> octal and hex sequences in "strings"
 		and in 'integers' in apostrophe if
 
@@ -17415,6 +17486,16 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
                 with option -Q the first mention in quotes
                 also causes macro lolly to happen instead of
                 just identifying it
+		<a	name="flag_X"/>
+	-X	retrieve data binary values exported as labels
+		from earlier assemblies. Any data value
+		up to 192 bits in size may be imported
+
+			$include,{$binary|$void}	ealier_asssembly[.txo]
+
+		without -X only address information associated
+		with a location counter may be imported
+
 
 	-Y	in $record structures flag fields as signed 
 		unless their bit size is suffixed u

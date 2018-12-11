@@ -341,7 +341,6 @@ static char *operates(char *s, char *e, char *list)
    return candidate;
 }
 
-
 static char  *getop(char  *l)
 {
    int			 symbol;

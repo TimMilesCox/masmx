@@ -58,7 +58,7 @@ static int complex(char *s, char *e)
       p = q;
    }
 
-   p = next_binary_operator(s, e, "*+\0*-\0", EXCLUDE_OPERATORS);
+   p = next_binary_nonexponent_operator(s, e, "*+\0*-\0", EXCLUDE_OPERATORS);
    if (p) return 1;
 
    return 0;
@@ -85,7 +85,7 @@ static int complex_beyond(char *s, char *e, char *list)
       p = q;
    }
 
-   if (p = next_operator(s, e, list, EXCLUDE_OPERATORS)) return 1;
+   if (p = next_nonexponent_operator(s, e, list, EXCLUDE_OPERATORS)) return 1;
 
    return 0;
 }
@@ -128,6 +128,7 @@ static int number(char *s, char *e)
 
    if (l->l.r.l.rel) return 0;
    if (l->l.valued == 0) return 0;
+   if (l->l.valued == SET) return 2;
    if (l->l.r.l.xref < 0) return 0;
    if (l->l.valued == EQUF) return 0;
    if (l->l.valued & 128) return 0;
@@ -229,12 +230,8 @@ static void fp_xpress(char *s, char *e, char *tag)
    int			 x;
 
 
-   #if 0
-   if ((unary == '+') || (unary == '-') || (unary == '*')) q++;
-   #endif
-
-   if ((p = operates(q, e, "+\0-\0"))
-   ||  (p = operates(q, e, "/\0*\0")))
+   if ((p = floperates(q, e, "+\0-\0"))
+   ||  (p = floperates(q, e, "/\0*\0")))
    {
       q = p + 1;
 
@@ -247,6 +244,7 @@ static void fp_xpress(char *s, char *e, char *tag)
          switch (*p)
          {
             case '-':
+
                fpxpress_asmq(" $x_reserve ");
                fp_xpress(s, p, tag);
                fpxpress_asmq(" $x_retrieve_subtract ");
@@ -262,10 +260,9 @@ static void fp_xpress(char *s, char *e, char *tag)
                   break;
                }
 
-
                x = PLUS;
 
-               while (q = next_operator(s, p, "+\0-\0", 0))
+               while (q = next_nonexponent_operator(s, p, "+\0-\0", 0))
                {
                   trailing_fp_operation(x, s, q, tag);
                   x = oper_ator(q, p - q);
@@ -273,6 +270,7 @@ static void fp_xpress(char *s, char *e, char *tag)
                }
 
                trailing_fp_operation(x, s, p, tag);
+
                break;
 
             case '*':
@@ -286,7 +284,7 @@ static void fp_xpress(char *s, char *e, char *tag)
 
                x = MULTIPLY;
 
-               while (q = next_operator(s, p, "*\0/\0", 0))
+               while (q = next_nonexponent_operator(s, p, "*\0/\0", 0))
                {
                   trailing_fp_operation(x, s, q, tag);
                   x = oper_ator(q, p - q);

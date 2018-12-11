@@ -203,9 +203,9 @@ extern unsigned _stklen = 32*1024;
 #define VERSION	"7"
 
 #ifdef	SUPERSET
-#define REVISION "3A Build 5"
+#define REVISION "3A Build 6"
 #else
-#define REVISION "3Z Build 5"
+#define REVISION "3Z Build 6"
 #endif
 
 #define	DISPLAY_Q

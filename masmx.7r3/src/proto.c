@@ -149,6 +149,7 @@ static void brake(char *what, char *why);
 static void pack_ltable(object *toplabel);
 static void embed_procedure(int type, char *line, char *argument);
 static unsigned long checkwaver(line_item *v, object *o);
+static int length_mark(int symbol);
 
 #ifdef	FP_XPRESS
 static int number(char *s, char *e);

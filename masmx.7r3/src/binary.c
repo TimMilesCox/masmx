@@ -72,6 +72,36 @@ static int load_quartets(char *p, line_item *v)
    return bits;
 }
 
+static int load_signed_quartets(char *p, line_item *v)
+{
+   int                   symbol, bits = 0;
+
+   *v = zero_o;
+
+   while (symbol = *p++)
+   {
+      if ((symbol > 0x2F) && (symbol < 0x3A))
+      {
+         symbol &= 15;
+      }
+      else
+      {
+         if ((symbol > 0x40) && (symbol < 0x5B)) symbol -= 55;
+         else break;
+      }
+
+      if (bits == 0)
+      {
+         if (symbol & 8) *v = minus_o;
+      }
+
+      lshift(v, 4);
+      v->b[RADIX/8-1] |= symbol;
+      bits += 4;
+   }
+   return bits;
+}
+
 long strict_quartets(int symbols, char *p)
 {
    long		 z = 0;
@@ -352,6 +382,31 @@ static object *binary_load_label(char *p, short ordered,
    }
 
    lname[x] = 0;
+
+   if (*p ^ '$')
+   {
+      /****************************************************
+        label of a data value
+      ****************************************************/
+
+      if (uselector['X'-'A'])
+      {
+         load_signed_quartets(p, &v);
+         o = insert_ltable(lname + 1, lname + x, &v, SET);
+
+         if (o)
+         {
+            o->l.valued = SET;
+            o->l.r.i = 0;
+            o->l.r.l.xref = -1;
+            o->l.value = v;
+         }
+
+         return o;
+      }
+   }
+
+
    y = strict_formal_locator(p, ':');
 
    /*******************************************************
@@ -590,6 +645,7 @@ static void load_binary(char *p)
 
             if (o)
             {
+               if (o->l.valued ^ LOCATION) break;
                o->l.link = xpo_list_head;
                xpo_list_head = o;
             }

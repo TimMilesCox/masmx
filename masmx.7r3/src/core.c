@@ -588,6 +588,7 @@ static long rfunction(int v,
 	 #ifdef	SOFTLY
 	 symbol = *d;
 	 if ((symbol == '-') || (symbol == '+')
+          || (symbol == '^')
           || (symbol == '*') || (symbol == '#')) d++;
 	 #endif
 
@@ -5388,7 +5389,6 @@ static void insequate(int how,
    #endif
    #endif
 
-
    #ifdef BINARY
    if (how == BINARY)
    {
@@ -5410,7 +5410,6 @@ static void insequate(int how,
       return;
    }
    #endif
-
 
    if ((how > 255) || ((how <  128)
                    &&  (how != SET)

@@ -1,4 +1,4 @@
-Preliminary	masmx.7r3A	Build 5	Distribution 14 November 2018
+Preliminary	masmx.7r3A	Build 6	Distribution 12 December 2018
 ___________	__________	_______	_____________________________
 
 
@@ -7,11 +7,17 @@ ___________	__________	_______	_____________________________
 	masmx.7r3A
 	__________
 
-	revises and makes more consistent
-	the assembly of hierarchically structured and
-	named code and data
 
-	added -H option, allows unrounded floating constants<br><br>
+	Build 6
+	_______
+
+	added -X option: data binary computational values up to 192 bits in size
+	may be passed from one assembly to another as labels
+
+	it has always been possible to export non-address values
+	-X makes it possible to import them for the first time
+
+	Build 6 also corrects an omission in internal function $t() label type
 
 
 	Build 5
@@ -35,6 +41,16 @@ ___________	__________	_______	_____________________________
 	but is now error-flagged
 
 	Earlier application code needs no changes
+
+	Earlier builds of 7r3A
+	______________________
+
+	revise and make more consistent the assembly of
+	hierarchically structured and named code and data
+
+	-H option allows unrounded floating constants
+
+	
 
 
 	Easy to Use Build Scripts for Updated or Ported masmx
