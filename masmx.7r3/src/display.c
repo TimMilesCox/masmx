@@ -414,14 +414,6 @@ static void walktable(int order)
 
       x = sr->h.type;
 
-      if (x == BLANK)
-      {
-         y = sr->l.r.l.rel & 127;
-         section = &locator[y];
-         if (section->flags & 128) x = EQUF;
-         else                      x = LOCATION;
-      }
-
       switch (x)
       {
 	 case LABEL:

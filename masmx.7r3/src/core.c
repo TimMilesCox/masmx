@@ -7029,8 +7029,17 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                if (argument) argument = substitute(argument, param);
                else          argument = "";
 
+               rvalue = *argument;
+               if (rvalue == qchar) argument++;
+               
                while (symbol = *argument++) 
                {
+                  if (symbol == qchar) break;
+                  if (symbol == ' ')
+                  {
+                     if (rvalue ^ qchar) break;
+                  }
+
                   if (x > 200) break;
                   path[x++] = symbol;
                }
@@ -7296,6 +7305,13 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       if (*limit == 0) break;
 	       lr->t.text[x++] = 0;
 	       limit++;
+
+               if (subfunction > 0)
+               {
+                  if (file_arguments < subfunction) limit = "";
+                  else limit = filename[subfunction - 1];
+               }
+
 	       while ((*limit) && (*limit != *search))
 	       {
 		  lr->t.text[x] = *limit;
@@ -9308,7 +9324,11 @@ int main(int argc, char *_argv[])
    #endif
    
    
-   if (selector['x'-'a']) walktable(0);
+   if (selector['x'-'a'])
+   {
+       if (selector['i'-'a']) walktable(3);
+       else                   walktable(0);
+   }
    
    for(i = 0; i <  LOCATORS; i++)
    {

@@ -45,39 +45,6 @@ masmx is a freeware meta-assembler for any target
 &nbsp;&nbsp;&nbsp;&nbsp;
 
 <a	href="http://timmilescox.github.io/masmx/">-----&gt;masm7r3A Downloads Page</a>
-<a	style="color:FF0000;right:100pt;position:absolute">
-        <u>recent features</u><br><br>
-
-	Improvement to hierarchically structured and named code and data.<br>
-	Earlier application code needs no changes<br><br>
-
-	Assembly flag -X allows data binary computational values<br>
-	up to 192 bits in size to be passed from one assembly to another<br>
-	as labels, accelerating just-in-realtime assembly.<br>
-        Only storage addresses could previously be imported<br><br>
-
-	Addition of :Z tag to construct integer and floating constants<br>
-	seven storage words in size.<br>
-        Size tags override integer self-sizing and floating point default size.<br>
-        The assembler already has flags to specify a number constant size of<br>
-	one / two / three / four / five / six / eight words<br><br>
-
-	other recent features see Release Note or intro page
-
-<a	href="#flag_XX"
-	style="right:20pt;top:388pt;position:absolute">import data binary values</a>
-
-<a	href="#floating_tag"
-	style="right:20pt;top:468pt;position:absolute">number size tag</a>
-
-<a	href="index.html"
-	style="right:20pt;top:498pt;position:absolute">intro page</a>
-
-<a	href="#strools"
-	style="right:20pt;top:324pt;position:absolute">
-	Structured Code
-</a>
-</a>
 
 <p>
 Developed as a cross-assembler for embedded targets<br>
@@ -12101,7 +12068,19 @@ contains operators which are not the masmx operators:
 <p>
 All the <b>$text</b> patterns must be placed adjacent to each other
 in the assembly header. Any separated from the first block of
-them will not be used.
+them will not be used
+
+<p>
+$text directive can also replace a text string in source code with positional argument 1..8 of the command line.<br>
+In this example _VECTOR in source code becomes callname1 and _PRIORITY becomes 5
+<pre>
+
+ $ masmx input_file output_file callname1 5
+
+	+	_VECTOR, _PRIORITY, $zenith(_STATIC), 7q
+	
+</pre>
+Strings of -oPtIon flags on the command line are not positional arguments and may appear before, between and after positional arguments
 
 <p>
 See also <a href="#describe1">10.1: Establishing your Syntax</a>
@@ -17171,6 +17150,9 @@ The full set of masmx command line options are
 
 		-see also <a href="#option_s">option -s</a>
 
+	-i	when -x is also opted then -i causes all the label table to be scanned serially
+		including macro templates and text substitution specifications
+		as <a href="#snap">$snap</a> directive with argument 3
 
 	-j      has meaning when using masmx as a cumulative linker:
 

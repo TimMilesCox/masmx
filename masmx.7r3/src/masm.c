@@ -62,7 +62,7 @@
 
 #define BASIC_SCAN
 
-#define	FILE_ARGUMENTS	2
+#define	FILE_ARGUMENTS	8
 
 #define STACKED_XPRESS
 #define STACK_TOP_VALUE	NULL
@@ -203,9 +203,9 @@ extern unsigned _stklen = 32*1024;
 #define VERSION	"7"
 
 #ifdef	SUPERSET
-#define REVISION "3A Build 6"
+#define REVISION "3A Build 7"
 #else
-#define REVISION "3Z Build 6"
+#define REVISION "3Z Build 7"
 #endif
 
 #define	DISPLAY_Q
