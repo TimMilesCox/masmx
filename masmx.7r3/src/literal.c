@@ -182,7 +182,7 @@ static long literal(char *arg, char *gparam, int tlocator)
 {
    int			 t = 3, bdepth = 1, x;
    long			 v;
-   char			 newmodel[READSIZE] = "   ", *newmodelv;
+   char			 newmodel[READSIZE] = "   ";
    int			 inquote = 0;
    int			 rvalue, symbol;
    int			 zflag = uselector['Z'-'A'];
@@ -272,19 +272,17 @@ static long literal(char *arg, char *gparam, int tlocator)
    
    newmodel[t] = 0;
 
-   newmodelv = substitute(newmodel, gparam);
-
-   symbol = isacommand(newmodelv+3);
+   symbol = isacommand(newmodel + 3);
 
    if ((symbol < 0)
    || ((symbol) && (symbol != FORM) && (symbol != PROC)))
    {
-       newmodelv[1] = '+';
+       newmodel[1] = '+';
    }
 
    if ((selector['q'-'a']) && (pass) && (plist > masm_level))
    {
-      printf("::::(%2.2x)::::%s\n", tlocator, newmodelv);
+      printf("::::(%2.2x)::::%s\n", tlocator, newmodel);
    }
 
    uselector['Z'-'A'] = 1;
@@ -295,10 +293,10 @@ static long literal(char *arg, char *gparam, int tlocator)
 
    #ifdef RELOCATION
    maprecursion++;
-   rvalue = assemble(newmodelv, gparam, NULL, &image);
+   rvalue = assemble(newmodel, gparam, NULL, &image);
    maprecursion--;
    #else
-   rvalue = assemble(newmodelv, gparam, NULL, &image);
+   rvalue = assemble(newmodel, gparam, NULL, &image);
    #endif
 
    uselector['Z'-'A'] = zflag;

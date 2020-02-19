@@ -1,3 +1,2 @@
 	$list	0
-x $do 100,y $do 100,z $do 25,n(x,y,z) + n(x,y,z)
-
+x $do 100,y $do 80,z $do 25,n(x,y,z) + n(x,y,z)

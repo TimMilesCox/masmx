@@ -1,0 +1,11 @@
+echo this should be OSX 10.6.8
+
+rm ../masmx.7r3/hosts/osx.x64/*
+gcc -m64 -funsigned-char -DINTEL -DSUSE -DSUPERSET -o ../masmx.7r3/hosts/osx.x64/masmx masm.c
+gcc -m64 -funsigned-char -DINTEL -DSUSE -o ../masmx.7r3/hosts/osx.x64/masmz masm.c
+gcc -m64 -funsigned-char -DINTEL -o ../masmx.7r3/hosts/osx.x64/mmx mmx.c
+gcc -m64 -funsigned-char -DINTEL -o ../masmx.7r3/hosts/osx.x64/imx imx.c
+gcc -m64 -funsigned-char -DINTEL -o ../masmx.7r3/hosts/osx.x64/symbol symbol.c
+cp ../masmx.7r3/hosts/osx.x64/* ..
+echo	cd ../test.msm and run ./alltests
+

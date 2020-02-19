@@ -45,6 +45,17 @@ masmx is a freeware meta-assembler for any target
 &nbsp;&nbsp;&nbsp;&nbsp;
 
 <a	href="http://timmilescox.github.io/masmx/">-----&gt;masm7r3A Downloads Page</a>
+<a	style="color:FF0000;right:100pt;position:absolute">
+        <u>Changes from 7r3 to 7r3A</u><br>
+        masmx.7r3A revises and makes more consistent the assembly<br>
+        of hierarchically structured and named code and data. Earlier<br>
+        application code needs no changes<br>
+
+<a	href="#strools"
+	style=right:100pt;position:absolute>
+	Structured Code
+</a>
+</a>
 
 <p>
 Developed as a cross-assembler for embedded targets<br>
@@ -420,13 +431,9 @@ for actual delivered binaries
 				process its relocation information
 				output the linked code			8.24.2
 
-	    <a href="#flag_XX">$include,{$binary|$void}</a>
-				import labels holding computational values
-				retrieve data binary values as labels	8.24.3
-
 	3.  <a href="#include_v">$include,$void</a>	linking directive:
 				include addresses from a text-encoded
-				binary file, but no code from it	8.24.4
+				binary file, but no code from it	8.24.3
 
     25.	<a href="#info">$info</a>			linking directive:			8.25
 
@@ -449,7 +456,7 @@ for actual delivered binaries
 			optionally declare literal tag			8.28
 
     29.	<a href="#load">$load</a>		linking directive:
-			write revised binary information to
+			write revised binary information in
 			output text-encoded binary file			8.30
 
     30.	<a href="#lterm">$lterm</a>		change comment character			8.30
@@ -2088,19 +2095,17 @@ Number storage values are in canonical byte order, and the only way to change th
 number constant commands (often with names like DW and DD) as macros.
 
 <p>
-<a	name="size_tag"/>
 Integer constants are self-sizing but may be tagged to determine their size in target storage.<br>
-Assembly selects a default size for <a href="#floating_tag">floating constants</a>
-but the constant may be tagged to determine a different size
+Assembly selects a default size for floating constants but the constant may be tagged to determine a different size
 <pre>
 
 	<i>expression:</i><a style = color:red>s</a>            . one storage word
-	<i>expression:</i><a style = color:red>d</a>            . two storage words: alternatively <i>expression:</i><a style = color:red>L</a>
+	<i>expression:</i><a style = color:red>d</a>            . two storage words: or expression:<a style = color:red>L</a>
 	<i>expression:</i><a style = color:red>t</a>            . three storage words
 	<i>expression:</i><a style = color:red>q</a>            . four storage words
 	<i>expression:</i><a style = color:red>p</a>            . five storage words
 	<i>expression:</i><a style = color:red>h</a>            . six storage words
-	<i>expression:</i><a style = color:red>z</a>            . seven storage words
+	<i>expression:</i><a style = color:red>Z</a>            . seven storage words
 	<i>expression:</i><a style = color:red>o</a>            . eight storage words
 
 </pre>
@@ -2111,22 +2116,12 @@ Size tags are case-independent irrespective of -k option.<br>
 	the last token in the expression is a label
 
 	the last token in the expression is hexadecimal
-	and the targeted storage is two words
-
-	binary notation is determined by <a href="#suffix">$suffix</a>
+	and the targeted storage two words
 
 </pre>
 It is never wrong to include : colon.
 Parentheses round expressions and quotes round label references
 can also disambiguate
-
-<pre>
-
-        +       <i>expression</i>:D
-        +(<i>expression</i>)q
-        +       "<i>label</i>"h
-
-</pre>
 
 Integers occupy their containing number of words in the absence of a length tag
 <pre>
@@ -2198,6 +2193,15 @@ MASMX 7r3
 
 </pre>
 
+If the last token in the expression is a label instead of a number string
+then any length override must be preceded by colon, parenthesis or quote
+<pre>
+
+	+       <i>expression</i>:D
+	+(<i>expression</i>)q
+	+	"<i>label</i>"h
+
+</pre>
 Words flag D after a hex string also needs separation
 <pre>
 
@@ -2259,53 +2263,41 @@ LTERM=;
 
 </pre>
 <p>
-<a	name="floating_tag"/>
-Floating point constants are not auto-sized like <a href="#size_tag">integers</a>
+Floating point items are not auto-sized like integers.
 
 <p>
-
-Assembly selects a default size for floating constants but the fraction may be tagged to determine a different number of words
-for the floating value
+Assembly selects a default size in words for floating constants <a href="#floating_point">$floating_point</a>.<br>
+A size tag after the mantissa overrides the default
 <pre>
 
-        <i>fraction:</i><a style = color:red>s</a><i>*&plusmn;scale</i>            . one storage word
-        <i>fraction:</i><a style = color:red>d</a><i>*&plusmn;scale</i>            . two storage words: alternatively <i>fraction:</i><a style = color:red>L</a><i>*&plusmn;scale</i>
-        <i>fraction:</i><a style = color:red>t</a><i>*&plusmn;scale</i>            . three storage words
-        <i>fraction:</i><a style = color:red>q</a><i>*&plusmn;scale</i>            . four storage words
-        <i>fraction:</i><a style = color:red>p</a><i>*&plusmn;scale</i>            . five storage words
-        <i>fraction:</i><a style = color:red>h</a><i>*&plusmn;scale</i>            . six storage words
-        <i>fraction:</i><a style = color:red>z</a><i>*&plusmn;scale</i>            . seven storage words
-        <i>fraction:</i><a style = color:red>o</a><i>*&plusmn;scale</i>            . eight storage words
+        +(MANTISSA)[<a style="color:red">s d l t q p h z o</a>][{*+|*-}SCALE]
+
+<a style="color:red">s S</a> for single (one word)
+<a style="color:red">d D l L</a> for double
+<a style="color:red">t T</a> for triple
+<a style="color:red">q Q</a> for quadword
+<a style="color:red">p P</a> for pentaword
+<a style="color:red">h H</a> for hexaword
+<a style="color:red">z Z</a> for heptaword
+<a style="color:red">o O</a> for octaword
 
 </pre>
-Size-suffixes are case-independent irrespective of -k option.<br>
-: colon is only necessary to disambiguate where
+<p>
+These trailing letters may be upper or lower case and may have a
+colon before them or parenthesis or quote, to avoid catenation
+with label references
 <pre>
 
-        the last token in the fraction is a label
+67.5t
 
-        the last token in the fraction is hexadecimal
-        and the targeted storage two words
+        +MANTISSA:<a style="color:red">q</a>*+1200000
 
-        binary notation is determined by <a href="#suffix">$suffix</a>
+        +(MANTISSA)<a style="color:red">p</a>*+800
 
-</pre>
-It is never wrong to include : colon.
-Parentheses round expressions and quotes round label references
-can also disambiguate, for example
-
-<pre>
-
-	67.5t		. no ambiguity
-
-        +MANTISSA:<a style="color:red">q</a>*+1200000	. separate MANTISSA from <a style="color:red">q</a>
-
-        +(MANTISSA)<a style="color:red">p</a>*+800	. separate MANTISSA from <a style="color:red">p</a>
-
-        20*"MANTISSA"<a style="color:red">d</a>*+307	. separate MANTISSA from <a style="color:red">d</a>
+        20*"MANTISSA"<a style="color:red">d</a>*+307
 
 </pre>
-Period may only appear in a decimal fraction string. Where period
+Period may only appear in a decimal digit string. Where period
 appears the scale notation [ e e+ e- E E+ E- ] can be typed in
 place of the masmx scale operator <b>*+</b> or <b>*-</b>
 
@@ -3821,111 +3813,15 @@ f       $func
 <a      name="fmacode"/>
 <h3>4.6.3: Code Generated During Function Evaluation</h3> 
 
-Code may be generated with values supplied by a function macro, for example
-<pre>
-
-	$ masmx 2log.msm -lnke
-	MASMX 7r3A Build 5
-	3/2log.msm
-	*EOF*
-	  :                            1 f	$func
-	  :                            2 LOG*	$name
-	  :                            3 fulcrum	$set	f(1, 1)-1
-	  :                            4 ?	$do	23,	$do	1*/?-1>fulcrum,	$return	?-1
-	  :                            5 	$return	-1
-	  :                            6 	$end
-	  :                            7 
-	  :                            8 $(3:03000)
-	03:003000  000005              +9 	+	LOG(30)
-	03:003001  000005              +10 	+	LOG(31)
-	03:003002  000005              +11 	+	LOG(32)
-	03:003003  000006              +12 	+	LOG(33)
-	  :                            13 
-	*EOF*
-	:$(03):003000:003004 
-	2log.msm: object code 65 bytes: 0 errors: 0 undefined labels
-
-	$
-
-</pre>
-
-
-Code may not be generated inline to the current location counter
-inside the expanded text of a function macro, for example
-<pre>
-
-	$ masmx liable -lnke
-	MASMX 7r3A Build 5
-	3/liable.msm
-	*EOF*
-	  :                            1 f*      $func
-	  :                            2         +       99
-	  :                            3 one     +       100
-	  :                            4 two     +       101
-	  :                            5 three   +       102
-	  :                            6         $snap   2
-	  :                            7         $return 103
-	  :                            8         $end
-	00:000000  000063              +9         +       f()
-	00:000001  000064              +9 
-	00:000002  000065              +9 
-	00:000003  000066              +9 
-	one=$00:000001
-	two=$00:000002
-	three=$00:000003
-	Error: liable.msm Line 9: Function Adding Code Inline
-	00:000004  000067              +9 
-	*EOF*
-	:$(00):000000:000005 
-	liable.msm: object code 72 bytes: 1 errors: 0 undefined labels
-
-	$
-
-</pre>
-This restriction is intended to avoid accidental inclusion of
-data constants in instruction streams.<br>
-It is consistent with the purpose of function macros, generating values not code
-
-<p>
-Assembly option flag -I releases this restriction
-<pre>
-
-	$ masmx viable -lnkeI
-	MASMX 7r3A Build 5
-	3/viable.msm
-	*EOF*
-	  :                            1 f*       $func
-	  :                            2         +       99
-	  :                            3 one     +       100
-	  :                            4 two     +       101
-	  :                            5 three   +       102
-	  :                            6         $snap   2
-	  :                            7         $return 103
-	  :                            8         $end
-	00:000000  000063              +9         +       f()
-	00:000001  000064              +9 
-	00:000002  000065              +9 
-	00:000003  000066              +9 
-	one=$00:000001
-	two=$00:000002
-	three=$00:000003
-	00:000004  000067              +9 
-	  :                            10         $snap   2
-	*EOF*
-	:$(00):000000:000005 
-	viable.msm: object code 72 bytes: 0 errors: 0 undefined labels
-
-	$
-
-</pre>
+Code may not be generated inline to the current
+location counter during a <b>$func</b>. That is treated
+as an error, although the functional result may determine
+more or less code generated inline
 
 <p>
 Here function <i>f</i> calls a macro <i>generate</i>
-to construct a data item out of line (in section 42), and  
+to construct a data item out of line (in locator 42), and  
 attach a label to it
-
-<p>
-masmx assembler allows this unconditionally
 <pre>
 
 f*      $func	*
@@ -8964,23 +8860,6 @@ label   $equ    10*44*/180
 A label is equated on the second assembly pass if it does not yet exist.
 
 <p>
-A label may be equated to a computational value, an address relocatable or absolute, an assembler command (directive), to an assembler internal function like $ (location counter) or to a type assigned by the developer
-
-<p>
-Equates may like all labels be exported
-<pre>
-
-$(0)
-routine
-
-entry*	$equ	routine		. label exports a storage location in program section $(0)
-
-dividend* $equ	3.666666999999333333666666999999333333666666z*+1250000	. label exports a data binary computational value
-
-</pre>
-See also <a href="#set">8.46: $set</a> and <a href="#flag_XX">$include,{$binary|$void}</a>
-
-<p>
 Labels cannot be changed between types location, $equ, $set,
 and cannot except for $set labels be redefined.
 See <a href="#set">8.46:$set Directive</a>
@@ -9861,30 +9740,10 @@ The binary includes must be Text Encoded Binary format.
 See <a href="#file_formats">9: Output File Formats, Relocation and Linking,
 Giant Address Spaces, Interfacing with GNU Tools</a>
 
-<a	name="flag_XX"/>
-<h3>8.24.3: $include,{$binary|$void}	Include Data Binary Values as Labels</h3>
-
-Assembly with option flag <a href="#flag_X">-X</a> may retrieve data binary values
-up to 192 bits in size as labels exported from an earlier assembly
-<pre>
-
-	$include,$binary	earlier_assembly[.txo]
-
-	$include,$void		imports[.txo]
-
-</pre>
-Data binary values are not associated with a location counter and are typically floating numbers or integers,
-for example
-<pre>
-
-floating_dividend*	$set,192	3.666666999999333333666666999999333333666666*+1200000
-floating_divisor*	$equ		3q*-60000
-
-</pre>
 
 
 <a      name="include_v"/>
-<h3>8.24.4: $include,$void		Bind to an Independent Text Encoded Binary</h3>
+<h3>8.24.3: $include,$void		Bind to an Independent Text Encoded Binary</h3>
 
 <p>
 Linking Directive. The default filename extension is .txo
@@ -11688,18 +11547,7 @@ with directive <a href="#characteristic">8.6: $characteristic</a><br>
 See also <a href="#fdemens2">11.2.2: Exponent Field Size</a>
 
 <p>
-Integers and floating numbers may be exported as data binary computational values
-for inclusion in subsequent assemblies, for example
-<pre>
-
-dividend*	$set,192	3.6666666999999333333666666999999333333666666*+12500000
-divisor*	$set,96		3*-100000
-
-</pre>
-See also <a href="#equ">8.14: equ</a> and <a href="#flag_XX">8.24.3: $include,{$binary|$void}</a>
-
-<p>
-Subcommand <b>$binary</b> is used with $set directive when linking binary code.
+Subcommand <b>$binary</b> is used with $set directive.
 See <a href="#map_ppc">9.2.2: masmx Linking in Principle</a>
 and <a href="#pushrel">8.39: $pushrel</a> directive
 
@@ -12068,19 +11916,7 @@ contains operators which are not the masmx operators:
 <p>
 All the <b>$text</b> patterns must be placed adjacent to each other
 in the assembly header. Any separated from the first block of
-them will not be used
-
-<p>
-$text directive can also replace a text string in source code with positional argument 1..8 of the command line.<br>
-In this example _VECTOR in source code becomes callname1 and _PRIORITY becomes 5
-<pre>
-
- $ masmx input_file output_file callname1 5
-
-	+	_VECTOR, _PRIORITY, $zenith(_STATIC), 7q
-	
-</pre>
-Strings of -oPtIon flags on the command line are not positional arguments and may appear before, between and after positional arguments
+them will not be used.
 
 <p>
 See also <a href="#describe1">10.1: Establishing your Syntax</a>
@@ -17150,9 +16986,6 @@ The full set of masmx command line options are
 
 		-see also <a href="#option_s">option -s</a>
 
-	-i	when -x is also opted then -i causes all the label table to be scanned serially
-		including macro templates and text substitution specifications
-		as <a href="#snap">$snap</a> directive with argument 3
 
 	-j      has meaning when using masmx as a cumulative linker:
 
@@ -17347,18 +17180,11 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 :$(00):00000000:00000004 
 a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 
-	-B	display owner and macro level of label added to $tree or $record structure
-
-		<b>[L</b><i>macro_level</i><b>:A</b><i>owner_macro_level</i><b>:G</b><i>macro_level_this_label</i><b>:V</b><i>label_type</i><b>:P</b><i>macro_passes</i><b>]</b><i>owner_name</i><b>:</b><i>name</i>
-
-
 
 	-D	translate \<i>ESCAPED</i> octal and hex sequences in "strings"
 		and in 'integers' in apostrophe if
 
 			-c is opted
-
-				and
 
 			$data_code is asserted
 
@@ -17387,13 +17213,17 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 
 			$set_option "G"
 
-		the mantissa is generated longer than its storage size
-		with appended signs XOR guard pattern
+		the mantissa is always generated longer than
+		it is stored. The OR of three guard pattern bits 
+		AND their corresponding truncated bit is carried
+		into the mantissa
 
 		The mantissa may outflow as a result of rounding.
 		Then the mantissa is shifted right one position to
 		normalise again and the exponent is incremented
 
+		The guard pattern is added simply during repositioning
+		cycles when translating decimal scales
 
 		 ___________________________________________________
 		 |
@@ -17425,13 +17255,6 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 		rounding is towards zero or truncation
 
 
-
-	-I	allow function macros to generate code inline to the current location counter
-
-
-	-L	display type and macro level of added label
-
-		<b>[</b><i>macro_level</i><b>&lt;-</b><i>macro_level_this_label</i><b>:</b><i>label_type</i><b>:</b><i>filename</i><b>:</b><i>inclusion_depth</i><b>:</b><i>label_name</i>]
 
 		<a	name="option_Q"/>
         -Q      execute a function name encountered in an
@@ -17476,16 +17299,6 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
                 with option -Q the first mention in quotes
                 also causes macro lolly to happen instead of
                 just identifying it
-		<a	name="flag_X"/>
-	-X	retrieve data binary values exported as labels
-		from earlier assemblies. Any data value
-		up to 192 bits in size may be imported
-
-			$include,{$binary|$void}	ealier_asssembly[.txo]
-
-		without -X only address information associated
-		with a location counter may be imported
-
 
 	-Y	in $record structures flag fields as signed 
 		unless their bit size is suffixed u
@@ -17497,8 +17310,6 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 		field-name	5s
 
 		See 5.2.3.4: Signed Bit Fields
-
-		macro language reads signedness of bit fields to determine manipulation
 
 
         -Z      zero fill buffers declared with $res directive

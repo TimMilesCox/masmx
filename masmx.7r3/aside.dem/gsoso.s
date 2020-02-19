@@ -47,13 +47,19 @@ __haulup
 	
 	ld	30, 0(30) # LR was pointing to the pointer
 
+	$plist	2
 	ld	9, __literal(	__upper48	startfromhere@ha)
+	$plist
+
 	lwa	9, startfromhere@l(9)
 	stw	9, x
 
 	addi	0, 9, 1
 
+	$plist	2
 	ld	9, __literal(	__upper48	startfromhere@ha)
+	$plist
+
 	stw	0, startfromhere@l(9)
 
 	ld	9, __literal(	__upper48	factor@ha)

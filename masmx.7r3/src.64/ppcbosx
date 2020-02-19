@@ -1,0 +1,10 @@
+echo this should be OSX PowerPC
+
+gcc -m32 -funsigned-char -DSUPERSET -o ../masmx masm.c
+gcc -m32 -funsigned-char -o ../masmz masm.c
+cp ../masmx ../masmx.7r3/hosts/osx.ppc
+cp ../masmz ../masmx.7r3/hosts/osx.ppc
+cp ../masmx.7r3/hosts/osx.ppc/imx ..
+cp ../masmx.7r3/hosts/osx.ppc/mmx ..
+echo	cd ../test.msm and run ./alltests
+

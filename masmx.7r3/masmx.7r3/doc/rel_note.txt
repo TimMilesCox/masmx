@@ -1,5 +1,5 @@
-Preliminary	masmx.7r3A	Build 7	Distribution 17 January 2019
-___________	__________	_______	____________________________
+Preliminary	masmx.7r3A	Build 5	Distribution 14 November 2018
+___________	__________	_______	_____________________________
 
 
 
@@ -7,34 +7,17 @@ ___________	__________	_______	____________________________
 	masmx.7r3A
 	__________
 
+	revises and makes more consistent
+	the assembly of hierarchically structured and
+	named code and data
 
-	Build 7
-	_______
-
-	fixed problem in $path directive where whitespace after the path was accidentally in the path
-
-	allows $TEXT,n to substitute text with command line positional argument
-
-	combines flags -ix to list all types of label table objects
-
-
-	Build 6
-	_______
-
-	added -X option: data binary computational values up to 192 bits in size
-	may be passed from one assembly to another as labels
-
-	it has always been possible to export non-address values
-	-X makes it possible to import them for the first time
-
-	Build 6 also corrects an omission in internal function $t() label type
+	added -H option, allows unrounded floating constants<br><br>
 
 
 	Build 5
 	_______
 
-	displays errno if an input or an output file cannot be accessed
-	pointing to cause of problem
+	displays errno if an input or an output cannot be accessed
 
 	option flag -I legalises inline code generation from $func macros
 
@@ -52,26 +35,16 @@ ___________	__________	_______	____________________________
 
 	Earlier application code needs no changes
 
-	Earlier builds of 7r3A
-	______________________
 
-	revise and make more consistent the assembly of
-	hierarchically structured and named code and data
-
-	-H option allows unrounded floating constants
-
-	
-
-
-	Easy to Use Build Scripts for Updated or Ported masmx
-	_____________________________________________________
+	Easy to Use Build Scripts
+	_________________________
 
 	Directory src now has scripts for constructing updated masmx and masmz
 	on and for platforms osx.x86 osx.ppc ubuntu.x86 win32
 
 		./bosx86
 		./ppcbosx
-		./bsuse
+		./bubuntu
 		./bw32
 
 	These builds are all for 32-bit targets. They also display guidance
@@ -126,7 +99,7 @@ ____________________________
 
 	Mac OS X / PowerPC G4		DELIVERED IN THIS PACKAGE
 
-	Mac OS X / x86			DELIVERED IN THIS PACKAGE
+	Mac OS X / ix86			DELIVERED IN THIS PACKAGE
 
 	Sun Sparc Solaris		pending
 
@@ -134,9 +107,7 @@ ____________________________
 	Linux Platforms
 	_______________
 
-	openSUSE Linux / x86		DELIVERED IN THIS PACKAGE
-
-	UBUNTU Linux / x86		replaced by openSUSE
+	UBUNTU Linux / ix86		DELIVERED IN THIS PACKAGE
 
 
 
@@ -165,7 +136,7 @@ All the binaries delivered are standalone programs.
 
 	masmz is the assembler with a subset of features
 
-masmx.7r3a manual describes programming with masmx and the masmx command line
+masmx.7r3a manual describes masmx command line
 
 	imx converts the output of masmx and masmz to 16-bit address I-Records
 
