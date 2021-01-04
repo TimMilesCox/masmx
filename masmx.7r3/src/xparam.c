@@ -38,7 +38,7 @@ static line_item *extract_xparam(char *s, char *gparam)
    object		*l = NULL;
    #endif
 
-   long			 z;
+   int			 z;
 
    #ifdef AUTOMATIC_LITERALS
    location_counter	*q;
@@ -93,7 +93,7 @@ static line_item *extract_xparam(char *s, char *gparam)
                {
                   pq = a->image[y];
                   if ((*pq == '*') || (*pq == '#')) pq++;
-	          if (l = isanequf(pq))
+	          if ((l = isanequf(pq)))
                   {
 	             x -= y;
 	             y = RADIX/32 - x;
@@ -137,7 +137,7 @@ static line_item *extract_xparam(char *s, char *gparam)
                case STAR__:
 
                   #ifdef EQUF
-                  if (l = isanequf(p)) 
+                  if ((l = isanequf(p)))
                   {
 	             v->b[RADIX/8-1] = l->l.value.b[RADIX/8-4] >> 7;
                   }
@@ -168,7 +168,7 @@ static line_item *extract_xparam(char *s, char *gparam)
 
                      if ((q->flags & 129) == 1)
                      {
-                        if (u = (value *) q->runbank)
+                        if ((u = q->runbank.p))
                         {
                            *v = u->value;
                            quadd_u(z, v);
@@ -242,7 +242,7 @@ static line_item *extract_xparam(char *s, char *gparam)
 static void range_warning(line_item *v)
 {
    #if RADIX==192
-   long			 u = v->i[0]
+   int			 u = v->i[0]
                            | v->i[1]
                            | v->i[2]
                            | v->i[3]
@@ -289,7 +289,7 @@ static void range_warning(line_item *v)
    #endif
 
    #if RADIX==96
-   long			 u = v->i[0] | v->i[1];
+   int			 u = v->i[0] | v->i[1];
 
    if (u)
    {
@@ -321,7 +321,7 @@ static void range_warning(line_item *v)
 
 #endif
 
-static long extract_gparam(char *s, char *gparam)
+static int extract_gparam(char *s, char *gparam)
 {
    line_item		*v = extract_xparam(s, gparam);
 

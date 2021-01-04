@@ -23,7 +23,7 @@
 
 
 
-static object *insert_qltable(char *l, long equator, int type)
+static object *insert_qltable(char *l, int equator, int type)
 {
    line_item		 local = zero_o;
 

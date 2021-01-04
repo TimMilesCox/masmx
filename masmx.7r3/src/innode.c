@@ -110,7 +110,7 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
       {
 	 if (*label_margin == '(')
 	 {
-	    load_qualifier(label_margin, margin);
+	    load_qualifier(/*label_margin, margin*/);
 
             indicated = sr;
 
@@ -148,11 +148,11 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
 
 	    #ifdef SYNONYMS
 	       
-	    if ((symbol == 0^'(') && (*(forward-1) == 0))
+	    if (((symbol == 0)^'(') && (*(forward-1) == 0))
 	    {
 	       if (*label_margin == '(')
 	       {
-		  load_qualifier(label_margin, margin);
+		  load_qualifier(/*label_margin, margin*/);
    
                   indicated = sr;
    
@@ -165,7 +165,7 @@ static object *findchain_in_node(object *sr, char *name2, char *margin)
 
 		  for (;;)
 		  {
-	             if (symbol = *forward++ - *tabled++) break; 
+	             if ((symbol = *forward++ - *tabled++)) break; 
 	             if ((!*forward) && (!*tabled)) return sr;
 		  }
 

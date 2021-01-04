@@ -44,9 +44,9 @@ static char include[72] = { 1,1,1,1,1,1,1,1,1,1,1,1,
                             1,1,1,1,1,1,1,1,1,1,1,1,
                             1,1,1,1,1,1,1,1,1,1,1,1 } ;
 
-void exout(int locator, long loc, char *b, int c, int handle, int flag)
+void exout(int locator, int loc, char *b, int c, int handle, int flag)
 {
-   static long loc0 = 0;
+   static int loc0 = 0;
    static char data[80];
    static char plen[4];
    static int index=12, sum=0, p=0, first = 73;
@@ -77,7 +77,7 @@ void exout(int locator, long loc, char *b, int c, int handle, int flag)
 
       if (flag == 7)
       {
-         sprintf(data, "S705%8.8lX", loc0);
+         sprintf(data, "S705%8.8X", loc0);
          sum += 5;
          sum ^= -1;
          sum &= 255;
@@ -86,7 +86,7 @@ void exout(int locator, long loc, char *b, int c, int handle, int flag)
          return;
       }
       
-      sprintf(data, "S300%8.8lX", loc0);
+      sprintf(data, "S300%8.8X", loc0);
    }
    
    while (c)
@@ -109,7 +109,7 @@ void exout(int locator, long loc, char *b, int c, int handle, int flag)
          write(handle, data, index);
          loc0 += p;
          sum = (loc0>>24)+(loc0>>16)+(loc0>>8)+loc0;
-         sprintf(data, "S300%8.8lX", loc0);
+         sprintf(data, "S300%8.8X", loc0);
          index = 12;
          p = 0;
       }
@@ -129,13 +129,13 @@ void exout(int locator, long loc, char *b, int c, int handle, int flag)
       write(handle, data, index);
       loc0 += p;
       sum = (loc0>>24)+(loc0>>16)+(loc0>>8)+loc0;
-      sprintf(data, "S300%8.8lX", loc0);
+      sprintf(data, "S300%8.8X", loc0);
       index = 12;
       p = 0;
    }
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   #ifdef DOS
   int i = open(argv[1], O_RDONLY|O_TEXT);
@@ -147,7 +147,7 @@ main(int argc, char *argv[])
   #endif
   
   int c, d, locator, e, f, symbol, x, interval, y = 0;
-  long loc, transfer, offset = 0;
+  int loc, transfer, offset = 0;
   char data[256];
   char internal[128];
   char *p;
@@ -194,7 +194,7 @@ main(int argc, char *argv[])
     if (data[0] == '-')
     {
        p = data;
-       while (symbol = *p++)
+       while ((symbol = *p++))
        {
           if (symbol == 0x0D) continue;
           if (symbol == 0x0A) break;
@@ -213,7 +213,7 @@ main(int argc, char *argv[])
           continue;
        }
        offset = 0;
-       x = sscanf(&data[1], "%x:%lx", &locator, &loc);
+       x = sscanf(&data[1], "%x:%x", &locator, &loc);
        if (x < 2)
        {
           printf("bad location line\n");
@@ -224,7 +224,7 @@ main(int argc, char *argv[])
     }
     if (data[0] == '>')
     {
-       sscanf(&data[1], "%x:%lx", &locator, &transfer);
+       sscanf(&data[1], "%x:%x", &locator, &transfer);
        if (x < 2)
        {
           printf("bad transfer line\n");
@@ -236,11 +236,11 @@ main(int argc, char *argv[])
     e = 0;
     interval = 0;
     p = data;
-    while (digit1 = *p++)
+    while ((digit1 = *p++))
     {
        if (digit1 == ':')
        {
-          printf("$%2.2x:%8.8lx relocation information discarded %s\n",
+          printf("$%2.2x:%8.8x relocation information discarded %s\n",
                                locator, loc + offset + interval, data);
           e = interval;
           continue;

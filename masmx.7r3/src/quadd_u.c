@@ -32,7 +32,7 @@
 *************************************************/
 
 
-static void quadd_u(unsigned long j, line_item *i)
+static void quadd_u(unsigned int j, line_item *i)
 {
    line_item		 from = zero_o;
 

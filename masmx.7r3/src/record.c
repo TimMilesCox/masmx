@@ -28,11 +28,11 @@
 
 static int precord(object *l, char *line, char **data, int nest)
 {
-   static long		 bits;
+   static int		 bits;
    static int		 rbase;
    static int		 positions;
    static int		 cache_line;
-   static long		 address;
+   static int		 address;
    static linkage	 rflags;
    static line_item	 stage;
 
@@ -47,7 +47,7 @@ static int precord(object *l, char *line, char **data, int nest)
 
    int			 offset;
 
-   long			 symbol,
+   int			 symbol,
                          mask,
 			 lsword;
 
@@ -55,9 +55,9 @@ static int precord(object *l, char *line, char **data, int nest)
    char                 *argument;
    char			*p;
 
-   long			 branch_mask = (1 << active_x) - 1;
+   int			 branch_mask = (1 << active_x) - 1;
 
-   long			 pointer;
+   int			 pointer;
 
    int			 position;
 
@@ -71,12 +71,12 @@ static int precord(object *l, char *line, char **data, int nest)
       #ifdef RECORD_BRANCH
       if (data)
       {
-         bits = (long) data & 0x7FFFFFFF;
+         bits = (int) data & 0x7FFFFFFF;
          if (nest < 0)
          {
-            if (y = cache_line - positions)
+            if ((y = cache_line - positions))
             {
-               if (x = y % word) lshift(&stage, word - x);
+               if ((x = y % word)) lshift(&stage, word - x);
                produce(y, '+', &stage, NULL);
                stage = zero_o;
                positions = cache_line;
@@ -100,7 +100,7 @@ static int precord(object *l, char *line, char **data, int nest)
 		outermost record
          ***********************************************/
 
-         if (selector['q'-'a']) printf("R %s %lx\n", l->l.name,
+         if (selector['q'-'a']) printf("R %s %x\n", l->l.name,
                                         loc);
          bits = 0;
          address = loc;
@@ -117,7 +117,7 @@ static int precord(object *l, char *line, char **data, int nest)
 		nested  record
          ***********************************************/
 
-         if (selector['q'-'a']) printf("r %s %lx:%lx\n", l->l.name,
+         if (selector['q'-'a']) printf("r %s %x:%x\n", l->l.name,
                                         address + bits / word,
                                         bits % word);
 
@@ -169,7 +169,7 @@ static int precord(object *l, char *line, char **data, int nest)
       {
          nest--;
 
-         if (selector['q'-'a']) printf("return on $root b=%lx\n", bits);
+         if (selector['q'-'a']) printf("return on $root b=%x\n", bits);
 
          if (nest == 0)
          {
@@ -195,7 +195,7 @@ static int precord(object *l, char *line, char **data, int nest)
             }
 
             loc = address + (bits + word - 1) / word * quanta;
-            if (selector['q'-'a']) printf("$=%lx\n", loc);
+            if (selector['q'-'a']) printf("$=%x\n", loc);
          }
 
          if (bits == 0) return 0x80000000;
@@ -334,7 +334,7 @@ static int precord(object *l, char *line, char **data, int nest)
 
       if (argument == NULL)
       {
-         if (selector['q'-'a']) printf("[%x/%x/%lx]", nest, positions, bits);
+         if (selector['q'-'a']) printf("[%x/%x/%x]", nest, positions, bits);
          if (y == 0) return 0;
 
          if ((x + y) > cache_line)
@@ -343,7 +343,7 @@ static int precord(object *l, char *line, char **data, int nest)
 		no new data to join to the cached data
             *********************************************/
 
-            if (offset = y % word) lshift(&stage, word - offset);
+            if ((offset = y % word)) lshift(&stage, word - offset);
             produce(y, '+', &stage, NULL);
             stage = zero_o;
             positions = cache_line;
@@ -361,12 +361,12 @@ static int precord(object *l, char *line, char **data, int nest)
 
       if (y == 0) positions -= offset;
 
-      if (selector['q'-'a']) printf("[\"%s\" %lx:%x, %x]",
+      if (selector['q'-'a']) printf("[\"%s\" %x:%x, %x]",
                                      argument, loc, offset, positions);
 
       if ((*argument == qchar) || (x > 192))
       {
-         mask = mask = (byte == 32) ? 0xFFFFFFFF : (1 << byte) - 1;;
+         mask = (byte == 32) ? 0xFFFFFFFF : (1 << byte) - 1;;
 
          for (;;)
          {
@@ -473,7 +473,7 @@ static int precord(object *l, char *line, char **data, int nest)
          operand_or(&stage, &temp);
       }
 
-      if (argument = *data) *data = argument = getop(argument);
+      if ((argument = *data)) *data = argument = getop(argument);
    }
 
    return 0;
@@ -482,12 +482,12 @@ static int precord(object *l, char *line, char **data, int nest)
 static int record(object *l, char *data, int subfunction)
 {
    #ifdef RECORD_BRANCH
-   static long		 offset[STRUCTURE_DEPTH];
-   static long		 record_high[STRUCTURE_DEPTH];
+   static int		 offset[STRUCTURE_DEPTH];
+   static int		 record_high[STRUCTURE_DEPTH];
    #endif
 
 
-   long			 origin;
+   int			 origin;
 
    int                   x,
                          y;
@@ -499,7 +499,7 @@ static int record(object *l, char *data, int subfunction)
 
    int			 active_b4 = active_x;
 
-   union { long	  p;
+   union { int	  p;
 	   char	**q; }	 startp = { 0 } ;		
 
 
@@ -529,7 +529,7 @@ static int record(object *l, char *data, int subfunction)
    {
       if (selector['p'-'a'] )
       {
-         printf("[$%x:%lx:%lx:]\n", counter_of_reference,
+         printf("[$%x:%x:%x:]\n", counter_of_reference,
                                        loc,
                                        record_high[active_x]);
       }
@@ -554,7 +554,7 @@ static int record(object *l, char *data, int subfunction)
    offset[active_x] = origin = precord(l, NULL, startp.q, record_nest);
    active_x++;
 
-   if (selector['p'-'a']) printf("$record %s nest %d active %d origin %ld\n",
+   if (selector['p'-'a']) printf("$record %s nest %d active %d origin %d\n",
        l->l.name, record_nest, active_x, origin);
 
    if ((actual->flags & 129) == 1)
@@ -573,7 +573,7 @@ static int record(object *l, char *data, int subfunction)
       {
          o = next_image[masm_level];
          y = o->t.length;
-         o = (object *) ((long) o + y);
+         o = (object *) ((char *) o + y);
          next_image[masm_level] = o;
          p = o->t.text;
          y = o->t.length;
@@ -607,7 +607,7 @@ static int record(object *l, char *data, int subfunction)
    active_x--;
    if (x == 0x80000000) x = 0;
 
-   if (selector['p'-'a']) printf("%ld %d action complete nest %d active %d\n",
+   if (selector['p'-'a']) printf("%d %d action complete nest %d active %d\n",
                                   origin,  x, record_nest, active_x);
 
    if (active_x ^ active_b4)
@@ -647,14 +647,14 @@ static int record(object *l, char *data, int subfunction)
    #endif
 
    x += origin;
-   if (selector['p'-'a']) printf("[o %ld %d %s]\n", origin, x, l->l.name);
+   if (selector['p'-'a']) printf("[o %d %d %s]\n", origin, x, l->l.name);
    quadinsert4(-x, &l->l.value);
 
    l->l.valued = EQUF;
    if (selector['p'-'a'])
    {
-      if (octal) printf("%0*lo end\n", apw, loc);
-      else       printf("%0*lx end\n", apw, loc);
+      if (octal) printf("%0*o end\n", apw, loc);
+      else       printf("%0*x end\n", apw, loc);
    }
 
    branch_restart = loc;

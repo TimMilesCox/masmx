@@ -37,9 +37,9 @@ static int load_qualifier()
    char			*limit;
 
 
-   while (name_aside[i] = name[i]) i++;
+   while ((name_aside[i] = name[i])) i++;
 
-   while (symbol = *s++)
+   while ((symbol = *s++))
    {
       name_aside[i++] = symbol;
       if (symbol == ')') break;

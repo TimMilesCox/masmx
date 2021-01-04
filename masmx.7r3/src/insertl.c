@@ -23,7 +23,7 @@
 
 static void checkwaveb(line_item *v, object *o)
 {
-   unsigned long		 check = (v->i[4] ^ o->l.value.i[4])
+   unsigned int		 check = (v->i[4] ^ o->l.value.i[4])
 				       | (v->i[5] ^ o->l.value.i[5]);
 
    if (check)
@@ -32,22 +32,22 @@ static void checkwaveb(line_item *v, object *o)
 
       if (octal)
       {
-         printf("%0*lo, %lo\n", apw, qextractv(o), quadextractx(&o->l.value, 2));
-         printf("%0*lo, %lo\n", apw, quadextract(v), quadextractx(v, 2));
+         printf("%0*o, %o\n", apw, qextractv(o), quadextractx(&o->l.value, 2));
+         printf("%0*o, %o\n", apw, quadextract(v), quadextractx(v, 2));
       }
       else
       {
-         printf("%0*lX, %lX\n", apw, qextractv(o), quadextractx(&o->l.value, 2));
-         printf("%0*lX, %lX\n", apw, quadextract(v), quadextractx(v, 2));
+         printf("%0*X, %X\n", apw, qextractv(o), quadextractx(&o->l.value, 2));
+         printf("%0*X, %X\n", apw, quadextract(v), quadextractx(v, 2));
       }
   
       flagp(o->l.name, "base + displacement altered");
    }
 }
 
-static unsigned long checkwaver(line_item *v, object *o)
+static unsigned int checkwaver(line_item *v, object *o)
 {
-   unsigned long		 check = (v->i[0] ^ o->l.value.i[0])
+   unsigned int		 check = (v->i[0] ^ o->l.value.i[0])
 				       | (v->i[1] ^ o->l.value.i[1])
 				       | (v->i[2] ^ o->l.value.i[2])
 				       | (v->i[3] ^ o->l.value.i[3])
@@ -59,7 +59,7 @@ static unsigned long checkwaver(line_item *v, object *o)
 
 static void checkwave(line_item *v, object *o, int section_flags)
 {
-   unsigned long		 check = (section_flags & 1) ?
+   unsigned int		 check = (section_flags & 1) ?
 				 checkwaver(v, o) : (v->i[5] ^ o->l.value.i[5]);
 
    if (check)
@@ -74,13 +74,13 @@ static void checkwave(line_item *v, object *o, int section_flags)
       {
          if (octal)
          {
-            printf("%0*lo\n", apw, qextractv(o));
-            printf("%0*lo\n", apw, quadextract(v));
+            printf("%0*o\n", apw, qextractv(o));
+            printf("%0*o\n", apw, quadextract(v));
          }
          else
          {
-            printf("%0*lX\n", apw, qextractv(o));
-            printf("%0*lX\n", apw, quadextract(v));
+            printf("%0*X\n", apw, qextractv(o));
+            printf("%0*X\n", apw, quadextract(v));
          }
       }
 
@@ -265,7 +265,7 @@ static object *retrieve_dynamic_label()
       p = name;
       q = next->l.name;
 
-      while (x = *p)
+      while ((x = *p))
       {
          y = *q;
          x -= y;
@@ -348,7 +348,7 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
       if (label_highest_byte == 0) return NULL;
 
       #ifdef SYNONYMS
-      if (*label_margin == '(') load_qualifier(label_margin, limit);
+      if (*label_margin == '(') load_qualifier(/*label_margin, limit*/);
       #endif
 
       s = label_margin;
@@ -418,7 +418,7 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
 
    if ((type == LOCATION) || (type == BLANK))
    {
-      if (x = actual->flags & 129)
+      if ((x = actual->flags & 129))
       {
          vnew = *v;
          v = &vnew;
@@ -432,7 +432,7 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
 
          if (x == 1)
          {
-            vlbase = (value *) actual->runbank;
+            vlbase = actual->runbank.p;
             operand_add(v, &vlbase->value);
          }
       }
@@ -483,6 +483,7 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
                return o;
             }
 
+            if (pass) printf("[%x:%x]", x, type);
             flagp(o->l.name, "may not be retyped");
             return o;
          }
@@ -525,7 +526,7 @@ static object *insert_ltable(char *column, char *limit, line_item *v, int type)
       {
          flotsam -= size;
 
-         if (flotsam < 0)
+         if ((int) flotsam < 0)
          {
             flag_either_pass("too many dynamic labels", "abandon");
             exit(0);
@@ -679,7 +680,7 @@ object *findlabel(char *s, char *limit)
 
    if (result)
    {
-      if (x = result->l.valued)
+      if ((x = result->l.valued))
       {
          #ifdef STRUCTURE_DEPTH
          if ((*label_margin == sterm)
@@ -688,6 +689,14 @@ object *findlabel(char *s, char *limit)
          &&  (x ^ PROC)
          &&  (result->l.down))
          {
+            if (context_string)
+            {
+               if (pass) printf("\n[%c%s%c] ", sterm, name, sterm);
+               note("binds string members not structure members");
+               if (pass) printf("to traverse structure %c+(%s%cmember)%c\n\n", sterm, name, sterm, sterm);
+               return result;
+            }
+
             x = label_highest_byte;
             load_trailer(label_margin, limit);
             return findchain_in_node(result->l.down,

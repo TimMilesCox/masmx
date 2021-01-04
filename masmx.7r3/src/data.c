@@ -185,7 +185,7 @@
 
 typedef struct {  char			   flag[26]; } flag_box;
 
-typedef union  {  unsigned long                   i;
+typedef union  {  unsigned int                   i;
 		  struct { char              y;
 			   char            rel;
 			   short          xref; } l; } linkage;
@@ -194,7 +194,7 @@ typedef struct { char                  type, length; } header_word;
 
 typedef union  {   unsigned char         b[RADIX/8];
 		   unsigned short       h[RADIX/16];
-		   long                 i[RADIX/32]; } line_item;
+		   int                 i[RADIX/32]; } line_item;
 
 typedef struct { line_item		      upper,
 					      lower; } shift_matrix;
@@ -221,20 +221,22 @@ typedef struct { char                  type, length;
 typedef struct { char type,length,text[PARAGRAPH-2]; } textline;
 
 typedef struct { char                     type, rel;
-                 unsigned short              oblong;   
-		 void                        *along;
-		 long                           loc;
+                 unsigned short             oblong;   
+		 void                       *along;
+		 int                           loc;
 		 unsigned short       symbols, bits;
 		 char                 d[IMAGE_SIZE]; } txo;
+
+#define	TXO_HEADER	sizeof(txo) - IMAGE_SIZE
    
 typedef struct { char                  type, length;
                  unsigned short              oblong;
                  void                        *along;
-                 long                          base; } breakpoint;
+                 int                          base; } breakpoint;
 
 typedef struct { char                  type, length;
-                 unsigned short              oblong;
-                 unsigned long               offset;
+                 unsigned short             oblong;
+                 unsigned int               offset;
                  line_item                    value; } value;
 
 typedef struct { char                  type, length;
@@ -243,7 +245,7 @@ typedef struct { char                  type, length;
                  char               name[PARAGRAPH]; } xref;
 
 typedef union  { header_word                      h;
-                 unsigned long			  i;
+                 unsigned int			  i;
 		 label                            l;
 		 bdlink                     nextbdi; 
 		 txo                              u;
@@ -262,7 +264,7 @@ typedef struct { unsigned short        ready, count;
 
 #ifdef XREFS
 
-typedef struct { long                base[LOCATORS]; } segment_base_array;
+typedef struct { int                base[LOCATORS]; } segment_base_array;
 
 typedef struct { segment_base_array        segments;
                  object       *pointer_array[XREFS]; } xref_list;
@@ -274,6 +276,7 @@ typedef struct { char		     base[LOCATORS]; } touch_table;
 #define BAD_PARAFORM	0
 #define COMPLETE_LINE	1
 #define ALL_FIELDS	2
+#define	FIELDS		7
 #define	FIELD		3
 #define SUBFIELD	4
 #define STAR_SUBFIELD	4+128
@@ -303,7 +306,7 @@ typedef struct { unsigned short                r, w;
 #ifdef QUI_TUPLE
 
 typedef struct { char		*name;
-		 long		value;
+		 int		value;
 		 int		 type; } qui_tuple;
 
 
@@ -374,14 +377,14 @@ static line_item minus_o = { 255,255,255, 255,255,255,
 			     255,255,255, 255,255,255 } ;
 #endif
 
-typedef struct { long				    loc,
+typedef struct { int				    loc,
                                                   lroot,
                                                    base,
                                              breakpoint,
-                                             litlocator,
-                                                runbank;
+                                             litlocator;
+                 union { long a; value *p; }    runbank;
                  char    rbase, bias, touch_base, flags;
-                 long			    relocatable; } location_counter;
+                 int			    relocatable; } location_counter;
                  
 static location_counter locator[LOCATORS];
 
@@ -392,8 +395,8 @@ static txo *ltag[LOCATORS];
 
 static breakpoint *lpart[LOCATORS];
 
-static long loc;
-static long actual_lbase;
+static int loc;
+static int actual_lbase;
 static int counter_of_reference;
 static location_counter *actual = locator;
 
@@ -422,8 +425,8 @@ static int		 label_highest_byte;
 #ifdef STRUCTURE_DEPTH
 static int		 active_x, branch_present;
 static object		*active_instance[STRUCTURE_DEPTH];
-static unsigned long	 active_origin[STRUCTURE_DEPTH];
-static unsigned long	 branch_high[STRUCTURE_DEPTH];
+static unsigned int	 active_origin[STRUCTURE_DEPTH];
+static unsigned int	 branch_high[STRUCTURE_DEPTH];
 static int		 treeflag;
 #endif
 
@@ -438,7 +441,7 @@ static int traverse_id;
 
 static char octal = 0;
 static char lterm = '.', sterm = ':', cont_char =';', qchar = '"';
-static long twoscomp = 1; 
+static int twoscomp = 1; 
 
 static int ll[INCLUDE_MAXDEPTH] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 static int linex, list, plist;
@@ -457,12 +460,13 @@ static int handle[INCLUDE_MAXDEPTH];
 static int ohandle, depth, nhandle;
 
 static int lwidth = 60;
-static int tsubs, litloc;
+static int tsubs, pass1_tsubs, litloc;
 
-static long zero_code_point = DEFAULT_ZERO_CODE_POINT;
-static long ecount=0, ucount=0;
+static int zero_code_point = DEFAULT_ZERO_CODE_POINT;
+static int ecount=0, ucount=0;
+static int context_string;
 static int suffix, code = ASCII; 
-static long code_set[256]
+static int code_set[256]
  = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
     16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
     32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,
@@ -554,7 +558,7 @@ static touch_table	 one_touch;
 #endif
 
 #ifdef REPORT_QNAMES
-static long		 qnames;
+static int		 qnames;
 #endif
 
 
@@ -573,7 +577,7 @@ static char			 path[204];
 #ifdef RECORD
 static int			 branch_record;
 static int			 record_nest;
-static long			 branch_restart;
+static int			 branch_restart;
 #endif
 
 

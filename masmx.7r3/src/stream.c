@@ -36,9 +36,9 @@ static void stringline(char *qstring, char *param, txo *image)
    int			 cache_line = RADIX / word * word;
    int			 positions = cache_line;
    int			 bits = 0;
-   long			 symbol;
-   long			 mask = (byte == 32) ? 0xFFFFFFFF : (1 << byte) - 1;
-   long			 buffer;
+   int			 symbol;
+   int			 mask = (byte == 32) ? 0xFFFFFFFF : (1 << byte) - 1;
+   int			 buffer;
    char			*q = substitute(qstring, param);
 
    int			 x,
@@ -93,7 +93,7 @@ static void stringline(char *qstring, char *param, txo *image)
    }
 
 
-   if (x = positions % word)
+   if ((x = positions % word))
    {
       /**************************************************
 		this step cannot overflow the cache line
@@ -125,7 +125,7 @@ static void stringline(char *qstring, char *param, txo *image)
 		some unwritten words
    ****************************************************/
 
-   if (x = cache_line - positions) produce(x, '+', &item, image);
+   if ((x = cache_line - positions)) produce(x, '+', &item, image);
 
    record_bits(bits);
 }

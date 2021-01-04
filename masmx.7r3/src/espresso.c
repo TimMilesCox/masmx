@@ -47,7 +47,7 @@ static int storage_addresses(char *s, char *e)
       if (*s == '+') return storage_addresses(s + 1, e);
       if (*s == '-') return storage_addresses(s + 1, e);
 
-      if (p = next_binary_operator(s, e, NULL, 0))
+      if ((p = next_binary_operator(s, e, NULL, 0)))
       {
          if (number(s, p) == 0) return 1;
          s = p + ofield;
@@ -181,7 +181,7 @@ static void i_xpress(char *s, char *e, char *tag)
                      break;
                   }
 
-                  while (q = next_operator(s, p, "++\0--\0", 0))
+                  while ((q = next_operator(s, p, "++\0--\0", 0)))
                   {
                      trailing_integer_operation(this_operator, s, q, tag);
                      this_operator = oper_ator(q, p - q);
@@ -207,7 +207,7 @@ static void i_xpress(char *s, char *e, char *tag)
                      break;
                   }
 
-                  while (q = next_operator(s, p, "++\0--\0", 0))
+                  while ((q = next_operator(s, p, "++\0--\0", 0)))
                   {
                      trailing_integer_operation(this_operator, s, q, tag);
                      this_operator = oper_ator(q, p - q);
@@ -229,7 +229,7 @@ static void i_xpress(char *s, char *e, char *tag)
                   }
 
 
-                  while (q = next_operator(s, p, "+\0-\0", 0))
+                  while ((q = next_operator(s, p, "+\0-\0", 0)))
                   {
                      trailing_integer_operation(this_operator, s, q, tag);
                      this_operator = oper_ator(q, p - q);
@@ -256,7 +256,7 @@ static void i_xpress(char *s, char *e, char *tag)
                      break;
                   }
 
-                  while (q = next_operator(s, p, "**\0", 0))
+                  while ((q = next_operator(s, p, "**\0", 0)))
                   {
                      fpxpress_assemble(" $i_and ",  s, q, tag);
                      s = q + ufield[AND];
@@ -275,7 +275,7 @@ static void i_xpress(char *s, char *e, char *tag)
                      break;
                   }
 
-                  while (q = next_operator(s, p, "*\0///\0//\0/\0", 0))
+                  while ((q = next_operator(s, p, "*\0///\0//\0/\0", 0)))
                   {
                      trailing_integer_operation(this_operator, s, q, tag);
                      this_operator = oper_ator(q, p - q);

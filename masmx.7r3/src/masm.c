@@ -40,7 +40,7 @@
 
 #define ESC 7
 #undef	WALKP
-#define BLOCK 4096
+#define	BLOCK 4096
 #define DEEP_RECURS	7
 #define ABOUND
 #define USING_NO_REL
@@ -98,6 +98,7 @@
 #include <mem.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #define	malloc	farmalloc
 
@@ -202,10 +203,18 @@ extern unsigned _stklen = 32*1024;
 #define OVERLAY_LITERALS
 #define VERSION	"7"
 
-#ifdef	SUPERSET
-#define REVISION "3A Build 8"
+#if	__LP64__
+#ifdef  SUPERSET
+#define REVISION "3A Build 10-64"
 #else
-#define REVISION "3Z Build 8"
+#define REVISION "3Z Build 10-64"
+#endif
+#else
+#ifdef	SUPERSET
+#define REVISION "3A Build 10"
+#else
+#define REVISION "3Z Build 10"
+#endif
 #endif
 
 #define	DISPLAY_Q

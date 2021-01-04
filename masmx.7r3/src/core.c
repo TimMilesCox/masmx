@@ -75,9 +75,9 @@ static int suffix_noclash(int symbol)
    return 1;
 }
 
-static long bucket(long granule)
+static int bucket(int granule)
 {
-   long power = 1;
+   int power = 1;
    while (power < granule) power <<= 1;
    return -power;
 }
@@ -89,7 +89,7 @@ static value *apply_value(int id)
 
    if (remainder < sizeof(value)) p = (value *) buy_ltable();
 
-   lr = (object *) ((long) lr + sizeof(value));
+   lr = (object *) ((char *) lr + sizeof(value));
    remainder -= sizeof(value);
 
    p->type = VALUE;
@@ -106,10 +106,10 @@ static void switch_locator(char *p, char *param)
    char			*limit, *limit2, *line_label = p;
 
    #ifdef RELOCATION
-   long			 container;
+   int			 container;
    #endif
 
-   unsigned long	 v = 0, w = 0, x = 0;
+   unsigned int	 v = 0, w = 0, x = 0;
    value		*vpoint;
 
    line_label++;
@@ -253,18 +253,16 @@ static void switch_locator(char *p, char *param)
                }
                else
                {
-                  vpoint = (value *) actual->runbank;
+                  vpoint =actual->runbank.p;
 
                   if (!vpoint)
                   {                  
-                     actual->runbank
-                     = (long) apply_value(counter_of_reference);
+                     actual->runbank.p = apply_value(counter_of_reference);
                   }
 
                   forward_reference = 0;
 
-                  ((value *) actual->runbank)->value
-                  = *xpression(limit2+1, limit, NULL);
+                  actual->runbank.p->value = *xpression(limit2+1, limit, NULL);
 
                   if (forward_reference)
                   {
@@ -276,7 +274,7 @@ static void switch_locator(char *p, char *param)
                       flag("relocatable value may not be used as giant section origin");
                   }
  
-                 actual->flags |= 3;
+                  actual->flags |= 3;
                }
             }
             else
@@ -288,7 +286,7 @@ static void switch_locator(char *p, char *param)
                else
                {
                   actual->bias = 1;
-                  actual->runbank = x = expression(limit2, limit, param);
+                  actual->runbank.a = x = expression(limit2, limit, param);
                   if (v != actual->base)
                   flag("address space region slipped");
                }
@@ -434,12 +432,12 @@ static void switch_locator(char *p, char *param)
 }
 
 
-static long rfunction(int v,
+static int rfunction(int v,
 		      char *s, char *param, char *mark, 
 		      object *tag)
 {
    char			*limit, *d = NULL;
-   long			 i, j;
+   int			 i, j;
    int			 h, symbol, x;
    object		*l;
    location_counter	*q;
@@ -482,7 +480,7 @@ static long rfunction(int v,
 
          if ((q->flags & 129) == 1)
          {
-            breakpoint_base = &((value *) q->runbank)->value;
+            breakpoint_base = &q->runbank.p->value;
             item = xpression(STACK_TOP_CLEAR, STACK_TOP_CLEAR, NULL);
             mapx->m.l.rel = x | 128;
             quadinsert(i, item);
@@ -532,7 +530,7 @@ static long rfunction(int v,
 
          if (actual->flags & 1)
          {
-            breakpoint_base = &((value *) actual->runbank)->value;
+            breakpoint_base = &actual->runbank.p->value;
             item = xpression(STACK_TOP_CLEAR, STACK_TOP_CLEAR, NULL);
             quadinsert(actual->base, item);
             operand_add(item, breakpoint_base);
@@ -812,7 +810,7 @@ static long rfunction(int v,
 
             #if 1
             l = findlabel(d, limit);
-            if (x = mapx->m.l.rel) q = &locator[x & 127];
+            if ((x = mapx->m.l.rel)) q = &locator[x & 127];
             else return j;
             #elif 0
             printf("[%x]", mapx->m.l.rel);
@@ -850,7 +848,7 @@ static long rfunction(int v,
          {
             if (q->flags & 1)
             {
-               breakpoint_base = &((value *) q->runbank)->value;
+               breakpoint_base = &q->runbank.p->value;
                item = xpression(STACK_TOP_VALUE, NULL, NULL);
 
                if ((q->flags & 128) || (d == NULL) || ((x) && (l) && (l->l.valued == EQUF)))
@@ -885,7 +883,7 @@ static long rfunction(int v,
          #ifdef	BANK_INDEX
 
       case BANK_INDEX:
-	 if ((actual->breakpoint) && ((actual->flags & 1) == 0)) return actual->runbank;
+	 if ((actual->breakpoint) && ((actual->flags & 1) == 0)) return actual->runbank.a;
          return 0;
 
          #endif		/* ifdef BANK_INDEX */	
@@ -922,7 +920,7 @@ static void pack_ltable(object *toplabel)
    paragraph			*p, *q;
    object			*pr = toplabel;
   
-   while ((long) pr != (long) floatop)
+   while (pr != floatop)
    {
       length = pr->h.length;
       
@@ -953,7 +951,7 @@ static void pack_ltable(object *toplabel)
       printf("advance cursor %d\n", length);
       #endif
       
-      pr = (object *) ((long) pr + length);
+      pr = (object *) ((char *) pr + length);
    }
 
    #ifdef TRACE_RECURS
@@ -966,13 +964,13 @@ static void pack_ltable(object *toplabel)
 static line_item *external_function(char *s, char *param, char *mark,
 		  	            object *l)
 {
-   long			 i = 0, f;
+   int			 i = 0, f;
    int			 j = 1, y = 0, prelif, preskip,
                          bdepth = 0, sinquo = 0, square = 0;
    
    char			*dir, *arg, *v_p;
    object		*x;
-   long			 start = loc;
+   int			 start = loc;
 
    char			 symbol1, symbol2;
    
@@ -1008,14 +1006,14 @@ static line_item *external_function(char *s, char *param, char *mark,
 
    if (symbol1 == '\\')
    {
-      while (symbol1 = *v_p++)
+      while ((symbol1 = *v_p++))
       {
          if (symbol1 == '(') break;
          if (symbol1 == '[') break;
       }
    }
 
-   while (symbol2 = l->l.name[y++]) v_param1[j++] = symbol2;
+   while ((symbol2 = l->l.name[y++])) v_param1[j++] = symbol2;
 
    v_param1[j++] = 32;
 
@@ -1024,7 +1022,7 @@ static line_item *external_function(char *s, char *param, char *mark,
       bdepth = 1;
       if (symbol1 == '[') square = 1;
 
-      while (symbol1 = *v_p++)
+      while ((symbol1 = *v_p++))
       {
          if ((symbol1 == '\'')  && ((sinquo & 2) == 0)) sinquo ^= 1;
          if ((symbol1 == qchar) && ((sinquo & 1) == 0)) sinquo ^= 2;
@@ -1122,7 +1120,7 @@ static line_item *external_function(char *s, char *param, char *mark,
       if (!y) cleat(1, x);
       #endif
 
-      x = (object *) ((long) x + y);
+      x = (object *) ((char *) x + y);
       
       #ifdef DISPLAY_Q
       if (plist > masm_level)
@@ -1159,7 +1157,7 @@ static line_item *external_function(char *s, char *param, char *mark,
 
       if (j == BYPASS_RECORD)
       {
-         if (j = x->nextbdi.next) x = bank[j];
+         if ((j = x->nextbdi.next)) x = bank[j];
          else                     x = NULL;
 
          if (!x)
@@ -1291,7 +1289,7 @@ static object *compose_filename(char *from, char *extension, int prefix)
    #ifdef PATH
    if (prefix)
    {
-      while (symbol = *d++)
+      while ((symbol = *d++))
       {
          if ((selector['o'-'a'])
          &&  (symbol > 0x40)
@@ -1305,7 +1303,7 @@ static object *compose_filename(char *from, char *extension, int prefix)
 
    if (*from == qchar) bounded = *from++;
 
-   while (symbol = *from++)
+   while ((symbol = *from++))
    {
       if (length == FILENAME_LIMIT) break;
       if (symbol == '.') extended = '.';
@@ -1333,7 +1331,7 @@ static object *compose_filename(char *from, char *extension, int prefix)
    
    if ((extension) && (!extended))
    {
-      while (symbol = *extension++)
+      while ((symbol = *extension++))
       {
          if ((selector['o'-'a'])
          &&  (symbol > 0x40)
@@ -1359,7 +1357,7 @@ static object *compose_filename(char *from, char *extension, int prefix)
    if (length > remainder) lr = buy_ltable();
    remainder -= length;
    l = lr;
-   lr = (object *) ((long) lr + length);
+   lr = (object *) ((char *) lr + length);
    l->l.r.l.xref = 0;
    l->l.r.l.rel = depth;
    l->l.r.l.y = 0;
@@ -1499,12 +1497,25 @@ static int physin()
    }
 }
 
+static int next_byte()
+{
+   int		 f = handle[depth];
+   char		 c = 0;
+   off_t	 here;
+
+   if (pass == 0) return 0;
+   here = lseek(f, 0, SEEK_CUR);
+   read(f, &c, 1);
+   lseek(f, here, SEEK_SET);
+   return c;
+}
+
 #endif
 
 #ifdef CODED_EXPRESS
-static long coded_character(int symbol)
+static int coded_character(int symbol)
 {
-   long           x = symbol;
+   int           x = symbol;
 
    if (code == ASCII)
    {
@@ -1533,7 +1544,7 @@ static int operand_compare(line_item *left, line_item *right)
    #ifdef INTEL
    while (c < RADIX/8)
    {
-      if (i = (left->b[c] - right->b[c])) break;
+      if ((i = (left->b[c] - right->b[c]))) break;
       c++;
    }
    #else
@@ -1660,7 +1671,7 @@ static void operand_xor(line_item *left, line_item *right)
 static void operand_addcarry(unsigned short carry, line_item *o)
 {
    int		 	i = RADIX/8;
-   unsigned long	c = carry;
+   unsigned int	c = carry;
 
    while ((c) && (i))
    {
@@ -1864,7 +1875,7 @@ static void operand_multiply(line_item *product, line_item *left, line_item *rig
 static void operand_addcarry(unsigned short c, line_item *o)
 {
    int			 i = RADIX/16;
-   unsigned long	 carry = c;
+   unsigned int	 carry = c;
 
    while ((carry) && (i))
    {
@@ -1883,7 +1894,7 @@ static void ashift(line_item *o, int scale)
 				 j = scale & 15,
 				 k = 0;
 
-   unsigned			 long c;
+   unsigned			 int c;
 
 
    if (o->b[0] & 128) m.upper = minus_o;
@@ -1905,7 +1916,7 @@ static void lshift(line_item *o, short distance)
 				 j = distance & 15,
 				 k = 0;
 
-   unsigned			 long c;
+   unsigned			 int c;
 
 
    if (distance < 0)
@@ -1930,7 +1941,7 @@ static void rshift(line_item *o, int distance)
 				 j = distance & 15,
 				 k = RADIX/16;
 
-   unsigned			 long c;
+   unsigned			 int c;
 
 
    if (i < 0) return;
@@ -1974,7 +1985,7 @@ static int operand_shift_count(line_item *o)
 
 static void operand_add(line_item *left, line_item *right)
 {
-   unsigned long	 c = 0;
+   unsigned int	 c = 0;
    int			 i = RADIX/16;
 
    while (i--)
@@ -1989,7 +2000,7 @@ static void operand_add(line_item *left, line_item *right)
 
 static void operand_add_negative(line_item *left, line_item *right)
 {
-   unsigned long	 c = twoscomp;
+   unsigned int	 c = twoscomp;
    int			 i = RADIX/16;
    while (i--)
    {
@@ -2009,7 +2020,7 @@ static void operand_multiply(line_item *product, line_item *left, line_item *rig
    unsigned short	 b;
    
    int			 i = 0, j, u;
-   unsigned long	 c = 0;
+   unsigned int	 c = 0;
    
    line_item transient;
    
@@ -2128,7 +2139,7 @@ static line_item *xpression(char *s, char *e, char *param)
    static line_item		*sp = &o[XPRESSION];
    #endif
 
-   long				 i = 0, ires;
+   int				 i = 0, ires;
 
    char				*d,
 				*p,
@@ -2184,7 +2195,7 @@ static line_item *xpression(char *s, char *e, char *param)
    if (sp == &o[XPRESSION]) floating_conversion = 0;
    #endif
 
-   if (d = contains(s, e, "=\0"))
+   if ((d = contains(s, e, "=\0")))
    {
       /*
       if (expression(s, d, param)
@@ -2213,7 +2224,7 @@ static line_item *xpression(char *s, char *e, char *param)
       return sp;
    }
    
-   if (d = contains(s, e, "^=\0"))
+   if ((d = contains(s, e, "^=\0")))
    {
       /*
       if (expression(s, d, param)
@@ -2242,7 +2253,7 @@ static line_item *xpression(char *s, char *e, char *param)
       return sp;
    }
    
-   if (d = contains(s, e, ">\0"))
+   if ((d = contains(s, e, ">\0")))
    {
       /*
       if (expression(s, d, param)
@@ -2272,7 +2283,7 @@ static line_item *xpression(char *s, char *e, char *param)
       return sp;
    }
    
-   if (d = contains(s, e, "<\0"))
+   if ((d = contains(s, e, "<\0")))
    {
       /*
       if (expression(s, d, param)
@@ -2326,7 +2337,7 @@ static line_item *xpression(char *s, char *e, char *param)
    #endif
    
 
-   if (d = contains(s, e, "--\0")) 
+   if ((d = contains(s, e, "--\0")))
    {
       left = xpression(s, d, param);
       
@@ -2346,7 +2357,7 @@ static line_item *xpression(char *s, char *e, char *param)
       return sp;
    }
 
-   if (d = contains(s, e, "++\0")) 
+   if ((d = contains(s, e, "++\0")))
    {
       left = xpression(s, d, param);
       
@@ -2366,7 +2377,7 @@ static line_item *xpression(char *s, char *e, char *param)
       return sp;
    }
 
-   if (d = contains(s, e, "/*\0")) 
+   if ((d = contains(s, e, "/*\0")))
    {
       left = xpression(s, d, param);
       
@@ -2395,7 +2406,7 @@ static line_item *xpression(char *s, char *e, char *param)
       return sp;
    }
 
-   if (d = contains(s, e, "*/\0")) 
+   if ((d = contains(s, e, "*/\0")))
    {
       left = xpression(s, d, param);
       
@@ -2460,7 +2471,7 @@ static line_item *xpression(char *s, char *e, char *param)
       return sp;
    }
 
-   if (d = contains(s, e, "**\0"))
+   if ((d = contains(s, e, "**\0")))
    {
       left = xpression(s, d, param);
       
@@ -2507,7 +2518,7 @@ static line_item *xpression(char *s, char *e, char *param)
       return sp;
    }
 
-   if (d = contains(s, e, "*+\0*-\0"))
+   if ((d = contains(s, e, "*+\0*-\0")))
    {
       if (!transient_floating_bits) transient_floating_bits = fpwidth;
 
@@ -2522,7 +2533,7 @@ static line_item *xpression(char *s, char *e, char *param)
          if (margin > (s + 1)) override = *(margin - 2);
       }
 
-      if (x = length_mark(symbol))
+      if ((x = length_mark(symbol)))
       {
          if (override == ':')
          {
@@ -2613,7 +2624,7 @@ static line_item *xpression(char *s, char *e, char *param)
    }
    #endif       /*      FP_EARLIER        */
 
-   if (d = operates(s, e, "-\0+\0"))
+   if ((d = operates(s, e, "-\0+\0")))
    {
       /*******************************************************
          this precaution here allows unary signs to follow
@@ -2789,7 +2800,7 @@ static line_item *xpression(char *s, char *e, char *param)
    }
    
 
-   if (d = operates(s, e, "///\0//\0/\0*\0"))
+   if ((d = operates(s, e, "///\0//\0/\0*\0")))
    {
       sp--;
       left = xpression(s, d, param);
@@ -2912,7 +2923,8 @@ static line_item *xpression(char *s, char *e, char *param)
    {
       if (qchar == 0x27) s = substitute(s, param);
       s++;
-      while (ires = *s++)
+
+      while ((ires = *s++))
       {
 	 if (ires == 0x27)
 	 {
@@ -3207,6 +3219,9 @@ static line_item *xpression(char *s, char *e, char *param)
                   case QUANTUM:
                     sp->b[RADIX/8-1] = address_quantum;
                     return sp;
+                  case LITS:
+                    sp->b[RADIX/8-1] = litloc;
+                    return sp;
                }
                #else
                switch (l->l.value.b[RADIX/8-1])
@@ -3247,7 +3262,7 @@ static line_item *xpression(char *s, char *e, char *param)
 
             if ((q->flags & 129) == 1)
             {
-               if (v = (value *) q->runbank)
+               if ((v = (value *) q->runbank.a))
                {
                   *sp = v->value;
                   quadd_u(ires, sp);
@@ -3400,7 +3415,7 @@ static line_item *xpression(char *s, char *e, char *param)
    return /* &o[0] */ sp;
 }
 
-static long ixpression(char *s, char *e, char *param)
+static int ixpression(char *s, char *e, char *param)
 {
    line_item		*o = xpression(s, e, param);
 
@@ -3417,12 +3432,12 @@ static long ixpression(char *s, char *e, char *param)
 
 /*********************************************************
 
-where intermediate results longer than long must not
-be lost but the result should fit in long
+where intermediate results inter than int must not
+be lost but the result should fit in int
 
 *********************************************************/
 
-static long zxpression(char *s, char *e, char *param)
+static /* int */ int zxpression(char *s, char *e, char *param)
 {
    line_item		*sp = xpression(s, e, param);
 
@@ -3438,9 +3453,9 @@ static long zxpression(char *s, char *e, char *param)
 
 #ifdef VERY_STACKED_XPRESSION
 
-static long expression(char *s, char *e, char *param)
+static int expression(char *s, char *e, char *param)
 { 
-   long			 y;
+   int			 y;
    link_profile		*b4 = mapx;
 
    sp--;
@@ -3467,10 +3482,10 @@ static long expression(char *s, char *e, char *param)
 #error you need VERY_STACKED_XPRESSION
 #endif
 
-static long expression(char *s, char *e, char *param)
+static int expression(char *s, char *e, char *param)
 {
    
-   long				 i = 0, j;
+   int				 i = 0, j;
    char				*d;
 
    char				 override = 0;
@@ -3489,28 +3504,28 @@ static long expression(char *s, char *e, char *param)
 
    if (s == e) return 0;
    
-   if (d = contains(s, e, "=\0"))
+   if ((d = contains(s, e, "=\0")))
    {
       if (expression(s, d, param)
       ==  expression(d+1, e, param)) return 1;
       else                           return 0;
    }
    
-   if (d = contains(s, e, "^=\0"))
+   if ((d = contains(s, e, "^=\0")))
    {
       if (expression(s, d, param)
       !=  expression(d+2, e, param)) return 1;
       else                           return 0;
    }
    
-   if (d = contains(s, e, ">\0"))
+   if ((d = contains(s, e, ">\0")))
    {
       if (expression(s, d, param)
       >   expression(d+1, e, param)) return 1;
       else                           return 0;
    }
    
-   if (d = contains(s, e, "<\0"))
+   if ((d = contains(s, e, "<\0")))
    {
       if (expression(s, d, param)
       <   expression(d+1, e, param)) return 1;
@@ -3523,22 +3538,22 @@ static long expression(char *s, char *e, char *param)
    if (*s == '+') return expression(++s, e, param);
    #endif
    
-   if (d = contains(s, e, "--\0")) return expression(s, d, param)
+   if ((d = contains(s, e, "--\0"))) return expression(s, d, param)
 					^ expression(d+2, e, param);
 
-   if (d = contains(s, e, "++\0")) return expression(s, d, param)
+   if ((d = contains(s, e, "++\0"))) return expression(s, d, param)
 					| expression(d+2, e, param);
 
-   if (d = contains(s, e, "/*\0")) return expression(s, d, param)
+   if ((d = contains(s, e, "/*\0"))) return expression(s, d, param)
 				       >> expression(d+2, e, param);
    
-   if (d = contains(s, e, "*/\0")) return expression(s, d, param)
+   if ((d = contains(s, e, "*/\0"))) return expression(s, d, param)
 				       << expression(d+2, e, param);
 
-   if (d = contains(s, e, "**\0")) return expression(s, d, param)
+   if ((d = contains(s, e, "**\0"))) return expression(s, d, param)
 					& expression(d+2, e, param);
 
-   if (d = operates(s, e, "-\0+\0"))
+   if ((d = operates(s, e, "-\0+\0")))
    {
       /*******************************************************
          this precaution here allows unary signs to follow
@@ -3564,7 +3579,7 @@ static long expression(char *s, char *e, char *param)
       #endif
    }
    
-   if (d = operates(s, e, "///\0//\0/\0*\0"))
+   if ((d = operates(s, e, "///\0//\0/\0*\0")))
    {
       if (*d == '*') return expression(s, d, param)
 			  * expression(d+1, e, param);
@@ -3603,7 +3618,7 @@ static long expression(char *s, char *e, char *param)
    {
       if (qchar == 0x27) s = substitute(s, param);
       s++;
-      while (symbol = *s++)
+      while ((symbol = *s++))
       {
          if (symbol == 0x27)
          {
@@ -3838,14 +3853,14 @@ static long expression(char *s, char *e, char *param)
             {
                x = expression(label_margin + 1, e, param);
 
-               if (x < 1)        return (long) 0;
-               if (x > RADIX/32) return (long) 0;
+               if (x < 1)        return 0;
+               if (x > RADIX/32) return 0;
 
-               return (long) quadextractx(&l->l.value, x);
+               return quadextractx(&l->l.value, x);
             }
             #endif
 
-	    i = (long) quadextract(&l->l.value);
+	    i = quadextract(&l->l.value);
 
             if (address_size < 32) i &= 0x7FFFFFFF;
 
@@ -3870,6 +3885,8 @@ static long expression(char *s, char *e, char *param)
                     return address_size;
                   case QUANTUM:
                     return address_quantum;
+                  case LITS:
+                    return litloc;
                }
                #else
                switch (l->l.value.b[RADIX-1])
@@ -3898,7 +3915,7 @@ static long expression(char *s, char *e, char *param)
 	    #endif
 
 	    i = qextractv(l);
-	    return (long) i;
+	    return i;
 
             #ifdef LITERALS
             #ifdef LTAG
@@ -3906,7 +3923,7 @@ static long expression(char *s, char *e, char *param)
             j = l->l.r.l.rel & 127;
             i = literal(label_margin, param, j);
             q = &locator[j];
-            if (q->flags == 1) i += vextractq((object *) q->runbank);
+            if (q->flags == 1) i += vextractq((object *) q->runbank.p);
             return i;
             #endif
             #endif
@@ -4098,7 +4115,7 @@ static void o_range(int flags, line_item *ii)
 {
    int			 z = 0;
 
-   long			 v = ii->i[0]
+   /* int */ int	 v = ii->i[0]
                            | ii->i[1]
                            | ii->i[2]
                            | ii->i[3]
@@ -4310,7 +4327,7 @@ static void map_field(unsigned char *p)
 
    if (!pass) return;
    
-   while (temp = *p++) scale += temp;
+   while ((temp = *p++)) scale += temp;
 
    map_linkages(bits, scale);
 }
@@ -4332,7 +4349,7 @@ static int text_substitute(int i, char *buffer)
       if (meaning(opcode) == TEXT_SUBSTITUTE) return i;
    }
 
-   while (datum = *k)
+   while ((datum = *k))
    {
       inquotes_b4 = inquotes;
 
@@ -4374,14 +4391,14 @@ static int text_substitute(int i, char *buffer)
 	    }
 
   	    if (*c == 0) break;
-	    l = (object *) ((long) l + l->h.length);
+	    l = (object *) ((char *) l + l->h.length);
          }
 
          if (l->h.type == TEXT_SUBSTITUTE)
          {
 	    c++;
 	    k = forward;
-	    while (aside[j++] = *c++);
+	    while ((aside[j++] = *c++));
 	    j--;
 	    changed = 1;
 	    l = earliest_tsub;
@@ -4571,13 +4588,15 @@ static int getline(char *k, int max)
          return -1;
       }
 
+      #ifdef BLOCK
       actual_block = block[depth];
+      #endif
       return 0;
    }
 
    if (tsubs) x = text_substitute(x, k);
 
-   if (selector['s'-'a'])
+   if ((selector['s'-'a']) && (pass == 0))
    {
       known = -1;
       p = getop(k);
@@ -4604,7 +4623,7 @@ static int getline(char *k, int max)
    return x;
 }
 
-static void quadza(long u, line_item *i)
+static void quadza(int u, line_item *i)
 {
    *i = zero_o;
 
@@ -4672,7 +4691,7 @@ static object *store_proc_index(char *line_label, char *directive, object *pid)
 
 
    #ifndef ABOUND
-   long valued = pid->l.valued;
+   int valued = pid->l.valued;
    #endif
 
    object *l;
@@ -4934,11 +4953,11 @@ static void awake_procedure(int type, char *line, char *argument)
    o = next_image[masm_level - 1];
    l->l.down = (void *) o;
    if (type != FUNCTION)
-   l->l.down = (void *) ((long) o + o->h.length);
+   l->l.down = (void *) ((char *) o + o->h.length);
    
    for (;;)
    {
-      o = (object *) ((long) o + o->h.length);
+      o = (object *) ((char *) o + o->h.length);
       k = o->t.text;
       
       #ifdef TRACE_RECURS
@@ -4951,8 +4970,8 @@ static void awake_procedure(int type, char *line, char *argument)
      
       if (o->h.type == BYPASS_RECORD)
       {
-         if (j = o->nextbdi.next) o = bank[j];
-         else                     o = NULL;
+         if ((j = o->nextbdi.next)) o = bank[j];
+         else                       o = NULL;
 
          if (o == NULL)
          {
@@ -5170,7 +5189,7 @@ static void embed_procedure(int type, char *line, char *argument)
          lr->h.type = j;
          lr->h.length = size;
 
-         lr = (object *) ((long) lr + size);
+         lr = (object *) ((char *) lr + size);
          remainder -= size;
       }
       
@@ -5188,7 +5207,7 @@ static void embed_procedure(int type, char *line, char *argument)
 static void decide(char *arg, char *param)
 {
    char			*limit;
-   long			 i;
+   int			 i;
 
    int			 mask, unmask;
    
@@ -5223,7 +5242,7 @@ static void decide(char *arg, char *param)
 static void newdecide(char *arg, char *param)
 {
    char				*limit;
-   long				 i;
+   int				 i;
 
    int				 mask, unmask;
    
@@ -5330,7 +5349,7 @@ static void save_object(char *arg)
 static int iterate(char *arg, char *param, object *tag, txo *image)
 {
    char			*limit;
-   long			 x;
+   int			 x;
    int			 rvalue;
 
 
@@ -5500,8 +5519,8 @@ static void insequate(int how,
 
 static void lhbx(char *from, int bits, line_item *item)
 {
-   long				 mask = (1<<byte)-1;
-   long				 datum;
+   int				 mask = (1<<byte)-1;
+   int				 datum;
 
 
    from++;
@@ -5607,9 +5626,9 @@ static void operand_round_down(int bytes, line_item *item)
 static void reduce(int w, int scale, line_item *item)
 {
    #ifdef ROUND1
-   unsigned long sum = scale - 1;
+   unsigned int sum = scale - 1;
    #else
-   unsigned long sum = (scale + 1) >> 1;
+   unsigned int sum = (scale + 1) >> 1;
    #endif
 
    unsigned short digit = 0, quo;
@@ -5631,7 +5650,7 @@ static void reduce(int w, int scale, line_item *item)
       sum |= (unsigned short) read16(w, item);
       digit = sum % scale;
       quo   = sum / scale;
-      write16(w, (int) quo, item);
+      write16(w, quo, item);
       w++;
    }
 }
@@ -5641,7 +5660,7 @@ static void floating_raise(int w, int scale, line_item *item)
 {
    int			 i = RADIX/16;
    unsigned short	 digit = 0, hu;
-   unsigned long	 ju;
+   unsigned int	 ju;
    
    while (i--)
    {
@@ -5656,9 +5675,9 @@ static void floating_raise(int w, int scale, line_item *item)
    }
 }
 
-static void characterise(long places, line_item *item)
+static void characterise(int places, line_item *item)
 {
-   unsigned long	 bias;
+   unsigned int	 bias;
 
    bias = 0x00400000 + RADIX - operand_shift_count(item);
    if (bias == 0x00400000) return;
@@ -5737,12 +5756,12 @@ static void characterise(long places, line_item *item)
 static void floating_generate(char *a, char *margin, char *param, line_item *item)
 {
    char			*limit;
-   long			 places = 0; 
+   int			 places = 0; 
 
    #ifdef INTEL
    unsigned short	 carry;
    #else
-   unsigned long	 carry;
+   unsigned int	 carry;
    #endif
 
    unsigned short	 fraction_triggered = 0, i;
@@ -5800,7 +5819,7 @@ static void floating_generate(char *a, char *margin, char *param, line_item *ite
       carry = *a++;
    }
 
-   if (i = length_mark(carry))
+   if ((i = length_mark(carry)))
    {
        transient_floating_bits = i;
        carry = *a++;
@@ -5967,13 +5986,13 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
    object		*toplabel, *txp, *depx;
    line_item		*ii;
-   long			 savelocator[LOCATORS];
-   long			 savelocatorl[LOCATORS];
+   int			 savelocator[LOCATORS];
+   int			 savelocatorl[LOCATORS];
    int			 savepass, subfunction;
    char			*nlabel, *ndirect;
    unsigned char	*subtext;
    char			*directive /* = getop(line_label) */; 
-   long			 v;
+   int			 v;
    int			 parenthesised, squoted;
 
    line_item		 item = zero_o;
@@ -6142,7 +6161,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                thislabel->l.r.l.y = 0;
                quadza(loc, &item);
 
-               if (x = actual->flags & 129)
+               if ((x = actual->flags & 129))
                {
                   if (x & 128)
                   {
@@ -6152,7 +6171,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                   if (x  == 1)
                   {
-                     operand_add(&item, &((value *) actual->runbank)->value);
+                     operand_add(&item, &actual->runbank.p->value);
                   }
                }
                else
@@ -6164,7 +6183,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                }
 
 
-	       thislabel->l.r.l.rel = counter_of_reference;
+	       thislabel->l.r.l.rel = counter_of_reference | 128;
                
                if (pass)
                {
@@ -6187,13 +6206,13 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             limit = name;
             ndirect++;
             *limit++ = qchar;
-            while (symbol = *ndirect++)
+            while ((symbol = *ndirect++))
             {
                *limit++ = symbol;
                if (symbol == qchar) break;
             }
 
-            while (symbol = *ndirect++)
+            while ((symbol = *ndirect++))
             {
                if (symbol != '*') break;
                *limit++ = symbol;
@@ -6283,7 +6302,9 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
    {  
       if (*directive == qchar)
       {
+         context_string = 1;
          stringline(directive, param, image);
+         context_string = 0;
          return 0;
       }
    
@@ -6345,7 +6366,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
          limit = search++;
          symbol = *limit;
 
-         if (j = length_mark(symbol))
+         if ((j = length_mark(symbol)))
          {
             x = 0;
             if (limit > argument) x = *(limit - 1);
@@ -6390,12 +6411,13 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
 		Intel suffix is always in a macro with a
 		name like DW or DD or DB or .byte or .word
-		or .long, so macro code can ensure syntax
+		or .int, so macro code can ensure syntax
 		clarity and application code needs no
 		alteration
                *******************************************/
 
-               subtext = frightmost(argument, search);
+               subtext = (unsigned char *) frightmost(argument, search);
+
                x = *subtext;
 
                if ((x  > '0' - 1) && (x < '9' + 1))
@@ -6491,7 +6513,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                      if ((qq->flags & 129) == 1)
                      {
-                        if (vv = (value *) qq->runbank)
+                        if ((vv = (value *) qq->runbank.a))
                         {
                            liti = vv->value;
                            quadd_u(v, oo);
@@ -6567,7 +6589,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
             if ((qq->flags & 129) == 1)
             {
-               if (vv = (value *) qq->runbank)
+               if ((vv = (value *) qq->runbank.a))
                {
                   item = vv->value;
                   quadd_u(v, &item);
@@ -6686,7 +6708,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                      if ((sr = isanequf(argument))
                      &&  ((j & 129) == 129))
                      {
-                        vv = (value *) qq->runbank;
+                        vv = (value *) qq->runbank.p;
                         operand_add(oo, &vv->value);
                      }
 
@@ -6718,7 +6740,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                   case BINARY:
                      loadfile(argument, ".txo");
 
-                     if (selector['s'-'a'])
+                     if ((selector['s'-'a']) && (pass == 0))
                      {
                         write(nhandle, line_label, strlen(line_label));
                         write(nhandle, "\n", 1);
@@ -6859,7 +6881,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	 	  x = RADIX/8;
 
 		  v_argument = substitute(argument, param);
-                  if (sr = isanequf(v_argument)) item = sr->l.value;
+                  if ((sr = isanequf(v_argument))) item = sr->l.value;
 
 		  for (;;)
 		  {
@@ -7032,7 +7054,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                rvalue = *argument;
                if (rvalue == qchar) argument++;
                
-               while (symbol = *argument++) 
+               while ((symbol = *argument++)) 
                {
                   if (symbol == qchar) break;
                   if (symbol == ' ')
@@ -7280,7 +7302,19 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                print_item(ii);
 	       break;
 	    case TEXT_SUBSTITUTE:
-	       if (pass) break;
+ 
+ 	       if (pass)
+               {
+                  /***************************************************
+			switch on previously stored translate patterns
+                   	at the point they are encountered
+ 			they do not affect source code until that
+                  ***************************************************/
+ 
+                  tsubs = pass1_tsubs;
+                  break;
+               }
+
 	       if (!argument) break;
 	       search = argument;
 	       limit = search;
@@ -7329,7 +7363,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       if (!tsubs) earliest_tsub = lr;
 	       tsubs++;
 	       remainder -= lr->h.length;
-	       lr = (object *) ((long) lr + lr->h.length);
+	       lr = (object *) ((char *) lr + lr->h.length);
                lr->h = zero_header_word;
 
 	       break;
@@ -7434,7 +7468,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                      This is the more stringent range check. It
                      provides that earlier check fails for this
                      field are retained, if the updated value is
-                     maintained in the field in code itself.
+                     malongained in the field in code itself.
 
                      Intermediate overflows are flagged.
 
@@ -7485,7 +7519,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         or
 
                         (descant) means an intermediate accumulated
-                        48-bit value "offset" is being maintained.
+                        48-bit value "offset" is being malongained.
 
                         Therefore the range check done most recently
                         at write back takes effect, not any intermediate
@@ -7574,7 +7608,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       if (!argument) break;
 	       if (*argument++ == qchar)
 	       {
-		  while (x = *argument++)
+		  while ((x = *argument++))
 		  {
 		     if (x == qchar) break;
 
@@ -7643,7 +7677,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                      outstanding = 1;
                      if ((pass) && (selector['p'-'a']))
                      {
-                        printf("[%lx %s %x %x]\n", loc, sr->l.name, sr->l.valued, active_x);
+                        printf("[%x %s %x %x]\n", loc, sr->l.name, sr->l.valued, active_x);
                      }
                   }
 
@@ -7677,7 +7711,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                   {
                      if ((pass) && (selector['p'-'a']))
                      {
-                        printf("[%lx ? %lx:%x]\n", loc, branch_high[active_x], active_x);
+                        printf("[%x ? %x:%x]\n", loc, branch_high[active_x], active_x);
                      }
                      if (loc > branch_high[active_x])
                      {
@@ -7785,7 +7819,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                         x = strict_locator(search, symbol);
                         qq = &locator[x];
                         xrefl = file_label[depth]->l.down;
-                        v = qq->runbank;
+                        vv = qq->runbank.p;
+			v = qq->base;
 
                         #ifdef LONG_ABSOLUTE
                         if (subfunction == LONG_ABSOLUTE)
@@ -7795,9 +7830,9 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                            if (qq->flags & 1)
                            {
-                              if (v)
+                              if (vv)
                               {
-                                 thislabel->l.value = ((value *) v)->value;
+                                 thislabel->l.value = vv->value;
 
                                  if (xrefl) quadd_u(xrefl->segments.base[x],
                                                    &thislabel->l.value);
@@ -8280,7 +8315,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
               
                if (argument)
                {
-                  if (sr = findlabel(argument, NULL))
+                  if ((sr = findlabel(argument, NULL)))
                   {
                      #ifdef RANGE_FLAGS
                      v = range_filter.i[0]
@@ -8296,7 +8331,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                         if (selector['n'-'a'])
                         {
-                           printf("$%X:%0*lX [", counter_of_reference, apw, loc);
+                           printf("$%X:%0*X [", counter_of_reference, apw, loc);
 
                            x = (RADIX - subfunction) >> 3;
                            while (x < RADIX/8) printf("%2.2x", sr->l.value.b[x++]);
@@ -8467,7 +8502,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             if (!x) cleat(2, sr);
             #endif
 
-	    txp = (object *) ((long) txp + x);
+	    txp = (object *) ((char *) txp + x);
          }
 
          if (plist > masm_level)
@@ -8500,8 +8535,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                if (j == BYPASS_RECORD)
                {
-                  if (x = txp->nextbdi.next) txp = bank[x];
-                  else                       txp = NULL;
+                  if ((x = txp->nextbdi.next)) txp = bank[x];
+                  else                         txp = NULL;
 
                   if (!txp)
                   {
@@ -8537,7 +8572,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
                if (!x) cleat(3, txp);
                #endif
             
-	       txp = (object *) ((long) txp + x);
+	       txp = (object *) ((char *) txp + x);
 	    }
 
 	    txp = depx;
@@ -8568,8 +8603,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
             if (j == BYPASS_RECORD)
             {
-               if (x = txp->nextbdi.next) txp = bank[x];
-               else                       txp = NULL;
+               if ((x = txp->nextbdi.next)) txp = bank[x];
+               else                         txp = NULL;
 
                if (!txp) 
                {
@@ -8619,7 +8654,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
             if (!x) cleat(4, txp);
             #endif
 
-	    txp = (object *) ((long) txp + x);
+	    txp = (object *) ((char *) txp + x);
 	 }
 
          if (plist > masm_level)
@@ -8729,7 +8764,7 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 
                         if ((qq->flags & 129) == 1)
                         {
-                           if (vv = (value *) qq->runbank)
+                           if ((vv = (value *) qq->runbank.p))
                            {
                               liti = vv->value;
                               quadd_u(v, oo);
@@ -8784,8 +8819,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
          if (selector['f'-'a'] | pass)
          {
             load_name(directive, NULL);
-            if (name[0]) printf("[%s]", name);
-            else         printf("[%s]", directive);
+            if (name[0]) printf("[%2.2x %s]", type, name);
+            else         printf("[%2.2x %s]", type, directive);
          }
 
 	 flagf("not a command");
@@ -8803,10 +8838,10 @@ int main(int argc, char *_argv[])
    char 		 line[READSIZE];
 
    object 		*sr;
-   long			 fsize;
+   int			 fsize;
    
    location_counter	*q;
-   long			 low, high, v;
+   int			 low, high, v;
 
    value		*vpoint;
 
@@ -8836,7 +8871,7 @@ int main(int argc, char *_argv[])
       {
          b++;
 
-         while (j = *b++)
+         while ((j = *b++))
          {
 	    if ((j > 0x60) && (j < 0x7b))  selector[j-'a'] = 1;
 	    if ((j > 0x40) && (j < 0x5b))
@@ -9022,7 +9057,7 @@ int main(int argc, char *_argv[])
             if (((q->flags & 129) == 128)
             &&  ( q->relocatable  ==   0))
             {
-               if (q->bias == 0) v += q->runbank;
+               if (q->bias == 0) v += q->runbank.a;
             }
             #endif
 
@@ -9037,8 +9072,8 @@ int main(int argc, char *_argv[])
             }
             #endif
 
-            if (q->flags & 1) ((value *) q->runbank)->offset = q->loc;
-            else                         q->runbank = 0;
+            if (q->flags & 1) q->runbank.p->offset = q->loc;
+            else              q->runbank.a = 0;
 
 	    q->loc = 0;
 
@@ -9086,16 +9121,30 @@ int main(int argc, char *_argv[])
 	 pass = 2;
          background_pass = 2;
 	 
-         if (selector['s'-'a'])
-         handle[0] = open(OSYM,                  O_RDONLY);
+         if (selector['s'-'a']) handle[0] = open(OSYM, O_RDONLY);
          else
-	 handle[0] = open(file_label[0]->l.name, O_RDONLY);
+         {
+            handle[0] = open(file_label[0]->l.name, O_RDONLY);
+            pass1_tsubs = tsubs;
+  
+            /******************************************************
+ 		save the count of text translate patterns
+ 		recorded on the 1st pass
+ 		to switch on when the block of patterns if any
+ 		is encountered again on the 2nd pass
+ 		but not if the 2nd pass input file is temp.msm OSYM
+ 		because translates are applied to OSYM on pass 1
+ 		repeating the translates can be wrong
+ 		and makes more work forcing the intended behaviour
+             ******************************************************/
+         }
 
          if (handle[0] < 0) printf("temp symbolic cannot be read %d\n", errno);
 
 	 quadza(handle[0], &file_label[0]->l.value);
 	 
 	 selector['s'-'a'] = 0;
+         tsubs = 0;
 
          #ifdef MS
          ohandle = open(OBIN, O_CREAT|O_TRUNC|O_RDWR, S_IREAD|S_IWRITE);
@@ -9227,7 +9276,7 @@ int main(int argc, char *_argv[])
                          "safely linked\n", sr->l.name);
                }
 
-               vpoint = (value *) q->runbank;
+               vpoint = (value *) q->runbank.p;
                v = qextractv(sr);
                quadza(v, &sr->l.value);
 
@@ -9341,8 +9390,8 @@ int main(int argc, char *_argv[])
 
       if ((selector['d'-'a']) && ((q->flags | q->relocatable) == 0) && (q->breakpoint))
       {
-         low += q->runbank - q->base;
-         high += q->runbank - q->base;
+         low += q->runbank.a - q->base;
+         high += q->runbank.a - q->base;
       }
 
       #ifdef GBASIS
@@ -9363,11 +9412,11 @@ int main(int argc, char *_argv[])
                write(ohandle, "\n@:", 3);
                pushh2(i);
                write(ohandle, ":", 1);
-               xpushaddress(&((value *) q->runbank)->value, i);
+               xpushaddress(&q->runbank.p->value, i);
                q->flags &= 0xFD;
             }
     
-            v = ((value *) q->runbank)->offset;
+            v = q->runbank.p->offset;
             if (v > high) high = v;
 
             if (!selector['w'-'a'])
@@ -9382,7 +9431,7 @@ int main(int argc, char *_argv[])
 
          #endif
 
-         if ((q->flags & 128) && (q->base == 0) && (q->runbank == 0)
+         if ((q->flags & 128) && (q->base == 0) && (q->runbank.a == 0)
          &&  (q->relocatable == 0))
          {
          }
@@ -9401,9 +9450,9 @@ int main(int argc, char *_argv[])
 	 if (!selector['w'-'a'])
          {
 	    if (octal)
-	    printf(":$(%o):%0*lo:%0*lo ", i, apw, low, apw, high);
+	    printf(":$(%o):%0*o:%0*o ", i, apw, low, apw, high);
 	    else
-	    printf(":$(%2.2X):%0*lX:%0*lX ", i, apw, low, apw, high);
+	    printf(":$(%2.2X):%0*X:%0*X ", i, apw, low, apw, high);
          }
       }
    }
@@ -9415,7 +9464,7 @@ int main(int argc, char *_argv[])
    write(ohandle, NULL, 0);
    #endif
 
-   fsize = lseek(ohandle, (long) 0, SEEK_CUR);
+   fsize = lseek(ohandle, (off_t) 0, SEEK_CUR);
 
    if (fsize)
    {
@@ -9434,7 +9483,7 @@ int main(int argc, char *_argv[])
    write(ohandle, NULL, 0);
    #endif
 
-   fsize = lseek(ohandle, (long) 0, SEEK_CUR);
+   fsize = lseek(ohandle, (off_t) 0, SEEK_CUR);
 
    #endif
 
@@ -9442,8 +9491,8 @@ int main(int argc, char *_argv[])
    ||  (ecount)
    || ((ucount) && (selector['u'-'a'])))
    {
-      printf("\n%s: object code %ld bytes: "
-             "%ld errors: %ld undefined labels\n",
+      printf("\n%s: object code %d bytes: "
+             "%d errors: %d undefined labels\n",
 	      file_label[0]->l.name, fsize, ecount, ucount);
    }
 

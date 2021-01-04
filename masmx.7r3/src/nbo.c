@@ -80,7 +80,7 @@ static char *next_nonexponent_operator(char *s, char *e, char *list, int exclude
 
 //   s += ofield;
 
-   while (p = next_operator(s, e, list, exclude))
+   while ((p = next_operator(s, e, list, exclude)))
    {
       q = p - 1;
       symbol = *q;
@@ -130,7 +130,7 @@ static char *floperates(char *s, char *e, char *list)
    char         *sense;
    int           symbol;
 
-   while (e = operates(s, e, list))
+   while ((e = operates(s, e, list)))
    {
       symbol = *e;
       sense = e - 1;

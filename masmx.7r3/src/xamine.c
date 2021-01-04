@@ -64,8 +64,12 @@ static void block_write(int handle, char *q, int bytes)
 
    int			 transfer;
 
+
    if (!q)
    {
+      if (uselector['W'-'A']) printf("\n__BWF_[%d:%d]%d\n%*s\n",
+                              nhandle, ohandle, handle, BLOCK_WRITE - x, b);
+
       write(handle, b, BLOCK_WRITE - x);
       x = BLOCK_WRITE;
       p = b;
@@ -84,6 +88,9 @@ static void block_write(int handle, char *q, int bytes)
 
       if (!x)
       {
+         if (uselector['W'-'A']) printf("\n__BW_[%d:%d]%d\n%*s\n",
+                                 nhandle, ohandle, handle, BLOCK_WRITE, b);
+
          write(handle, b, BLOCK_WRITE);
          p = b;
          x = BLOCK_WRITE;
@@ -177,7 +184,7 @@ static char *edge(char *s, char *m)
    {
       if (!(*s)) return s;
       p = m;
-      while (symbol = *p++)
+      while ((symbol = *p++))
       {
 	 if (*s == symbol) return s;
       }
@@ -186,7 +193,7 @@ static char *edge(char *s, char *m)
 }
 
 
-static int oper_ator(char *c, long len)
+static int oper_ator(char *c, int len)
 {
    char		*q, *p;
    int		 i, j, symbol;
@@ -305,7 +312,7 @@ static char *contains(char *s, char *e, char *list)
 {
    char		*rightmost = NULL;
 
-   while (s = next_operator(s, e, list, 0))
+   while ((s = next_operator(s, e, list, 0)))
    {
        rightmost = s;
        s += ofield;
@@ -321,7 +328,7 @@ static char *operates(char *s, char *e, char *list)
 
    int		 symbol;
 
-   while (candidate = contains(s, e, list))
+   while ((candidate = contains(s, e, list)))
    {
       rewind = candidate;
       e = candidate;
@@ -347,7 +354,7 @@ static char  *getop(char  *l)
 
    l = first_at(l, " ");
 
-   while (symbol = *l)
+   while ((symbol = *l))
    {
       if (symbol ^ ' ') break;
       l++;
@@ -369,7 +376,7 @@ static char *first_at(char *data, char *mask)
    int			 btype = 0;
 
  
-   while (d = *data)
+   while ((d = *data))
    {
       if (!squote)
       {
@@ -462,7 +469,7 @@ static char *first_at(char *data, char *mask)
       #endif
       {
 	 f = mask;
-	 while (e = *f++)
+	 while ((e = *f++))
 	 {
 	    if (d == e) return data;
 	 }
@@ -516,7 +523,7 @@ static char *fendbe(char *s)
 {
    int		 i = 1, sinquo = 0, symbol;
 
-   while (symbol = *s)
+   while ((symbol = *s))
    {
       if (symbol == qchar)
       {

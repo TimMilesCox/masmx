@@ -23,8 +23,8 @@
 
 
 
-static long expression(char *s, char *e, char *param);
-static long ixpression(char *s, char *e, char *param);
+static int expression(char *s, char *e, char *param);
+static int ixpression(char *s, char *e, char *param);
 static line_item *xpression(char *s, char *e, char *param);
 static int assemble(char *line_label,char *param,object *above,txo *image);
 static void note(char *k);
@@ -34,7 +34,7 @@ static char *first_at(char *data, char *mask);
 static char *fendb(char *s, char *e);
 
 #ifdef LITERALS
-static long literal(char *arg, char *gparam, int tlocator);
+static int literal(char *arg, char *gparam, int tlocator);
 #endif
 
 static void rshift(line_item *o, int distance);
@@ -51,21 +51,21 @@ static int operand_compare(line_item *left, line_item *right);
 
 #ifdef INTEL
 
-static long qextractv(object *l);
-static long vextractq(object *l);
-static void quadinsert(long u, line_item *i);
-static void quadinsert1(long u, line_item *i);
-static void quadinsert2(long u, line_item *i);
-static void quadinsert3(long u, line_item *i);
-static void quadinsert4(long u, line_item *i);
-static long quadextract(line_item *);
-static long quadextract1(line_item *i);
+static int qextractv(object *l);
+static int vextractq(object *l);
+static void quadinsert(int u, line_item *i);
+static void quadinsert1(int u, line_item *i);
+static void quadinsert2(int u, line_item *i);
+static void quadinsert3(int u, line_item *i);
+static void quadinsert4(int u, line_item *i);
+static int quadextract(line_item *);
+static int quadextract1(line_item *i);
 
-static long quadextractx(line_item *i, int index);
+static int quadextractx(line_item *i, int index);
 
 static unsigned short read16(int w, line_item *item);
 static void write16(int w, int v, line_item *item);
-static void quadza(long u, line_item *i);
+static void quadza(int u, line_item *i);
 
 #else
 
@@ -91,22 +91,22 @@ static void quadza(long u, line_item *i);
 #define read16(index, item)  (item)->h[index]
 #define write16(index, value, item) (item)->h[index] = value
 
-static void quadza(long u, line_item *i);
+static void quadza(int u, line_item *i);
 
 #endif
 
-static void illustrate(long location, 
+static void illustrate(int location, 
 			    int bits, 
 		      int counter_id, 
 			   int dflag,
 			    int code,
 		     line_item *item);
 
-static void illustrate_xad(location_counter *q, long location);
+static void illustrate_xad(location_counter *q, int location);
 static char *fendbe(char *s);
 static object *isanequf(char *field);
-static object *insert_qltable(char *l, long equator, int type);
-static void characterise(long places, line_item *item);
+static object *insert_qltable(char *l, int equator, int type);
+static void characterise(int places, line_item *item);
 
 #ifdef LITERALS
 static void output_literals(int tlocator);
@@ -131,7 +131,7 @@ static void illustrate_linkage(int i);
 #endif
 
 static int getline(char *k, int max);
-static long zxpression(char *s, char *e, char *param);
+static int zxpression(char *s, char *e, char *param);
 
 static char *substitute(char *text, char *param);
 static value *apply_value(int id);
@@ -143,12 +143,12 @@ static int meaning(char *directive);
 #ifdef RECORD
 static int record(object *l, char *data, int subfunction);
 #endif
-static long coded_character(int symbol);
+static int coded_character(int symbol);
 static void record_bits(int bits);
 static void brake(char *what, char *why);
 static void pack_ltable(object *toplabel);
 static void embed_procedure(int type, char *line, char *argument);
-static unsigned long checkwaver(line_item *v, object *o);
+static unsigned int checkwaver(line_item *v, object *o);
 static int length_mark(int symbol);
 
 #ifdef	FP_XPRESS

@@ -50,7 +50,7 @@ static object *hash_locate(int	purpose)
    unsigned short	 sum = 0;
    unsigned short	*p2su = (unsigned short *) name;
 
-   unsigned long	*p, *q;
+   unsigned int		*p, *q;
    object		*sr;
 
    object		*udef_encountered = NULL;
@@ -110,8 +110,8 @@ static object *hash_locate(int	purpose)
          break;
       }
 
-      p = (unsigned long *) name;
-      q = (unsigned long *) sr->l.name;
+      p = (unsigned int *) (char *) name;
+      q = (unsigned int *) (char *) sr->l.name;
       x = label_length >> 2;
 
       while (x)

@@ -29,7 +29,7 @@ static object *isanequf(char *field)
    
    object		*l;
    
-   long			 v;
+   int			 v;
    
    location_counter	*c;
 
@@ -42,7 +42,7 @@ static object *isanequf(char *field)
       
       if (c->flags & 128)
       {
-         if (v = c->rbase)
+         if ((v = c->rbase))
          {
             quadinsert1(v, &x.value);
             #ifdef RELOCATION

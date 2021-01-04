@@ -25,7 +25,7 @@
 #ifdef INTEL
 #ifdef DOS
 
-static long qextractv(object *l)
+static int qextractv(object *l)
 {
     unsigned short	 x = (l->l.value.b[RADIX/8-2] <<  8)
 			   |  l->l.value.b[RADIX/8-1];
@@ -33,7 +33,7 @@ static long qextractv(object *l)
     unsigned short	 y = (l->l.value.b[RADIX/8-4] <<  8)
 			   |  l->l.value.b[RADIX/8-3];
 
-    long		 z = y;
+    int			 z = y;
 
     z <<= 16;
     z  |=  x;
@@ -43,7 +43,7 @@ static long qextractv(object *l)
 
 #ifdef LITERALS
 #ifndef	VERY_STACKED_XPRESSION
-static long vextractq(object *l)
+static int vextractq(object *l)
 {
     unsigned short	 x = (l->l.value.b[RADIX/8-2] <<  8)
 			   |  l->l.value.b[RADIX/8-1];
@@ -51,7 +51,7 @@ static long vextractq(object *l)
     unsigned short	 y = (l->l.value.b[RADIX/8-4] <<  8)
 			   |  l->l.value.b[RADIX/8-3];
 
-    long		 z = y;
+    int			 z = y;
 
     z <<= 16;
     z  |=  x;
@@ -61,7 +61,7 @@ static long vextractq(object *l)
 #endif
 #endif
 
-static void quadinsert(long v, line_item *item)
+static void quadinsert(int v, line_item *item)
 {
    item->b[RADIX/8-1] = v;
    item->b[RADIX/8-2] = v >>  8;
@@ -69,7 +69,7 @@ static void quadinsert(long v, line_item *item)
    item->b[RADIX/8-4] = v >> 24;
 }
 
-static void quadinsert1(long v, line_item *item)
+static void quadinsert1(int v, line_item *item)
 {
    item->b[RADIX/8-5] = v;
    item->b[RADIX/8-6] = v >>  8;
@@ -79,7 +79,7 @@ static void quadinsert1(long v, line_item *item)
 
 #ifdef BINARY
 
-static void quadinsert2(long v, line_item *item)
+static void quadinsert2(int v, line_item *item)
 {
    item->b[RADIX/8-9]  = v;
    item->b[RADIX/8-10] = v >>  8;
@@ -87,7 +87,7 @@ static void quadinsert2(long v, line_item *item)
    item->b[RADIX/8-12] = v >> 24;
 }
 
-static void quadinsert3(long v, line_item *item)
+static void quadinsert3(int v, line_item *item)
 {
    item->b[RADIX/8-13] = v;
    item->b[RADIX/8-14] = v >>  8;
@@ -95,7 +95,7 @@ static void quadinsert3(long v, line_item *item)
    item->b[RADIX/8-16] = v >> 24;
 }
 
-static void quadinsert4(long v, line_item *item)
+static void quadinsert4(int v, line_item *item)
 {
    item->b[RADIX/8-17] = v;
    item->b[RADIX/8-18] = v >>  8;
@@ -105,7 +105,7 @@ static void quadinsert4(long v, line_item *item)
 
 #endif
 
-static long quadextract(line_item *item)
+static int quadextract(line_item *item)
 {
     unsigned short	 x = (item->b[RADIX/8-2] <<  8)
 			   |  item->b[RADIX/8-1];
@@ -113,7 +113,7 @@ static long quadextract(line_item *item)
     unsigned short	 y = (item->b[RADIX/8-4] <<  8)
 			   |  item->b[RADIX/8-3];
 
-    long		 z = y;
+    int			 z = y;
 
     z <<= 16;
     z  |=  x;
@@ -121,7 +121,7 @@ static long quadextract(line_item *item)
     return z;
 }
 
-static long quadextract1(line_item *item)
+static int quadextract1(line_item *item)
 {
     unsigned short	 x = (item->b[RADIX/8-6] <<  8)
 			   |  item->b[RADIX/8-5];
@@ -129,7 +129,7 @@ static long quadextract1(line_item *item)
     unsigned short	 y = (item->b[RADIX/8-8] <<  8)
 			   |  item->b[RADIX/8-7];
 
-    long		 z = y;
+    int			 z = y;
 
     z <<= 16;
     z  |=  x;
@@ -137,14 +137,14 @@ static long quadextract1(line_item *item)
     return z;
 }
 
-static long quadextractx(line_item *item, int index)
+static int quadextractx(line_item *item, int index)
 {
    unsigned short	 x = (RADIX/32-index) << 2;
 
    unsigned short	 y = (item->b[x] << 8)
 			   |  item->b[x+1];
 
-   long			 z = y;
+   int			 z = y;
 
    y = (item->b[x+2] << 8) | item->b[x+3];
    z <<= 16;
@@ -155,7 +155,7 @@ static long quadextractx(line_item *item, int index)
 
 #else		/*  DOS  */
 
-static long qextractv(object *l)
+static int qextractv(object *l)
 {
    return (l->l.value.b[RADIX/8-4] << 24)
    |      (l->l.value.b[RADIX/8-3] << 16)
@@ -165,7 +165,7 @@ static long qextractv(object *l)
 
 #ifdef LITERALS
 #ifndef	VERY_STACKED_XPRESSION
-static long vextractq(object *l)
+static int vextractq(object *l)
 {
    return (l->v.value.b[RADIX/8-4] << 24)
    |      (l->v.value.b[RADIX/8-3] << 16)
@@ -175,7 +175,7 @@ static long vextractq(object *l)
 #endif
 #endif
 
-static void quadinsert(long v, line_item *item)
+static void quadinsert(int v, line_item *item)
 {
    item->b[RADIX/8-1] = v;
    item->b[RADIX/8-2] = v >>  8;
@@ -183,7 +183,7 @@ static void quadinsert(long v, line_item *item)
    item->b[RADIX/8-4] = v >> 24;
 }
 
-static void quadinsert1(long v, line_item *item)
+static void quadinsert1(int v, line_item *item)
 {
    item->b[RADIX/8-5] = v;
    item->b[RADIX/8-6] = v >>  8;
@@ -193,7 +193,7 @@ static void quadinsert1(long v, line_item *item)
 
 #ifdef BINARY
 
-static void quadinsert2(long v, line_item *item)
+static void quadinsert2(int v, line_item *item)
 {
    item->b[RADIX/8-9]  = v;
    item->b[RADIX/8-10] = v >>  8;
@@ -201,7 +201,7 @@ static void quadinsert2(long v, line_item *item)
    item->b[RADIX/8-12] = v >> 24;
 }
 
-static void quadinsert3(long v, line_item *item)
+static void quadinsert3(int v, line_item *item)
 {
    item->b[RADIX/8-13] = v;
    item->b[RADIX/8-14] = v >>  8;
@@ -209,7 +209,7 @@ static void quadinsert3(long v, line_item *item)
    item->b[RADIX/8-16] = v >> 24;
 }
 
-static void quadinsert4(long v, line_item *item)
+static void quadinsert4(int v, line_item *item)
 {
    item->b[RADIX/8-17] = v;
    item->b[RADIX/8-18] = v >>  8;
@@ -219,7 +219,7 @@ static void quadinsert4(long v, line_item *item)
 
 #endif  /* BINARY  */
 
-static long quadextract(line_item *item)
+static int quadextract(line_item *item)
 {
    return (item->b[RADIX/8-4] << 24)
    |      (item->b[RADIX/8-3] << 16)
@@ -227,7 +227,7 @@ static long quadextract(line_item *item)
    |       item->b[RADIX/8-1];
 }
 
-static long quadextract1(line_item *item)
+static int quadextract1(line_item *item)
 {
    return (item->b[RADIX/8-8] << 24)
    |      (item->b[RADIX/8-7] << 16)
@@ -242,7 +242,7 @@ static long quadextract1(line_item *item)
 
 ***********************************************************/
 
-static long quadextractx(line_item *item, int index)
+static int quadextractx(line_item *item, int index)
 {
    int		 x = (RADIX/32-index) << 2;
 

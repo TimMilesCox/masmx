@@ -55,15 +55,13 @@ static object *buy_ltable()
 object *buy_object(int size)
 {
    object	*sr = lr;
-   long		 bucket = (size + PARAGRAPH - 1) & -PARAGRAPH;
+   int		 bucket = (size + PARAGRAPH - 1) & -PARAGRAPH;
 
    if (remainder < size) sr = buy_ltable();
    remainder -= bucket;
 
    sr->h.length = bucket;
- 
-   bucket += (long) lr;
-   lr = (object *) bucket;
+   lr = (object *) (char *) sr + bucket;
 
    return sr;
 }

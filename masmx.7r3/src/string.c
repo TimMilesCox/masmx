@@ -31,7 +31,7 @@
 #define	BS	8
 #define	BEL	7
 
-static long simple_c_escape(int symbol)
+static int simple_c_escape(int symbol)
 {
    switch (symbol)
    {
@@ -76,12 +76,12 @@ static long simple_c_escape(int symbol)
    return symbol;
 }
 
-static long string_read(char *q)
+static int string_read(char *q)
 {
    static char		*p;
    static int		 out_of_band;
 
-   long			 symbol;
+   int			 symbol;
    int			 x,
 			 y;
 

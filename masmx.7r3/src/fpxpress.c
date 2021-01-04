@@ -46,7 +46,7 @@ static int complex(char *s, char *e)
    if (*s == '*') return complex(s + 1, e);
    #endif
 
-   while (p = l2r_find('(', p, e))
+   while ((p = l2r_find('(', p, e)))
    {
       q = fendbe(p);
 
@@ -75,7 +75,7 @@ static int complex_beyond(char *s, char *e, char *list)
    if (*s == '*') return complex(s + 1, e);
    #endif
 
-   while (p = l2r_find('(', p, e))
+   while ((p = l2r_find('(', p, e)))
    {
       q = fendbe(p);
       if (complex_beyond(p, q, list))
@@ -85,7 +85,7 @@ static int complex_beyond(char *s, char *e, char *list)
       p = q;
    }
 
-   if (p = next_nonexponent_operator(s, e, list, EXCLUDE_OPERATORS)) return 1;
+   if ((p = next_nonexponent_operator(s, e, list, EXCLUDE_OPERATORS))) return 1;
 
    return 0;
 }
@@ -149,11 +149,11 @@ static void fpxpress_assemble(char *name, char *start, char *end, char *tag)
 
    __literal = number(start, end);
 
-   while (symbol = *name++) *p++ = symbol;
+   while ((symbol = *name++)) *p++ = symbol;
 
    if (__literal)
    {
-      while (symbol = *tag++)
+      while ((symbol = *tag++))
       {
          if (symbol == ' ') break;
          *p++ = symbol;
@@ -262,7 +262,7 @@ static void fp_xpress(char *s, char *e, char *tag)
 
                x = PLUS;
 
-               while (q = next_nonexponent_operator(s, p, "+\0-\0", 0))
+               while ((q = next_nonexponent_operator(s, p, "+\0-\0", 0)))
                {
                   trailing_fp_operation(x, s, q, tag);
                   x = oper_ator(q, p - q);
@@ -284,7 +284,7 @@ static void fp_xpress(char *s, char *e, char *tag)
 
                x = MULTIPLY;
 
-               while (q = next_nonexponent_operator(s, p, "*\0/\0", 0))
+               while ((q = next_nonexponent_operator(s, p, "*\0/\0", 0)))
                {
                   trailing_fp_operation(x, s, q, tag);
                   x = oper_ator(q, p - q);

@@ -117,7 +117,7 @@ void exout(int locator, int loc, char *b, int c, int handle, int flag)
    }
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   #ifdef DOS
   int i = open(argv[1], O_RDONLY|O_TEXT);
@@ -173,7 +173,8 @@ main(int argc, char *argv[])
     if (data[0] == '-')
     {
        p = data;
-       while (symbol = *p++)
+
+       while ((symbol = *p++))
        {
           if (symbol == 0x0D) continue;
           if (symbol == 0x0A) break;
@@ -202,7 +203,8 @@ main(int argc, char *argv[])
     e = 0;
     interval = 0;
     p = data;
-    while (digit1 = *p++)
+
+    while ((digit1 = *p++))
     {
        if (digit1 == ':')
        {

@@ -56,7 +56,7 @@ static void xpushaddress(line_item *i, int id)
    write(ohandle, table, x);
 }
 
-static void pushaddress(long i)
+static void pushaddress(int i)
 {
    int			 j = AQUARTETS;
    int			 k = AQUARTETS - (address_size + 3) / 4;
@@ -74,7 +74,7 @@ static void pushaddress(long i)
    write(ohandle, &b[j], AQUARTETS - j);
 }
 
-static void pushsegx(long i)
+static void pushsegx(int i)
 {
    int			 j = RADIX/4;
    int			 k = RADIX/4 - ((xadw-address_size)+3) / 4;
@@ -103,7 +103,7 @@ static int pushs(char  *b)
 
 static void outfactor(int counter_id)
 {
-   long v = locator[counter_id].relocatable;
+   int v = locator[counter_id].relocatable;
    
    if (!(v < 0)) return; 
    v = -v;
@@ -116,11 +116,11 @@ static void outfactor(int counter_id)
    pushaddress(v);
 }
 
-static void outcounter(int counter_id, long location, char *type)
+static void outcounter(int counter_id, int location, char *type)
 {
    int		     id = counter_id & 127;
    location_counter *q = &locator[id];
-   long		     running_bank = q->runbank;
+   int		     running_bank = q->runbank.a;
    
    if (!pass) return;
    
@@ -133,9 +133,9 @@ static void outcounter(int counter_id, long location, char *type)
          write(ohandle, "\n@:", 3);
          pushh2(id);
          write(ohandle, ":", 1);
-         xpushaddress(&((value *) q->runbank)->value, id);
+         xpushaddress(&q->runbank.p->value, id);
          q->flags &= 0xFD;
-      }    
+      }
 
       running_bank = 0;
 
@@ -188,7 +188,7 @@ static void outcounter(int counter_id, long location, char *type)
 static void produce(int bits, char dflag, line_item *item, txo *a_image)
 {
    int			 datum, i, x, bytes, mask, encode = pass;
-   long			 v;
+   int			 v;
    
    txo 			 d_image = { LITERAL, 0, 0, NULL, 0, 0, 0 };
    txo 			*image  = &d_image;
@@ -231,11 +231,11 @@ static void produce(int bits, char dflag, line_item *item, txo *a_image)
    if ((actual->flags & 128)
    &&  (actual->base == 0)
    &&  (actual->relocatable == 0)
-   &&  (actual->runbank == 0))
+   &&  (actual->runbank.a == 0))
    {
       encode = 0;
 
-      if (x = mapx - mapinfo)
+      if ((x = mapx - mapinfo))
       {
          while (x--)
          {
@@ -320,7 +320,7 @@ static void produce(int bits, char dflag, line_item *item, txo *a_image)
       if (outstanding) linex = 0;
       */
 
-      if (mask = bits & 7)
+      if ((mask = bits & 7))
       {
          datum = item->b[i++] & ((1 << mask) - 1);
 	 if (mask > 4) image->d[x++] = left(datum);

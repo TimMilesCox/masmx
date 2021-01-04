@@ -26,14 +26,14 @@
 
 #ifdef LITERALS
 
-static void write_breakpoint(int x, long v)
+static void write_breakpoint(int x, int v)
 {
    breakpoint		*p = lpart[x],
                         *q = (breakpoint *) lr;
                         
    if (remainder < sizeof(breakpoint)) q = (breakpoint *) buy_ltable();
    
-   lr = (object *) ((long) lr + (long) sizeof(breakpoint));
+   lr = (object *) ((char *) lr + sizeof(breakpoint));
    remainder -= sizeof(breakpoint);
    
    q->type = BREAKPOINT;
@@ -52,10 +52,10 @@ static void write_breakpoint(int x, long v)
    p->along = (void *) q;
 }
 
-static long read_breakpoint(int x)
+static int read_breakpoint(int x)
 {
    breakpoint		*p = lpart[x];
-   long			 v = (p) ? p->base : 0;
+   int			 v = (p) ? p->base : 0;
    
    if (p) lpart[x] = (breakpoint *) p->along;
 
@@ -150,7 +150,7 @@ static int isacommand(char *p)
    int			 symbol;
    object		*l1;
 
-   while (symbol = *p)
+   while ((symbol = *p))
    {
       if (symbol != 32) break;
       p++;
@@ -178,10 +178,10 @@ static int isacommand(char *p)
    return -1;
 }
 
-static long literal(char *arg, char *gparam, int tlocator)
+static int literal(char *arg, char *gparam, int tlocator)
 {
    int			 t = 3, bdepth = 1, x;
-   long			 v;
+   int			 v;
    char			 newmodel[READSIZE] = "   ";
    int			 inquote = 0;
    int			 rvalue, symbol;
@@ -199,7 +199,7 @@ static long literal(char *arg, char *gparam, int tlocator)
    txo image = { LITERAL, tlocator, 0, NULL, 0, 0, 0 } ;
    #endif
    
-   paragraph		*p, *q;
+   /* paragraph */ unsigned int		*p, *q;
 
    #ifdef DOS
    image.rel = tlocator;
@@ -207,7 +207,7 @@ static long literal(char *arg, char *gparam, int tlocator)
    
    if ((actual->flags == 128)
    &&  (actual->base  ==   0)
-   &&  (actual->runbank == 0)
+   &&  (actual->runbank.a == 0)
    &&  (actual->relocatable == 0))
    {
       note("void section literal request dropped");
@@ -224,7 +224,7 @@ static long literal(char *arg, char *gparam, int tlocator)
 
    if ((tloc->flags == 128)
    &&  (tloc->base  ==   0)
-   &&  (tloc->runbank == 0)
+   &&  (tloc->runbank.a == 0)
    && (!tloc->relocatable))
    {
       flagg("literal in void section");
@@ -246,7 +246,7 @@ static long literal(char *arg, char *gparam, int tlocator)
       return 0;
    }
 
-   while (symbol = *arg++)
+   while ((symbol = *arg++))
    {
       if (symbol == qchar)
       {
@@ -310,6 +310,11 @@ static long literal(char *arg, char *gparam, int tlocator)
    t = image.symbols;
    image.d[t++] = 0;
 
+   if ((selector['q'-'a']) && (pass) && (plist > masm_level))
+   {
+      printf("[%x:%s]\n", t, image.d);
+   }
+
    v = tloc->litlocator;
 
    #if 0	/* this is now checked at the end */
@@ -363,7 +368,7 @@ static long literal(char *arg, char *gparam, int tlocator)
    #endif
    
    while (t & PARAGRAPH-1) image.d[t++] = 0;
-   t += 16;
+   t += TXO_HEADER;
    
    image.oblong = t;
    
@@ -372,8 +377,8 @@ static long literal(char *arg, char *gparam, int tlocator)
    image.rel = tlocator;
    
    #ifdef OVERLAY_LITERALS
-   p = (paragraph *) lr;
-   if (t > remainder) p = (paragraph *) buy_ltable();
+   p = (unsigned int *) lr;
+   if (t > remainder) p = (unsigned int *) buy_ltable();
    remainder -= t;
 
    if (sr) sr->along = p;
@@ -383,11 +388,20 @@ static long literal(char *arg, char *gparam, int tlocator)
       ltag[tlocator] = (txo *) p;
    }
 
-   q = (paragraph *) &image;
+   q = (unsigned int *) &image;
    t >>= 2;
    while (t--) *p++ = *q++;
    
+   if ((selector['q'-'a']) && (pass) && (plist > masm_level))
+   {
+      printf("[%4.4x:%x:%x:%s %p %p]\n", ((txo *) lr)->oblong,
+                                         ((txo *) lr)->symbols,
+                                         ((txo *) lr)->bits,
+                                         ((txo *) lr)->d, lr, p);
+   }
+
    lr = (object *) p;
+
    #endif
 
    #if	0	/*	def LROOT	*/
@@ -404,10 +418,11 @@ static void output_literals(int tlocator)
 {
    txo			*s = ltag[tlocator];
    location_counter	*q = &locator[tlocator];
-   long			 v;
+   int			 v;
    
    if (!s) return;
 
+   if (selector['q'-'a']) printf("$%2.2x:%x\n", tlocator, s->loc);
    outcounter(tlocator, s->loc, "\n$");
    while (s)
    {
@@ -435,14 +450,14 @@ static void output_literals(int tlocator)
 
                if (selector['v'-'a'])
                {
-                  printf("%0*lx:", apwx, q->runbank);
+                  printf("%0*lx:", apwx, q->runbank.a);
                }
                else
                {
-                  v += q->runbank;
+                  v += q->runbank.a;
                }
             }
-            printf("%0*lx", apw, v);
+            printf("%0*x", apw, v);
          }
 
          printf("+%s\n", s->d);

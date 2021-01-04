@@ -39,12 +39,12 @@ static void print_item(line_item *item)
    printf("]\n");
 }
 
-static void illustrate_xad(location_counter *q, long location)
+static void illustrate_xad(location_counter *q, int location)
 {
    #ifdef VALUE
-   line_item			 p = ((value *) q->runbank)->value;
+   line_item			 p = q->runbank.p->value;
    #else
-   line_item			 p = ((label *) q->runbank)->value;
+   line_item			 p = q->runbank.p->value;
    #endif
 
    int				 y = (xadw+7)>>3, x = RADIX/8 - y;
@@ -61,7 +61,7 @@ static void illustrate_xad(location_counter *q, long location)
    while (y--) printf("%2.2X", p.b[x++]);
 }
 
-static void illustrate(long location,
+static void illustrate(int  location,
 			    int bits, 
 		      int counter_id, 
 			   int dflag,
@@ -108,16 +108,16 @@ static void illustrate(long location,
 
                if (selector['v'-'a'])
                {
-                  printf("%0*lo:", apwx, q->runbank);
+                  printf("%0*lo:", apwx, q->runbank.a);
                   v = apwx + apw + 6;
                }
                else
                {
-                  location += q->runbank;
+                  location += q->runbank.a;
                }
             }
 
-            printf("%0*lo ", apw, location);
+            printf("%0*o ", apw, location);
          }
       }
       else
@@ -145,16 +145,16 @@ static void illustrate(long location,
 
                if (selector['v'-'a'])
                {
-                  printf("%0*lX:", apwx, q->runbank);
+                  printf("%0*lX:", apwx, q->runbank.a);
                   v = apwx + apw + 5;
                }
                else
                {
-                  location += q->runbank;
+                  location += q->runbank.a;
                }
             }
 
-            printf("%0*lX ", apw, location);
+            printf("%0*X ", apw, location);
          }
       }
 
@@ -399,7 +399,7 @@ static void walktable(int order)
    object		*sr = origin;
    object		*avanti;
 
-   long			 v;
+   int			 v;
    location_counter	*section;
    
 
@@ -521,7 +521,7 @@ static void walktable(int order)
                               v &= 0x7FFFFFFF;
                            }
 
-                           printf("%0*lX", apw, v);
+                           printf("%0*X", apw, v);
                         }
 
                         if (y < i) putchar(',');
@@ -595,7 +595,7 @@ static void walktable(int order)
 	 case TEXT_SUBSTITUTE:
 	    printf(":Tsub:");
 	    w = sr->t.text;
-	    while (i = *w++) putchar(i);
+	    while ((i = *w++)) putchar(i);
 	    putchar(':');
 	    fputs(w, stdout);
 	    putchar(10);
@@ -622,7 +622,7 @@ static void walktable(int order)
             break;
 
 	 case BYPASS_RECORD:
-	    if (i = sr->nextbdi.next) sr = bank[i];
+	    if ((i = sr->nextbdi.next)) sr = bank[i];
 	    else                            return;
 	    continue;
 	 
@@ -632,11 +632,11 @@ static void walktable(int order)
 	 #endif
          
          case BREAKPOINT:
-            printf("breakpoint %x/%lx\n", sr->b.oblong, sr->b.base);
+            printf("breakpoint %x/%x\n", sr->b.oblong, sr->b.base);
             break;
 
          case VALUE:
-            printf("large address base %x/%lx/",
+            printf("large address base %x/%x/",
                     sr->v.oblong, sr->v.offset);
 
             bytes = (xadw+EIGHT-1) >> 3;
@@ -665,7 +665,7 @@ static void walktable(int order)
 
       *********************************************************/
 
-      if      (order == 2) sr = (object *) ((long) sr + sr->h.length);
+      if      (order == 2) sr = (object *) ((char *) sr + sr->h.length);
       else if (order == 3)
       {
          if (sr->h.type == LITERAL) y = sr->u.oblong;
@@ -673,7 +673,7 @@ static void walktable(int order)
 
          if (y == 0) break;
 
-         sr = (object *) ((long) sr + y);
+         sr = (object *) ((char *) sr + y);
       }
       else sr = sr->l.along;
    }
@@ -687,9 +687,9 @@ static void walktable(int order)
 	 sr = (object *) ltag[x];
 	 while (sr)
 	 {
-	    printf("$%2.2x:%0*lx:%s\n", x,
-					apw, sr->u.loc,
-					sr->u.d);
+	    printf("$%2.2x:%0*x:%s\n", x,
+				       apw, sr->u.loc,
+				       sr->u.d);
 	    sr = sr->u.along;
 	 }
       }
@@ -702,23 +702,23 @@ static void walktable(int order)
       sr = files;
       while (sr)
       {
-	 printf("%s=%x<%0*lX\n", sr->l.name,
-				 sr->l.r.l.rel, 
-				 apw, 
-				 qextractv(sr));
+	 printf("%s=%x<%0*X\n", sr->l.name,
+				sr->l.r.l.rel, 
+			 	apw, 
+				qextractv(sr));
 	 sr = sr->l.along;
       }
    }
 }
 
-static void summarise_revision(location_counter *q, unsigned long v, unsigned long high)
+static void summarise_revision(location_counter *q, unsigned int v, unsigned int high)
 {
    printf("[%x] code size changed on 2nd assembly pass", q->touch_base);
 
    if (octal)
-   printf(": $(%o) :%0*lo:%0*lo\n", q - locator, apw, v, apw, high);
+   printf(": $(%o) :%0*o:%0*o\n", (int) ((location_counter *) q - (location_counter *) locator), apw, v, apw, high);
    else
-   printf(": $(%2.2X) :%0*lX:%0*lX\n", q - locator, apw, v, apw, high);
+   printf(": $(%2.2X) :%0*X:%0*X\n", (int) ((location_counter *) q - (location_counter *) locator), apw, v, apw, high);
 }
 
 /**************************************************************************

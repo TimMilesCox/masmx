@@ -25,12 +25,12 @@
 #ifdef	BINARY
 #define	QSEMA33
 
-static long quartets(char *p)
+static int quartets(char *p)
 {
-   long		 z = 0;
+   int		 z = 0;
    int		 symbol;
 
-   while (symbol = *p++)
+   while ((symbol = *p++))
    {
       if ((symbol > 0x2F) && (symbol < 0x3A)) symbol &= 15;
       else
@@ -53,7 +53,7 @@ static int load_quartets(char *p, line_item *v)
 
    *v = zero_o;
 
-   while (symbol = *p++)
+   while ((symbol = *p++))
    {
       if ((symbol > 0x2F) && (symbol < 0x3A))
       {
@@ -78,7 +78,7 @@ static int load_signed_quartets(char *p, line_item *v)
 
    *v = zero_o;
 
-   while (symbol = *p++)
+   while ((symbol = *p++))
    {
       if ((symbol > 0x2F) && (symbol < 0x3A))
       {
@@ -102,9 +102,9 @@ static int load_signed_quartets(char *p, line_item *v)
    return bits;
 }
 
-long strict_quartets(int symbols, char *p)
+int strict_quartets(int symbols, char *p)
 {
-   long		 z = 0;
+   int		 z = 0;
    int		 symbol;
 
    while (symbols--)
@@ -130,9 +130,9 @@ long strict_quartets(int symbols, char *p)
    return z;
 }
 
-static long strict_address(char *p)
+static int strict_address(char *p)
 {
-   int		 symbols = (address_size) + 3 >> 2;
+   int		 symbols = ((address_size) + 3) >> 2;
 
    return strict_quartets(symbols, p);
 }
@@ -171,7 +171,7 @@ static int strict_formal_locator(char *p, char mark)
 static void transfer_address(char *p)
 {
    int		 x = strict_locator(p+1, ':');
-   long		 z = strict_address(p+4);
+   int		 z = strict_address(p+4);
    xref_list	*q = file_label[depth]->l.down;
    
    if (q) z += q->segments.base[x];
@@ -199,11 +199,11 @@ static xref_list *assure_xlist(object *f)
    return q;
 }
 
-static void load_long_breakpoint(char *p)
+static void load_int_breakpoint(char *p)
 {
    int			 x = strict_locator(p+2, ':');
    location_counter	*q = &locator[x];
-   value		*v = (value *) q->runbank;
+   value		*v = (value *) q->runbank.p;
    xref_list		*xrefs = file_label[depth]->l.down;
 
 
@@ -221,14 +221,14 @@ static void load_long_breakpoint(char *p)
    if (!v)
    {
       v =  apply_value(x);
-      q->runbank = (long) v;
+      q->runbank.p =  v;
    }
 
    load_quartets(p + 5, &v->value);
 
    #ifdef TRACE_LONG_RELOAD
    printf("[%s RUNBANK__ $%x %x p%x/%x P%x]\n", file_label[depth]->l.name,
-                                             x, q->runbank,
+                                             x, q->runbank.a,
                                                q->loc, loc,
                        ((value *) q->runbank)->value.i[5]);
    #endif
@@ -279,10 +279,10 @@ static int binary_switch_locator(char *p, short ordered,
 static int load_binary_summary(char *p)
 {
    int			 x = strict_formal_locator(p + 1, '*');
-   long			 alignment;
-   unsigned long	 low, high, size, base;
+   int			 alignment;
+   unsigned int	 low, high, size, base;
    location_counter	*q = &locator[x];
-   value		*v = (value *) q->runbank;
+   value		*v = (value *) q->runbank.p;
    xref_list		*xl  = file_label[depth]->l.down;
 
    #if 0
@@ -317,13 +317,13 @@ static int load_binary_summary(char *p)
       high = low + size;
 
       #if 0
-      printf("[$%x:%lx:%lx:%lx:%lx:%lx:%lx]", x, base, size, q->runbank, low, high, q->loc);
+      printf("[$%x:%lx:%lx:%lx:%lx:%lx:%lx]", x, base, size, q->runbank.a, low, high, q->loc);
       #endif
 
       if (high > q->loc)
       {
          q->loc = high;
-         if ((x == counter_of_reference) /*&& (q->flags & 1)*/) loc = high;
+         if (x == counter_of_reference) /*&& (q->flags & 1)*/ loc = high;
       }
 
       #if 1
@@ -348,10 +348,10 @@ static int load_binary_summary(char *p)
 
    else
 
-   q->runbank = low;
+   q->runbank.a = low;
 
    if (((selector['b'-'a']) && ((q->flags & 1) == 0))
-   ||  (q->bias)) q->runbank += q->loc;
+   ||  (q->bias)) q->runbank.a += q->loc;
 
    if ((selector['d'-'a']) && ((q->flags | q->relocatable) == 0)) q->base = low;
 
@@ -374,7 +374,7 @@ static object *binary_load_label(char *p, short ordered,
    object		*o;
    location_counter	*q;
 
-   while (symbol = *p++)
+   while ((symbol = *p++))
    {
       if (symbol == ':') break;
       lname[x++] = symbol;
@@ -442,7 +442,7 @@ static object *binary_load_label(char *p, short ordered,
       o->l.r.l.rel  =   y;
       o->l.r.l.y    =   0;
 
-      if ((long) q->relocatable) o->l.r.l.y = 1;
+      if ((int) q->relocatable) o->l.r.l.y = 1;
    }
 
    return o;
@@ -450,10 +450,10 @@ static object *binary_load_label(char *p, short ordered,
 
 static short xref_index(object *o)
 {
-   long		*p,
+   int		*p,
 		*q;
 
-   long		 difference;
+   int		 difference;
 
    int		 x = o->l.length - sizeof(label) + sizeof(xref),
 		 y;
@@ -469,12 +469,12 @@ static short xref_index(object *o)
          y = x - sizeof(xref) + PARAGRAPH;
          y >>= 2;
 
-         p = (long *) s->x.name;
-         q = (long *) o->l.name;
+         p = (int *) s->x.name;
+         q = (int *) o->l.name;
 
          while (y--)
          {
-            if (difference = *p++ ^ *q++) break;
+            if ((difference = *p++ ^ *q++)) break;
          }
 
          if (!difference) return s->x.xref;
@@ -496,8 +496,8 @@ static short xref_index(object *o)
    s = lr;
    if (remainder < x) s = buy_ltable();
 
-   p = (long *) s->x.name;
-   q = (long *) o->l.name;
+   p = (int *) s->x.name;
+   q = (int *) o->l.name;
 
    s->x.type = XREF;
    s->x.length = x;
@@ -541,7 +541,7 @@ static void load_binary(char *p)
    short	 last_in_order;
    short	 order[LOCATORS];
 
-   long		 alignment, v;
+   int		 alignment, v;
 
    touch_table	 touched = untouched;
 
@@ -619,7 +619,10 @@ static void load_binary(char *p)
             break;
          }
 
+         #ifdef BLOCK
          actual_block = block[depth];
+         #endif
+
          break;
       }
 
@@ -636,7 +639,6 @@ static void load_binary(char *p)
             included = binary_switch_locator(&assembly[6], ordered,
                                                            order1,
                                                            order);
-
             break;
 
          case '+':
@@ -658,7 +660,7 @@ static void load_binary(char *p)
             index = -1;
             x = 0;
 
-            while (symbol = *s++)
+            while ((symbol = *s++))
             {
                if (symbol == ':')
                {
@@ -758,7 +760,7 @@ static void load_binary(char *p)
          case '@':
 
             #ifdef LONG_TRAILER
-            load_long_breakpoint(&assembly[6]);
+            load_int_breakpoint(&assembly[6]);
             #endif
 
             break;
@@ -820,12 +822,12 @@ static void load_binary(char *p)
                   if (((selector['b'-'a']) && ((sample->flags & 1) == 0))
                   ||  (sample->bias))
                   {
-                     v = sample->runbank;
+                     v = sample->runbank.a;
                   }
 
                   if (sample->flags & 1)
                   {
-                     v = ((value *) sample->runbank)->offset;
+                     v = sample->runbank.p->offset;
                   }
 
                   v = (v + alignment - 1) & -alignment;
@@ -864,12 +866,12 @@ static void load_binary(char *p)
 
                if (sample->flags & 1)
                {
-                  v = ((value *) sample->runbank)->offset;
+                  v = sample->runbank.p->offset;
                }
                else
                {
                   if (sample->loc < loc) flag("code address moved back");
-                  if (!sample->touch_base) sample->base = sample->runbank;
+                  if (!sample->touch_base) sample->base = sample->runbank.a;
                   v = sample->base;
                }
 
@@ -879,22 +881,22 @@ static void load_binary(char *p)
             if (selector['l'-'a'])
             {
                #ifdef DOS
-               printf("%s:$(%d) %lu locations decimal ", f->l.name,
+               printf("%s:$(%d) %u locations decimal ", f->l.name,
                                        x, loc - v);
                #else
-               printf("%s:$(%d) %lu %s decimal ", f->l.name,
+               printf("%s:$(%d) %u %s decimal ", f->l.name,
                                         x, loc - v,
                (address_quantum == 8) ? "bytes" : "words");
                #endif
 
                if (sample->relocatable)
                {
-                  printf("[*%ld] ", sample->relocatable);
+                  printf("[*%d] ", sample->relocatable);
                }
 
-               if (octal) printf("from octal %0*lo to %0*lo",
+               if (octal) printf("from octal %0*o to %0*o",
                                      apw, v, apw, loc);
-               else printf("from hexadecimal %0*lX to %0*lX",
+               else printf("from hexadecimal %0*X to %0*X",
                                      apw, v, apw, loc);
 
                if (sample->flags & 1)
@@ -929,20 +931,20 @@ static void load_binary(char *p)
          x = o->l.r.l.rel;
          sample = &locator[x];
          
-         if (y = touched.base[x])
+         if ((y = touched.base[x]))
          {
             if (sample->flags & 1)
             {
                if (y == 4)
                {
-                  if (!sample->runbank)
+                  if (!sample->runbank.p)
                   {
                      flag_either_pass(o->l.name, "adding void base, abandon");
                      exit(0);
                   }
 
                   operand_add(&o->l.value,
-                             &((value *) sample->runbank)->value);
+                              &sample->runbank.p->value);
                }
             }
 
@@ -982,7 +984,7 @@ static int load_offset(char *p, line_item *v)
 
    *v = zero_o;
 
-   while (symbol = *p++)
+   while ((symbol = *p++))
    {
       if ((symbol > 0x2F) && (symbol < 0x3A))
       {
@@ -1063,9 +1065,9 @@ static void propagate_upwards(int descant, int scale, int bits)
    }
 }
 
-static long mantissa(char *s)
+static int mantissa(char *s)
 {
-   long			 i = quartets(s);
+   int			 i = quartets(s);
 
    return i;
 }
@@ -1075,7 +1077,7 @@ static int scale(char *s)
    int			 i = 0;
    int			 symbol;
 
-   while (symbol = *s++)
+   while ((symbol = *s++))
    {
       if (((symbol > 0x2F) && (symbol < 0x3A))
       ||  ((symbol > 0x40) && (symbol < 0x5B))

@@ -35,7 +35,7 @@ static char *stack_string(char *q)
 
    if (to > (aside + ASIDE_BUFFER - 120)) p = to = aside;
 
-   while (*to++ = *from++)
+   while ((*to++ = *from++))
    {
       if (to > (aside + ASIDE_BUFFER - 4))
       {

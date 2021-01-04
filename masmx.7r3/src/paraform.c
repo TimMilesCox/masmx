@@ -140,6 +140,7 @@ static char *substring(char *g, int i)
 #define BAD_PARAFORM	0
 #define COMPLETE_LINE	1
 #define ALL_FIELDS	2
+#define	FIELDS		7
 #define	FIELD		3
 #define SUBFIELD	4
 #define STAR_SUBFIELD	4+128
@@ -164,7 +165,7 @@ static paraform_code encode_paraform(char *p, char **s)
 
    if (!p) return z;
 
-   if (symbol = *p)
+   if ((symbol = *p))
    {
       #ifdef SLIPSHO
       printf("[%c][%s]", symbol, p);
@@ -179,12 +180,12 @@ static paraform_code encode_paraform(char *p, char **s)
          }
          else
          {
-            q = edge(p, ",)");
+            q = edge(p, ",):");
             z.field = expression(p, q, NULL);
             p = q;
             z.level = FIELD;
 
-            if (symbol = *p)
+            if ((symbol = *p))
             {
                p++;
                if (symbol == ',')
@@ -208,9 +209,10 @@ static paraform_code encode_paraform(char *p, char **s)
                   z.subfield = expression(p, q, NULL);
                   p = q;
 
-                  if (symbol = *p)
+                  if ((symbol = *p))
                   {
                      p++;
+
                      if (symbol == ')')
                      {
                      }
@@ -225,7 +227,7 @@ static paraform_code encode_paraform(char *p, char **s)
                            z.level = SUBSTRING;
                            p = q;
 
-                           if (symbol = *p)
+                           if ((symbol = *p))
                            {
                               p++;
                            }
@@ -236,6 +238,15 @@ static paraform_code encode_paraform(char *p, char **s)
                         }
                      }
                   }
+               }
+               else if (symbol == ':')
+               {
+                  z.level = FIELDS;
+                  q = edge(p, ")");
+                  while (*p == 32) p++;
+                  z.subfield = expression(p, q, NULL);
+                  p = q;
+                  if ((symbol = *p)) p++; 
                }
             }
          }
@@ -269,7 +280,7 @@ static char *text_image(paraform_code sample, char *gparam)
    unsigned char	*quartet;
    #endif
 
-   long			 v;
+   int			 v;
 
    array		*a;
 
@@ -303,7 +314,7 @@ static char *text_image(paraform_code sample, char *gparam)
 
                if ((*pq == '*') || (*pq == '#')) pq++;
 
-               if (o = isanequf(pq))
+               if ((o = isanequf(pq)))
                {
                   #ifdef INTEL
 
@@ -322,9 +333,9 @@ static char *text_image(paraform_code sample, char *gparam)
 
                   if ((address_size < 32) && (v & 0x80000000))
                   {
-                       sprintf(dynamic_name, "*%ld", v & 0x7FFFFFFF);
+                       sprintf(dynamic_name, "*%d", v & 0x7FFFFFFF);
                   }
-                  else sprintf(dynamic_name, "%ld", v);
+                  else sprintf(dynamic_name, "%d", v);
 
                   return dynamic_name;
                }
@@ -381,6 +392,13 @@ static char *text_image(paraform_code sample, char *gparam)
 
          return a->image[0];
 
+      case FIELDS:
+         y = sample.subfield;
+         if (y < 0) return "";
+         if (y == 0) return a->image[0];
+         if (y > a->count) return "";
+         return a->image[y-1];
+
       case ALL_FIELDS:
 
       case COMPLETE_LINE:
@@ -399,6 +417,8 @@ static char *substitute(char *search, char *param)
    char			*vv;
    int			 inquote, symbol;
    int			 inbe, btype;
+
+   int			 y;
 
    paraform_code	 sample;
 
@@ -427,7 +447,7 @@ static char *substitute(char *search, char *param)
       exit(0);
    }
    
-   while (symbol = *search++)
+   while ((symbol = *search++))
    {
       if (symbol == ESC)
       {
@@ -454,7 +474,7 @@ static char *substitute(char *search, char *param)
 
                inbe = 0;
 
-	       while (symbol = *vv++)
+	       while ((symbol = *vv++))
 	       {
 	          if (symbol == qchar)
                   {
@@ -541,7 +561,7 @@ static char *substitute(char *search, char *param)
                btype = 0;
                inquote = 0;
 
-	       while (symbol = *vv++)
+	       while ((symbol = *vv++))
 	       {
                   if (!inquote)
                   {
@@ -644,7 +664,7 @@ static char *substitute(char *search, char *param)
 
 	       for (;;)
 	       {
-	  	  while (symbol = *vv++)
+	  	  while ((symbol = *vv++))
 		  {
                      if (!inquote)
                      {
@@ -714,7 +734,7 @@ static char *substitute(char *search, char *param)
 		  if (symbol != ',') break;
 		  *v++ = symbol;
 
-                  while (symbol = *vv)
+                  while ((symbol = *vv))
                   {
                      if (symbol != 32) break;
                      vv++;
@@ -722,6 +742,57 @@ static char *substitute(char *search, char *param)
 			
 	       }
 
+               break;
+
+            case FIELDS:
+
+               inquote = 0;
+               inbe = 0;
+
+               if ((y = sample.subfield))
+               {
+                  /********************************************
+			refined case: starting subfield given
+                        everything up to exposed [ , ) ]
+                  ********************************************/
+
+                  while ((symbol = *vv++))
+                  {
+                     if (symbol == '\'')
+                     {
+                        if ((inquote & 1) == 0) inquote ^= 2;
+                     }
+
+                     if (symbol == '\"')
+                     {
+                        if ((inquote &2) == 0) inquote ^= 1;
+                     }
+
+                     if (inquote == 0)
+                     {
+                        if (symbol == '(') inbe++;
+                        if (symbol == ')') inbe--;
+                        if (inbe < 0) break;
+
+                        if (inbe == 0)
+                        {
+                           if (symbol == ',') break;
+                        }
+                     }
+
+                     *v++ = symbol;
+                  }
+
+                  break;
+               }
+
+               /***********************************************
+			simple case: no starting subfield
+			all fields from given field
+			arranged just how they are
+               ***********************************************/
+
+               while ((symbol = *vv++)) *v++ = symbol;
                break;
 
             case ALL_FIELDS:
@@ -759,8 +830,7 @@ static char *substitute(char *search, char *param)
 
                while (*vv == ' ') vv++;
 
-               while (symbol = *vv++) *v++ = symbol;
-
+               while ((symbol = *vv++)) *v++ = symbol;
                break;
 
             case COMPLETE_LINE:
@@ -776,7 +846,7 @@ static char *substitute(char *search, char *param)
                }
                #endif
 
-               while (symbol = *vv++) *v++ = symbol;
+               while ((symbol = *vv++)) *v++ = symbol;
 
                break;
 
