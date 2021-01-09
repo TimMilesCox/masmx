@@ -58,12 +58,14 @@ Directory src now has scripts for constructing updated masmx and masmz
 on and for platforms osx.x86 osx.ppc ubuntu.x86 win32
 
 	./bosx86
+	./bosx64
 	./ppcbosx
-	./bubuntu 
+	./bsuse
+	./bsuse.x64 
 	./bw32
 
-These builds are all for 32-bit targets. They also display guidance
-for executing test suites
+These builds all use the same source which is portable between 64-bit and 32-bit targets
+The builds conclude by telling you how to run the test suites
 
 The following calls are used for platforms and compiler systems which
 have so far constructed masmx
@@ -75,7 +77,7 @@ have so far constructed masmx
 
 		options for Microsoft MS assert INTEL automatically
 
-	-DSUSE	is necessary for any Linux to avoid a function name clash
+	-DSUSE	is necessary for any clang compiler system to avoid a function name clash readline()
 
 	unsigned char is necessary
 	unsigned char options on platforms so far are
@@ -102,7 +104,13 @@ osx.x86 BINARIES SUPPLIED ../masmx.7r3/hosts/osx.x86
 	gcc -m32 -funsigned-char -DINTEL -DSUPERSET -o ../masmx masm.c
         gcc -m32 -funsigned-char -DINTEL -o ../masmz masm.c
 
+osx.x64_64 BINARIES SUPPLIED ../masmx.7r3/hosts/osx.x¨64
 
+	gcc -m32 -funsigned-char -DINTEL [-DSUSE] -DSUPERSET -o ../masmx masm.c
+	gcc -m64 -funsigned-char -DINTEL [-DSUSE] -o ../masmz masm.c
+
+	recent compilers are clang and [-DSUSE] is needed
+	to avoid function name clash readline()
 
 win32	BINARIES SUPPLIED ../masmx.7r3/hosts/win32/
 
@@ -116,11 +124,16 @@ win32	BINARIES SUPPLIED ../masmx.7r3/hosts/win32/
 
 
 any x86 Linux
-ubuntu	BINARIES SUPPLIED ../masmx.7r3/hosts/ubuntu.x86/
+suse	BINARIES SUPPLIED ../masmx.7r3/hosts/suse.x86/
 
         gcc -m32 -funsigned-char -DINTEL -DSUSE -DSUPERSET -o ../masmx masm.c
         gcc -m32 -funsigned-char -DINTEL -DSUSE -o ../masmz masm.c
 
+any x86_64 Linux
+suse	BINARIES SUPPLIED ../masmx.7r3/hosts/suse.x64/
+
+	gcc -m64 -funsigned-char -DINTEL -DSUSE -DSUPERSET -o ../masmx masm.c
+	gcc -m64 -funsigned-char -DINTEL -DSUSE -o ../masmz masm.c
 
 There are five binaries for each platform
 _________________________________________
@@ -173,93 +186,66 @@ build for MS Windows is
 
 
 
-64-Bit Ubuntu
+64-Bit Linux
 _____________
 
 
-	REBUILDING on 64-BIT Ubuntu
+	Running on 64-BIT Linux
+
+	32-bit and 64-bit binaries are supplied
+
+	some 64-bit linux distros need extra ibrary download to run any 32-bit binary
+
+	however 64-bit openSUSE does not appear to have any problems with 32-bit binaries
+
+	building the masmx binaries for Linux uses the same source code for 32-bit and 64-bit
 
 	updating Ubuntu x86/32-bit programs on an x86/84-bit Ubuntu platform
-	____________________________________________________________________
 
-	masmx / masmz / imx / mmx are a suite of 32-bit programs
-	rebuilding and running on 64-bit Ubuntu x86 may need some library updates 
+	Linux seems to have clang compiler suite as standard
+	so -DSUSE switch is always needed to avoid function name clash readline()
 
-	It's neither necessary nor advisable to change the masmx suite to
-	64-bit programs. long integers would need changing to default-size
-	integers in hundreds of declarations
+	on some Linux distros you need to re-enable a lot of scripts for build and test
 
-	masmx 32-bit resolves 192-bit number expressions
+	of for any reason it becomes necessary to regenerate and retest
+	the openSUSE-generated binaries on Ubuntu
 
-	These library updates will enable gcc to compile 32-bit
+	the build script bubuntu which displays a list of scripts you need to re-enable
 
-	        $ sudo apt-get install gcc-multilib
-        	$ sudo apt-get install libc6-dev:i386 gcc:i386
+	src $ cat bubuntu
 
-	Then of course use the 32-mit machine option as always to build
+	echo this should be ubuntu.x86
 
-        	$ masmx -m32 -funsigned-char -DINTEL -DSUSE -DSUPERSET -o $UBUNTU32_X86/masmx masm.c
+	gcc -m32 -funsigned-char -DINTEL -DSUSE -DSUPERSET -o ../masmx masm.c
+	gcc -m32 -funsigned-char -DINTEL -DSUSE -o ../masmz masm.c
+	cp ../masmx ../masmx.7r3/hosts/ubuntu.x86
+	cp ../masmz ../masmx.7r3/hosts/ubuntu.x86
+	cp ../masmx.7r3/hosts/ubuntu.x86/imx ..
+	cp ../masmx.7r3/hosts/ubuntu.x86/mmx ..
+	echo	cd ../test.msm
+	echo	chmod 0755 ugo
+	echo	run ./ugo
+	echo	run ./alltests
 
-	All Linux builds need the SUSE switch
+	src $ cd ../test.msm
+	test.msm $ cat ugo
 
-
-	RUNNING on 64-BIT Ubuntu
-	________________________
-
-	running Ubuntu x86/32-bit applications on x86/64-bit Ubuntu platforms
-	_____________________________________________________________________
-
-	some library must be added to make this possible
-
-	        $ sudo dpkg --add-architecture i386
-        	$ sudo apt-get update
-	        $ sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386
-
-
-
-To test Unix / Linux builds
-___________________________
-
-$ cd ../test.msm
-$ ../script
-$ diff -w --brief ../result.txo ../test.o3
-$ pushd ../test.dds/2r1
-$ ./script
-$ cd ../1r45p
-$ ./script
-$ popd
-$ ../zscript
-$ diff -w --brief ../result.zo3 ../test.zo3
-
-The materials are packed together on OSX which implements chmod
-flags somehow differently from Ubuntu (or the memory stick does).
-You may need to permit these files before you can test on Linux
-or maybe on all non-Darwin Unix
-
-$ chmod 0755 ../script
-$ chmod 0755 ../zscript
-$ chmod 0755 ../test.dds/2r1/script
-$ chmod 0755 ../test.dds/1r45p/script
-$ chmod 0755 ../linkpart
-$ chmod 0755 ../test.map/mverify
-$ chmod 0755 ../test.map/zferify
-$ chmod 0755 ../test.gcc/dothis
-$ chmod 0755 ../trabble/trabble
-$ chmod 0755 ../aside.dem/sgen
-$ chmod 0755 bojo
-$ chmod 0755 ../coldire
-$ chmod 0755 ../ppc_kern
-
-If you copy in the Ubuntu binaries you may even need to permit those
-on the Ubuntu platform
-
-$ pushd masmx.3r1/masmx.3r1/hosts/ubuntu.x86
-$ chmod 0755 masmx
-$ chmod 0755 mmx
-$ chmod 0755 imx
-$ chmod 0755 masmz
-$ popd
-
+	chmod 0755 alltests
+	chmod 0755 ../script
+	chmod 0755 ../zscript
+	chmod 0755 ../test.dds/2r1/script
+	chmod 0755 ../test.dds/1r45p/script
+	chmod 0755 ../linkpart
+	chmod 0755 ../test.map/mverify
+	chmod 0755 ../test.map/zferify
+	chmod 0755 ../test.gcc/dothis
+	chmod 0755 ../trabble/trabble
+	chmod 0755 ../aside.dem/sgen
+	chmod 0755 bojo
+	chmod 0755 ../coldfire
+	chmod 0755 ../ppc_kern
+	chmod 0755 ../imx
+	chmod 0755 ../mmx
 
 Testing on win32
 ________________
