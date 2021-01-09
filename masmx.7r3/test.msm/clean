@@ -1,0 +1,5 @@
+rm ../test.o3/*
+rm ../text.o3/*
+rm ../test.zo3/*
+rm ../text.zo3/*
+

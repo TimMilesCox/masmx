@@ -205,15 +205,15 @@ extern unsigned _stklen = 32*1024;
 
 #if	__LP64__
 #ifdef  SUPERSET
-#define REVISION "3A Build 10-64"
+#define REVISION "3A Build 11-64"
 #else
-#define REVISION "3Z Build 10-64"
+#define REVISION "3Z Build 11-64"
 #endif
 #else
 #ifdef	SUPERSET
-#define REVISION "3A Build 10"
+#define REVISION "3A Build 11"
 #else
-#define REVISION "3Z Build 10"
+#define REVISION "3Z Build 11"
 #endif
 #endif
 

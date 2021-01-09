@@ -4,11 +4,39 @@ ___________	__________	_______	____________________________
 			and	Build 9-64 Distribution 15 February 2019
 				________________________________________
 
+			and	Build 10 Distribution December 2020
+				___________________________________
+
+			and	Build 11 Build 11-64 Distribution 11 January 2021
+				_________________________________________________
+
 
 
 	masmx.7r3A
 	__________
 
+
+	Build 11 / Build 11-64
+	______________________
+
+        algorithm plotter directive $xqt_fp correction
+        handling of parenthesised sub-expressions corrected
+
+        new script test.msm/clean removes benchmark results
+        before backup or zip
+
+        these benchmarks apply when masmx toolchain is generated
+
+        the required results controls are kept
+        but the generated test results are dropped after comparison
+
+
+	build 10 / 10-64
+	________________
+
+        merged 64-bit / 32-bit sources
+        nothing is called long and all c language i32s are called int
+        correction to 1st / 2nd pass behaviour of $text translations
 
 	Build 9-64
 	__________
@@ -78,8 +106,10 @@ ___________	__________	_______	____________________________
 	on and for platforms osx.x86 osx.ppc ubuntu.x86 win32
 
 		./bosx86
+		./bisx64
 		./ppcbosx
 		./bsuse
+		./bsuse.x64
 		./bw32
 
 	These builds are all for 32-bit targets. They also display guidance
@@ -132,11 +162,11 @@ ____________________________
 	Proprietary Unix Platforms
 	__________________________
 
-	Mac OS X / PowerPC G4		DELIVERED IN THIS PACKAGE		Build 8
+	Mac OS X / PowerPC G4		DELIVERED IN THIS PACKAGE		Build 11
 
-	Mac OS X / x86			DELIVERED IN THIS PACKAGE		Build 8
+	Mac OS X / x86			DELIVERED IN THIS PACKAGE		Build 11
 
-        Max OS X / ia64                 DELIVERED IN THIS PACKAGE		Build 9-64
+        Max OS X / x86-64		DELIVERED IN THIS PACKAGE		Build 11-64
                                         for any Intel Mac
                                         from Snow Leopard to Catalina
 
@@ -147,9 +177,9 @@ ____________________________
 	Linux Platforms
 	_______________
 
-	openSUSE Linux / x86		DELIVERED IN THIS PACKAGE		Build 8
+	openSUSE Linux / x86		DELIVERED IN THIS PACKAGE		Build 11
 
-	UBUNTU Linux / x86		replaced by openSUSE
+	openSUSE Linux / x86-64		DELIVERED IN THIS PACKAGE		Build 11-64
 
 
 

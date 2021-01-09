@@ -22,7 +22,7 @@
 
 
 
-
+#undef	TRACK_COMPLEXITY
 #define EXCLUDE_OPERATORS 1
 #define	INDIRECTION_PMONOLITH
 
@@ -48,10 +48,18 @@ static int complex(char *s, char *e)
 
    while ((p = l2r_find('(', p, e)))
    {
+      #ifdef TRACK_COMPLEXITY
+      printf("[?]");
+      #endif
+
       q = fendbe(p);
 
       if (complex(p, q))
       {
+          #ifdef TRACK_COMPLEXITY
+          printf("[!]");
+          #endif
+
           return 1;
       }
 
@@ -77,9 +85,17 @@ static int complex_beyond(char *s, char *e, char *list)
 
    while ((p = l2r_find('(', p, e)))
    {
+      #ifdef TRACK_COMPLEXITY
+      printf("[k?]");
+      #endif
+
       q = fendbe(p);
       if (complex_beyond(p, q, list))
       {
+         #ifdef TRACK_COMPLEXITY
+         printf("[k!]");
+         #endif
+
          return 1;
       }
       p = q;
@@ -274,7 +290,8 @@ static void fp_xpress(char *s, char *e, char *tag)
                break;
 
             case '*':
-               if (complex_beyond(s, p, "*\0/\0*+\0*-\0"))
+
+               if (complex_beyond(s, p, "*+\0*-\0"))	/* "*\0/\0*+\0*-\0" */
                {
                   fpxpress_asmq(" $x_reserve ");
                   fp_xpress(s, p, tag);
