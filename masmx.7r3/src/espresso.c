@@ -266,8 +266,8 @@ static void i_xpress(char *s, char *e, char *tag)
 
                   break;
 
-               case MULTIPLY:
-                  if ((complex_beyond(s, p, "*\0///\0//\0/\0*+\0*-\0")) && (storage_addresses(s, p)))
+               case MULTIPLY:			/*	"*\0///\0//\0/\0*+\0*-\0"	*/
+                  if ((complex_beyond(s, p, "*+\0*-\0")) && (storage_addresses(s, p)))
                   {
                      fpxpress_asmq(" $i_reserve ");
                      i_xpress(s, p, tag);
