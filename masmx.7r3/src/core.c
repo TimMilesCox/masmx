@@ -6876,6 +6876,8 @@ static int assemble(char *line_label,char *param,object *above,txo *image)
 	       thislabel->l.r.l.y = 0;
 	       thislabel->l.r.l.rel = 0;
 
+               if (thislabel->l.valued == EQUF) item = thislabel->l.value;
+
 	       if (argument)
 	       {
 	 	  x = RADIX/8;

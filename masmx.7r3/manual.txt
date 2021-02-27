@@ -6506,18 +6506,29 @@ LISTP**		$set	LISTP-1
 
 <p>
 <b>$xqt_fp</b> directive scans an expression and calls macro code to write an
-instruction plan. The tokens which are constants appear as literals at the foot
-of the program
+instruction plan
+
+<p>
+Macro code is specific per target and has macro call names global to all targets
+
+<p>
+Macro code may compute into any result register considered intuituve or serviceable
+
+<p>
+Tokens which are constants appear as literals at the foot of the program
+
+<p>
+An algorithm which can be stated as an expression is assembled in one pass of one <b>$xqt_fp</b> line
 
 <p>
 <b>$xqt_fp</b> does not currently attempt assembly-time calculation of expression
-steps between floating constants. Each floating operation is at runtime
+steps between constant terms. The assembly platform may not be the target device. masmx generates constants for any floating architecture but executes no floating arithmetic. Each floating operation is at runtime
 
 <p>
-<b>$xqt_fp</b> concerns four-function arithmetic only
+<b>$xqt_fp</b> resolves four-function arithmetic and parentheses. All algorithms are built from these
 
 <p>
-<b>$xqt_fp</b> is demonstrated here with ColdFire architecture
+<b>$xqt_fp</b> is demonstrated here with ColdFire architecture. Macro code in fpxpress.def for ColdFire computes into register fp0
 
 <p>
 The first simple algorithm has five inputs and is executed in five instructions, including

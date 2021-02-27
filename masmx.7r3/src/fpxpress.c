@@ -127,7 +127,20 @@ static int complex_beyond(char *s, char *e, char *list)
 static int number(char *s, char *e)
 {
    object		*l;
-   int		 symbol = *s;
+   int			 symbol = *s;
+
+   while (symbol == ' ')
+   {
+      s++;
+
+      if (s == e)
+      {
+         flag("syntactic anomaly");
+         return 0;
+      }
+
+      symbol = *s;
+   }
 
    if (symbol == '*') return 0;
    if (symbol == '(') return number(s + 1, e - 1);
@@ -142,12 +155,12 @@ static int number(char *s, char *e)
       return 0;
    }
 
-   if (l->l.r.l.rel) return 0;
-   if (l->l.valued == 0) return 0;
-   if (l->l.valued == SET) return 2;
-   if (l->l.r.l.xref < 0) return 0;
-   if (l->l.valued == EQUF) return 0;
-   if (l->l.valued & 128) return 0;
+   if (l->l.r.l.rel) return 0;		/* locator index | 128 = storage */
+   if (l->l.valued == 0) return 0;	/* unresolved / external = storage */
+   if (l->l.valued == SET) return 2;	/* and not bound to a locator	*/
+   if (l->l.r.l.xref < 0) return 0;	/* external ? equals storage	*/
+   if (l->l.valued == EQUF) return 0;	/* base displacement construct	*/
+   if (l->l.valued & 128) return 0;	/* user supplied ? storage	*/
 
    return 2;
 }
