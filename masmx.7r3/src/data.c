@@ -312,12 +312,16 @@ typedef struct { char		*name;
 
 #endif
 
-enum	{	EQUAL, UNEQUAL, GREATER, LESS,
+#define	OPERATORS 19
+
+#if	OPERATORS == 17
+
+enum	{	UNEQUAL, EQUAL, GREATER, LESS,
 		REMAINDER, COVERED_QUOTIENT, SHIFT_RIGHT, DIVIDE,
 		AND, SHIFT, EXPONENT_PLUS, EXPONENT_MINUS,
 		MULTIPLY, XOR, MINUS, OR, PLUS } ;
 
-static char ufield[] = {	sizeof("=")   - 1,	sizeof("^=") - 1,
+static char ufield[] = {	sizeof("^=")   - 1,	sizeof("=") - 1,
 				sizeof(">")   - 1,	sizeof("<")  - 1,
 				sizeof("///") - 1,	sizeof("//") - 1,
 				sizeof("/*")  - 1,	sizeof("/")  - 1,
@@ -327,10 +331,8 @@ static char ufield[] = {	sizeof("=")   - 1,	sizeof("^=") - 1,
 				sizeof("-")   - 1,	sizeof("++") - 1,
 				sizeof("+")   - 1			  } ;
 
-
-   #define OPERATORS 17
-   static char *o[] = { "=",
-			"^=",
+   static char *o[] = { "^=",
+			"=",
 			">",
 			"<",
 			"///",
@@ -346,8 +348,47 @@ static char ufield[] = {	sizeof("=")   - 1,	sizeof("^=") - 1,
 			"-",
 			"++",
 			"+"     } ;
+#endif
+
+#if	OPERATORS == 19
+
+enum	{	UNEQUAL, EQUAL, NOT_GREATER, GREATER, NOT_LESS, LESS,
+		REMAINDER, COVERED_QUOTIENT, SHIFT_RIGHT, DIVIDE,
+		AND, SHIFT, EXPONENT_PLUS, EXPONENT_MINUS,
+		MULTIPLY, XOR, MINUS, OR, PLUS } ;
+
+static char ufield[] = {	sizeof("^=")  - 1,	sizeof("=")  - 1,
+				sizeof("^>")  - 1,	sizeof(">")  - 1,
+				sizeof("^<")  - 1,	sizeof("<")  - 1,
+				sizeof("///") - 1,	sizeof("//") - 1,
+				sizeof("/*")  - 1,	sizeof("/")  - 1,
+				sizeof("**")  - 1,	sizeof("*/") - 1,
+				sizeof("*+")  - 1,	sizeof("*-") - 1,
+				sizeof("*")   - 1,	sizeof("--") - 1,
+				sizeof("-")   - 1,	sizeof("++") - 1,
+				sizeof("+")   - 1 			  } ;
 
 
+   static char *o[] = { "^=",
+			"=",
+			"^>",
+			">",
+			"^<",
+			"<",
+			"///",
+			"//",
+			"/*",
+			"/",
+			"**",
+			"*/",
+			"*+",
+			"*-",
+			"*",
+			"--",
+			"-",
+			"++",
+			"+"	} ;
+#endif
 
 static char tstring[] = ":, ";
 

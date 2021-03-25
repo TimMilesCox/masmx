@@ -124,13 +124,26 @@ static void i_xpress(char *s, char *e, char *tag)
       ||  (unary == '*') || (unary == '^')) q++;
       #endif
 
-      if ((p = operates(q, e, "=\0^=\0"))
+      #if OPERATORS == 19
+      if ((p = operates(q, e, "^=\0=\0"))
+      ||  (p = operates(q, e, "^>\0>\0"))
+      ||  (p = operates(q, e, "^<\0<\0"))
+      ||  (p = operates(q, e, "--\0++\0"))
+      ||  (p = operates(q, e, "/*\0*/\0"))
+      ||  (p = operates(q, e, "**\0"))
+      ||  (p = operates(q, e, "+\0-\0"))
+      ||  (p = operates(q, e, "/\0//\0///\0*\0")))
+      #endif
+
+      #if OPERATORS == 17
+      if ((p = operates(q, e, "^=\0=\0"))
       ||  (p = operates(q, e, ">\0<\0"))
       ||  (p = operates(q, e, "--\0++\0"))
       ||  (p = operates(q, e, "/*\0*/\0"))
       ||  (p = operates(q, e, "**\0"))
       ||  (p = operates(q, e, "+\0-\0"))
       ||  (p = operates(q, e, "/\0//\0///\0*\0")))
+      #endif
       {
          this_operator = oper_ator(p, e - p);
          q = p + ufield[this_operator];
@@ -160,11 +173,27 @@ static void i_xpress(char *s, char *e, char *tag)
 
                   break;
 
+                  #if OPERATORS == 19
+               case NOT_GREATER:
+                  fpxpress_asmq(" $i_reserve ");
+                  i_xpress(s, p, tag);
+                  fpxpress_asmq(" $i_retrieve_test_nogreater ");
+                  break;
+                  #endif
+
                case GREATER:
                   fpxpress_asmq(" $i_reserve ");
                   i_xpress(s, p, tag);
                   fpxpress_asmq(" $i_retrieve_testgreater ");
                   break;
+
+                  #if OPERATORS == 19
+               case NOT_LESS:
+                  fpxpress_asmq(" $i_reserve ");
+                  i_xpress(s, p, tag);
+                  fpxpress_asmq(" $i_retrieve_test_noless ");
+                  break;
+                  #endif
 
                case LESS:
                   fpxpress_asmq(" $i_reserve ");
@@ -320,19 +349,31 @@ static void i_xpress(char *s, char *e, char *tag)
             switch (this_operator)
             {
                case EQUAL:
-                  fpxpress_assemble( "$i_testequal ", q, e, tag);
+                  fpxpress_assemble( " $i_testequal ", q, e, tag);
                   break;
 
                case UNEQUAL:
-                  fpxpress_assemble( "$i_testunequal ", q, e, tag);
+                  fpxpress_assemble( " $i_testunequal ", q, e, tag);
                   break;
+
+                  #if OPERATORS == 19
+               case NOT_GREATER:
+                  fpxpress_assemble( " $i_test_nogreater ", q, e, tag);
+                  break;
+                  #endif
 
                case GREATER:
-                  fpxpress_assemble( "$i_testgreater ", q, e, tag);
+                  fpxpress_assemble( " $i_testgreater ", q, e, tag);
                   break;
 
+                  #if OPERATORS == 19
+               case NOT_LESS:
+                  fpxpress_assemble( " $i_test_noless ", q, e, tag);
+                  break;
+                  #endif
+
                case LESS:
-                  fpxpress_assemble( "$i_testless ", q, e, tag);
+                  fpxpress_assemble( " $i_testless ", q, e, tag);
                   break;
 
                case XOR:

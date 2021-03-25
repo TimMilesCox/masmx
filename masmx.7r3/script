@@ -710,6 +710,7 @@ rm ../text.o3/*
 ../masmx roundown ../test.o3/roundown -lyok > ../text.o3/roundown.txt
 ../masmx plasma ../test.o3/plasma -lyok > ../text.o3/plasma.txt
 ../masmx choppity ../test.o3/choppity -lyok > ../text.o3/choppity.txt
+../masmx notalot ../test.o3/notalot -lyok > ../text.o3/notalot.txt
 ../linkpart
 ../coldfire
 ../ppc_kern

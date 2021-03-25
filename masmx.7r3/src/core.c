@@ -2195,6 +2195,7 @@ static line_item *xpression(char *s, char *e, char *param)
    if (sp == &o[XPRESSION]) floating_conversion = 0;
    #endif
 
+#if 0
    if ((d = contains(s, e, "=\0")))
    {
       /*
@@ -2223,7 +2224,8 @@ static line_item *xpression(char *s, char *e, char *param)
       
       return sp;
    }
-   
+#endif   
+
    if ((d = contains(s, e, "^=\0")))
    {
       /*
@@ -2253,6 +2255,65 @@ static line_item *xpression(char *s, char *e, char *param)
       return sp;
    }
    
+   if ((d = contains(s, e, "=\0")))
+   {  
+      /* 
+      if (expression(s, d, param)
+      ==  expression(d+1, e, param)) return 1;
+      else                                  return 0;
+      */
+      sp--;
+      left = xpression(s, d, param);
+      
+      #ifdef RELOCATION
+      left_side = mapx->m;
+      #endif
+      
+      sp--; 
+      right = xpression(d+1, e, param);
+      i = operand_compare(left, right);
+      sp += 2;
+      if (!i) sp->b[RADIX/8-1] = 1;
+      
+      #ifdef RELOCATION
+      if ((left_side.l.y | mapx->m.l.y)
+      &&  (left_side.i   ^ mapx->m.i))
+      flag("comparison between differently relocated values");
+      #endif
+      
+      return sp;
+   }
+  
+   #if OPERATORS == 19
+
+   if ((d = contains(s, e, "^>\0")))
+   {
+      sp--;
+      left = xpression(s, d, param);
+
+      #ifdef RELOCATION
+      left_side = mapx->m;
+      mapx->m.i = 0;
+      #endif
+
+      sp--;
+      right = xpression(d+2, e, param);
+      i = operand_compare(left, right);
+      sp += 2;
+
+      if ((i < 0) || (i == 0)) sp->b[RADIX/8-1] = 1;
+
+      #ifdef RELOCATION
+      if ((left_side.l.y | mapx->m.l.y)
+      &&  (left_side.i   ^ mapx->m.i))
+      flag("Comparison between differently relocated values");
+      #endif
+
+      return sp;
+   }
+
+   #endif
+
    if ((d = contains(s, e, ">\0")))
    {
       /*
@@ -2282,7 +2343,40 @@ static line_item *xpression(char *s, char *e, char *param)
       
       return sp;
    }
-   
+
+   #if OPERATORS == 19
+
+   if ((d = contains(s, e, "^<\0")))
+   {
+      sp--;
+      left = xpression(s, d, param);
+
+      #ifdef RELOCATION
+      left_side = mapx->m;
+      mapx->m.i = 0;
+      #endif
+
+      sp--;
+      right = xpression(d+2, e, param);
+      i = operand_compare(left, right);
+      sp += 2;
+
+      if (i < 0)
+      {
+      }
+      else  sp->b[RADIX/8-1] = 1;
+
+      #ifdef RELOCATION
+      if ((left_side.l.y | mapx->m.l.y)
+      &&  (left_side.i   ^ mapx->m.i))
+      flag("Comparison between differently relocated values");
+      #endif
+
+      return sp;
+   }
+
+   #endif
+
    if ((d = contains(s, e, "<\0")))
    {
       /*
@@ -2312,7 +2406,7 @@ static line_item *xpression(char *s, char *e, char *param)
       
       return sp;
    }
-   
+
    #ifndef PROMOTE_UNARY
    /*
    if (*s == '!') return expression(++s, e, param) ^ -1;
@@ -3503,14 +3597,14 @@ static int expression(char *s, char *e, char *param)
    while ((s < e) && (*s == ' ')) s++;
 
    if (s == e) return 0;
-   
+#if 0   
    if ((d = contains(s, e, "=\0")))
    {
       if (expression(s, d, param)
       ==  expression(d+1, e, param)) return 1;
       else                           return 0;
    }
-   
+#endif
    if ((d = contains(s, e, "^=\0")))
    {
       if (expression(s, d, param)
@@ -3518,13 +3612,42 @@ static int expression(char *s, char *e, char *param)
       else                           return 0;
    }
    
+   if ((d = contains(s, e, "=\0")))
+   {
+      if (expression(s, d, param)
+      ==  expression(d+1, e, param)) return 1;
+      else                           return 0;
+   }
+  
+   #if OPERATORS == 19
+
+   if ((d = contains(s, e, "^>\0")))
+   {
+      if (expression(s, d, param)
+      >   expression(d+2, e, param)) return 0;
+      else                           return 1;
+   }
+
+   #endif
+
    if ((d = contains(s, e, ">\0")))
    {
       if (expression(s, d, param)
       >   expression(d+1, e, param)) return 1;
       else                           return 0;
    }
-   
+
+   #if OPERATORS == 19
+
+   if ((d = contains(s, e, "^<\0")))
+   {
+      if (expression(s, d, param)
+      <   expression(d+2, e, param)) return 0;
+      else                           return 1;
+   }
+
+   #endif
+ 
    if ((d = contains(s, e, "<\0")))
    {
       if (expression(s, d, param)

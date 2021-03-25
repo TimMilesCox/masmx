@@ -690,3 +690,5 @@ rm ../text.zo3/*
 ../masmz roundown ../test.zo3/roundown -lok > ../text.zo3/roundown.txt
 ../masmz plasma ../test.zo3/plasma -lok > ../text.zo3/plasma.txt
 ../masmz choppity ../test.zo3/choppity -lok > ../text.zo3/choppity.txt
+../masmz notalot ../test.zo3/notalot -lok > ../text.zo3/notalot.txt
+

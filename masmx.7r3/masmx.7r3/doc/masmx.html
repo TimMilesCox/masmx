@@ -1181,25 +1181,35 @@ $
 <h3>4.2.1: Operators</h3>
 	
 Operators by rank are
+<pre>
 
-	<blockquote>
-	()<br>
-	=<br>
-	^=<br>
-	><br>
-	<<br>
-	--<br>
-	++<br>
-	/*<br>
-	*/ */-<br>
-	**<br>
-	*+ *-<br>
-	+ -<br>
-	* / // ///<br>
-	&plusmn; ^unary<br>
-	</blockquote>
+	()
 
+	^=	=
 
+	^&gt;	&gt;
+
+	^&lt;	&lt;
+
+	--
+
+	++
+
+	/*
+
+	*/	*/-
+
+	**
+
+	*+	*-
+
+	+	-
+
+	*	/	//	///
+
+	&plusmn;	^unary
+
+</pre>
 Operators in the same rank have left-to-right precedence as they are
 encountered in the expression
 
@@ -1214,13 +1224,17 @@ The operators are
 
 
 	_________________________________________
-	|	=	|	equal		|	=  value 1 : ^= value 0
+	|	=	|	equal		|	=  : 1 else 0
 	|_______________|_______________________|
-	|	^=	|	unequal		|	^= value 1 : =  value 0
+	|	^=	|	unequal		|	=  : 0 else 1
 	|_______________|_______________________|
-	|	>	|	greater		|	>  value 1 : &le;  value 0
+	|	&gt;	|	greater		|	&gt;  : 1 else 0
 	|_______________|_______________________|
-	|	<	|	less		|	<  value 1 : &ge;  value 0
+	|	&lt;	|	less		|	&lt;  : 1 else 0
+	|_______________|_______________________|
+	|	^&gt;	|	not greater	|	&gt;  : 0 else 1
+	|_______________|_______________________|
+	|	^&lt;	|	not less	|	&lt;  : 0 else 1
 	|_______________|_______________________|
 	|	--	|	XOR		|
 	|_______________|_______________________|
@@ -1251,6 +1265,8 @@ The operators are
 	|	///	|	remainder	|
 	|_______________|_______________________|
 
+							^unary is 1s complement
+							for scope of unary + - ^ see <a href="#nconstant">number constants</a>
 
 Only	+	PLUS
 	-	MINUS
@@ -6506,18 +6522,29 @@ LISTP**		$set	LISTP-1
 
 <p>
 <b>$xqt_fp</b> directive scans an expression and calls macro code to write an
-instruction plan. The tokens which are constants appear as literals at the foot
-of the program
+instruction plan
+
+<p>
+Macro code is specific per target and has macro call names global to all targets
+
+<p>
+Macro code may compute into any result register considered intuituve or serviceable
+
+<p>
+Tokens which are constants appear as literals at the foot of the program
+
+<p>
+An algorithm which can be stated as an expression is assembled in one pass of one <b>$xqt_fp</b> line
 
 <p>
 <b>$xqt_fp</b> does not currently attempt assembly-time calculation of expression
-steps between floating constants. Each floating operation is at runtime
+steps between constant terms. The assembly platform may not be the target device. masmx generates constants for any floating architecture but executes no floating arithmetic. Each floating operation is at runtime
 
 <p>
-<b>$xqt_fp</b> concerns four-function arithmetic only
+<b>$xqt_fp</b> resolves four-function arithmetic and parentheses. All algorithms are built from these
 
 <p>
-<b>$xqt_fp</b> is demonstrated here with ColdFire architecture
+<b>$xqt_fp</b> is demonstrated here with ColdFire architecture. Macro code in fpxpress.def for ColdFire computes into register fp0
 
 <p>
 The first simple algorithm has five inputs and is executed in five instructions, including
@@ -11904,19 +11931,28 @@ See also <a href="#nconstant">4.3.3: Number Constants</a>
 
 <p>
 $text directive is used for syntax translations which cannot
-be reached any other way. Examples are where source code
-contains operators which are not the masmx operators:
+be reached any other way, for example operators which are not the masmx operators:
 <pre>
 
 	$text   \ div \/\
-	$text   \ shl \*/\
+	$text   | shl |*/|
 	$text   / and /**/
 
 </pre>
+A subfunction of value [ 1..8 ] translates search value to corresponding command line value
+<pre>
+
+	$text,3	|_COMPASS_POINT|
+
+
+	+	_COMPASS_POINT		. value assembly command line argument 3
+
+</pre>
+Argument list does not include command line strings starting -
+
 <p>
-All the <b>$text</b> patterns must be placed adjacent to each other
-in the assembly header. Any separated from the first block of
-them will not be used.
+All the <b>$text</b> lines must be placed together in the assembly
+with no other directives or code between. Any separated are not  used.
 
 <p>
 See also <a href="#describe1">10.1: Establishing your Syntax</a>
@@ -17180,6 +17216,20 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 :$(00):00000000:00000004 
 a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 
+	-B	trace information about structure member labels
+		[L<i>macro_depth<sub>16</sub></i>
+		 A<i>owner_macro_depth<sub>16</sub></i>
+		 G<i>globality<sub>16</sub></i>
+		 V<i>label_type<sub>16</sub></i>
+		 P<i>owner_pass_generated<sub>16</sub></i>]<i>owner_name:name</i>
+
+		label type storage indentifier is 127 7F<sub>16</sub>
+		other label types may be displayed by assembly
+
+				masmx -x+yk
+				$end
+
+		label types 128+ are user-defined
 
 	-D	translate \<i>ESCAPED</i> octal and hex sequences in "strings"
 		and in 'integers' in apostrophe if
@@ -17255,6 +17305,20 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
 		rounding is towards zero or truncation
 
 
+	-I	allow a function macro $func..$end to generate code
+		inline to current location counter, not by default permitted
+
+
+	-L	display macro depth, globality and type of labels declared in macros
+
+                label type storage indentifier is 127 7F<sub>16</sub>
+                other label types may be displayed by assembly
+
+                                masmx -x+yk
+                                $end
+
+                label types 128+ are user-defined
+
 
 		<a	name="option_Q"/>
         -Q      execute a function name encountered in an
@@ -17299,6 +17363,17 @@ a1.msm: object code 54 bytes: 0 errors: 0 undefined labels
                 with option -Q the first mention in quotes
                 also causes macro lolly to happen instead of
                 just identifying it
+
+
+	-W	reserved
+
+
+	-X	allow binary inclusions containing label exports
+		which are absolute values not addresses
+
+		encountering an exported label not bound to a location counter
+		causes a linking assembly without option flag -X to error
+
 
 	-Y	in $record structures flag fields as signed 
 		unless their bit size is suffixed u
