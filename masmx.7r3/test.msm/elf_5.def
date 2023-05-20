@@ -1,0 +1,109 @@
+	$word	8
+
+"$ELFDATA2MSB"	$equ	2
+"$ELFDATA2LSB"	$equ	1
+
+"$ELFCLASS64"	$equ	2
+"$ELFCLASS32"	$equ	1
+
+"$ET_REL"	$equ	1
+"$ET_EXEC"	$equ	2
+"$ET_DYN"	$equ	3
+"$ET_CORE"	$equ	4
+
+"$EM_68K"	$equ	4
+"$EM_PPC"	$equ	20	. may need to be "ppc_old" (17)
+"$EM_386"	$equ	3
+
+        $if	$PLATFORM_LE
+
+"$EI_DATA"	$set	$ELFDATA2LSB
+
+p		$proc
+Elf32_Half*     $name	16	. Unsigned 16-bit field
+Elf64_Half*     $name	16	. Unsigned 16-bit field
+Elf32_Addr*	$name	32	. Signed 32-bit field or integer
+Elf32_Off*      $name	32	. Unsigned 32-bit file offset
+Elf32_Word*     $name	32	. Unsigned 32-bit field or integer
+Elf32_Sword*    $name	32	. Signed 32-bit field or integer
+Elf64_Word*     $name	32	. Signed 32-bit field
+Elf64_Sword*    $name	32	. Signed 32-bit field
+Elf64_Addr*     $name	64	. Unsigned 64-bit file offset
+Elf64_Off*      $name	64	. Unsigned 64-bit file offset
+Elf64_Xword*    $name	64	. Unsigned 64-bit field or integer
+Elf64_Sxword*   $name	64	. Signed 64-bit field or integer
+
+	$do	p(0,0)=16,	;
+	+	p(1,1), p(1,1)/*8:d
+
+        $do     p(0,0)=32,	;
+        +       p(1,1), p(1,1)/*8, p(1,1)/*16, p(1,1)/*24:q
+
+        $do     p(0,0)=64,	;
+        +       p(1,1),    p(1,1)/*8, p(1,1)/*16, p(1,1)/*24,;
+		p(1,1)/*32,p(1,1)/*40,p(1,1)/*48, p(1,1)/*56:o
+
+		$end
+
+	$else
+
+"$EI_DATA"	$set	$ELFDATA2MSB
+
+Elf32_Addr      $form	32	. Unsigned 32-bit program address
+Elf32_Half      $form	16	. Unsigned 16-bit field
+Elf32_Off       $form	32	. Unsigned 32-bit file offset
+Elf32_Sword     $form	32	. Signed 32-bit field or integer
+Elf32_Word      $form	32	. Unsigned 32-bit field or integer
+
+Elf64_Addr      $form	64	. Unsigned 64-bit program address
+Elf64_Half      $form	16	. Unsigned 16-bit field
+Elf64_Off       $form	64	. Unsigned 64-bit file offset
+Elf64_Sword     $form	32	. Signed 32-bit field
+Elf64_Word      $form	32	. Unsigned 32-bit field
+Elf64_Sxword    $form	64	. Signed 64-bit field or integer
+Elf64_Xword     $form	64	. Unsigned 64-bit field or integer
+
+	$endif
+
+p		$proc
+Elf32_Ehdr* 	$name
+*		$tree
+e_ident		"":127:"ELF":$elfclass32:EI_DATA:EI_VERSION:EI_OSABI:;
+			     EI_ABIVERSION:0:0:0:;
+			     0:0:EI_BRAND:EI_NIDENT
+e_type		Elf32_Half	p(1,1)
+e_machine	Elf32_Half	p(2,1)
+e_version	Elf32_Word	$EV_CURRENT
+e_entry		Elf32_Addr	p(3,1)
+e_phoff		Elf32_Off	p(4,1)
+e_shoff		Elf32_Off	p(5,1)
+e_flags		Elf32_Word	p(6,1)
+e_ehsize	Elf32_Half	p(7,1)
+e_phentsize	Elf32_Half	$PH_ENTRY
+e_phnum		Elf32_Half	p(8,1)
+e_shentsize	Elf32_Half	$SH_ENTRY
+e_shnum		Elf32_Half	p(9,1)
+e_shstrndx	Elf32_Half	p(10,1)
+		$root
+		$end
+
+p	$proc
+Elf64_Ehdr*	$name
+*		$tree
+e_ident		"":127:"ELF":$elfclass64
+e_type		Elf64_Half	p(1,1)
+e_machine	Elf64_Half	p(2,1)
+e_version	Elf64_Word	$EV_CURRENT
+e_entry		Elf64_Addr	p(3,1)
+e_phoff		Elf64_Off	p(4,1)
+e_shoff		Elf64_Off	p(5,1)
+e_flags		Elf64_Word	p(6,1)
+e_ehsize	Elf64_Half	p(7,1)
+e_phentsize	Elf64_Half	$PH_ENTRY
+e_phnum		Elf64_Half	p(8,1)
+e_shentsize	Elf64_Half	$SH_ENTRY
+e_shnum		Elf64_Half	p(9,1)
+e_shstrndx	Elf64_Half	p(10,1)
+		$root
+		$end
+

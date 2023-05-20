@@ -1,0 +1,22 @@
+	$include	"critical.def"
+ $word 32
+ $quantum 8
+ $byte 8
+ $awidth 32:128
+
+ARRAY  $equ 5*/96
+ELEMENT_SIZE $equ 1024*1024*1024
+
+element* $proc
+* + subscript
+ $res ELEMENT_SIZE-4
+ $end
+ 
+newpart* $proc
+$(45::*ARRAY+ELEMENT_SIZE*subscript-ELEMENT_SIZE)
+ $do subscript=4,  $list 0
+part(subscript)* element
+ $do subscript=HOW_MANY-3, $list 1
+ $end
+
+subscript $do HOW_MANY, newpart

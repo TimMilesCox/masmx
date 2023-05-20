@@ -1,0 +1,4 @@
+$(0:64)
+grum(1) + grum
+grum	+ grum(1)
+	$end

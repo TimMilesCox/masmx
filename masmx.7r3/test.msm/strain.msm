@@ -1,0 +1,28 @@
+        $word   32
+        $quantum 8
+
+"$two"* $func    
+        $return	$two(1,1)/*8
+	$return	$two(1,1)
+        $end
+
+"$three"* $proc    
+        $i	"":$three(1,1)/*16:$three(1,1)/*8:$three(1,1):
+        $end
+
+"$four"* $proc    
+        $i	"":$four(1,1)/*24:$four(1,1)/*16:$four(1,1)/*8:$four(1,1):
+        $end
+
+
+"$bytes"* $proc  
+times    $do     $bytes(1), $i	"":$bytes(1,times):
+        $end
+
+.        $space
+	"abc": 1: 2: 3:;
+        022:022:;
+        033:033:033:;
+        044:044:044:044:;
+        ""
+.	$free

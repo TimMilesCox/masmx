@@ -1,0 +1,68 @@
+$(2:02000)
+$(5:05000)
+$(62:62*262144)
+$(63:63*262144)
+$(0:64)
+bd      $form   24, 12, 6, 6, 48
+struccie $form  8, 16
+
+p       $proc
+call*   $name   7
+        struccie $n, p(1,1)
+        $end
+
+go*     $proc
+        struccie 4, go(1,1)
+        $end
+
+bdi*    $proc   $(62)
+        $byte   6
+        bd      bdi(1, 1), 0, 3, 0, "bdi(1,1)"
+        $byte   8
+        $end
+
+vector* $proc   $(2)
+*       +       $(62):s
+        bdi     vector(1,1)
+        $end
+
+"$v"*   $func	*        
+        $if     $t($v(1,1))=0
+"$v(1,1)"***   vector  $v(1,1)
+        $endif
+        $return $v(1,1)
+        $end
+
+s*      $func	*
+        $if     $t(s(1,1))=0
+"s(1,1)"* fixit        
+        $endif
+        $return s(1,1)
+        $end
+
+fixit*  $proc   $(5)
+*       +       $(63):s
+        bdiu    fixit(1,1)
+        $end
+
+bdiu*   $proc   $(63)
+        $byte   6
+        bd      bdiu(1, 1), 0, 3, 0, "bdiu(1,1)"
+        $byte   8
+        $end
+
+squall* $proc
+        call    $v(squall(1,1))
+        $end
+
+.        +       99
+. ok        vector  yes
+.        +       100
+. yea        vector  always
+
+.        struccie 8, s(plat)
+.        go      s(plat)
+.        struccie 5, $v(snibbo)
+        squall  gribbons
+        squall  gribbons
+        call    $v(ribbons)

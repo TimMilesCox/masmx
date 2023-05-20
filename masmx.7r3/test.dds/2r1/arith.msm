@@ -1,0 +1,67 @@
+
+NUM_Pack2:                      ; Tim, 31iij2000
+	movx    a,@dptr         ; Read 1
+	inc     dptr            ; Advance
+	anl     a,#15           ; Isolate Numeric 
+	swap    a               ; Replace Zone
+	mov     b,a             ; ->destination
+	movx    a,@dptr         ; Read 1 Other
+	inc     dptr            ; Advance
+	anl     a,#15           ; Isolate Numeric
+	orl     b,a             ; ++->destination. Note B is the Receiving
+	ret                     ;                  Operand of the OR.
+
+
+B2I:    movx    a,@dptr         ; Tim, 14iv2000
+	inc     dptr    
+	anl     a,#15
+	rl      a               ; save *2
+	mov     b,a
+	rl      a               ; make *8
+	rl      a
+	add     a,b             ;    =*10
+	mov     b,a
+	movx    a,@dptr         ;   +Next
+	inc     dptr
+	anl     a,#15
+	add     a,b
+	ret
+
+	
+	
+I2B:    mov     b,#10           ; Tim, 14iv2000        
+	div     ab
+	orl     a,#'0'
+	orl     b,#'0'
+	movx    @dptr,a
+	inc     dptr
+	mov     a,b
+	movx    @dptr,a
+	inc     dptr
+	ret
+	
+
+ARITH_MinutesNow:
+	mov     dptr,#datebuffer+2      ; Compute Ordinal Actual Minute 
+	movx    a,@dptr                 ; read xxxx xHHH
+	anl     a,#7                    ;      0000 0hhh
+	push    acc                     ;                       SP+1
+	swap    a                       ;      0hhh 0000
+	mov     b,a
+	inc     dptr
+	movx    a,@dptr                 ; read HHmm mmmm
+	push    acc                     ;                       SP+2
+	swap    a                       ;      mmmm HHmm
+	anl     a,#0Ch                  ;      0000 hh00
+	orl     a,b                     ;      0hhh hh00
+	cpl     a                       ;     -0HHH HH00 ones complement
+	mov     b,a                     
+	pop     acc                     ;      hhMM MMMM        SP+1
+	setB    c                       ; subtraction will be twos complement
+	addc    a,b                     
+	mov     b,a                     ; set aside LSBytes ordinal minute
+	pop     acc                     ;      0000 0hhh        SP+0
+	addc    a,#255                  ; subtract zero with borrow
+	ret
+	
+	END             ; Arith.Asm

@@ -1,0 +1,20 @@
+__giant	$set		1
+	$include	"../aside.dem/ppc_64.def"
+	$include	../aside.dem/enter64a.def
+__base36	$set	0x00444400000ebfc0
+$(.literal::*__base36,30/__literal)
+$(.data::*0x00444400000ec000)
+wonderloaf      "wonderloaf3"
+	$res	2048
+
+$(.text::*0x00444400000fc000)
+yoohoo	enter64	32
+	ld	r7, __literal(wonderloaf:d)
+        ld	9, __literal(	__upper48	factor1@ha)
+        lwa	9, factor1@l(9)
+        ld	10, __literal(   __upper48       factor2@ha)
+        lwa	10,factor2@l(10)
+	ld	r0, __literal(zoohoo:d)
+	blrl
+	leave64
+

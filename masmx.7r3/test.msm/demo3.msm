@@ -1,0 +1,33 @@
+
+	$word		32
+ 	$quantum	8
+	$byte		8
+	$awidth		32:64
+
+	$set_option	"v"
+
+ARRAY	$equ		5*/24
+ELEMENT_SIZE $equ 	4096
+HOW_MANY $equ		3072
+
+element* $proc
+*	+	subscript
+	$if	subscript=HOW_MANY
+	+	ARRAY
+	+	part(1)
+	$else
+	+	ARRAY+ELEMENT_SIZE*subscript
+	+	part(subscript+1)
+	$endif
+	$res	ELEMENT_SIZE-1024-12
+	$end
+ 
+newpart* $proc
+$(45:1024:ARRAY+ELEMENT_SIZE*subscript-ELEMENT_SIZE)
+	$do	subscript=4,		$list 0
+part(subscript)* element
+	$do	subscript=HOW_MANY-3,	$list 1
+	$end
+
+	$lit	45
+subscript $do	HOW_MANY,	newpart

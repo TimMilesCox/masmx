@@ -1,0 +1,17 @@
+echo this should be OSX 10.6.8
+echo build osx.x86
+
+if	[ "$1" == "-u" ]
+then
+	rm	../masmx.7r3/hosts/osx.x86/*
+	gcc -m32 -funsigned-char -o ../masmx.7r3/hosts/osx.x86/mmx mmx.c
+	gcc -m32 -funsigned-char -o ../masmx.7r3/hosts/osx.x86/imx imx.c
+	gcc -m32 -funsigned-char -o ../masmx.7r3/hosts/osx.x86/symbol symbol.c
+fi
+
+gcc -m32 -funsigned-char -DSUSE -DINTEL -DSUPERSET -o ../masmx.7r3/hosts/osx.x86/masmx masm.c
+gcc -m32 -funsigned-char -DSUSE -DINTEL -o ../masmx.7r3/hosts/osx.x86/masmz masm.c
+
+cp ../masmx.7r3/hosts/osx.x86/* ..
+echo	cd ../test.msm and run ./alltests
+

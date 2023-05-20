@@ -1,0 +1,11 @@
+p       $proc
+assign*  $name
+tag     $set    p(1,1)
+        +       tag
+        
+        $end
+
+$(0:0)
+        $plist  3
+        assign  7
+        assign  8

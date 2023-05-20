@@ -1,0 +1,10 @@
+	$include	"map_ppc.def"
+	$set_option	"b"
+$(1:000A0000)
+$(3:000B0000)
+$(5:000B8000)
+$(6:000C0000)
+	$include,$binary	../result.txo/soso
+	$include,$binary	../result.txo/factor
+
+	$store			image2

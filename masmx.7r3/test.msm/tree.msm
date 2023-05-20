@@ -1,0 +1,49 @@
+tree*   $proc
+*       $tree
+branch1 branch  tree(1) tree(2)
+branch2 branch  tree(3) tree(4)
+        $root
+        $end
+
+branch* $proc
+*       $tree
+twig1   twig    branch(1)    
+twig2   twig    branch(2)
+        $root
+        $end
+
+twig*   $proc
+*       $tree
+leaf1   +       twig(1, 1)
+leaf2   +       twig(1, 2)
+        $root
+        $end
+
+oak     $tree
+branch1 $tree
+twig1   $tree
+leaf1   +       1
+leaf2   +       2
+        $root
+twig2   $tree
+leaf1   +       3
+leaf2   +       4
+        $root
+        $root
+branch2 $tree
+twig1   $tree
+leaf1   +       1
+leaf2   +       2
+        $root
+twig2   $tree
+leaf1   +       3
+leaf2   +       4
+        $root
+        $root
+        +branch1:twig2
+        $root
+
+tulip   tree    8,7 6,5 4,3 2,1
+
+        +oak:branch2:twig2:leaf2
+        +tulip:branch2:twig2:leaf1

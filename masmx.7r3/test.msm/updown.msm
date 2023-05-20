@@ -1,0 +1,18 @@
+raspberry $equ 4
+
+p$      $proc	*
+
+
+updown* $name
+raspberry $equ 4
+up      +(down)
+down    +(up)
+        $end
+
+$(0:0)        
+        updown
+        updown
+        updown
+        updown
+
+        $end

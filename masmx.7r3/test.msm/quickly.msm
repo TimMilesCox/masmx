@@ -1,0 +1,16 @@
+	$path		../smaragd.68k
+	$include	coldfire.def
+	$include	fpxpress.def
+	$path
+	$include	espresso.def
+	$include	ieee754.def
+
+$(5:65536,a5)
+one	$res	8
+two	$res	8
+
+$(0:16384,pc/$azlit)
+froutine
+	$xqt_fp,$ieee64		one*1.6384e307+two
+	rts
+

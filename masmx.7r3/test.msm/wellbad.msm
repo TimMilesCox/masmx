@@ -1,0 +1,34 @@
+p	$proc
+insider* $name
+*	$branch
+yo	+	p(1,1)
+	$root
+	$end
+
+outsider* $proc
+*	$tree
+	+	outsider(1, 1)
+	$root
+	$end
+
+well	$tree
+switch	$res	1
+blech	$branch
+	$res	7
+blas
+	$root
+come	$branch
+first	insider	1
+second	insider 2
+third	outsider 3
+	$root
+last
+	$root
+
+	+	well:blech
+	+	well:come:first
+	+	well:come:second
+	+	well:come:third
+	+	well:last
+
+

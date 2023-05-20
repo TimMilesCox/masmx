@@ -1,0 +1,16 @@
+__giant	$set	1
+	$include	"../aside.dem/ppc_64.def"
+	$include	"../aside.dem/enter64a.def"
+__base36 $equ	0x00444400000e4040
+$(.literal::*__base36,30/__literal)
+$(.data::*0x00444400000e4000)
+gotcha*	$res	16
+wonderloaf      "wonderloaf"
+
+$(.text::*0x00444400000f4000)
+zoohoo*	enter64	32
+	ld	r7, __literal(wonderloaf:d)
+	ld	r0, __literal(fireup:d)
+	mtlr	r0
+	blrl
+	leave64

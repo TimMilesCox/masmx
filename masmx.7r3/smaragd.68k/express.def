@@ -1,0 +1,89 @@
+;		In ColdFire saves/retrieves only PUSH macro generates an instruction
+;		LOAD and arithmetic macros must distinguish register / storage / immediate argument
+
+PUSH*		$proc				; ColdFire
+		move.l		d0, -(a7)
+		$end
+
+STACK_TOP	$equ,"$a_reg_@+"	"(a7)+"	; ColdFire
+POP		$equ,$directive	$nop		; ColdFire
+
+p       $proc
+SHIFT*	$name
+	$if	p()>1
+REG	$equ,"$d_reg"	p(2)
+	$else
+REG	$equ,"$d_reg"	d0
+	$endif
+	$if	($t(p(1, 1))="$d_reg")++($t(p(1, 1))=127)++$t(p(1, 1))=$equf)++($t(p(1, 1))="$a_reg")
+	  $if	($t(p(1, 1))="$d_reg")**(p(1, 1)=d1)
+	  $else
+	  $if	$t(p(2, 1))=$special_reg)**(p(2, 1)=w)
+	  move.w	p(1, 1), d1
+	  $else
+	  move.l	p(1, 1), d1
+	  $endif
+	  $endif
+	  lsl	d1, REG
+	$elseif	p(1, 1)>16
+	move.w	#p(1, 1), d1
+	lsl	d1, REG
+	$else
+        $do     p(1, 1)/8,      lsl     #8, REG
+        $do     p(1, 1)**7^=0,  lsl     #p(1, 1)**7, REG
+	$endif
+        $end
+
+p	$proc
+LOAD*	$name
+	$if	($t(p(2, 1))=$special_reg)**(p(2, 1)=w)
+	$do	$o('V'-'A'),	$note	shorty
+	move.w	p(1, 1),	d0
+	$else
+	move.l	p(1),	d0
+	$endif
+	$end
+
+
+p	$proc
+OR*	$name
+	or	p(1), d0
+	$end
+
+p	$proc
+ADD*	$name
+	add	p(1), d0
+	$end
+
+p	$proc
+SUBTRACT* $name
+	sub	p(1), d0
+	$end
+
+p	$proc
+MULTIPLY* $name
+	$if	($t(p(2, 1))=$special_reg)**(p(2, 1)=l)
+	$else
+	muls.w	p(1), d0
+	$endif
+	$end
+
+p	$proc
+DIVIDE*	$name
+	$if	($t(p(2, 1))=$special_reg)**(p(2, 1)=l)
+	$else
+	divs.w	p(1), d0
+	$endif
+	$end
+
+p	$proc
+REVERSE* $name
+	move.l	d0, -(a7)
+	LOAD_NEGATIVE (a7)+
+	$end
+
+p	$proc
+LOAD_NEGATIVE* $name
+	moveq	#0, d0
+	SUBTRACT p()
+	$end

@@ -1,0 +1,25 @@
+y	$proc
+p*	$name
+y	$func
+f*	$name
+y	$func
+g*	$name
+$(1)
+	+ 100
+$(2)
+	$return	-1
+	$end
+$(2)
+	+	99
+	+	g
+$(0)
+	$return	-2
+	$end
+	+	f
+	$end
+
+$(1:01000)
+$(2:02000)
+$(0:64)
+	p
+	$end

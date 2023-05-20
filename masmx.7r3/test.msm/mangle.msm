@@ -1,0 +1,72 @@
+$(3:*4)
+dingle + 5
+$(4:*4)
+jingle + 5
+
+$(1:0100)
+
+bingle $set dingle+boogle
+ningle $set 0+dingle+boogle
+.pingle $set dingle+jingle
+tingle $set jingle+zoogle+0
+wingle $set 0+zoogle+jingle
+.wongle $set zoogle+boogle
+ + bingle
+ + 0+bingle
+ + bingle+0
+ + ningle
+ + 0+ningle
+ + ningle+0
+ + pingle
+ + 0+pingle
+ + pingle+0
+ + tingle
+ + 0+tingle
+ + tingle+0
+ + wingle
+ + 0+wingle
+ + wingle+0
+ + wongle
+ + 0+wongle
+ + wongle+0
+	+	dingle+boogle
+	+	dingle+jingle
+	+	boogle+zoogle
+$(1:0200)
+
+bingle $set dingle-boogle
+ningle $set 0-dingle-boogle
+.pingle $set dingle-jingle
+tingle $set jingle-zoogle+0
+wingle $set 0+zoogle-jingle
+.wongle $set zoogle-boogle
+ + bingle
+ + 0+bingle
+ + bingle+0
+ + ningle
+ + 0+ningle
+ + ningle+0
+ + pingle
+ + 0+pingle
+ + pingle+0
+ + tingle
+ + 0+tingle
+ + tingle+0
+ + wingle
+ + 0+wingle
+ + wingle+0
+ + wongle
+ + 0+wongle
+ + wongle+0
+	$end
+	+	dingle-boogle
+	+	dingle-jingle
+	+	boogle-zoogle
+	+	jingle-jingle
+	+	zoogle-zoogle
+rangle	$set	5+boogle-boogle
+bangle	$set	dingle-dingle-5
+	+	rangle-1
+	+	1+bangle
+
+ $end

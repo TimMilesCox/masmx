@@ -1,0 +1,12 @@
+__giant	$set		1
+	$include	"ppc64map.def"
+	$list		 1
+
+.	$set_option	"b"
+
+	$path			test.txo
+
+	$include,$binary	image7
+	$include,$binary	gzactor
+
+	$store			test.txo/image8

@@ -1,0 +1,32 @@
+
+f		$func
+fieee754_24*	$name	8*/8++24
+fieee754_32*	$name	9*/8++32
+fieee754_64*	$name	12*/8++64
+fieee754_128*	$name	16*/8++128
+
+__BITS		$set	f(0, 0)**255
+__CHARACTERISTIC_BITS	$set	f(0, 0)/*8
+__MANTISSA_BITS	$set	__BITS-__CHARACTERISTIC_BITS
+
+		$nop	size and rounding are already done from the field size+1
+		$nop	isolate the sign and set exponent.mantissa to magnitude
+
+__NUMBER	$set,__BITS+1	f(1, 1)
+__SIGNS		$set	__NUMBER*/-__BITS
+__NUMBER	$set	__NUMBER--__SIGNS
+
+		$do	$o('V'),	$snap	2
+
+		$nop	adjust the characteristic magnitude
+		$nop	truncate the integer bit. slide the exponent over it
+
+		$do	__NUMBER^=0,__NUMBER	$set	__NUMBER-(2*/__MANTISSA_BITS+1)
+
+
+		$return	__SIGNS**1*/__BITS-1++|
+			(__NUMBER/*__MANTISSA_BITS+1)*/__MANTISSA_BITS++|
+			__NUMBER**((1*/__MANTISSA_BITS)-1)
+
+		$end
+

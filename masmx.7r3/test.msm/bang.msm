@@ -1,0 +1,27 @@
+	$path		../smaragd.68k
+	$include	coldfire.def
+	$path
+
+$(6:060000)
+Bang	$branch
+mono	$branch
+	125000
+	$root
+stereo	$branch
+left	500000
+right	500000
+	$root
+	$root
+Olufsson $branch
+	10q
+stereo	$branch
+left	1000000
+right	2000000
+	$root
+veryo	$branch
+left	1250000
+right	2500000
+centre	3750000
+	$root
+	$root
+

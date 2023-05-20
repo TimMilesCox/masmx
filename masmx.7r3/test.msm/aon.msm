@@ -1,0 +1,15 @@
+        $byte   24
+        $data_code  'a', 'a'*/16,'b'*/16,'c'*/16,-1 'z', 0aaaaaa
+
+        $data_code  48, 'a','b'
+
+	"abc031z"
+x       $do     26, $data_code 061+x-1, (061+x-1)*/8)
+
+	$if	$o(07a)
+	$data_code	'c', -1
+	$else
+        $data_code  063, -1
+	$endif
+
+        "abcdefghijklmnopqrstuvwxyz"

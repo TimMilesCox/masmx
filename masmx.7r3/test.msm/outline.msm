@@ -1,0 +1,24 @@
+p*       $proc
+        +       0aaaaaaaaaaaa:d
+        $end
+
+q*      $proc   $(20)
+        +       0bbbbbbbbbbbb:d
+        $note   because it's not in the inline location counter
+        $end
+
+f       $func
+legal*   $name   1 
+illegal* $name   2
+        $if     $n=2
+        p
+        $else
+        $note   the function-generated constant below is legal 
+        q
+        $endif
+        $return -8
+        $end
+
+        +       $, illegal():d
+        $plist	7
+        +       legal(), $:d

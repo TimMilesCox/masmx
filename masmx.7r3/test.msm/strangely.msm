@@ -1,0 +1,29 @@
+$(3:*8)
+hoogoo	+	99
+
+$(7:*8,44)
+zingaro	+	1.5
+
+$(0:256)
+
+	+	hoogoo
+	+	zingaro
+	+	$a(zingaro)
+
+oso	$equf	hoogoo, 10
+soso	$equ	hoogoo
+
+yoho	$equf	zingaro, 11
+yoso	$equ	zingaro
+
+just_u	$equf	$a(zingaro), 12
+justso	$equ	$a(zingaro)
+
+	+	oso
+	+	soso
+	+	yoho
+	+	yoso
+	+	just_u
+	+	justso
+
+

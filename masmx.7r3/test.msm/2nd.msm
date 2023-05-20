@@ -1,0 +1,7 @@
+$(ram)
+times   $do     30,space2(times)        $res    4*times
+$(static)
+times   $do     24,p2(times)            +       space2(times)
+$(text)
+        +       $string("string2")
+times   $do     12,d2(times)            +       p2(times)

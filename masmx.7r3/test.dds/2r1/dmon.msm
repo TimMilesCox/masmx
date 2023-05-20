@@ -1,0 +1,216 @@
+MSG_RAMREPORT   EQU 138
+MSG_RAMSET      EQU 139
+MSG_RAMSNAP     EQU 140
+
+MSG_iRAMREPORT  EQU 141
+MSG_iRAMSET     EQU 142
+MSG_iRAMSNAP    EQU 143
+
+
+MSG_SFReport    EQU 144
+
+
+DMON_Local:
+        inc     dptr
+        inc     dptr
+        movx    a,@dptr
+
+
+        cjne    a,#MSG_RAMREPORT,MON_NotRamReport
+
+        inc     dptr
+        movx    a,@dptr                 ; read address upper
+        mov     b,a                     ; set aside
+        inc     dptr
+        movx    a,@dptr                 ; read address lower
+        mov     dpl,a                   ; set acquisition address
+        mov     dph,b
+        movx    a,@dptr                 ; read desired object
+
+        mov     dptr,#host_buffer+9     ;
+        movx    @dptr,a                 ; write to host buffer
+
+        mov     a,#4
+        jmp     MON_Completion
+       
+MON_NotRamReport:
+        cjne    a,#MSG_RAMSET,MON_NotRamSet
+
+        inc     dptr                    ; move on from message type
+        movx    a,@dptr                 ; load address upper
+        mov     b,a                     ; set aside
+        inc     dptr                    ; move on
+        movx    a,@dptr                 ; load address lower
+        push    acc                     ; set aside
+        inc     dptr                    ; move on
+        movx    a,@dptr                 ; read store value
+        pop     dpl                     ; retrieve address lower
+        mov     dph,b                   ; retrieve address upper
+        movx    @dptr,a                 ; write intended value
+
+        mov     a,#4        
+        jmp     MON_Completion
+
+MON_NotRamSet:
+        cjne    a,#MSG_RAMSNAP,MON_NotRamSnap
+
+        mov     dpsel,#0                ; make no external assumption
+
+        mov     dptr,#host_buffer+7
+        movx    a,@dptr                 ; read address upper
+        mov     b,a                     ; set aside
+        inc     dptr                    ; move on
+        movx    a,@dptr                 ; read address lower
+
+
+        push    acc                     ; set aside
+        inc     dptr                    ; move on
+        movx    a,@dptr                 ; read byte count
+        pop     dpl                     ; retrieve address lower
+        mov     dph,b                   ; retrieve address upper
+        mov     b,a                     ; set aside the byte count
+        add     a,#4                    ; and convert it to a message length
+        mov     r7,a                    ; + message_type + address[2] + bcount
+
+        mov     dpsel,#1                ; assume normal operation was dptr0
+        push    dph                     ; borrow dptr1
+        push    dpl
+        mov     dptr,#host_buffer+10    ; as string pointer into message buff
+
+MON_RamSnapL1:
+        mov     dpsel,#0                ; point to the target data 
+        movx    a,@dptr                 ; read it
+        inc     dptr                    ; advance
+        mov     dpsel,#1                ; point to the message area
+        movx    @dptr,a                 ; write it
+        inc     dptr                    ; advance
+        djnz    b,MON_RamSnapL1         ; loop
+        pop     dpl                     ; restore dptr1
+        pop     dph
+        mov     dpsel,#0
+        
+        mov     a,r7
+        jmp     MON_Completion
+
+MON_NotRamSnap:
+        cjne    a,#MSG_iRAMREPORT,MON_NotiRamReport
+
+        inc     dptr                    ; move on from message type
+        movx    a,@dptr                 ; load address
+        mov     r0,a                    ; cursor
+        inc     dptr                    ; move on
+        mov     a,@r0                   ; read target value
+        movx    @dptr,a                 ; into original messsage buffer
+        mov     a,#3                    ; message_type + address[1] + value
+        jmp     MON_Completion
+
+
+MON_NotiRamReport:
+        cjne    a,#MSG_iRAMSET,MON_NotiRamSet
+
+        inc     dptr                    ; move on from message type
+        movx    a,@dptr                 ; load address
+        mov     r0,a                    ; cursor
+        inc     dptr                    ; move on
+        movx    a,@dptr                 ; read store value
+        mov     @r0,a                   ; write intended value
+
+        mov     a,#3                    ; message_type + address[1] + value
+        jmp     MON_Completion
+
+MON_NotiRamSet:
+        cjne    a,#MSG_iRAMSNAP,MON_NotiRamSnap
+
+        inc     dptr                    ; move on from message type
+        movx    a,@dptr                 ; read address
+        mov     r0,a                    ; cursor
+        inc     dptr                    ; move on
+        movx    a,@dptr                 ; read byte count
+        inc     dptr                    ; move to message readout area
+        mov     b,a                     ; set aside the byte count
+        add     a,#3                    ; and convert it to a message length
+        mov     r7,a                    ; + message_type + address[1] + bcount
+
+MON_iRamSnapL1:
+        mov     a,@r0                   ; read iram
+        inc     r0                      ; advance
+        movx    @dptr,a                 ; write message buffer
+        inc     dptr                    ; advance
+        djnz    b,MON_iRamSnapL1        ; loop
+
+        mov     a,r7
+        jmp     MON_Completion
+
+MON_NotiRamSnap:
+        cjne    a,#MSG_SFReport,MON_NotSFReport
+
+        inc     dptr                    ; move on from message type
+        
+        mov     a,080h                  ; P0
+        movx    @dptr,a
+        inc     dptr
+        
+        mov     a,090h                  ; P1
+        movx    @dptr,a
+        inc     dptr
+
+        mov     a,0A0h                  ; P2
+        movx    @dptr,a
+        inc     dptr
+
+        mov     a,0B0h                  ; P3
+        movx    @dptr,a
+        inc     dptr
+
+        mov     a,0E8h                  ; P4
+        movx    @dptr,a
+        inc     dptr
+
+        mov     a,0F8h                  ; P5
+        movx    @dptr,a
+        inc     dptr
+
+        mov     a,IEN0
+        movx    @dptr,a
+        inc     dptr
+        
+        mov     a,IEN1
+        movx    @dptr,a
+        inc     dptr
+
+        mov     a,09Ah                  ; IEN2
+        movx    @dptr,a
+        inc     dptr
+
+        mov     a,0A9h                  ; IP0
+        movx    @dptr,a
+        inc     dptr
+
+        mov     a,0B9h                  ; IP1
+        movx    @dptr,a
+        inc     dptr
+
+        mov     a,0C0h                  ; IRCON
+        movx    @dptr,a
+        inc     dptr
+
+
+        
+        mov     a,#13                   ; message code + data[12]
+        jmp     MON_Completion
+
+
+MON_NotSFReport:
+        clr     a
+        ret
+
+MON_Completion:
+        mov     dptr,#host_buffer+5
+        movx    @dptr,a
+        add     a,#3
+        mov     r7,a
+        ret
+
+        END
+
+

@@ -1,0 +1,22 @@
+	$include	"ppc64map.def"
+$(1::*0a000000000000)
+$(3::*0b000000000000)
+$(5::*0c000000000000)
+$(6::*0d000000000000)
+$(36::*0e000000000000)
+	$list		2
+
+	$path		test.txo
+
+	$include,$binary gsoso
+$(1)
+	$res	256
+$(3)
+	$res	256
+$(5)
+	$res	256
+$(6)
+	$do	64,	+	99
+.$(0)
+	$include,$binary	gfactor
+	$store			test.txo/intune

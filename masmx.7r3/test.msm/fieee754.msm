@@ -1,0 +1,10 @@
+	$word		32
+	$cont_char	'|'
+	$set_option	"F"
+
+	$list		2
+	$include	fieee754.def
+
+	+	fieee754_24(-0.0), fieee754_24(1.6), fieee754_24(1.7), fieee754_24(1.8), |
+		fieee754_24(1.9), fieee754_24(-2.0), fieee754_24(2.1), fieee754_24(0.1)x:h
+

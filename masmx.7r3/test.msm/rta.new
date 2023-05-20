@@ -1,0 +1,304 @@
+r       $equ    0
+k       $equ    1
+x       $equ    2
+y       $equ    3
+a       $equ    4
+b       $equ    5
+p	$equ	12
+q	$equ	13
+sp      $equ    14
+dp      $equ    15
+
+w0      $equ    0
+t1      $equ    1
+t2      $equ    2
+t3      $equ    3
+i       $equ    4
+xi      $equ    5
+
+h1      $equ    t2
+h2      $equ    t3
+
+i$      $form   5, 3, 1, 15
+i$x     $form   5, 3, 1, 3, 12
+i$a	$form	5, 3, 16
+
+p       $proc
+sr*     $name   0
+sk*     $name   1
+sx*     $name   2
+sy*     $name   3
+sa*     $name   4
+sb*     $name   5
+z*      $name   6
+t*      $name   7
+lr*     $name   8
+lk*     $name   9
+lx*     $name   10
+ly*     $name   11
+la*     $name   12
+lb*     $name   13
+inc*    $name   14
+dec*    $name   15
+or*     $name   16
+orB*    $name   17
+and*    $name   18
+andB*   $name   19
+xor*    $name   20
+ta*     $name   21
+ax*     $name   22
+ay*     $name   23
+aa*     $name   24
+ab*     $name   25
+ana*    $name   26
+anb*    $name   27
+m*      $name   28
+mf*     $name   29
+d*      $name   30
+push*   $name   31
+
+operand	$set	p(1, 1)
+index	$set	p(1, 2)
+jdesignator $set p(0, 2)
+jdesignator $set	jdesignator++p(1, 3)
+indirection $set	p(1, *1)
+
+	$if	jdesignator=xi
+	 $if	index
+	  $flag indexing not allowed with sign extended immediate
+	 $endif
+	 $if	indirection
+	  $flag indirection not allowed with sign extended immediate
+	 $endif
+	 $do	$net(operand)<-32768,	$flag sign extended immediate too low
+	 $do	$set(operand)>32767,	$flag sign extended immediate too high
+	 i$a	$n, xi, operand
+        $elseif index
+        i$x     $n, jdesignator, 1, $index(index), $address12(operand)
+        $else
+        i$      $n, jdesignator, indirection, $address15(p(1, 1))
+        $endif
+        $end
+
+p       $proc
+ina*    $name   0
+inb*    $name   1
+outa*   $name   2
+outb*   $name   3
+plva*   $name   4
+
+sabr*   $name   6
+sbbr*   $name   7
+fsabr*  $name   14
+fsbbr*  $name   15
+
+        $if     p(1, 2)
+        i$x     $n, i, 1, $index(p(1, 2)), $address12(p(1, 1))
+        $else
+        i$      $n, i, p(1, *1), $address15(p(1, 1))
+        $endif
+        $end
+
+
+see$1   $equ    1*/14
+see$2   $equ    1*/13
+see$3   $equ    1*/12
+see$4   $equ    1*/11
+see$5   $equ    1*/10
+see$6   $equ    1*/9
+see$7   $equ    1*/8
+half$w  $equ    1*/7
+fraction$ $equ	1*/6
+
+
+carry$  $equ    1*/4
+sign$   $equ    1*/3
+zero$   $equ    1*/2
+parity$ $equ    1*/1
+odd$    $equ    1
+
+p       $proc
+on*     $name   0
+off*    $name   1
+ask*	$name	2
+
+ii*     $name   4
+ir*     $name   5
+lret*   $name   6
+fret*   $name   7
+
+        $if	p(1, 2)++p(1, *1)
+        $flag	no indexing or indirection with this instruction
+        $flag	only sign extended immediate 16-bit operand possible
+        $endif
+        i$a     $n, xi, p(1, 1)
+        $end
+
+i$2a    $form   5, 3, 1, 7, 8 
+
+p       $proc
+l*      $name   14
+_ax*    $name   15
+
+        $if     (p(0, 2)=xi)++(p(1, 3)=xi)
+        i$2a    $n, xi, 1, p(1, 1), p(1, 2)
+        $else
+        i$2a    $n, xi, 0, p(1, 1), p(1, 2)
+        $endif
+        $end
+
+p       $proc
+
+sar*    $name   0
+sbr*    $name   1
+dsr*    $name   2
+lcal*   $name   3
+
+sal*    $name   4
+sbl*    $name   5
+dsl*    $name   6
+
+rar*    $name   8
+rbr*    $name   9
+drr*    $name   10
+
+ral*    $name   12
+rbl*    $name   13
+drl*    $name   14
+j*      $name   15
+
+saa*    $name   16
+sba*    $name   17
+dsa*    $name   18
+
+jdr*    $name   20
+jdk*    $name   21
+jnc*    $name   22
+jc*     $name   23
+
+jp*     $name   24
+jm*     $name   25
+jnz*    $name   26
+jz*     $name   27
+
+jpe*    $name   28
+jpo*    $name   29
+je*     $name   30
+jo*     $name   31
+
+        $if     p(1, 2)
+        i$x     $n, 6, 1, $index(p(1, 2)), $address12(p(1, 1))
+        $else
+        i$      $n, 6, p(1, *1), $address15(p(1, 1))
+        $endif
+        $end
+
+
+p       $proc
+
+ts*     $name   0
+n*      $name   1
+sim*	$name	2
+labt*   $name   3
+
+qpush*	$name   4
+qpop*	$name   5
+go*     $name   6
+call*   $name   7
+
+qs*     $name   8
+ql*     $name   9
+flp*    $name   10
+dpx*    $name   11
+
+fa*     $name   12
+fan*    $name   13
+fm*     $name   14
+fd*     $name   15
+
+pop*	$name	16
+mlb*	$name	17
+qa*	$name	18
+ex*	$name	19
+
+dlsc*   $name   20
+mta*    $name   21
+sc*     $name   22
+lc*     $name   23
+
+ds*     $name   24
+dl*     $name   25
+da*     $name   26
+dan*    $name   27
+
+lsc*    $name   28
+dtab*   $name   29
+src*    $name   30
+slc*    $name   31
+
+operand	$set	p(1, 1)
+index	$set	p(1, 2)
+
+        $if     index
+        i$x     $n, 7, 1, $index(index), $address12(operand)
+        $else
+        i$      $n, 7, p(1, *1), $address15(operand)
+        $endif
+        $end
+
+f	$func
+"$address15"* $name
+offset	$set	f(1, 1)
+	$do	$t(f(1,1))=$equf,;
+offset	$set	offset**((1*/31)-1)
+	$if	f(1, *1)
+.        $do	$net(offset**0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF)>8191,	;
+
+	$do	$net(offset)>8191,	;
+         $flag  indirection only on words 0 to 8191
+        $else
+        $do	$net(offset)>32767,	;
+         $flag  direct addressing only 0 to 32767
+        $endif
+       	$return	offset
+	$end
+        
+f	$func
+"$address12"* $name
+offset	$set	f(1, 1)
+        $do	$net(offset)>4095,	;
+         $flag  base-displacement addressing only index + 0 to 4095
+       	$return	offset
+	$end
+
+f	$func
+"$index"* $name
+	$do	f(1,*1),	 ;
+	 $note  *flag on index value has no effect
+	$do	(f(1,1)>15)++(f(1,1)<2)++((f(1,1)>5)**(f(1,1)<14)),	;
+	 $flag	only registers x,y,a,b,dp,sp (2,3,4,5,14,15) may be used for indexing
+	$return	f(1, 1)	
+	$end
+
+        $set_option "a"
+
+f	$func
+"$bank_address"* $name
+
+	$if	f(1,1)<262144
+base	$set	f(1,1)/*12
+offset	$set	f(1,1)**4095
+	$else
+	$return	f(1,1)
+	$endif
+
+	$return base*/18++offset
+	$end
+	
+	$if	0
+f	$func
+"$subfield"* $name
+v	$set	f(1, 1)
+	$return	f(0, v)**((1*/31)-1)
+	$end
+	$endif

@@ -1,0 +1,63 @@
+	$list	0
+        $include   "8051.def"
+	$list
+
+LSR_RDR EQU     0       ; Data In Receive FIFO
+
+serial*  $proc  	$(2)
+        $res    (($+15)**-16)-$
+*       $tree          
+rhr
+thr     $res    1
+ier     $res    1
+isr     $res    1
+lcr     $res    1
+mcr     $res    1
+lsr     $res    1
+msr     $res    1
+spr     $res    1
+        $root
+        $end
+
+'$bit'*	$func
+	$do	$bit(1,1:1)<128,	$return (($bit(1,1:1)**31)*/3)++$bit(1,1:2)
+	$return	$bit(1,1:1)++$bit(1,1:2)
+	$end
+
+generate* $proc *
+Sample:
+        jb      $bit(FULL.device),leave ; Is there any buffer space?
+        mov     dptr,#uart(device).lsr  ; Is there data on COM1 input FIFO?
+        movx    a,@dptr
+        jnb     $bit(acc.LSR_RDR), Leave; No more so Next UART
+        mov     dptr,#uart(device).rhr  ; Yes
+        movx    a,@dptr                 ; Read
+        mov     dptr,#buffer(device)    ; Find Place in Circular Input Buffer
+        mov     dpl,write_cursor(device); By Means of the Running Cursor
+        movx    @dptr,a                 ; Write the Data to XRAM
+        inc     write_cursor(device)    ; Advance the Input Cursor
+        mov     a,read_cursor(device)   ; If write starts to equal read
+        cjne    a,write_cursor(device),Sample ; Is there any more? 
+        setB    $bit(FULL.device)       ; Stop reading from FIFO to XRAM
+leave:       
+        $end
+
+
+DEVICES equ     128
+DATA    equ     1024
+TOTAL   equ     4
+RTVARS  equ     64
+FULL    equ     32
+
+$(3:RTVARS)
+device  $do     TOTAL,write_cursor(device)      $res    1
+device  $do     TOTAL,read_cursor(device)       $res    1
+$(2:DEVICES)
+device  $do     TOTAL,uart(device)              serial
+$(1:DATA)
+device  $do     TOTAL,buffer(device)            VAR    256
+
+
+$(0:64)
+device	$do	TOTAL,	generate
+

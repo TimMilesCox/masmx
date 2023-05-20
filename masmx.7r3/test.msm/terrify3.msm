@@ -1,0 +1,18 @@
+        $include        "../aside.dem/ppc_603.def"
+
+SEGMENT .equ    511*1024
+$(48::SEGMENT,r15)
+part1   +       2048*2048d
+part2   +       100d
+part3   $res    2048*2048-16
+
+	+	.absolute(part1)
+
+$(0:3*65536)
+start   oris    r15,, SEGMENT@ha     
+        ori     r15, r15, SEGMENT@l 
+        lwz     r3, part1
+        lwz     r4, part2
+        lwz     r5, part3
+        blr
+        $end    start

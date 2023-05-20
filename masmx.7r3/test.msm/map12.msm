@@ -1,0 +1,3 @@
+	$include		"map_ppc.def"
+	$include,$binary	../result.txo/map2
+	$include,$binary	../result.txo/zactor

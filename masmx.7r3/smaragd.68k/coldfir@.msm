@@ -1,0 +1,232 @@
+	$include	"coldfire.def"
+
+__LINK_POINTER	$equ,"$a_reg"	6
+__TCB_LOCATION	$equ		0
+
+
+CPUS		$set	1
+PRIORITIES	$set	8
+IDLE_STACK	$set	64
+
+
+        $do     $o('i')=0,	$list   -1
+
+	$do     $o('l'),        $note	listing off
+	$do     $o('l'),        $note	after all, the kernel structures aren't interesting
+
+	$store	yield@
+
+f	$func
+flog*	$name
+	$do	PRIORITIES=8,	$return	3+2-1
+	$do	PRIORITIES=64,	$return	6+2-1
+	$do	PRIORITIES=256,	$return	8+2-1
+	$flag	priorities may only be 8 or 64 or 256
+	$return	0
+	$end
+
+p	$proc
+activity_control_table*	$name
+*	$tree
+	$do	IDLE_STACK/4,	+	0xa5a5a5a5:d
+
+frame	trap_return_frame	p(1, 1)
+link_root			+	0:d
+
+initial_a6			$set	link_root
+initial_a7			$set	frame
+
+tcb	task_control_block	p(2)	|
+				initial_a6, initial_a7
+	$root
+	$end
+
+p	$proc
+task_control_block*	$name
+*	$tree
+h	task_control_block_head	p(1)
+
+genregs
+	$do	8,	+	0:d
+a_reg_0
+	$do	6,	+	0:d
+a_reg_6			+	p(2, 1):d
+a_reg_7			+	p(2, 2):d
+delta			+	0:d
+bank_list		+	0:d	
+	$root
+	$end
+
+p	$proc
+trap_return_frame* $name
+*	$tree
+format_offset	+	0x4020
+save_sr		+	0
+transfer	+	p(1, 1):d
+	$root
+	$end
+
+p	$proc
+task_control_block_head*	$name
+*	$tree
+next	+	p(1, 1):d
+priority +	p(1, 2):d
+state	+	p(1, 3):d
+base	+	p(1, 4):d
+	$root
+	$end
+
+p	$proc
+tailx*	$name
+*	$tree
+
+next1	$set	qtailx(1)
+	$do	index<PRIORITIES,next1	$set	qtailx(index+1)
+	$do	index=PRIORITIES-1,next1 $set	itask(1).tcb.h
+
+uplink	$set	qtailx(PRIORITIES)
+	$do	index>1,uplink		$set	qtailx(index-1)
+	$do	index=PRIORITIES,uplink	$set	itask(CPUS).tcb.h
+
+h	task_control_block_head	next1, index-1, -1, uplink
+
+	$root
+	$end
+
+p	$proc
+idle_task* $name
+
+next1	$set	qtailx(PRIORITIES)
+	$do	index<CPUS,next1	$set	itask(index+1).tcb.h
+
+*	activity_control_table	idle	next1, PRIORITIES-1, 0, 0	
+	$end
+
+$(67,a1)
+tcb	task_control_block
+
+$(3:*4)
+index	$do	PRIORITIES,qtailx(index)	tailx
+index	$do	CPUS,itask(index)		idle_task
+qaside_h* +	0:d
+qaside_t* +	0:d
+
+$(0:1024)
+	$list	1
+
+	move	a0, a7@-
+	bsr	p_tcb
+
+	movem	d0-a6, [tcb.genregs, a0]
+
+	move	a0, a1
+	move	a7@+, a0
+	move	a0, [tcb.a_reg_0, a1]
+	move	a7, [tcb.a_reg_7, a1]
+
+	move	[tcb.h.priority, a1], d0
+
+	bmi	qaside	$8_bits
+	cmpi	#PRIORITIES-1, d0
+	bgt	qaside	$8_bits
+
+
+        $do     $o('i')=0,      $list   -1
+
+	$do     $o('l'),        $note	listing off
+	$do     $o('l'),        $note	after all, the context switch isn't interesting
+
+	lsl	#4, d0
+	move	#qtailx(1), a2
+
+	adda	d0, a2				; next
+	move	[tcb.h.base, a2], a0		; last
+
+	move	a1, [tcb.h.next, a0]
+	move	a2, [tcb.h.next, a1]
+	move	a1, [tcb.h.base, a2]
+	
+pick	move	#qtailx(PRIORITIES), a1
+next	move	a1, a0
+	move	[tcb.h.next, a1], a1
+
+	tst	[tcb.h.state, a1]
+	bne	next
+
+	move	[tcb.h.next, a1], a2
+	move	a2, [tcb.h.next, a0]
+
+	tst	[tcb.h.state, a2]
+	bpl.b	not_last
+	move	a0, [tcb.h.base, a2]
+not_last
+	$list	1
+
+	movem	[tcb.genregs, a1], d0-a7
+	rte
+
+
+
+qaside	tst	(qaside_h).l
+	beq	first	$8_bits
+	move	(qaside_t).l, a0
+	move	a1, [tcb.h.next, a0]
+	bra	last	$8_bits
+first	move	a1, (qaside_h).l 	
+last	move	a1, (qaside_t).l
+	bra	pick
+
+
+	$if	__LINK_POINTER
+
+	$do	$t(__LINK_POINTER)^=$a_reg,	|
+	$flag	__LINK_POINTER should be a6 or similar
+
+;	this is callable from c and returns pointer to tcb
+;	it requires that applications do not use stack frame
+;	link register (often a6) for anything else
+
+;	it does not matter if functions do not use stack
+;	frames at all. It matters that nothing but LINK and UNLK
+;	instructions should change the link register
+
+p_tcb*	move	d0, a7@-
+
+	move	__LINK_POINTER, a0
+	bra	again?	$8_bits
+again!	move	d0, a0
+again?	move	a0@+, d0
+	bne	again!
+
+	move	a7@+, d0
+	rts
+
+
+	$elseif	__TCB_LOCATION
+
+;	this is callable from c and returns pointer to tcb
+;	if compilers can be directed to spare an address register,
+;	possibly a5 or a4, then __TCB_LOCATION can be that register
+;	and the encoding at the head of the assembly would be as
+;
+;	__LINK_POINTER	$equ		0
+;	__TCB_LOCATION	$equ,$a_reg	a5
+;
+;	otherwise __TCB_LOCATION may be a longword in RAM
+;	linked in location counter 3 (static data), but not if
+;	more than one core is running in the execution space
+
+	$if	$t(__TCB_LOCATION)=$a_reg
+	$note	tcb pointer is an address register
+	$else
+	$note	tcb pointer is not at address register
+	$endif
+
+p_tcb*	move	__TCB_LOCATION, a0
+	rts
+
+	$else
+
+	$flag	you must have __LINK_POINTER or __TCB_LOCATION
+
+	$endif

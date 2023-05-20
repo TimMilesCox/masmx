@@ -1,0 +1,14 @@
+ $set_option "ln"
+ $awidth 31
+ $word 32
+ $awidth 31
+param $equf *99, 100, *101
+
+p* $proc
+ + p(1, *1), p(1, 1)
+ + p(1, *2), p(1, 2)
+ + p(1, *3), p(1, 3)
+ $end
+
+ p param
+ $end

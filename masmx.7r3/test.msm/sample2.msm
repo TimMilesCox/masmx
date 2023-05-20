@@ -1,0 +1,11 @@
+aa      $equ    99
+bb*     $proc
+index   $do     bb(1), "":bb(1,index):
+        ""
+        $end
+cc*     $proc
+        bb      "0aa"
+        $end
+
+        bb      "1bb":0a
+        cc

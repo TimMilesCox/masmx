@@ -1,0 +1,178 @@
+	$path		../smaragd.68k
+	$include	coldfire.def
+	$path
+	$include	ieee754.def
+
+	;	this demonstration code block
+	;	reads a string in ASCII or any other data code
+	;	and converts it to 64-bit floating in fp1
+
+	;	ColdFire floating instructions' ability
+	;	to convert and use 8/16/32-bit integer operands 
+	;	prompts this conversion directly from string
+	;	to double float. That is very feasible, so
+	;	there is no attempt to generate and then
+	;	convert a long long integer
+
+scale_10 $equ,$d_reg	d1
+
+$(0:262144,pc/$literal)
+
+s2double*
+	fmove.w		$literal(0), fp1
+	moveq		#0, scale_10	; decimal scale is accumulated here
+s2dscanforit
+	moveq		#0, d0
+	move.b		(a0)+, d0
+	beq		(eostringx).w
+	cmp.w		#' ', d0
+	beq		s2dscanforit	; walk any leading space
+					; if there are none it costs nothing
+
+	addi		#-'+', d0	; check for leading sign
+	beq.b		read_1st_digit
+	addi		#'+'-'-', d0
+	beq.b		s2dnegative
+	addi		#'-'-'0'-10, d0	; well was it a digit then?
+	bra.b		check_1st_digit
+
+s2dnegative
+	bsr.b		read_1st_digit	; read the number then switch polarity
+	fmul.w		$literal(-1), fp1 ; you can't just invert bits in fp1
+	rts
+
+read_1st_digit
+	moveq		#0, d0
+	move.b		(a0)+, d0
+	addi		#-'0'-10, d0	; first is it higher than '9' ?
+
+check_1st_digit
+	bcs.b		high
+	addi		#10, d0		; was it then lower than '0' ?
+	bcc.b		low
+integer	fadd.b		d0, fp1		; column 1 was in '0'..'9' and is now in 0..9
+	moveq.l		#0, d0
+	move.b		(a0)+, d0	; read next column
+	addi		 #-'0'-10, d0	; is it higher than '9' ?
+	bcs.b		high		; if so it's the end of the integral part
+	addi		#10, d0		; was it lower than '0' ?
+	bcc.b		low
+	fmul.w		$literal(10), fp1 . multiply the accumulation so far
+	bra		integer		; add the new stripped digit in 0..9
+
+	$if	'.'<'0'			; data code independent. If period < digit
+low	addi		#'0'-'.', d0	; is this the decimal point?
+	$else
+high	addi		#'0'+10-'.', d0	; otherwise if period > digit was this . ?
+	$endif
+	
+	beq.b		fraction	; whatever the data code, was that decimal point
+	addi		#'.'-'e', d0	; if it wasn't is this an exponent string?
+	bra.b		estring?
+
+fraction				; decimal point has been found
+	moveq.l		#0, d0		; read the fraction
+	move.b		(a0)+, d0
+	addi		#-'0'-10, d0	; higher than '9' ?
+	bcs.b		eofraction
+	addi		#10, d0		; lower than '0' ?
+	bcc.b		eofraction
+					; the accumulation attributes all columns to the
+	add		#-1, scale_10	; integral part, so keep track of the scale
+	fmul.w		$literal(10), fp1 ; multiply the accumulation by 10
+	fadd.b		d0, fp1		; add the stripped digit to it
+	bra		fraction	
+
+	
+	$if	'.'<'0'			; data code independent, if period < digit
+high					; byte was higher than a digit
+eofraction
+	addi		#'0'+10-'e', d0	; was it letter 'e' ?
+	$else				; periods are higher than digits
+low					; byte was lower than a digit
+eofraction
+	addi		#'0'-'e', d0	; so was it letter 'e' ?
+	$endif
+
+estring?
+	$if	'e'^='E'		; are there different code points for 'e' and 'E' ?
+	beq.b		estring!	; if there are and it was an 'e' you've found it
+	addi		#'e'-'E', d0	; otherwise was it an 'E' instead?
+	$endif
+
+	bne.b		eostring	; it wasn't any 'e' or 'E'
+estring!
+	move.l		scale_10, -(a7)	; yes it was, add the e+- number
+	bsr.b		string2i
+	add		(a7)+, scale_10	; to the scale we already have
+
+					; the exponent range [ -307 .. +307 ] (15 bits midpoint)
+					; is small enough to be handled in a table
+
+					; listing is off for the 615 constants at table_u
+					; generated with
+
+					; ?       $do     615,    ieee754_64      1.0e?-308
+
+					; you can't quite have
+					;	lea	(table_u+307*8-$-2, pc, scale_10.l*8), a0
+					; because table_u+307*8-$-2 is more than 255
+
+					; so we point a0 to the exponent factor in 2 instructions
+
+					; table_u is a base-displacement address
+					; with the meaning on reference
+					;	table_u-$-2, pc
+eostring
+	cmp.l		#-307, scale_10	; has the decimal exponent got too low?
+	bmi.b		outrange	; yes it has, NAN
+	cmp.l		#308, scale_10	; has it got too high?
+	bpl.b		outrange	; yes it has, NAN
+							; the exponent is in range
+	lea		table_u+307*8, a0		; point to the table location 1.0e0
+	lea		(0, a0, scale_10.l*8), a0	; add the accumulated scale to it
+	fmul.d		(a0), fp1	; multiply by [ 1.0e-307 .. 1.0e+307 ]
+
+eostringx
+	rts
+outrange				; score a NAN
+	fmove.d		$literal(-1q), fp1
+	rts
+
+string2i				; scan an integer for whatever purpose
+	moveq		#0, d1		; there won't be leading space however
+	moveq		#0, d0
+	move.b		(a0)+, d0
+	addi		#-'+', d0	; leading sign?
+	beq.b		istring_next
+	addi		#'+'-'-', d0
+	beq.b		istring_minus
+	addi		#'-'-'0'-10, d0	; well is it a digit?
+	bra.b		istring_digit?
+
+istring_minus				; scan the magnitude and negate it
+	bsr.b		istring_next
+	neg		d1
+	rts
+
+istring_next
+	moveq		#0, d0
+	move.b		(a0)+, d0
+	addi		#-'0'-10, d0	; is it > '9' ?
+istring_digit?
+	bcs.b		istring_end	; if so, not more
+	addi		#10, d0		; is it < '0' ?
+	bcc.b		istring_end	; if so no more
+	lsl		#1, d1		; multiply accumulation by 2
+	add		d1, d0		; add accumulation to stripped digit
+	lsl		#2, d1		; multiply accumulation by 4
+	add		d0, d1		; accumulation = accumulation * 10 + digit
+	bra		istring_next
+
+istring_end
+	rts
+					; the table is not quadword-aligned
+table_u					; but is only read once per conversion
+	$list	0
+?	$do	615,	ieee754_64	1.0e?-308
+	$list

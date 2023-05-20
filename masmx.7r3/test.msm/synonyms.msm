@@ -1,0 +1,20 @@
+	$res	4
+label(5000)
+label(5,1) $res	4
+label(1) $res	4
+label(2) $res	4
+label(3) $res	4
+label(4) $res	4
+	$do	$o('k'),label(5)
+
+.	+	label
+	+	label(2)
+	+	label(1)
+	+	label(5)
+	+	label()
+label(0,1)
+label(0,2)
+label(0,3)
+label(1,1)
+label(1,2)
+label(5,2)

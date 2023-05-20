@@ -1,0 +1,7 @@
+f*      $func
+label   $set    label+1
+        $snap   2
+        $return label
+        $end
+$(0:512)
+        +       f

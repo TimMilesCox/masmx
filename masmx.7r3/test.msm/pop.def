@@ -1,0 +1,26 @@
+	$if	$t(pop)=0
+pop*	$proc
+        $if     pop(1,1)<6
+          $if     pop(1,1)=r
+          lr    0, sp
+          $elseif pop(1,1)=k
+          lk    0, sp
+          $elseif pop(1,1)=x
+          lx    0, sp
+          $elseif pop(1,1)=y
+          ly    0, sp
+          $elseif pop(1,1)=a
+          la    0, sp
+          $else
+          lb    0, sp
+          $endif
+        _ax,xi  sp, 1
+        $else
+        push    r
+        lr      1, sp
+        sr      pop(1,1)
+        lr      0, sp
+        _ax,xi  sp, 2
+        $endif
+        $end
+	$endif

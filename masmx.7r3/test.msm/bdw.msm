@@ -1,0 +1,10 @@
+bdw     $form   24,12,6,6,48
+p       $proc   $(5)
+bd*     $name        
+        $byte   6
+        bdw     p(1, 1), 0, 0, p(1, 2), "p(1, 1)"
+        $byte   8
+        $end
+
+        bd      bank1, 3
+        bd      bank1001, 7

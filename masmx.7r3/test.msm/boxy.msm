@@ -1,0 +1,13 @@
+	$plist	4
+f       $func
+inbox*  $name
+        $return f(1, 1)*/24++f(1, #2)*/23++f(1, 2)
+        $end
+
+p       $proc
+loopity*        $name
+        +       inbox\p(1,1:1)
+        $end
+
+        loopity [14,#99]
+        $end

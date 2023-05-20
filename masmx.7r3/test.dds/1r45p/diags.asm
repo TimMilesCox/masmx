@@ -1,0 +1,829 @@
+;testing:
+;  cause error during cold boot section
+;  cause error during warm boot section
+;  cause error during rest of boot sequence
+;  cause error during main loop or procedure
+;  for each error, lose power during error handling
+;  for each fatal error, try OK and CANCEL options
+;  confirm quick priceplug changes dont fuck it all up
+;  confirm watchdog handling
+;  confirm manual reset handling
+
+
+;******************************************************************************
+;
+; File     : DIAGS.ASM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains the diagnostics and self test routines.
+;
+; System   : 80C537
+;
+; History  :
+;   Date     Who Ver  Comments
+;
+;******************************************************************************
+
+ ALIGN VAR,ToPage
+dia_boot_iram:		VAR 256		; 256 bytes of internal RAM
+dia_boot_dpsel:		VAR 1		; DPSEL reg
+dia_boot_sp:		VAR 1		; SP reg
+dia_boot_b:             VAR 1           ; B reg
+dia_boot_area:		VAR 1		; area diagnostics code
+dia_boot_powerup:	VAR 1		; hardware powerup status byte
+dia_boot_powerfail:     VAR 1           ; interrupt driven powerfail signal
+
+;******************************************************************************
+;
+; Function:	DIA_SaveBootInfo
+; Input:	See Description
+; Output:	?
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   This routine is directly jumped to from the cold boot sequence.
+;   No registers are modified before this routine is called.
+;   The routine saves all 256 bytes of internal ram, plus a few special
+;     function registers (SFRs) to a diagnostics area of onboard XRAM.
+;   Later on in the boot code, if the reason for cold boot is deemed to be
+;     anything other than a power up, the diagnostics area can be printed
+;     or thrown out the serial port for debugging.
+;
+;******************************************************************************
+
+DIA_SaveBootInfo:
+
+        mov     24+4,psw
+
+	ORL	PSW,#018h		; select reg bank 3
+
+        MOV     R2,A                    ; save ACC in regbank3.R4
+        mov     r3,b
+
+;       r4 = psw
+
+        mov     r5,dpsel
+        mov     r6,sp
+
+;       r7 is the index of the most recent interrupt
+
+        mov     dpsel,#0
+        mov     r0,#128+16              ; overwrite trailer of print field
+DIA_DPtrace:
+        mov     @r0,dph
+        inc     r0
+        mov     @r0,dpl
+        inc     r0
+        inc     dpsel
+        cjne    r0,#128+16+16,DIA_DPtrace
+
+        mov     dpsel,#0
+
+	MOV	A,P8			; save hardware
+        ANL	A,#7			; power up status
+        MOV	DPTR,#dia_boot_powerup	;
+        MOVX	@DPTR,A			;
+
+        MOV	DPTR,#SYS_MEM_AREACODE	; save sys_mem_areacode
+        MOVX	A,@DPTR			; into diagnostics area
+        MOV	DPTR,#dia_boot_area	;
+        MOVX	@DPTR,A			;
+
+        MOV	DPTR,#SYS_MEM_POWERFAIL	; save sys_mem_powerfail
+        MOVX	A,@DPTR			; into diagnostics area
+        MOV	DPTR,#dia_boot_powerfail;
+        MOVX	@DPTR,A			;
+        MOV     DPTR,#SYS_MEM_POWERFAIL ;
+        CLR     A
+        MOVX    @DPTR,A
+
+        MOV	DPTR,#SYS_MEM_AREACODE	; indicate now in coldboot code
+        MOV	A,#SYS_AREA_COLDBOOT	; (incase coldboot crashes - Yes
+        MOVX	@DPTR,A			;  we handle that case too !!)
+
+        MOV	R1,#0			; copy all 256 bytes of
+        MOV	R0,#0			; internal ram to external
+        MOV	DPTR,#dia_boot_iram	; onboard ram
+DIA_SBIloop:				;
+	MOV	A,@R0			;
+        INC	R0			;
+        MOVX	@DPTR,A			;
+        INC	DPTR			;
+        DJNZ	R1,DIA_SBIloop		;
+
+        MOV	A,DPSEL			; save SFR DPSEL reg
+        ANL	A,#07h			;
+        MOVX	@DPTR,A			;
+        INC	DPTR			;
+
+        MOV	A,SP			; save SFR SP reg
+        MOVX	@DPTR,A			;
+        INC	DPTR			;
+
+	MOV	A,B			; save SFR B reg
+        MOVX	@DPTR,A			;
+        INC	DPTR			;
+
+        ANL	PSW,#0E7h		; select reg bank 0
+
+	JMP	DT_WarmBoot		; return to normal DT boot procedure
+
+;******************************************************************************
+;
+; Function:	DIA_CheckBootInfo
+; Input:	None
+; Output:	None
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   Checks the normality of the boot in progress and returns immediately if
+;     its a normal boot (power on).
+;   If not, the algorithm is:
+;
+;       IF areacode is a booting area code THEN
+;         Report FATAL error to user
+;         IF user holds CANCEL down for .5secs THEN
+;           completely cleardown the machine
+;           cold boot
+;         ENDIF
+;       ENDIF
+;       log booterror in the audit roll
+;       print a diags dump
+;       shutdown machine
+;
+; Note:
+;   The complete cleardown is necessary if whatever is crashing the machine
+;   is crashing it before the machine boots to a useable point. If areacode
+;   is MAINLOOP or better, it is assumed that the manager key sequence to
+;   clear the machine down is activatable. In the remote possibility that
+;   the machine crashes between having an areacode of MAINLOOP and letting
+;   the manager activate the cleardown, a fatal boot could be created by
+;   causing an error during the boot process (eg remove power, or press
+;   2 and 9 together) thus allowing entry to the cleardown.
+;
+;******************************************************************************
+
+dia_fatalboot:	DB 23,'Fatal Boot Error, Press'
+dia_fatalboot2:	DB 23,'OK to print diagnostics'
+
+DIA_CheckBootInfo:
+	MOV	DPTR,#dia_boot_area		; check for a normal boot
+        MOVX	A,@DPTR				;
+        JNZ	DIA_CBIbootnotok		;
+
+	MOV	DPTR,#sys_stats_power		; log a normal power on
+        CALL	MEM_SetSource			;
+        MOV	DPTR,#EE_STATS_POWER		;
+        CALL    SYS_UpdateStat			;
+
+        RET
+DIA_CBIbootnotok:
+	JNB	ACC.7,DIA_CBInonfatal		; check for a boot areacode
+
+        IF      SPEAKER
+	CALL	SND_Warning
+        ENDIF
+
+	CALL	LCD_Clear			; display fatal message
+;        MOV	DPTR,#dia_fatalboot		;
+;        CALL	LCD_DisplayStringCODE		;
+;	MOV	A,#64				;
+;        CALL	LCD_GotoXY			;
+;        MOV	DPTR,#dia_fatalboot2		;
+;        CALL	LCD_DisplayStringCODE		;
+
+DIA_CBIwaitkey:					; wait for OK or CANCEL
+;	CALL	KBD_WaitKey			; to be pressed
+;        CJNE	A,#KBD_OK,DIA_CBInotok		;
+        JMP	DIA_CBInonfatal			;
+DIA_CBInotok:					;
+	CJNE	A,#KBD_CANCEL,DIA_CBIwaitkey	;
+
+	MOV     R7,#0				; make sure CANCEL
+DIA_CBItestcancel:				; is held down
+	MOV     R0,#20				; for 0.5 secs
+	CALL    delay100us			;
+	CALL    KBD_ScanKeyboard		;
+	CJNE    A,#19,DIA_CBIwaitkey		; cancel released
+	DJNZ    R7,DIA_CBItestcancel		;
+
+
+        IF      SPEAKER
+        CALL    SND_Warning                     ; cancel held for enough time
+        ENDIF
+
+;	CALL	AUD_ClearAudit			; clear and reset anything
+	CALL	TKT_ClearTicketNo		; which may be corrupt and
+	CALL	PPG_ClearChunkHotkeyTickets	; cause the system to fail
+	CALL	PPG_ClearChunkMenuTickets	;
+	CALL	PPG_ClearChunkLayout		;
+	CALL	PPG_ClearChunkManager		;
+	CALL	SHF_ClearShiftNo		;
+
+	MOV	A,#SYS_AREA_UNITOFF		; ensure clean boot
+	CALL	SYS_SetAreaCode			;
+	JMP	DT_ColdBoot			;
+
+DIA_CBInonfatal:
+	IF USE_ALTONCOMMS
+
+        IF      SPEAKER
+	 CALL	SND_Warning			; cancel held for enough time
+        ENDIF
+
+;	 CALL	AUD_ClearAudit			; clear and reset anything
+	 CALL	TKT_ClearTicketNo		; which may be corrupt and
+	 CALL	PPG_ClearChunkHotkeyTickets	; cause the system to fail
+	 CALL	PPG_ClearChunkMenuTickets	;
+	 CALL	PPG_ClearChunkLayout		;
+	 CALL	SHF_ClearShiftNo		;
+	ENDIF
+
+	MOV	A,#SYS_AREA_UNITOFF		; ensure clean boot
+	CALL	SYS_SetAreaCode			;
+	JMP	DT_ColdBoot			;
+
+	MOV	DPSEL,#0			; log areacode and hardware
+;	MOV	DPTR,#aud_entry_booterror	; powerup status in audit roll
+;        CALL	AUD_AddEntry			;
+
+        MOV     DPTR,#dia_boot_powerup		; get the power up code
+        MOVX    A,@DPTR				;
+        ANL     A,#7				;
+
+        CJNE    A,#7,DIA_CBInotcrash
+
+        MOV	DPTR,#sys_stats_crashreset	; log a crash boot
+        CALL	MEM_SetSource			;
+        MOV	DPTR,#EE_STATS_CRASHRESET	;
+        JMP	DIA_CBIlogged			;
+
+DIA_CBInotcrash:
+	JB	ACC.1,DIA_CBInotmanreset
+
+        MOV	DPTR,#sys_stats_manualreset	; log a manual reset boot
+        CALL	MEM_SetSource			;
+        MOV	DPTR,#EE_STATS_MANUALRESET	;
+        JMP	DIA_CBIlogged			;
+
+DIA_CBInotmanreset:
+	JB	ACC.2,DIA_CBInotwdogreset
+
+        MOV	DPTR,#sys_stats_wdogreset	; log a watchdog reset
+        CALL	MEM_SetSource			;
+        MOV	DPTR,#EE_STATS_WDOGRESET	;
+;        JMP	DIA_CBIlogged			;
+
+DIA_CBInotwdogreset:
+
+DIA_CBIlogged:
+	CALL	SYS_UpdateStat
+        CALL	DIA_DumpBootDiags
+
+        IF      SPEAKER
+        CALL	SND_Warning
+        ENDIF
+
+        CLR	ppg_plugstate
+        CALL    LCD_Clear
+        JMP	SYS_UnitPowerOff
+;DIA_CBIbootok:
+	RET
+
+;******************************************************************************
+;
+; Function:	DIA_DumpBootDiags
+; Input:	None
+; Output:	None
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   Prints all the information contained in the diagnostics boot info block
+;   to the printer.
+;
+;******************************************************************************
+
+dia_bootdump: DB 255,21,0,0,0,0,21,'**Error Diagnostics**'
+
+dia_dumpparams:
+	DB 6,1
+
+        DW dia_boot_area			; software area code
+        DW buffer+FIELD_HEADER+0
+        DB 3+NUM_ZEROPAD,0,NUM_PARAM_DECIMAL8
+
+        DW dia_boot_powerup			; hardware powerup status
+        DW buffer+FIELD_HEADER+4
+        DB 3+NUM_ZEROPAD,0,NUM_PARAM_DECIMAL8
+
+        DW dia_boot_dpsel			; DPSEL reg at bootup
+        DW buffer+FIELD_HEADER+8
+        DB 3+NUM_ZEROPAD,0,NUM_PARAM_DECIMAL8
+
+        DW dia_boot_sp				; SP reg at bootup
+        DW buffer+FIELD_HEADER+12
+        DB 3+NUM_ZEROPAD,0,NUM_PARAM_DECIMAL8
+
+        DW dia_boot_b				; B reg at bootup
+        DW buffer+FIELD_HEADER+16
+        DB 3+NUM_ZEROPAD,0,NUM_PARAM_DECIMAL8
+
+        DW dia_boot_powerfail			; powerfail code at bootup
+        DW buffer+FIELD_HEADER+20
+        DB 1,0,NUM_PARAM_DECIMAL8
+
+;**************************
+
+dia_hexdumpline: DB 255,19,0,0,0,0,19
+dia_otherdumpline: DB 255,21,0,0,0,0,21,'xxx xxx xxx xxx xxx x'
+
+DIA_DumpBootDiags:
+	MOV	DPTR,#prt_density
+        MOV	A,#10
+        MOVX	@DPTR,A
+        MOV	prt_stepdelay3,#20
+	CALL	PRT_StartPrint
+
+; display the header
+        MOV	DPTR,#dia_bootdump
+        CALL	PRT_DisplayMessageCODE
+
+;**********
+; Dump IRAM
+;**********
+	MOV	DPTR,#dia_hexdumpline		; setup 8 byte hex line
+        CALL	MEM_SetSource			;
+        MOV	DPTR,#buffer			;
+        CALL	MEM_SetDest			;
+        MOV	R7,#FIELD_HEADER		;
+        CALL	MEM_CopyCODEtoXRAMsmall		;
+        MOV	A,#8
+        CALL	PRT_SetBitmapLenSmall
+	CALL	PRT_ClearBitmap			;
+
+        CLR	prt_paperout			; force re-check of paper
+
+	MOV	DPSEL,#0			; start at first byte
+        MOV	DPTR,#dia_boot_iram		; of IRAM
+DIA_DPPloop1:
+	MOV	DPSEL,#0
+        MOV	A,DPL
+        MOV	DPSEL,#1
+	MOV	DPTR,#buffer+FIELD_HEADER
+	CALL	BinToHex			; print DPL
+	MOV	A,#':'				; print ':'
+	MOVX	@DPTR,A
+	INC	DPTR
+	MOV	R1,#8				; 8 bytes per line
+DIA_DPPloop2:
+	MOV	DPSEL,#0			; print next byte
+        MOVX	A,@DPTR
+        INC	DPTR
+        MOV	DPSEL,#1
+	CALL	BinToHex
+	DJNZ	R1,DIA_DPPloop2
+
+	CALL	PRT_ClearBitmap
+	MOV	DPTR,#buffer
+	CALL	PRT_FormatXRAMField
+	CALL	PRT_PrintBitmap
+
+        MOV	DPSEL,#0
+        MOV	A,DPL				; repeat for 256 bytes
+	JNZ	DIA_DPPloop1
+
+; display the areacode, DPSEL and SP regs
+
+	MOV	DPTR,#dia_otherdumpline
+        CALL	MEM_SetSource
+        MOV	DPTR,#buffer
+        CALL	MEM_SetDest
+        MOV	R7,#FIELD_HEADER+20
+        CALL	MEM_CopyCODEtoXRAMsmall
+	MOV	DPSEL,#2
+        MOV	DPTR,#dia_dumpparams
+        CALL	NUM_MultipleFormat
+        MOV	DPTR,#buffer
+        CALL	PRT_FormatXRAMField
+        CALL	PRT_PrintBitmap
+
+	CALL	PRT_FormFeed
+        CALL    CUT_FireCutter
+	CALL	PRT_EndPrint
+
+	RET
+
+;******************************************************************************
+;
+;             S i m p l e   D i a g n o s t i c s   R o u t i n e s
+;
+;    Simple diagnostics are the diagnostics which print when a user (with a
+;    diagnostics priceplug, or a dds priceplug) asks for a diagnostics using
+;    the key sequence MANAGER DDS DIAGS.
+;
+;******************************************************************************
+
+dia_perfmode: VAR 1
+dia_cardport: VAR 1
+
+dia_template:
+;        len f  mag  x   y string
+  DB 255,20,00h,01h, 0,  0,20,'-SIMPLE DIAGNOSTICS-'
+  DB 255,19,00h,00h, 0, 24,19,'Code Version: '
+  DT_VERSION
+  DB 255,13,00h,00h, 0, 32,13,'Ram Size: xxx'
+  DB 255,18,00h,00h, 0, 40,18,'Print Density: xxx'
+  DB 255,21,00h,00h, 0, 48,21,'Head Fire Pulse: xxxx'
+  DB 255,19,00h,00h, 0, 56,19,'Stepper xxx xxx xxx'
+
+  DB 255,16,00h,00h, 0, 70,16,'Header Feed: xxx'
+  DB 255,17,00h,00h, 0, 80,17,'Trailer Feed: xxx'
+  DB 255,12,00h,00h, 0, 88,12,'Perf Mode: x'
+  DB 255,20,00h,00h, 0, 96,20,'Battery Volts: xx.xx'
+  DB 255,17,00h,00h, 0,104,17,'Battery Temp: xxx'
+  DB 255,21,00h,00h, 0,120,21,'Customer Display: xxx'
+  DB 255,18,00h,00h, 0,128,18,'Card Reader: xxx x'
+  DB 255,21,00h,00h, 0,144,21,'Power On : xxxxxxxxxx'
+  DB 255,21,00h,00h, 0,152,21,'ManlReset: xxxxxxxxxx'
+  DB 255,21,00h,00h, 0,160,21,'WDogReset: xxxxxxxxxx'
+  DB 255,21,00h,00h, 0,168,21,'CrashRset: xxxxxxxxxx'
+  DB 255,21,00h,00h, 0,176,21,'PPInserts: xxxxxxxxxx'
+;  DB 255,21,00h,00h, 0,168,21,'PPErrors : xxxxxxxxxx'
+;  DB 255,21,00h,00h, 0,176,21,'Tickets  : xxxxxxxxxx'
+;  DB 255,21,00h,00h, 0,184,21,'PowerFail: xxxxxxxxxx'
+;  DB 255,21,00h,00h, 0,192,21,'Timeouts : xxxxxxxxxx'
+;  DB 255,21,00h,00h, 0,200,21,'Uploads  : xxxxxxxxxx'
+;  DB 255,21,00h,00h, 0,208,21,'Downloads: xxxxxxxxxx'
+  DB 00h
+dia_template_end:
+
+dia_tmpl_text1		EQU 0100h
+dia_tmpl_text1b         EQU dia_tmpl_text1+FIELD_HEADER+20
+dia_tmpl_text1c		EQU dia_tmpl_text1b+FIELD_HEADER+19
+dia_tmpl_ramsize        EQU dia_tmpl_text1c+FIELD_HEADER+10
+dia_tmpl_text2          EQU dia_tmpl_ramsize+3
+dia_tmpl_density	EQU dia_tmpl_text2+FIELD_HEADER+15
+dia_tmpl_text2b         EQU dia_tmpl_density+3
+dia_tmpl_firepulse      EQU dia_tmpl_text2b+FIELD_HEADER+17
+dia_tmpl_text4		EQU dia_tmpl_firepulse+4
+dia_tmpl_stepper1	EQU dia_tmpl_text4+FIELD_HEADER+8
+dia_tmpl_stepper2	EQU dia_tmpl_text4+FIELD_HEADER+12
+dia_tmpl_stepper3	EQU dia_tmpl_text4+FIELD_HEADER+16
+dia_tmpl_text5		EQU dia_tmpl_stepper3+3
+dia_tmpl_headfeed	EQU dia_tmpl_text5+FIELD_HEADER+13
+dia_tmpl_text6		EQU dia_tmpl_headfeed+3
+dia_tmpl_trailfeed	EQU dia_tmpl_text6+FIELD_HEADER+14
+dia_tmpl_text7		EQU dia_tmpl_trailfeed+3
+dia_tmpl_perfmode	EQU dia_tmpl_text7+FIELD_HEADER+11
+dia_tmpl_text9		EQU dia_tmpl_perfmode+1
+dia_tmpl_batteryvolts	EQU dia_tmpl_text9+FIELD_HEADER+15
+dia_tmpl_text10		EQU dia_tmpl_batteryvolts+5
+dia_tmpl_batterytemp	EQU dia_tmpl_text10+FIELD_HEADER+14
+dia_tmpl_text10b	EQU dia_tmpl_batterytemp+3
+dia_tmpl_custdisp       EQU dia_tmpl_text10b+FIELD_HEADER+18
+dia_tmpl_text10c	EQU dia_tmpl_custdisp+3
+dia_tmpl_cardreader	EQU dia_tmpl_text10c+FIELD_HEADER+13
+dia_tmpl_cardreaderport	EQU dia_tmpl_text10c+FIELD_HEADER+17
+dia_tmpl_text11         EQU dia_tmpl_cardreaderport+1
+dia_tmpl_poweron	EQU dia_tmpl_text11+FIELD_HEADER+11
+dia_tmpl_text12		EQU dia_tmpl_poweron+10
+dia_tmpl_manreset	EQU dia_tmpl_text12+FIELD_HEADER+11
+dia_tmpl_text13		EQU dia_tmpl_manreset+10
+dia_tmpl_wdogreset	EQU dia_tmpl_text13+FIELD_HEADER+11
+dia_tmpl_text14		EQU dia_tmpl_wdogreset+10
+dia_tmpl_crashreset	EQU dia_tmpl_text14+FIELD_HEADER+11
+dia_tmpl_text15		EQU dia_tmpl_crashreset+10
+dia_tmpl_ppinserts	EQU dia_tmpl_text15+FIELD_HEADER+11
+dia_tmpl_termination	EQU dia_tmpl_crashreset+10
+
+dia_format:
+	DB 19,0 ; param count
+        DW sys_ramsize				; RAM board size
+        DW dia_tmpl_ramsize
+        DB 3,0,NUM_PARAM_DECIMAL8
+	DW prt_density				; density
+	DW dia_tmpl_density
+	DB 3,0,NUM_PARAM_DECIMAL8
+        DW prt_firepulse			; firepulse
+        DW dia_tmpl_firepulse
+        DB 4,0,NUM_PARAM_DECIMAL16
+	DW prt_stepdelay			; stepdelay1
+	DW dia_tmpl_stepper1
+	DB 3,0,NUM_PARAM_DECIMAL8IRAM
+	DW prt_stepdelay2			; stepdelay2
+	DW dia_tmpl_stepper2
+	DB 3,0,NUM_PARAM_DECIMAL8IRAM
+	DW prt_stepdelay3			; stepdelay3
+	DW dia_tmpl_stepper3
+	DB 3,0,NUM_PARAM_DECIMAL8IRAM
+	DW ppg_oper_headerfeed			; headerfeed
+	DW dia_tmpl_headfeed
+	DB 3,0,NUM_PARAM_DECIMAL8
+	DW ppg_oper_trailerfeed			; trailerfeed
+	DW dia_tmpl_trailfeed
+	DB 3,0,NUM_PARAM_DECIMAL8
+	DW dia_perfmode				; perfmode
+	DW dia_tmpl_perfmode
+	DB 1,0,NUM_PARAM_STRING
+	DW sys_batteryvolts16			; battery volts
+	DW dia_tmpl_batteryvolts
+	DB 4,2,NUM_PARAM_FLOAT16
+	DW sys_batterytemp			; battery temp
+	DW dia_tmpl_batterytemp
+	DB 3,0,NUM_PARAM_DECIMAL8
+        DW man_custdispctrl			; customer display
+        DW dia_tmpl_custdisp
+        DB 3,0,NUM_PARAM_DECIMAL8
+        DW man_cardctrl				; card reader
+        DW dia_tmpl_cardreader
+        DB 3,0,NUM_PARAM_DECIMAL8
+        DW dia_cardport				; card reader port
+        DW dia_tmpl_cardreaderport
+        DB 1,0,NUM_PARAM_DECIMAL8
+        DW sys_stats_power			; system power ons
+        DW dia_tmpl_poweron
+        DB 10,0,NUM_PARAM_DECIMAL32
+        DW sys_stats_manualreset		; system manual resets
+        DW dia_tmpl_manreset
+        DB 10,0,NUM_PARAM_DECIMAL32
+        DW sys_stats_wdogreset			; system watchdog resets
+        DW dia_tmpl_wdogreset
+        DB 10,0,NUM_PARAM_DECIMAL32
+        DW sys_stats_crashreset			; system crash resets
+        DW dia_tmpl_crashreset
+        DB 10,0,NUM_PARAM_DECIMAL32
+        DW sys_stats_ppinserts			; machine priceplug inserts
+        DW dia_tmpl_ppinserts
+        DB 10,0,NUM_PARAM_DECIMAL32
+
+
+;******************************************************************************
+;
+; Function:	DIA_LayoutDiags
+; Input:	None
+; Output:	None
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   Generates the layout of the diagnostics and fills in all the fields.
+;
+;******************************************************************************
+
+DIA_LayoutDiags:
+	MOV	DPTR,#dia_template
+	CALL	MEM_SetSource
+	MOV	DPTR,#dia_tmpl_text1
+	CALL	MEM_SetDest
+	MOV	R7,#LOW(dia_template_end-dia_template)
+	MOV	R6,#HIGH(dia_template_end-dia_template)
+	CALL	MEM_CopyCODEtoXRAM
+
+	MOV	DPTR,#dia_perfmode			; frig the
+	MOV	A,#'y'					; perfmode
+	JB	prt_perfmode,DIA_LDperf			;
+	MOV	A,#'n'					;
+DIA_LDperf:						;
+	MOVX	@DPTR,A					;
+
+        MOV	DPTR,#dia_cardport			; frig the
+        MOV	A,#CRD_COM				; card reader
+        MOVX	@DPTR,A					; port
+
+	MOV	DPSEL,#2
+	MOV	DPTR,#dia_format
+	CALL	NUM_MultipleFormat
+	RET
+
+;******************************************************************************
+;
+; Function:	DIA_Diagnostics
+; Input:	None
+; Output:	None
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   Main entry point for simple diagnostics. Prints the diagnostics
+;   to the printer.
+;
+;******************************************************************************
+
+DIA_Diagnostics:
+	IF DT5
+	MOV     R7,#0
+DIA_Dtest:
+	MOV     R0,#50
+	CALL    delay100us
+	CALL    KBD_ScanKeyboard
+	CJNE    A,#1,DIA_Dnormaldiags
+	DJNZ    R7,DIA_Dtest
+        CALL    AUD_ClearAudit
+        CALL    TKT_ClearTicketNo
+        CALL    SHF_ClearShiftNo
+
+        IF      SPEAKER
+        CALL    SND_Warning
+        ENDIF
+
+        RET
+        ENDIF
+DIA_Dnormaldiags:
+	CALL	SYS_ScanBatteryVolts
+	CALL	SYS_ScanBatteryTemp
+        CALL	PRT_StartPrint
+        MOV	A,#200
+        CALL	PRT_SetBitmapLenSmall
+        CALL	PRT_ClearBitmap
+        CALL	DIA_LayoutDiags
+	MOV	DPTR,#dia_tmpl_text1
+	CALL	PRT_FormatBitmap
+        MOV	A,#200
+        CALL	PRT_SetBitmapLenSmall
+        CALL	PRT_PrintBitmap
+        CALL	PRT_FormFeed
+        CALL	PRT_EndPrint
+	CALL	DIA_PPDiagnostics
+        CALL    CUT_FireCutter
+	RET
+
+dia_pp_template:
+;        len f  mag  x   y string
+  DB 255,21,00h,00h, 0, 0,21,'PricePlug Diagnostics'
+  DB 255,19,00h,00h, 0, 8,19,'Plug Number: xxxxxx'
+  DB 255,14,00h,00h, 0,16,14,'Plug Type: xxx'
+  DB 255,16,00h,00h, 0,24,16,'User Number: xxx'
+  DB 255,21,00h,00h, 0,32,21,'Data Ch:xx, Len:xxxxx'
+  DB 255,19,00h,00h, 0,40,19,'Inserts: xxxxxxxxxx'
+  DB 00h
+dia_pp_template_end:
+
+dia_pp_tmpl_text1	EQU 0100h
+dia_pp_tmpl_text2	EQU dia_pp_tmpl_text1+FIELD_HEADER+21
+dia_pp_tmpl_plugnum	EQU dia_pp_tmpl_text2+FIELD_HEADER+13
+dia_pp_tmpl_text3	EQU dia_pp_tmpl_plugnum+6
+dia_pp_tmpl_plugtype    EQU dia_pp_tmpl_text3+FIELD_HEADER+11
+dia_pp_tmpl_text4       EQU dia_pp_tmpl_plugtype+3
+dia_pp_tmpl_usernum     EQU dia_pp_tmpl_text4+FIELD_HEADER+13
+dia_pp_tmpl_text5       EQU dia_pp_tmpl_usernum+3
+dia_pp_tmpl_datachunks  EQU dia_pp_tmpl_text5+FIELD_HEADER+8
+dia_pp_tmpl_datalen     EQU dia_pp_tmpl_text5+FIELD_HEADER+16
+dia_pp_tmpl_text6       EQU dia_pp_tmpl_datalen+5
+dia_pp_tmpl_inserts	EQU dia_pp_tmpl_text6+FIELD_HEADER+9
+dia_pp_tmpl_termination	EQU dia_pp_tmpl_inserts+10
+
+dia_pp_format:
+	DB 6,0
+	DW ppg_fixhdr_plugnum			; priceplug number
+	DW dia_pp_tmpl_plugnum
+	DB 6,0,NUM_PARAM_DECIMAL32
+        DW ppg_fixhdr_plugtype			; priceplug type
+        DW dia_pp_tmpl_plugtype
+        DB 3,0,NUM_PARAM_DECIMAL8
+        DW ppg_hdr_usernum			; priceplug usernum
+        DW dia_pp_tmpl_usernum
+        DB 3,0,NUM_PARAM_DECIMAL16
+        DW ppg_hdr_datachunks			; datachunks
+        DW dia_pp_tmpl_datachunks
+        DB 2,0,NUM_PARAM_DECIMAL8
+        DW ppg_hdr_databytes			; databytes
+        DW dia_pp_tmpl_datalen
+        DB 5,0,NUM_PARAM_DECIMAL16
+	DW ppg_hdr_insertions			; priceplug insertions
+	DW dia_pp_tmpl_inserts
+	DB 10,0,NUM_PARAM_DECIMAL32
+
+;******************************************************************************
+;
+; Function:	DIA_LayoutPPDiags
+; Input:	None
+; Output:	None
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   Generates the layout of the priceplug diagnostics and fills in all the
+;   fields.
+;
+;******************************************************************************
+
+DIA_LayoutPPDiags:
+	MOV	DPTR,#dia_pp_template
+	CALL	MEM_SetSource
+	MOV	DPTR,#dia_pp_tmpl_text1
+	CALL	MEM_SetDest
+	MOV	R7,#LOW(dia_pp_template_end-dia_pp_template)
+	MOV	R6,#HIGH(dia_pp_template_end-dia_pp_template)
+	CALL	MEM_CopyCODEtoXRAM
+	MOV	DPSEL,#2
+	MOV	DPTR,#dia_pp_format
+	CALL	NUM_MultipleFormat
+	RET
+
+;******************************************************************************
+;
+; Function:	DIA_PPDiagnostics
+; Input:	None
+; Output:	None
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;
+;******************************************************************************
+
+DIA_PPDiagnostics:
+        CALL	PRT_StartPrint
+        MOV	A,#48
+        CALL	PRT_SetBitmapLenSmall
+        CALL	PRT_ClearBitmap
+        CALL	DIA_LayoutPPDiags
+	MOV	DPTR,#dia_pp_tmpl_text1
+	CALL	PRT_FormatBitmap
+        MOV	A,#48
+        CALL	PRT_SetBitmapLenSmall
+        CALL	PRT_PrintBitmap
+        CALL	PRT_FormFeed
+        CALL	PRT_EndPrint
+	RET
+
+;******************************************************************************
+;
+; Function:	DIA_TestPrint
+; Input:	?
+; Output:	?
+; Preserved:	?
+; Destroyed:	?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+dia_testline:
+	IF DT10W
+         IF USE_NARROWBAND
+          DB 255, 8,0,0, 0,12, 8,1,1,1,1,1,1,1,1
+          DB 255, 8,0,0, 0, 6, 8,2,2,2,2,2,2,2,2
+          DB 255, 8,0,0, 0, 0, 8,3,3,3,3,3,3,3,3
+         ELSE
+          DB 255,10,0,0, 0,12,10,1,1,1,1,1,1,1,1,1,1
+          DB 255,10,0,0, 0, 6,10,2,2,2,2,2,2,2,2,2,2
+          DB 255,10,0,0, 0, 0,10,3,3,3,3,3,3,3,3,3,3
+         ENDIF
+         DB 0
+;        ELSE
+;	IF DT10W
+;         DB 255,3,1,0,0,0,3
+;         DB 3,2,1
+;         DB 255,3,1,0,1,0,3
+;         DB 3,2,1
+;         DB 255,3,1,0,2,0,3
+;         DB 3,2,1
+;         DB 255,3,1,0,3,0,3
+;         DB 3,2,1
+;         DB 255,3,1,0,4,0,3
+;         DB 3,2,1
+;         DB 255,3,1,0,5,0,3
+;         DB 3,2,1
+;         DB 255,3,1,0,6,0,3
+;         DB 3,2,1
+;         DB 255,3,1,0,7,0,3
+;         DB 3,2,1
+;         IF USE_NARROWBAND
+;         ELSE
+;          DB 255,3,1,0,8,0,3
+;          DB 3,2,1
+;          DB 255,3,1,0,9,0,3
+;          DB 3,2,1
+;         ENDIF
+;         DB 0
+        ELSE
+	 DB 255,32,0,0,0,0,32
+	 DB 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+	 DB 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+	 DB 255,32,0,0,0,8,32
+	 DB 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
+	 DB 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
+	 DB 255,32,0,0,0,16,32
+	 DB 3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3
+	 DB 3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3
+	 DB 0
+        ENDIF
+
+DIA_TestPrint:
+	IF DT10W
+        ELSE
+        MOV	A,#24
+        CALL	PRT_SetBitmapLenSmall
+	CALL	PRT_ClearBitmap
+	CALL	PRT_StartPrint
+	MOV	DPTR,#dia_testline
+DIA_TPloop:
+	CALL	PRT_FormatCodeField
+	JNZ	DIA_TPloop
+	CALL	PRT_PrintBitmap
+	CALL	PRT_EndPrint
+        ENDIF
+	RET
+
+;******************************* End Of DIAGS.ASM *****************************
+;

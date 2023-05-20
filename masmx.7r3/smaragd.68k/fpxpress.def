@@ -1,0 +1,196 @@
+
+p	$proc
+FPUSH*	$name
+	fmove	fp0, -(a7)
+	$end
+
+FP_STACK_TOP	$equ,"$a_reg_@+"	7
+FPOP		$equ,$directive		$nop
+
+IEEE754_64_ACQUIRE$ $equ 1111
+
+	$plist	3
+
+p	$proc
+FOP*	$name
+"$TYPE"	$set	$t(p(1, 1))
+"$RING"	$set	0
+	$do	p()>1,	$do	$t(p(2, 1))=$name,"$RING"	$set	p(2, 1)
+	$if	$RING=IEEE754_64_ACQUIRE$
+	p(2, 1)	p(1)
+"$FOP"*	$equ,$fp_reg	fp1
+	$elseif	$t(p(1, 1))=$fp_reg
+"$FOP"*	$equ,$fp_reg	p(1, 1)
+	$elseif	$t(p(1, 1))=$d_reg
+"$FOP"*	$equ,$d_reg	p(1, 1)
+	$elseif	$t(p(1, 1))=$a_reg
+	$flag	sending register may not be a0..a7
+	$elseif	($t(p(1, 1))=$a_reg_@)++|
+		($t(p(1, 1))="$a_reg_@+")++|
+		($t(p(1, 1))="$a_reg_@-")
+"$FOP"*	$equ,$TYPE	p(1, 1)
+	$elseif	$t(p(1, 1))=127
+	$if	p(1, *1)
+	move	p(1, 1), a0
+	$else
+	lea	p(1, 1), a0
+	$endif
+"$FOP"*	$equ,$a_reg_@	a0
+	$elseif	$inside\p(1, 1)=2
+"$FOP"*	$equf	$inside\p(1, 1), $base_a\p(1, 1)
+	$elseif	$itype\p(1, 1)="$a_reg"
+"$FOP"*	$equf	p(1, 1), $ibase\p(1, 1)
+	$elseif	$t(p(1, 1))=$equf
+"$FOP"*	$equf	p(1, 1), p(1, 2)
+	$else
+"$UP"*	$equf	p()
+"$FOP"*	$equf	$UP
+	$do	$o('V'),	$trace	$FOP
+	$do	$o('V'),	$trace	$FOP\2
+	$endif
+	$end
+
+	$plist
+
+p	$proc
+floating_string* $name	IEEE754_64_ACQUIRE$
+	$do	$o('V'),	$note	call s2double
+	$if	p(1, *1)
+	movea	p(1, 1), a0
+	$else
+	lea	p(1, 1), a0
+	$endif
+	jsr	(s2double).l
+	$end
+
+f	$func
+"$ieee64"* $name
+	$if	$t(f(2, 1))=$special_reg
+	$if	f(2, 1)=l
+"$UP"* 	$equf	$azlit(f(1)d)
+	$elseif	f(2, 1)=w
+"$UP"*	$equf	$azlit(f(1)s)
+	$elseif	f(2, 1)=b
+"$UP"*	$equf	$azlit(f(1)*/8s)
+	$elseif	f(2, 1)=s
+"$UP"*	$equf	$azlit(ieee754_32 f(1))
+	$endif
+	$else
+"$UP"*	$equf	$azlit(ieee754_64 f(1))
+	$endif
+	$return	$UP
+	$end
+
+p	$proc
+FP_LOAD* $name
+	FOP	p()
+	$if	$t(p(2, 1))=$special_reg
+	$if	p(2, 1)=s
+	fmove.s	$FOP, fp0
+	$elseif	p(2, 1)=l
+	fmove.l	$FOP, fp0
+	$elseif	p(2, 1)=w
+	fmove.w	$FOP, fp0
+	$elseif	p(2, 1)=b
+	fmove.b	$FOP, fp0
+	$else
+	fmove.d	$FOP, fp0
+	$endif
+	$else
+	fmove	$FOP, fp0
+	$endif
+	$end
+
+p	$proc
+FP_ADD* $name
+	FOP	p()
+	$if	$t(p(2, 1))=$special_reg
+	$if	p(2, 1)=s
+	fadd.s	$FOP, fp0
+	$elseif	p(2, 1)=l
+	fadd.l	$FOP, fp0
+	$elseif	p(2, 1)=w
+	fadd.w	$FOP, fp0
+	$elseif	p(2, 1)=b
+	fadd.b	$FOP, fp0
+	$else
+	fadd.d	$FOP, fp0
+	$endif
+	$else
+	fadd	$FOP, fp0
+	$endif
+	$end
+
+p	$proc
+FP_SUBTRACT* $name
+	FOP	p()
+	$if	$t(p(2, 1))=$special_reg
+	$if	p(2, 1)=s
+	fsub.s	$FOP, fp0
+	$elseif	p(2, 1)=l
+	fsub.l	$FOP, fp0
+	$elseif	p(2, 1)=w
+	fsub.w	$FOP, fp0
+	$elseif	p(2, 1)=b
+	fsub.b	$FOP, fp0
+	$else
+	fsub.d	$FOP, fp0
+	$endif
+	$else
+	fsub	$FOP, fp0
+	$endif
+	$end
+
+p	$proc
+FP_MULTIPLY* $name
+	FOP	p()
+	$if	$t(p(2, 1))=$special_reg
+	$if	p(2, 1)=s
+	fmul.s	$FOP, fp0
+	$elseif	p(2, 1)=l
+	fmul.l	$FOP, fp0
+	$elseif	p(2, 1)=w
+	fmul.w	$FOP, fp0
+	$elseif	p(2, 1)=b
+	fmul.b	$FOP, fp0
+	$else
+	fmul.d	$FOP, fp0
+	$endif
+	$else
+	fmul	$FOP, fp0
+	$endif
+	$end
+
+p	$proc
+FP_DIVIDE* $name
+	FOP	p()
+	$if	$t(p(2, 1))=$special_reg
+	$if	p(2, 1)=s
+	fdiv.s	$FOP, fp0
+	$elseif	p(2, 1)=l
+	fdiv.l	$FOP, fp0
+	$elseif	p(2, 1)=w
+	fdiv.w	$FOP, fp0
+	$elseif	p(2, 1)=b
+	fdiv.b	$FOP, fp0
+	$else
+	fdiv.d	$FOP, fp0
+	$endif
+	$else
+	fdiv	$FOP, fp0
+	$endif
+	$end
+
+p	$proc
+FP_LOAD_NEGATIVE* $name
+	moveq	#0, d0
+	FP_LOAD d0 l
+	FP_SUBTRACT	p()
+	$end
+
+p	$proc
+FP_REVERSE*	$name
+	FPUSH
+	FP_LOAD_NEGATIVE FP_STACK_TOP
+	$end
+

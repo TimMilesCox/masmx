@@ -1,0 +1,9 @@
+        $word   32
+        $floating_point 32
+        $characteristic 8
+        $characteristic,64 16
+        $characteristic,128 20
+
+        +       1.5
+        +       1.5d
+        +       1.5q

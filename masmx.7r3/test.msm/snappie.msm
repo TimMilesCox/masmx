@@ -1,0 +1,5 @@
+	$include	../aside.dem/ppc_603.def
+	$plist		7
+	.ascii		"abc", "abcde"
+	.ascii		"zzzzzzzzzzzzzzzzzz"
+	.ascii		"xxx","yyy","zzz"

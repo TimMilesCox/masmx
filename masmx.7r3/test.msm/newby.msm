@@ -1,0 +1,13 @@
+f       $func
+rel2*   $name   2
+rel3*   $name   3
+	$trace	f(0,1)
+        $return f(1,1)-$-$n
+        $end
+
+target1 $res    99
+.        +       f()
+        +       rel2(target1)
+        +       rel3(target2)
+        $res    99
+target2

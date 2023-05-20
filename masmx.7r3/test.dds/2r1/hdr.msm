@@ -1,0 +1,9 @@
+	$include	"8051Z.def"
+IR	equ	0aa
+	mov	b, #'y'
+	mov	IR, #127
+	sync
+	mov	0, #, 'z'
+	reti
+	'[B91][D031003][V1.0][M1493]'
+"

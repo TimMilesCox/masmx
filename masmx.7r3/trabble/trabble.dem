@@ -1,0 +1,14 @@
+../masm7	tribble	-ln
+
+cat     tribble.txo
+
+cat	tribble.def
+
+../masm7	trabble	-ln
+
+cat     trabble.txo
+
+../masm7	trybble	-ln
+
+cat	trybble.txo
+

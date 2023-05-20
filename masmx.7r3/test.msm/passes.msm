@@ -1,0 +1,27 @@
+$(2:120/$02)
+$(0)
+
+p*      $proc	*
+        +       down
+up
+        +       up
+down    
+l1      $set    up        
+l1      $set    up        
+        +       l1
+        $end
+
+q*      $proc
+fore
+        +       fore
+aft    
+        +       aft:s
+l1      $set    fore        
+l1      $set    fore        
+        +       l1
+        $end
+
+        p
+        q
+
+        +       $02(    +       1.75)

@@ -1,0 +1,30 @@
+v*       $proc   $(2)
+*       +       $(62)
+        b       v(1,1)
+        $end
+
+bdi     $form   24,24,48
+
+b*       $proc   $(62)
+        bdi     0, 0, "b(1,1)"
+        $end
+
+f*       $func
+        $if     $t(f(1,1))=0
+        $note   just once
+"f(1,1)"** v       f(1,1)
+        $endif
+        $return  f(1,1)
+        $end
+
+j       $form   8, 16
+
+$(2:02000)
+$(62:62*4096)
+$(0:64)
+
+        j       99, f(label)
+        j       99, f(label)
+
+	$end
+

@@ -1,0 +1,17 @@
+:bongo  $equ,$function  $    
+p       $proc   $(6)
+minus6* $name
+        -       6d
+        $end
+
+q       $proc   :bongo(5)
+minus5* $name
+        -       5d
+        minus6
+        $end
+
+        minus5
+
+        -10
+"+ 99"
+"+ 100"""

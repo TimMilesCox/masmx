@@ -1,0 +1,318 @@
+	$word	16
+	$awidth	32
+	$quantum 8
+	$byte	 8
+
+	$cont_char	'|'
+	$lterm		';'
+	$sterm		'.'
+
+
+	$text	/-(a0)/a0@-/
+	$text	/-(a1)/a1@-/
+	$text	/-(a2)/a2@-/
+	$text	/-(a3)/a3@-/
+
+	$text	/-(a4)/a4@-/
+	$text	/-(a5)/a5@-/
+	$text	/-(a6)/a6@-/
+	$text	/-(a7)/a7@-/
+
+	$text	/(a0)+/a0@+/
+	$text	/(a1)+/a1@+/
+	$text	/(a2)+/a2@+/
+	$text	/(a3)+/a3@+/
+
+	$text	/(a4)+/a4@+/
+	$text	/(a5)+/a5@+/
+	$text	/(a6)+/a6@+/
+	$text	/(a7)+/a7@+/
+
+	$if	0
+        $text   /(a0)/a0@/
+        $text   /(a1)/a1@/
+        $text   /(a2)/a2@/
+        $text   /(a3)/a3@/
+
+        $text   /(a4)/a4@/
+        $text   /(a5)/a5@/
+        $text   /(a6)/a6@/
+        $text   /(a7)/a7@/
+	$endif
+
+"$d_reg" 	$equ	128
+"$a_reg" 	$equ	129
+"$a_reg_@"	$equ	130
+"$a_reg_@+" 	$equ	131
+"$a_reg_@-"	$equ	132
+
+d0	$equ,"$d_reg"	0
+d1	$equ,"$d_reg"	1
+d2	$equ,"$d_reg"	2
+d3	$equ,"$d_reg"	3
+
+d4	$equ,"$d_reg"	4
+d5	$equ,"$d_reg"	5
+d6	$equ,"$d_reg"	6
+d7	$equ,"$d_reg"	7
+
+a0	$equ,"$a_reg"	0
+a1	$equ,"$a_reg"	1
+a2	$equ,"$a_reg"	2
+a3	$equ,"$a_reg"	3
+
+a4	$equ,"$a_reg"	4
+a5	$equ,"$a_reg"	5
+a6	$equ,"$a_reg"	6
+a7	$equ,"$a_reg"	7
+
+a0@	$equ,"$a_reg_@"	0
+a1@	$equ,"$a_reg_@"	1
+a2@	$equ,"$a_reg_@"	2
+a3@	$equ,"$a_reg_@"	3
+
+a4@	$equ,"$a_reg_@"	4
+a5@	$equ,"$a_reg_@"	5
+a6@	$equ,"$a_reg_@"	6
+a7@	$equ,"$a_reg_@"	7
+
+"a0@-"	$equ,"$a_reg_@-"	0
+"a1@-"	$equ,"$a_reg_@-"	1
+"a2@-"	$equ,"$a_reg_@-"	2
+"a3@-"	$equ,"$a_reg_@-"	3
+
+"a4@-"	$equ,"$a_reg_@-"	4
+"a5@-"	$equ,"$a_reg_@-"	5
+"a6@-"	$equ,"$a_reg_@-"	6
+"a7@-"	$equ,"$a_reg_@-"	7
+
+"a0@+"	$equ,"$a_reg_@+"	0
+"a1@+"	$equ,"$a_reg_@+"	1
+"a2@+"	$equ,"$a_reg_@+"	2
+"a3@+"	$equ,"$a_reg_@+"	3
+
+"a4@+"	$equ,"$a_reg_@+"	4
+"a5@+"	$equ,"$a_reg_@+"	5
+"a6@+"	$equ,"$a_reg_@+"	6
+"a7@+"	$equ,"$a_reg_@+"	7
+
+
+
+"$i_rr"	$form	4, 3, 3, 3, 3
+"$i_rm"	$form	4, 3, 3, 3, 3, 16
+"$i_rl"	$form	4, 3, 3, 3, 3, 32
+
+f	$func
+inside*	$name
+count	$set	f(0)
+	$return	count
+first_inside* $name
+	$return	$t(f(0, 1))
+offset*	$name
+	$return	f(0, 1)
+base_a*	$name
+	$do	$t(f(0, 2))^=$a_reg,	$flag base register not a0..a7
+	$return	f(0, 2)
+idx_d*	$name
+	$return	f(0, 3:1)
+idx_c*	$name
+	$return	f(0, 3:)
+idx_w*	$name
+	$return	f(0, 3:2)
+	$end
+
+f	$func
+itype*	$name
+icount	$set	f(0)
+	$return	$t("f(1, 1)")
+index*	$name
+	$return	f(1, 1)
+	$end
+
+f       $func
+ztype*  $name
+        $return $t("f(0, 1)")
+zindex*  $name
+        $return f(0, 1)
+        $end
+
+p	$proc
+
+move.b*	$name	1
+move.w*	$name	3
+move.l*	$name	2
+
+	$if	__default_16
+move	$name	move.w
+	$else
+move	$name	move.l
+	$endif
+
+"$frot"	$set	$t("p(1,1)")
+"$tot"	$set	$t("p(1,2)")
+
+	$if	$frot**128
+
+"$from"	  $set	$frot**7
+"$fror"	  $set	p(1, 1)
+
+	  $if	$tot**128
+
+"$tom"	    $set	$tot**7	
+"$tor"	    $set	p(1, 2)
+	    $i_rr	p(0, 0), $tor, $tom, $from, $fror
+
+	  $elseif	inside(p(1, 2))=2
+	    $i_rm 	p(0, 0), base_a(p(1, 2)), 5, $from, $fror, offset(p(1, 2))
+	  $elseif	inside(p(1, 1))=3
+
+	  $else
+	    $i_rl	p(0, 0), 1, 7, $from, $fror, p(1, 2)
+	  $endif
+	$elseif	$tot**128
+	  $if	inside(p(1,1))=2
+	    $i_rm	p(0, 0), $tor, $tom, 5, base_a(p(1, 1)), offset(p(1, 1))
+	  $elseif inside(p(1, 1))=3
+
+	  $else
+	    $i_rl	p(0, 0), $tor, $tom, 7, 1, p(1, 1)
+	  $endif
+	$else
+	  $flag	two-address version not yet macro-coded
+	$endif
+
+	$end	
+
+
+"$movem_i"	$form	10, 3, 3, 16
+"$movem_im"	$form	10, 3, 3, 16, 16
+
+p	$proc
+
+movem*	$name
+	$if	($t(p(1, 1))=$a_reg_@)++(ztype\p(1,1)=$a_reg)
+	$movem_i	0133, 2, p(1, 1), right2left(p(1, 2))
+
+	$elseif	($t(p(1, 2))=$a_reg_@)++(ztype\p(1,2)=$a_reg)
+	$movem_i	0123, 2, p(1, 2), left2right(p(1, 1))
+
+	$elseif	itype\p(1,1)=$a_reg
+
+	$movem_im	0133, 5, index\p(1, 1), right2left(p(1, 2)), p(1, 1)
+
+	$elseif	itype\p(1,2)=$a_reg
+	$movem_im	0123, 5, index\p(1, 2), left2right(p(1, 1)), p(1, 2)
+
+	$elseif	inside\p(1, 1:1)=2
+base_rega $set		base_a\p(1, 1:1)
+	$movem_im	0133, 5, base_rega, right2left(p(1, 2)),|
+			offset\p(1, 1)
+
+	$elseif	inside\p(1, 2:1)=2
+base_rega $set		base_a\p(1, 2:1)
+	$movem_im	0123, 5, base_rega, left2right(p(1, 1)),|
+			offset\p(1, 2)
+ 
+	$else
+
+	$flag	movem variant not in ColdFire set
+
+	$endif
+	$end
+
+f	$func
+right2left*	$name
+mask	$set	0
+	$sterm	'/'
+x	$do	f(1, 1:),mask	$set	mask++range_up(f(1, 1:x))
+	$sterm	'.'
+	$return	mask
+	$end
+
+f	$func
+left2right*	$name
+mask	$set	0
+	$sterm	'/'
+x	$do	f(1, 1:),mask	$set	mask++range_down(f(1, 1:x))
+	$sterm	'.'
+	$return	mask
+	$end
+
+f	$func
+range_up*	$name
+mask	$set	0
+	$sterm	'-'
+	$if	f(1,1:)=1
+	$if	$t(f(1, 1:1))=$d_reg
+mask	$set	1*/f(1, 1:1)
+	$elseif	$t(f(1, 1:1))=$a_reg
+mask	$set	256*/f(1, 1:1)
+	$else
+	$flag	tag not data register or address register
+	$endif
+	$elseif	f(1,1:)=2
+	$if	  ($t(f(1, 1:1))=$d_reg)|
+		**($t(f(1, 1:2))=$d_reg)|
+		**(f(1, 1:2)>f(1, 1:1))
+
+mask	$set	((1*/f(1, 1:1))-1)--((2*/f(1, 1:2))-1)
+
+	$elseif	  ($t(f(1, 1:1))=$a_reg)|
+		**($t(f(1, 1:2))=$a_reg)|
+		**(f(1, 1:2)>f(1, 1:1))
+
+mask	$set	((256*/f(1, 1:1))-1)--((512*/f(1, 1:2))-1)
+
+	$elseif	($t(f(1, 1:1))=$d_reg)**($t(f(1, 1:2))=$a_reg)
+
+mask	$set	((1*/f(1, 1:1))-1)--((512*/f(1, 1:2))-1)
+	$else
+	$flag	bad range
+	$endif
+	$else
+	$flag	too many ranges in range
+	$endif
+	$sterm	'/'
+	$return	mask
+	$end
+
+
+f	$func
+range_down*	$name
+mask	$set	0
+	$sterm	'-'
+	$if	f(1,1:)=1
+	$if	$t(f(1, 1:1))=$d_reg
+mask	$set	32768/*f(1, 1:1)
+	$elseif	$t(f(1, 1:1))=$a_reg
+mask	$set	128/*f(1, 1:1)
+	$else
+	flag	tag not data register or address register
+	$endif
+	$elseif	f(1,1:)=2
+
+	$if	  ($t(f(1, 1:1))=$d_reg)|
+		**($t(f(1, 1:2))=$d_reg)|
+		**(f(1, 1:2)>f(1, 1:1))
+
+mask	$set	((65536/*f(1, 1:1))-1)--((32768/*f(1, 1:2))-1)
+
+	$elseif	  ($t(f(1, 1:1))=$a_reg)|
+		**($t(f(1, 1:2))=$a_reg)|
+		**(f(1, 1:2)>f(1, 1:1))
+
+mask	$set	((256/*f(1, 1:1))-1)--((128/*f(1, 1:2))-1)
+
+	$elseif	($t(f(1, 1:1))=$d_reg)**($t(f(1, 1:2))=$a_reg)
+
+mask	$set	((65536/*f(1, 1:1))-1)--((128/*f(1, 1:2))-1)
+
+	$else
+	$flag	bad range
+	$endif
+	$else
+	$flag	too many ranges in range
+	$endif
+	$sterm	'/'
+	$return	mask
+	$end

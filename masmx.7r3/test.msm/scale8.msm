@@ -1,0 +1,18 @@
+	$list		-1
+	$include	"ppc64map.def"
+	$include,"$void" "../result.txo/langobar.txo"
+. $(1::*0x0044440000080000)
+	$list		2
+	$include,$binary "../result.txo/visobar.txo"
+"$base(1)"      $set    0
+"$base(3)"	$set	0
+	$include,$binary	../result.txo/tally2
+        $include,$binary        ../result.txo/tally3
+"$base(1)"	$set	00444400000f8000
+	$include,$binary	../result.txo/gworser
+        $include,$binary        ../result.txo/tally4
+"$base(1)"	$set	00444400000fc000
+	$include,$binary	"../result.txo/gfurther.txo"
+	$store		"../test.o3/scale8.txo"
+	$end		fireup
+

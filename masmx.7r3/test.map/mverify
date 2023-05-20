@@ -1,0 +1,14 @@
+rm *.txo
+../masmx soso soso		$1
+../masmx factor factor		$1
+../masmx wolverine wolverine	$1
+../masmx submarine submarine	$1
+../masmx hard hard		$1
+../masmx zactor zactor		$1
+../masmx centre2.map ce5	$1	$2	
+../masmx part2.map o  		$1	$2
+../masmx part33.map z4 		$1	$2
+../masmx z5.map z5  		$1	$2
+diff -ws ../test.msm/z4.txo z4.txo
+diff -ws ../test.msm/z5.txo z5.txo
+

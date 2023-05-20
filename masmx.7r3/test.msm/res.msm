@@ -1,0 +1,26 @@
+	$plist	5
+p*	$proc
+	$do	$net(p(1,1))>4095,	$flag	gargoyle
+	$if	$net(p(1,1))>4095
+	$flag	gurgole
+	$endif
+	$if	p(1,1)>4095
+	$flag	gangrule
+	$endif
+zaporogets $set p(1,1)
+	$if	zaporogets>4095
+	$flag	gringole
+	$endif
+	$do	p(1,1)>4095,	$flag	grumbole
+	+	$net(p(1,1))
+	$end
+
+$(0:4094/dp)
+	$set_option	"a"
+$(2:02000)
+	p	(99)
+	p	(100)
+	p	(101)
+
+	$end
+

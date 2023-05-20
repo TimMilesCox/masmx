@@ -1,0 +1,3 @@
+	$include	"agranoy.def"
+
+WIBBLE	$do	50,	+	wibble, wibble>=30, wibble<=30

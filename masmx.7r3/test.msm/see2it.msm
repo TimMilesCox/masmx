@@ -1,0 +1,34 @@
+		$word	16
+
+r9		$equ	9
+r7		$equ	7
+
+
+WRITABLE	$equ	1
+WRITE_PROTECTED	$equ	-WRITABLE
+STACK_FRAME 	$equ	64
+
+
+frame		$equ	-STACK_FRAME
+eprom		$equ	0F000
+
+parameter1	$equf	*frame, r9, WRITABLE
+parameter2	$equf	eprom, r7, WRITE_PROTECTED
+
+. If the flag is retrieved it is the sign bit of the address
+
+macro*		$proc
+		+	macro(1, *1)
+		+	macro(1,  2)
+		+	macro(1, *3)
+		+	macro(1,  3)d
+		+	macro(1,  1)q
+		$end
+
+		macro	parameter1
+
+		macro	parameter2
+
+		macro	0FFFFFC00,,*0A0000FF0
+
+

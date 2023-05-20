@@ -1,0 +1,202 @@
+.$l0$printer16$E=0
+.
+.............................................................................
+.
+. These are a proc to localise labels inside them.
+. Just include the whole thing
+. and then invoke the proc where you want the routines to assemble 
+.
+............................................................................
+
+p         $proc
+buy8$sell8 $name
+
+new_base  $equ          0
+remaining_granules $equ 1
+maxchains $equ          2
+freechains         $equ 3
+
+temp      $equ      R13
+index     $equ      R6
+
+
+. initi8*
+.         Reserve # whole banks for granule-8 buffer assignment.
+.         A descriptor starting from index in A must be
+.         contiguously in descriptor table for each bank.
+.         Routine will use base register 31 for initialisation.
+.         Array banks can be based in any user space after that.
+.         All banks will be grabbed at initial time,
+.         Probably in response to a configuration parameter.
+.         Console keyins may be possible to adjust number
+.         of banks in use during running time.
+.         # 8-word granules desired is in B.
+.         Max Buffer Size in X.
+.
+. On call:                                  
+.          A is BDI of 1st Bank in Pool::    
+.          B = size of pool desired in 8-word granules                
+.          No Storage is assigned before call. A is
+.          the index of the first of a series of void descriptors.
+.                                           
+.
+.
+.    On return R is changed, 1st bank of pool is based in B31:
+.                            and                    _______________________
+.    X points to Pool Header, B31+0:::::::> Word 0: | free heap granule id| 
+.                                                   |_____________________|
+.                                           Word 1: |granules on free heap|
+.                                                   |_____________________|
+.                                           Word 2: |maximum freechains   |
+.                                                   |_____________________|
+.                                         Words 3+: | 1-gran. free chainH |
+.                                                   |_____________________|
+.                                                   | 2-gran. free chainH |
+.                                                   |_____________________|
+.                                                   | 3-gran....
+.                                                              .
+.                                                              .
+.                                                   | max-gran. free ch H |
+.                                                   |_____________________|
+.
+.. .........................................................................
+
+
+initi8*   ab,i      -1          . round down banks required
+          sbr       15          . because JDR stops on -1
+          lr        b           .
+          sa        6           . pages desired in segment
+          lb,i      64
+request   i         segment$    .
+          j         no_more     . if IRET was not +1, there weren't any
+          aa,i      64          . increment the descriptor index
+          jdr       request
+          ana       6           . how many did we get?
+          jnz       some_at_least
+          lret      0           . If none, do not skip on return
+some_at_least
+          lb        a           . banks obtained (* 64)
+          la        6           . start bank. Some header info to write
+          sabr      31          . place first bank in address space
+          sbl       15-6        . # granules
+          la        x           . Max Buffer
+          aa,i      7
+          sar       3           . calculate high id+1 (#) of free chains
+          lx        (31*/18)
+          sa        maxchains,x
+          aa,i      freechains+7 . calculate granules pre-empted by headers
+          sar       3           . //8
+          sa        new_base,x  .   
+          anb       a          
+          sb        granules_remaining,x
+          lret      0
+          
+. buy8*....................................................................
+.
+.    On call A = BDI First Bank in Pool
+.            X = Storage Required
+.            B contains ID of Base Register required to contain result
+.    Result is in X
+..........................................................................
+
+
+buy8*     sabr      0,b               . base the pool header
+          sa        temp              . save the virtual information
+          sbl       18                . turn base selector into relative addr
+          la        x                 . start bulding the result
+          lx        b                 . change the size required
+          aa,xi     -1                . one less than # granules desired
+          sar       3                 . to a relative zero index
+next_size_up
+          ta        maxchains,x       . make sure it's less than this number
+          jnc       allowed
+          lret      0                 . return with no skip = fail
+allowed
+          lk        a                 . save it
+          aa,i      freechains,x      . compute free chain head addr
+          sa        temp_chainhead
+          la        0,a               . and read from it
+          t         a                 . is there a buffer?
+          jz        heaptop           . no, carve out a new one
+          sa        index
+          lb,i      0                 . spread out the idx
+          dsr       15
+          sbr       6
+          sal       6
+          aa        temp              . compute a virtual address
+          ax        b                 . and a relative address
+          sbr       18                . 
+          sabr      0,b               . base it
+          sk        1,x               . size index for when it's sell time
+          la        0,x               . get the next in chain idx
+          z         0,x               . break the chain
+          sa        *temp_chainhead   . write it to the chain head
+          lret      1                 . good: skip one instruction on return
+
+heaptop   la        k                 . granules - 1
+          lb        new_base,x        . next granule available in pool
+          aa        b                 . is required_granules-1
+          lmr,i     32767             . inside the same bank?
+          n         mr                . quicker than loading literal -32768
+          mta       b                 . in the same bank?
+          jz        in_same_bank
+          sb        index             . no -register a free buffer in between
+          and       mr                . the next base is start of next bank
+          sa        new_base,x        . next base
+          ana       b                 . size of gap = difference
+          sa        temp_gapsize      . put the gap on the free chain
+          lb        remaining_granules,x . subtract from pool
+          anb       a                 . it has to fit: it's in "this" bank
+          sb        remaining_granules,x . 
+          la,i      0                 . now get the long virtual address
+          lb        index
+          dsl       9                 . split bank from offset
+          sbr       6
+          sal       6
+          aa        temp
+          ax        b
+          lb        x
+          sbr       18
+          sabr      0,b
+          la        temp_gapsize      . # granules
+          ana,i     1                 . convert to chain index
+          sa        1,b               . store in new header
+          aa,i      freechains,x      . compute what chain
+          swap      index:*a          . load old chainhead, store new one
+          sa        index:*b          . forward pointer in new chainhead
+                                      . new_base is at a new bank edge
+
+in_same_bank        
+          la        k
+          aa,i      1                 . round up free chain idx to # granules
+          lb        remaining_granules,x
+          anb       a
+          jnc       next_size_up      . 
+
+          sb        remaining_granules,x  . write decremented heap size
+          lb        new_base,x        . acquire current start index 
+          sb        index             .
+          aa        b                 .
+          sa        new_base,x        . write incremented heap base
+          la,i      0
+          dsl       9
+          sal       6
+          sbr       6
+          ax        b
+          aa        temp
+          sbr       18
+          sabr      0,b
+          sk        1,x               . write the free chain index
+          z         0,x
+          lret      1                 . good: skip one instruction on return
+
+
+
+sell8*
+          lret      0                 . until I've written it
+
+          $end
+
+
+          
+

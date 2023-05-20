@@ -1,0 +1,10 @@
+	$set_option	"Q"
+
+"&"*    $func
+        $return $r
+        $end
+
+$(4:04000)
+        +       "&"
+	+	$r
+        $end

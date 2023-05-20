@@ -1,0 +1,230 @@
+
+p	$proc
+"$i_load"*	$name
+	LOAD	p()
+	$end
+
+p	$proc
+"$i_load_negative"*	$name
+	LOAD_NEGATIVE	p()
+	$end
+
+p	$proc
+"$i_testequal"*	$name
+	TEST_EQUAL	p()
+	$end
+
+p	$proc
+"$i_testunequal"*	$name
+	TEST_NE	p()
+	$end
+
+p	$proc
+"$i_testgreater"*	$name
+	TEST_GREATER	p()
+	$end
+
+p	$proc
+"$i_testless"*	$name
+	TEST_LESS	p()
+	$end
+
+p	$proc
+"$i_shift"*	$name
+	SHIFT	p()
+	$end
+
+p	$proc
+"$i_shift_right"*	$name
+	SHIFT_RIGHT	p()
+	$end
+
+p	$proc
+"$i_or"*	$name
+	OR	p()
+	$end
+
+p	$proc
+"$i_and"*	$name
+	AND	p()
+	$end
+
+p	$proc
+"$i_xor"*	$name
+	XOR	p()
+	$end
+
+p	$proc
+"$i_add"*	$name
+	ADD	p()
+	$end
+
+p	$proc
+"$i_subtract"*	$name
+	SUBTRACT	p()
+	$end
+
+p	$proc
+"$i_multiply"*	$name
+	MULTIPLY	p()
+	$end
+
+p	$proc
+"$i_divide"*	$name
+	DIVIDE	p()
+	$end
+
+p	$proc
+"$i_covered_quotient"*	$name
+	DIVIDE_ROUNDED	p()
+	$end
+
+p	$proc
+"$i_remainder"*	$name
+	MODULO	p()
+	$end
+
+p	$proc
+"$i_reserve"*	$name
+	PUSH
+	$end
+
+p	$proc
+"$i_reverse"*	$name
+	REVERSE
+	$end
+
+"$i_retrieve_testequal"*	$proc
+	TEST_EQUAL	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_testunequal"*	$proc
+	TEST_NE	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_testgreater"*	$proc
+	TEST_GREATER	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_testless"*	$proc
+	TEST_LESS	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_shift"*	$proc
+	SHIFT	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_shift_right"*	$proc
+	SHIFT_RIGHT	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_or"*	$proc
+	OR	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_and"*	$proc
+	AND	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_xor"*	$proc
+	XOR	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_add"*	$proc
+	ADD	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_subtract"*	$proc
+	SUBTRACT	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_multiply"*	$proc
+	MULTIPLY	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_divide"*	$proc
+	DIVIDE	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_covered_quotient"*	$proc
+	DIVIDE_ROUNDED	STACK_TOP
+	POP
+	$end
+
+"$i_retrieve_remainder"*	$proc
+	MODULO	STACK_TOP
+	POP
+	$end
+
+p       $proc
+"$x_load"* $name
+	FP_LOAD		p()
+	$end
+
+p       $proc
+"$x_load_negative"* $name
+	FP_LOAD_NEGATIVE p()
+	$end
+
+p	$proc
+"$x_add"*	$name
+	FP_ADD		p()
+	$end
+
+p       $proc
+"$x_subtract"* $name
+	FP_SUBTRACT	p()
+	$end
+
+p       $proc
+"$x_multiply"* $name
+	FP_MULTIPLY	p()
+	$end
+
+p       $proc
+"$x_divide"* $name
+	FP_DIVIDE	p()
+	$end
+
+"$x_reserve"* $proc
+	FPUSH
+	$end
+
+p	$proc
+"$x_reverse"* $name
+	FP_REVERSE
+	$end
+
+"$x_retrieve_add"* $proc
+        FP_ADD		FP_STACK_TOP
+        FPOP
+        $end
+
+"$x_retrieve_subtract"* $proc
+        FP_SUBTRACT	FP_STACK_TOP
+        FPOP
+        $end
+
+"$x_retrieve_multiply"* $proc
+        FP_MULTIPLY	FP_STACK_TOP
+        FPOP
+        $end
+
+"$x_retrieve_divide"* $proc
+	FP_DIVIDE	FP_STACK_TOP
+	FPOP
+	$end
+

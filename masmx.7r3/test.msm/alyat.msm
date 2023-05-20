@@ -1,0 +1,9 @@
+ALIGMENT $equ 64
+	$res 20
+        $res	+($+ALIGMENT-1**-ALIGMENT)-$
+so
+	$res	+($+ALIGMENT-1**-ALIGMENT)-$
+ho + 'ho'
+	$res	+($+ALIGMENT-1**-ALIGMENT)-$
+yo + 'yo'
+	$end

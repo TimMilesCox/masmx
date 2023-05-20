@@ -1,0 +1,8 @@
+"$highest"*	$func
+highest	$set	0
+index	$do	71,	;
+	$do	$(index)>$(highest),;
+highest	$set	index
+	$return	highest
+	$end
+

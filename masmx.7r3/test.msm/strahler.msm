@@ -1,0 +1,5 @@
+	$include	map1.def
+	$set_option	"b"
+somewhere*      $equ    0a00
+$(8:08000)
+	$include,$binary ../result.txo/strahl

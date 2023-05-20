@@ -1,0 +1,8 @@
+	$include	"map_ppc.def"
+
+	$set_option	"b"
+
+	$include,$void		image2
+	$include,$binary	zactor
+
+	$store			image9

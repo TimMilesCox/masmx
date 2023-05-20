@@ -1,0 +1,6 @@
+	$list		1
+__relocatable $set	1
+	$include	"ppc_603.def"
+	$list		2
+	$store		factor
+	$include	factor.s

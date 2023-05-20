@@ -1,0 +1,4 @@
+__relocatable	$set	1
+	$include	"ppc_603.def"
+$(61:*4)
+submarine*	blr

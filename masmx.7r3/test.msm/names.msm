@@ -1,0 +1,8 @@
+
+this*	$proc
+        $do     times=3,   $list 0
+        $do     times=7497, $list 1
+name(times)*        +       name(times)
+        $end
+
+times	$do	7500,	this

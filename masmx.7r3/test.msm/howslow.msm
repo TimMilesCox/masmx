@@ -1,0 +1,9 @@
+p       $proc        
+        $nop
+        $end
+        $do     -32768, $do $d(1)///8192=0, $notef   yeally
+        $do     -32768
+        $do $d(1)///8192=0, $note   really
+        $do $d(1)///8192=0, $notef   really
+        $nop   really      
+        $endo

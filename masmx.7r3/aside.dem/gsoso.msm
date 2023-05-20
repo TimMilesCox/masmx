@@ -1,0 +1,11 @@
+__giant		$set	1
+__relocatable	$set	1
+	$list		0
+	$include	"ppc_64.def"
+	$list		2
+__litseg $set		36
+$(__litseg:*8,r30/__literal)
+__base36
+	$include	gsoso.s
+	$store		gsoso
+	.align		3	# align for 64-bit literal pointer constants

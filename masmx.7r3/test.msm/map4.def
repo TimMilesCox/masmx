@@ -1,0 +1,69 @@
+p	$proc
+"$map"*	$name
+
+p	$proc
+word*	$name
+parts	$set	p(1,1:)
+"$data"	$set,$binary	p(1,1:parts)
+part	$do	parts-1,	$addrel	p(1, 1:part)
+	$load,$bits		$data
+	$end
+
+p	$proc
+"$addrel"* $name
+index	$set	extract\p(1,1:1)
+unscale $set	descant\p(1,1:1)
+offset	$set	part2\p(1,1:1)
+symbol	$set	$symbol(p(1,1))
+	$do	symbol='(',; 028
+relocator	$set	$b(index)
+	$do	symbol='[',; 05b
+relocator	$xref	index
+	$if	($rlabel(relocator))++($t(relocator)=0)
+	$info	p(1,1:1):
+	$else
+bits	$set	width\p(1,1)
+scale	$set	upwards\p(1,1)
+limit	$set	1*/bits
+mask	$set	limit-1
+unmask	$set	^(mask*/scale)
+field	$set	relocator+(($data/*scale)**mask)
+	$if	unscale<0
+field	$set	(relocator+offset)/*(-unscale)
+	$do	(bits=24)**(offset<0),;
+field	$set	(relocator-($b-offset))/*(-unscale)
+	$endif
+	$if	(field<limit)++(bits<24)++(offset<0)
+	$else
+	$trace	bits
+	$trace	limit
+	$trace	field
+	$trace	$b
+	$trace  offset
+	$trace	$b-offset
+	$flag	target field overflow
+	$endif
+field	$set	field**mask
+"$data"* $set	($data**unmask)++(field*/scale)
+	$endif
+	$end
+
+f	$func
+extract* $name
+	$return	f(0,1:1)
+descant* $name
+	$return $scale(f(0,1:2))
+part2*	$name
+	$return $mantissa(f(0,1:2))
+	$end
+
+f	$func
+upwards* $name
+	$return	$scale(f(1,1))
+width*	$name
+	$return	$mantissa(f(1,1))
+	$end
+
+index1	$do	p(),	word	p(index1, 1)
+	$end
+

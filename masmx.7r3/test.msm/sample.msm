@@ -1,0 +1,24 @@
+	$plist	8
+
+sample*	$func
+
+where	$set	sample(2,1)
+what	$set	sample(1,1)
+
+intervenor* $proc	$(where)
+
+tag*	+	intervenor(1,1)
+	$end
+
+	intervenor	sample(1,1)	where
+	$return	tag
+	$end
+
+$(2:02000)
+$(3:03000)
+$(4:04000)
+$(0:256)
+
+	+	sample(99	2)
+	+	sample(100	3)
+	+	sample(101	4)

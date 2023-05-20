@@ -1,0 +1,14 @@
+        $word   32
+        $quantum 8
+        $lterm  '#'
+        $sterm  '.'
+        $set_option "c"
+	$cont_char '\\'
+
+
+?	$set	0xAABBCC
+
+
+	" text?".\
+        ?/*16.?/*8.?.\
+        "enough text?"

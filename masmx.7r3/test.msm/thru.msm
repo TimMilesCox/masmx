@@ -1,0 +1,30 @@
+f*      $func	*
+	$do	$t(f(1,1))=0,;
+"f(1,1)"****   p       f(1,1)
+        $return f(1,1)
+        $end
+p*       $proc   $(2)
+*       $set    $
+        +       $(62)
+        q       p(1,1)
+        $end
+b       $form   24,24,48
+q*      $proc   $(62)
+        b       0, 0, "q(1,1)"
+        $end
+c*      $proc
+        i	66, c(1,1)
+        $end
+j*      $proc
+        i       67, j(1, 1)
+        $end
+i       $form   8, 16
+$(2:02000)        
+$(62:62*01000)
+$(0:64)
+        +       66*/16++f(wembo)
+        i       66, f(wembo)
+        c       f(lembo)
+	c	f(crumbo)
+        j       f(crumbo)
+        j       f(crumbo)

@@ -1,0 +1,13 @@
+	$include	"../aside.dem/ppc_64.def"
+	$include	enter64.def
+$(.literal:*8,30/__literal)
+__base36
+$(.data:*4)
+gotcha*	$res	16
+wonderloaf      "wonderloaf"
+
+$(.text:*4)
+zoohoo*	enter64	32
+	ld	r7,__literal(wonderloaf:d)
+	bl	fireup
+	leave64

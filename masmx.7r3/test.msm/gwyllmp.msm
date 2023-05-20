@@ -1,0 +1,41 @@
+$(4:04000:4096)
+	+	$a
+wiberil
+	+	wiberil
+	+	$a(wiberil)
+zenftool*
+	+	zenftool
+	+	$a(zenftool)
+$(5:05000:0500000,14)
+	+	$a
+clamding
+	+	clamding
+	+	$a(clamding)
+	$res	16
+zoort*
+	+	zoort
+	+	$a(zoort)
+$(67:0600000,3)
+	+	$a
+zorich
+	+	zorich
+	+	$a(zorich)
+	$res	16
+padl*
+	+	padl
+	+	$a(padl)
+.$(67:0600080)
+trombone*
+string
+	+	trombone
+	+	string
+	+	$a(trombone)
+	+	$a(string)
+$(5)
+	+	$
+$(67)
+	+	$
+$(5:05000:0580000)
+	+	$
+slithily
+carronade*

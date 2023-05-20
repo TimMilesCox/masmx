@@ -1,0 +1,7 @@
+	$include	"tribble.def"
+	$list		 2
+	$plist	12
+tribble $set             1000000
+	$include,$binary trabble
+	$store		 trybble
+tribble	$set		 1000000

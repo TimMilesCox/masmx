@@ -1,0 +1,36 @@
+bandicoot* $proc $(6)
+        +       bandicoot(1, 1), bandicoot(1, 2):s
+        $end
+
+f*      $func	*        
+was     $set    $r
+$(7)
+l       +       $(6)
+        bandicoot fave, -f(1,1)
+        +       fave
+$(was)
+        $return l
+        $end
+
+        $set_option "a"
+$(1:*8:0100/$01)
+wance
+$(2:*8:0200/$02)
+trimgo  +       4095
+$(3:*8:0300/$03)
+tredgo  +       99
+$(4:*8:0400/$04)
+faddress
+$(5:*8:0500/$05)
+fave
+$(6:*8:0600)
+$(7:*8:0700)
+$(0:*8:040/$00)
+
+
+        +       trimgo, (f(16), tredgo)
+        +       (f(32), wance), f(64)
+        +       $
+        bandicoot  0ee, 9
+        +       f(9)
+        $res    35

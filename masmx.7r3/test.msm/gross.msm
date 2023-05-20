@@ -1,0 +1,8 @@
+gross   $form   48, 48
+p*      $proc
+.        $trace  p(1,1)
+.        $trace  p(1,2)
+        gross   p(1,2), p(1,1)
+        $end
+        p      -1, -2
+        p      05a5a5a5a5a5a, 0a5a5a5a5a5a5

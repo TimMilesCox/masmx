@@ -1,0 +1,5 @@
+__relocatable $set	1
+	$include	"ppc_603.def"
+	$store		soso
+	$list		2
+	$include	soso.s

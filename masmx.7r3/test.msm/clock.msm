@@ -1,0 +1,21 @@
+ahead*	$func
+	$return	-(clock+ahead(1, 1))
+	$end
+
+clock	$set	0400000
+target	$set	ahead(0400000)
+	+	target:s
+	+	clock+target:s
+	+	clock+03FFFFF+target:s
+	+	clock+0400000+target:s
+
+clock	$set	0C00000
+target	$set	ahead(0400008)
+	+	target:s
+	+	clock+target:s
+	+	clock+03FFFFF+target:s
+	+	clock+0400004+target:s
+	+	clock+0400007+target:s
+	+	clock+0400008+target:s
+	+	clock+0400009+target:s
+

@@ -1,0 +1,4 @@
+        $cont_char      0
+        $lterm          ';'
+        $quote          027
+        $sterm          '.'

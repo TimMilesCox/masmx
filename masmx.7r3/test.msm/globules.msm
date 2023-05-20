@@ -1,0 +1,21 @@
+	$include	../aside.dem/ppc64map.def
+
+$(27::*000FC010000B0000)
+$(25::*000FC00A80000000)
+	+	globule1:d
+	+	globule2:d
+	+	globule3:d
+	+	globule4:d
+	+	tally:d
+	$list	2
+$(25::*$)
+	$include,$binary	../result.txo/globule1
+$(25::*$)
+	$include,$binary	../result.txo/globule2
+$(25::*$)
+	$include,$binary	../result.txo/globule3
+$(25::*$)
+	$include,$binary	../result.txo/globule4
+$(25::*$)
+tally	+	99
+rally	$equ	$

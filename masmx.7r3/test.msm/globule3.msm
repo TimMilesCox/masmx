@@ -1,0 +1,8 @@
+	$word	32
+	$quantum 8
+
+$(25:*8)
+globule3*	$res	3*/30
+trip3*		92
+$(27:*8)
+drastique*	"abcdef"

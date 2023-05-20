@@ -1,0 +1,43 @@
+	$plist	7
+
+p	$proc
+scan*	$name
+index	$set	p(1,1:)
+data	$set	p(1,1:index)
+
+f	$func
+extract* $name
+	$return	f(0,1)
+	$end
+
+extras*	$func
+	$return	extras(1,1)
+	$end
+
+p	$proc
+apply*	$name
+locator	$set	extract\p(1,1)
+	+	locator
+	+	extras\p(1,1)
+	$end
+
+x	$do	index-1,	apply	p(1,1:x) data
+	+	data
+	$end
+ scan 000064
+ scan (01)18:500001
+ scan (01)18:500000
+ scan 000015
+ scan [0004]18:[0003]18*/18:(01)18*/30:(04)18*/48:[0003]18*/48:000400500000000000000000
+ scan 
+ scan 000064
+ scan (01)18:500001
+ scan (01)18:500000
+ scan 000015
+ scan [0004]18:[0003]18*/18:(01)18*/30:(04)18*/48:[0003]18*/48:000400500000000000000000
+ scan 
+ scan
+ scan +SOSO:$01:00000000
+ scan -ADJUSTMENT:[0001]
+ scan -FACTOR:[0000]
+ 

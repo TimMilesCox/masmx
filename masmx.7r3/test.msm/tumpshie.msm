@@ -1,0 +1,7 @@
+$(2:02000)
+yes:sir $res 1
+no:sir $res 1
+  $set_option "l"
+  + yes:sir
+  + no:sir
+  $end

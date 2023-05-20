@@ -1,0 +1,16 @@
+        $word   48
+		1.5, 1*-1, +1.875
+		0.8, 0.9
+                06666, 07777, 08888
+                10, 11, 12, 13, 14, 15
+                -1, +10, -1, +11
+                1,2,3,4,5,6,7,8,9,10,11,12
+left    $equ    0aaaaaaaaaaaaaaaaaaaaa
+centre  $equ    0bbbbbbbbbbbbbbbbbbbbb
+right   $equ    0ccccccccccccccccccccc
+
+        +       left, right, centre
+        +       left, right, centre:d   
+        +       left, right, centre:q
+		-1.5, -1*-1, -1.875
+		-0.8, -0.9   

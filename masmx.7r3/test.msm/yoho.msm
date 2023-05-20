@@ -1,0 +1,7 @@
+$(0:64)
+yohoho(10)(15)	$res	1
+aha(12)(20)	$res	1
+ $set_option "l"
+ + yohoho(10)(15)
+ + aha(12)(20)
+ $end

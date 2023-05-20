@@ -1,0 +1,34 @@
+p	$proc
+yooz*	$name
+*	$tree
+yo	$branch
+	+	7
+	+	8
+	+	9
+	$root
+ho	$branch
+	+	12
+	$root
+	$root
+	$end
+
+$(6:06000)
+well $tree
+switch $res 1
+blech $branch
+up + 1
+halfway yooz
+down	+	99
+ $root
+
+fest	$branch
+left	+	2
+centre	yooz
+right	+	100
+	$root
+	$root
+
+	+	well:blech:halfway:ho
+	+	well:fest:centre:yo
+	+	well:blech:down
+	+	well:fest:left

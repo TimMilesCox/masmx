@@ -1,0 +1,7 @@
+TCP_URG $equ    32
+TCP_ACK $equ    16
+TCP_PSH $equ    8
+TCP_RST $equ    4
+TCP_SYN $equ    2
+TCP_FIN $equ    1
+.

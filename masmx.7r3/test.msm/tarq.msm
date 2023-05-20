@@ -1,0 +1,16 @@
+	$quote	''''
+
+p*	$proc
+	+	p(1, 1)
+	+	'p(1, 1)'
+	'p(1, 1)'
+	'"p(1, 1)"'
+	$end
+
+	p	abc
+	p	xyz
+
+abc	$equ	99
+xyz	$equ	101
+
+

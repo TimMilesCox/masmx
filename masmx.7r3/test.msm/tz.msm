@@ -1,0 +1,17 @@
+$(7:0)
+p*      $proc
+yif*    $name
+        +       p(1,1)
+        $end
+        
+of_the_former* $proc
+        $do     index=5, $list 0
+        $do     index=1397, $list 1
+        +       $r(freddons)       
+        +       1+2+3
+        +       $r(freddons)
+        yif     index-1
+        $end
+
+freddons
+index	$do	1400,	of_the_former

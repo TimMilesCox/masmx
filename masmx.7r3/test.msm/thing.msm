@@ -1,0 +1,6 @@
+        $res    6
+index   $do     7,thing(4,index)
+        +       thing(4)
+index	$do	15,athing(index)
+	+	athing()
+        $end 

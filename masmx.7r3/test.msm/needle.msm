@@ -1,0 +1,40 @@
+        $cont_char      0
+        $lterm          ';'
+        $quote          027
+        $sterm          '.'
+
+        $suffix 1
+        $set_option     'ul'
+
+
+        $text   / and /**/
+        $text   / or /++/
+        $text   / xor /--/
+        $text   \ shr \/*\
+        $text   \ shl \*/\
+        $text   \ mod \///\
+        $text   / eq /=/
+        $text   / gt />/
+        $text   / lt /</
+        $text   / <> /#/
+        $text   / = /=/
+        $text   / * /*/
+        $text   \ / \/\
+        $text   / + /+/
+        $text   / - /-/
+        $text   /# low/#low/
+        $text   /#low /#low/
+        $text   / not /^/
+        $text   /#not /#^/
+        $text   /#not/#^/
+        $text   / ERROR / $note /
+
+	$list	3
+
+f	$func
+	$note one always can, can't one?
+	$end
+
+p	$proc
+            $flag You can't INC/DEC This Register
+	$end

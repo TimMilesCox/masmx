@@ -1,0 +1,5 @@
+	$include	"map_ppc.def"
+.	$set_option	"b"
+$(0:000A0000)
+	$include,$binary	../result.txo/soso
+	$include,$binary	../result.txo/factor

@@ -1,0 +1,311 @@
+;******************************************************************************
+;
+; File     : ACT.ASM
+;
+; Author   : Robert Sneddon
+;
+; Project  : Network printers master - XQ10
+;
+; Contents :    This file contains the routines to handle the Attraction
+;               Closing Time system, that stops printing tickets after a
+;               certain time is reached.
+;
+; Routines :    ACT_ClosingTime         ; Called in [CONTROL.ASM]
+;
+; System   : 80C537
+;
+; History  :
+;   Date        Who     Ver     Comments
+; 01/07/99      RS              Code moved out of CONTROL.ASM into separate file
+;
+;******************************************************************************
+;
+; Function:     ACT_ClosingTime
+; Input:        ?
+; Output:       ?
+; Preserved:    All except DPTR,C       
+; Destroyed:     A > 0 => attraction closed
+; Description:  Checks the "Queue Until" Time against the Attraction Closing
+;               Time (set by the HOST). If QUT >= ACT, set act_closed TRUE.
+;               An ACT value of 99:99 is a null, meaning there is no ACT.
+; Calls:        Some MATHS routines
+; Uses:         buffer, 3 bytes stack, act_attclosetimelh, act_queueuntiltime
+; Called in:    DT.ASM
+;
+; Written by : Robert Sneddon           26 June 1999
+; 02/07/99      v1.28   RS      Fixed little-endian problem with time bytes.
+;******************************************************************************
+act_attclosetime        VAR     2       ; hours:minutes
+act_attclosetimelh      VAR     2       ; minutes:hours
+act_queueuntiltime      VAR     2
+act_closed              VAR     1       ; "Attraction closed" flag - 0=FALSE,>0=TRUE
+act_tppzero             VAR     1       ; "Attraction closed" flag - 0=FALSE,>0=TRUE
+;
+ACT_ClosingTime:
+	PUSHDPH
+	PUSHDPL
+	PUSHB
+
+	IF      THEATRE
+
+	call    THEATRE_IfGrandEntrance
+	jnz     ACT_CTnoShow
+
+	mov     dptr,#theatre_cursor            
+	movx    a,@dptr                         ; subtract the process index
+	cpl     a                               ; from the total
+	mov     b,a                             ; Both are Offsets encoded
+	mov     dptr,#theatre_shows             ; as OBJECTSIZE*OCCURENCE 
+	movx    a,@dptr                         ; if no theatre array is 
+	jnz     ACT_CTestFinal                  ; loaded, close
+	jmp     ACT_CTfinal
+ACT_CTestFinal:
+	setB    c                               ; in 2s complement
+	add     a,b                             ; underflow means that the
+	jc      ACT_CTnotYet                    ; last show is closed for
+;        setB    tim_timerupdate
+	jmp     ACT_CTfinal                     ; booking
+ACT_CTnoShow:
+	ENDIF
+
+	MOV     DPTR,#act_attclosetimelh        ; ACT hours = 99?
+	MOVX    A,@DPTR
+	CLR     C
+	CJNE    A,#99,ACT_CTnotnull     ; No, not null.
+;
+	INC     DPTR                    ; ACT minutes?
+	MOVX    A,@DPTR
+	CLR     C
+	CJNE    A,#99,ACT_CTnotnull
+; Fall-through - both hours and minutes set to 99. No ACT set.
+ACT_CTnotyet:
+	CLR     A                       ; "attraction closed" = FALSE.          
+	MOV     DPTR,#act_closed
+	MOVX    @DPTR,A
+	POP     B
+	POP     DPL
+	POP     DPH
+	RET
+;
+; ACT not 99:99. Check the ACT against the QUT now.
+ACT_CTnotnull:
+
+
+;                                       ; T,23xj99
+					; just reckon absolute minute QU
+					; (beginning of period edge)
+
+
+
+
+	mov     dptr,#timebuffer        ; first read the hhhhhmmmmmm time
+	movx    a,@dptr                 ; and subtract   0000hhhhh00
+	anl     a,#7                    ; giving ordinal minutes
+	push    acc                     ;                              SP+1
+	swap    a                       ;                   0hhh0000
+	mov     b,a                     ; 
+	inc     dptr                    ;
+	movx    a,@dptr                 ;                   hhmmmmmm
+	push    acc                     ;                              SP+2
+	swap    a
+	anl     a,#0Ch                  ;                   0000hh00
+	orl     a,b                     ;                   0hhhhh00
+	cpl     a                       ;
+	setB    c                       ;                              
+	pop     b                       ;                   hhmmmmmm   SP+1
+	add     a,b                     ;                   -hhhhh*4
+	mov     b,a                     ;
+	pop     acc                     ;         00000hhh             SP+0
+	addc    a,#255                  ;         00000mmm  mmmmmmmm
+	push    acc                     ;                              SP+1
+	mov     dptr,#ctrl_periodahead  ;
+	movx    a,@dptr                 ; read LSB minutes ahead 
+	add     a,b                     ; add to LSB RT
+	mov     b,a                     ; set aside
+	inc     dptr                    ; read MSB minutes ahead
+	mov     r0,sp                   ; point to MSB RT in minutes in stack
+	movx    a,@dptr                 ; read MSB period ahead in minutes
+	addc    a,@r0                   ; add MSB RT minutes on stack top
+	mov     @r0,a                   ; put MSB result back on stack
+	mov     dptr,#ctrl_queuetimelength
+	movx    a,@dptr                 ; add QTL (1 byte) to all that
+	add     a,b
+	mov     b,a
+	pop     acc                     ; finally get MSB off stack    SP+0
+	addc    a,#0                    ; add the final carry on
+
+
+	qdan    act_attclosetime        ; 16-bit subtract ordinal minute
+	JnC     ACT_CTnotyet2           ; QUT still less than ACT
+
+
+	IF      DISNEY>2             ; find out if the negativity
+					; > QTL; if not replace QTL
+
+	orl     a,b
+	jz      ACT_CTnotyet
+
+	mov     dptr,#ctrl_periodlength ; subtract one period length
+	movx    a,@dptr                 ; from queue time length
+	cpl     a                       ; load 1s complement
+	mov     b,a                     ; place 1s complement aside
+	mov     dptr,#ctrl_queuetimelength ; load the queue time length
+	movx    a,@dptr
+	setB    C                       ; make it a 2s complement
+	addc    a,b                     ; subtract the period length
+	jnc     ACT_CTpreclose          ; underflow -close
+	jz      ACT_CTpreclose          ; exact zero -close
+	movx    @dptr,a                 ; still in business, save new QTL
+
+	IF      DISNEY>3
+	mov     dptr,#ctrl_ticketsperperiod ; subtract 6.25% from TPP
+	movx    a,@dptr                 ; load TPP LSB
+	swap    a                       ; LSB/*4
+	mov     b,a
+	anl     b,#15                   ; discard LSB--15
+	inc     dptr                    ; address MSB
+	movx    a,@dptr                 ; load LSB TPP
+	swap    a                       ; MSB--240/*4:MSB--15*/4
+	push    acc                     ;
+	anl     a,#240                  ; LSB/*4++(MSB--15*/4)
+	orl     b,a                     ; 
+	pop     acc                     ; 
+	anl     a,#15                   ; MSB--240/*4
+	qdans   ctrl_ticketsperperiod   ; then subtract it
+	ENDIF
+
+	jmp     ACT_CTnotNull
+ACT_CTpreclose:
+
+	IF      DISNEY>3
+	call    CTRL_GetTPP
+	ENDIF
+
+	call    CTRL_GetQTL             ; pull it back up from E2Rom
+
+	ENDIF                           ;
+;
+; Fall-through - the ACT equals or exceeds the QUT.
+ACT_CTfinal:
+;        setB    tim_timerupdate
+	MOV     DPTR,#act_closed
+
+	movx    a,@dptr                 ; T,1x99. This calculation is
+	jnz     ACT_ClosedAlready       ;       . Iterated continually
+					;       . Don't, however, keep
+					;       . starting the display
+					;       . update counter
+
+	MOV     A,#1                    ; "attraction closed" = TRUE.
+	MOVX    @DPTR,A
+
+
+;       *******************************************************************
+;       *       Tim     1x99    *******************************************
+;       *******************************************************************
+;       *       Try to ensure that the first pass of Blankdisplay *********
+;       *       blanks the display (=whenever counter decrements to zero) *
+;       *******************************************************************
+
+	IF      LDSP
+	mov     dptr,#ldsp_notalwaysblank
+	movx    @dptr,a
+	ENDIF
+
+ACT_ClosedAlready:
+	POP     B
+	POP     DPL
+	POP     DPH
+	RET
+ACT_CTnotyet2:
+	JMP     ACT_CTnotyet
+;
+;******************************************************************************
+;
+; Function:     ACT_TPPzeroed
+; Input:        ?
+; Output:       A > 0 => attraction closed
+; Preserved:    All except C    
+; Destroyed:    A, DPTR
+; Description:  Sets a flag (act_tppzero) TRUE if TPP is set to zero.
+;               NOTE: the TPP value is stored as one less than its true value.
+;
+; Calls:        None
+; Uses:         ctrl_ticketsperperiod, act_tppzero
+; Called in:    [CONTROL.ASM]CTRL_ChangeTickets
+;
+; Written by : Robert Sneddon           26 July 1999
+;******************************************************************************
+
+ACT_TPPzeroed:
+	MOV     DPTR,#ctrl_ticketsperperiod
+	MOVX    A,@DPTR         ; Low byte
+	INC     A               ; FFh -> 00h if necessary
+	JNZ     ACT_TPPZnotzero ; Skip now if not zero
+	INC     DPTR            ; otherwise test the high byte
+	MOVX    A,@DPTR
+	INC     A
+	JNZ     ACT_TPPZnotzero
+; Fall-through - TPP set to FFFFh, equivalent to zero (stored as one less)
+	MOV     A,#1            ; Set to one.
+	MOV     DPTR,#act_tppzero
+	MOVX    @DPTR,A
+
+;       *******************************************************************
+;       *       Tim     1x99    *******************************************
+;       *******************************************************************
+;       *       Try to ensure that the first pass of Blankdisplay *********
+;       *       blanks the display (=whenever counter decrements to zero) *
+;       *******************************************************************
+
+	IF      LDSP
+	mov     dptr,#ldsp_notalwaysblank
+	movx    @dptr,a
+	ENDIF
+
+	RET
+;
+ACT_TPPZnotzero:
+	CLR     A       ; "Attraction closed" = FALSE
+	MOV     DPTR,#act_tppzero
+	MOVX    @DPTR,A
+	RET
+;
+;******************************************************************************
+
+	IF      1
+ACT_Debug2:
+		PUSHDPH
+		PUSHDPL
+		PUSHACC
+
+		MOV     A,#18
+		CALL    LCD_GotoXY
+		POP     ACC
+		PUSHACC
+		ADD     A,#'0'
+		CALL    LCD_WriteData
+
+		POP     ACC
+		POP     DPL
+		POP     DPH
+		RET
+ACT_Debug3:
+		PUSHDPH
+		PUSHDPL
+		PUSHACC
+
+		MOV     A,#19
+		CALL    LCD_GotoXY
+		POP     ACC
+		PUSHACC
+		ADD     A,#'0'
+		CALL    LCD_WriteData
+
+		POP     ACC
+		POP     DPL
+		POP     DPH
+		RET
+	ENDIF   ; Debug code switch
+;
+	END             ; ****** ACT.ASM *******

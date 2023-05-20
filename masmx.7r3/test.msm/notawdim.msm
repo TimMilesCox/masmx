@@ -1,0 +1,13 @@
+yadontsay* $proc
+*	$equ	99
+	$end
+
+
+	$set_option	"a"
+$(17::,9)
+	+	undecided_value
+	+	location_2
+
+undecided_value	$set	1*/190
+
+location_2	yadontsay

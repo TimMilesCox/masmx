@@ -1,0 +1,2 @@
+	$include	"8051_3r1.def"
+	inc	pc

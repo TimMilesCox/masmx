@@ -1,0 +1,7 @@
+        $include "8051.def"
+DT_VERSION* macro
+        DB      '2r8  '
+        macend
+
+
+        DT_VERSION

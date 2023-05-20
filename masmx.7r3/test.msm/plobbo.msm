@@ -1,0 +1,13 @@
+p*      $proc
+w       $do     p(1),	smacro	p(1)
+	$end
+
+smacro* $proc
+v       $set    smacro(1, w)
+        $snap   2
+        +       v
+        +       smacro(1, w)
+        +       smacro(1, w)
+        $end
+
+        p       5, 4, 3, 2, 1

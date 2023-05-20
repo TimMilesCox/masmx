@@ -1,0 +1,9 @@
+	$include	"../aside.dem/map_ppc.def"
+	$list		 2
+$(61:040000000)
+	$include,$binary	"submarine.txo"
+$(1:040004400)
+	$include,$binary	"o.txo"
+	$include,$binary	"hard.txo"
+	$do	$o('b'),	$store	z4
+	$end	soso

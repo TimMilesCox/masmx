@@ -1,0 +1,26 @@
+	$path		../smaragd.68k
+	$include	coldfire.def
+	$include	express.def
+	$include	fpxpress.def
+	$path
+	$include	espresso.def
+	$include	ieee754.def
+
+$(4:16384,a5/$literal)
+
+one	$res	8
+two	$res	8
+three	$res	8
+
+westward $res	2
+ho	$res	2
+
+$(5:16384+1024)
+rastore	$res	8
+rapointer $res	4
+
+$(1:131072,pc/$azlit)
+	movea.w	#$a(one), a5
+
+	$xqt_fp	one-two+three*(*rapointer floating_string)
+

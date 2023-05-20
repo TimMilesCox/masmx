@@ -1,0 +1,62 @@
+	$plist	7
+
+f*      $func
+        $return f(0)
+        $end
+g*      $func
+        $return g(1)
+        $end
+h*      $func
+        $return h(2)
+	$end
+ipro	$func
+i*	$name
+	$return	ipro(0, 1)
+        $end
+j*	$func
+	$return	j(1, 1)
+	$end
+k*	$func
+	$return	k(2, 1)
+	$end
+l*      $func
+        $return l(1, 2)
+        $end
+m*      $func
+        $return m(2, 2)
+        $end
+
+p*	$proc
+
+	+	f\p(1, 1)
+	+	g\p(1, 1)
+	+	h\p(1, 1)
+	+	f\p(1, 2)
+	+	g\p(1, 2)
+	+	h\p(1, 2)
+	+	i\p(1, 1)
+	+	j\p(1, 1)
+	+	k\p(1, 1)
+	+	l\p(1, 1)
+        +       m\p(1, 1)
+        +       i\p(1, 2)
+        +       j\p(1, 2)
+        +       k\p(1, 2)
+        +       l\p(1, 2)
+        +       m\p(1, 2)
+
+
+	$end
+
+        +       f\(12,3,3)
+        +       g\99(1,2,3,4)
+        +       h\100(1 1,2,3,4,5)
+
+
+	p	(12, 3, 3)
+	p	99(1, 2, 3, 4), (1 1,2,3,4,5,6)
+	p	100(1 1, 2, 3, 4, 5), 101(1,2,3,4,5,6,7)
+
+
+        $end
+

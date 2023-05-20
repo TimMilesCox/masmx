@@ -1,0 +1,25 @@
+	$set_option	"c"
+	$word	32
+	$quantum 8
+
+	1d		. d = 2 words
+	0x1d		. d becomes part of 1d
+	0x1:d		. d = 2 words
+	0x1l		. l = 2 words
+	01		. -c option octal
+	01d		. d = 2 words
+	01:d		. d = 2 words
+	01l		. l = 2 words
+
+	
+	0xaa*+0
+	0Xaad*+0	. d becomes part of aad
+	0xaal*+0	. l = 2 words
+	1.5d*+1		. d = 2 words in fraction string
+	1.5l*+1		. l = 2 words
+
+	010d*+0		. -c option octal. d = 2 words
+	010:d*+0	. :d = 2 words
+	010l*+0		. l = 2 words
+	8d*+0		. decimal, d = 2 words
+

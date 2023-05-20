@@ -1,0 +1,18 @@
+        $word   32
+all1s   $equ    0ffffffffffffffffffffffffffffffffffffffffffffffff        
+        $twos_complement        0
+        -8*(-2)
+        -0
+        -8*2
+        -16*/168
+        $if     all1s<0
+        +       1+all1s:s
+        $endif
+        $twos_complement        1
+        -8*(-2)
+        -0
+        -8*2
+        -16*/168
+        $if     all1s<0
+        +       1+all1s:s
+        $endif

@@ -1,0 +1,25 @@
+i       $form   12, 84
+
+p       $proc
+load*   $name   0
+store*  $name   1
+add*    $name   2
+subtract* $name  3
+jump*   $name   4
+
+        i       $n, p(1, 1)
+        $end
+
+table1  $equ    1*/80++5*/60
+table2  $equ    table1+(1*/80)
+table3  $equ    table2+(1*/80)
+table4  $equ    table3+(1*/80)
+table5  $equ    table4+(1*/80)
+
+forever load    table1
+        add     table2
+        subtract table3
+        add     table4
+        store   table5
+        jump    forever
+

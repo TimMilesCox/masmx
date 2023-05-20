@@ -1,0 +1,14 @@
+	$word		32
+constanza $form		1, 31
+
+	$set_option	"a"
+	$lit		5
+	$plist		5
+
+instanza*	$proc
+	constanza	instanza(1, *1), instanza(1, 1)
+	 $end
+
+$(5:050000)
+ 	instanza	*(instanza *(instanza *(99)))
+	$end

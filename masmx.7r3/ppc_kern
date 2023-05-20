@@ -1,0 +1,9 @@
+pushd ../smaragd.ppc
+rm ./*.txo
+rm smaragd.ppc
+../masmx yield -w
+../masmx idle -w
+../masmx smaragd.map -w
+../mmx smaragd.txo smaragd.ppc
+cp smaragd.ppc ../test.o3
+popd

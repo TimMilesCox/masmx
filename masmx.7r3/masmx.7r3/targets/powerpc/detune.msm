@@ -1,0 +1,24 @@
+	$include	"map_ppc.def"
+	$set_option	"b"
+$(1:0a0000)
+$(3:0b0000)
+$(5:0c0000)
+$(6:0d0000)
+	$list		2
+
+	$path		test.txo
+
+	$include,$binary soso
+$(1)
+	$res	256
+$(3)
+	$res	256
+$(5)
+        $do     64,     +       99
+$(6)
+	$res	256
+
+	$include,$binary	factor
+
+	$store		test.txo/detune
+

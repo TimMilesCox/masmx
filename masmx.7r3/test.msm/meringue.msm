@@ -1,0 +1,12 @@
+	$word		32
+	$include	ieee754.def
+
+	ieee754_32	0.0
+	ieee754_32	-0.0
+
+	ieee754_64	0.0
+	ieee754_64	-0.0
+
+	ieee754_128	0.0
+	ieee754_128	-0.0
+

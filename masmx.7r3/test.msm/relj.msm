@@ -1,0 +1,11 @@
+        $include        "8051_3r1.def"
+down    sjmp    up
+
+that_lot* $proc    
+        $do     index=2,        $list   0
+        +       5
+        $do     index=125,      $list   1
+	$end
+index   $do	128,	that_lot
+
+up      jc      down

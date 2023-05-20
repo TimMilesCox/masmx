@@ -1,0 +1,6 @@
+f*      $func
+        $return $t(f(1,1))
+        $end
+
+        +       f(hyacinth)
+        +       f($equ)

@@ -1,0 +1,78 @@
+
+	$floating_point	32
+	$characteristic	9
+	$characteristic,64 12
+	$characteristic,128 16
+	
+
+"$fieee754_32"	$form	1, 8, 23
+"$fieee754_64"	$form	1, 11, 52
+"$fieee754_128"	$form	1, 15, 112
+
+p       $proc
+ieee754_32* $name 0
+
+	$nop	request a 33-bit number so masmx rounds the true 24-bit mantissa
+	$nop	the normalising bit is suppressed on storage
+
+tag     $set,33	 p(1,1)
+
+	$nop	extend the sign and XOR the number to a magnitude
+
+signs   $set    tag*/-32
+tag     $set    tag--signs
+characteristic $set (tag/*24)-2
+	$do	tag=0,characteristic	$set	0
+
+	$do	$o('V'),	$snap	2
+
+        $nop	normalising bit truncated by copy to 23-bit field
+
+        $fieee754_32	signs, characteristic, tag
+        $end
+
+
+p       $proc
+ieee754_64* $name
+
+	$nop	request a 65-bit number so masmx rounds the true 53-bit mantissa
+	$nop	the normalising bit is suppressed on storage
+
+tag     $set,65	p(1,1)
+
+	$nop	extend the sign and XOR the number to a magnitude
+
+signs	$set    tag*/-64
+tag     $set	tag--signs
+characteristic $set (tag/*53)-2
+	$do	tag=0,characteristic	$set	0
+
+	$do	$o('V'),	$snap	2
+
+        $nop	normalising bit truncated by copy to 52-bit field
+
+        $fieee754_64	signs, characteristic, tag
+        $end
+
+p	$proc
+ieee754_128* $name
+
+	$nop	request a 129-bit number so masmx rounds the true 113-bit mantissa
+	$nop	the normalising bit is suppressed on storage
+
+tag	$set,129	p(1, 1)
+
+	$nop	extend the sign and XOR the number to a magnitude
+
+signs	$set	tag*/-128
+tag	$set	tag--signs
+characteristic $set (tag/*113)-2
+	$do	tag=0,characteristic	$set	0
+
+	$do	$o('V'),	$snap	2
+
+	$nop	normalising bit truncated by copy to 112-bit field
+
+	$fieee754_128	signs, characteristic, tag
+	$end
+

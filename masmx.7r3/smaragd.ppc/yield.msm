@@ -1,0 +1,184 @@
+__save_cr		$set	1
+__registers_by_name	$set	1
+
+	$include	"../aside.dem/ppc_603.def"
+	$store		yieldppc
+
+CPUS		$set	2
+PRIORITIES	$set	8
+IDLE_STACK	$set	64
+STARTUP_MSR	$equ	0
+LOOKASIDE_R3	$equ    273
+LOOKASIDE_TCB	$equ    272
+
+f	$func
+flog*	$name
+	$do	PRIORITIES=8,	$return	3+2-1
+	$do	PRIORITIES=64,	$return	6+2-1
+	$do	PRIORITIES=256,	$return	8+2-1
+	$flag	priorities may only be 8 or 64 or 256
+	$return	0
+	$end
+
+p	$proc
+task_control_block*	$name
+*	$tree
+h	task_control_block_head p(2)
+save_srr0 +	p(1,1)
+save_srr1 +	STARTUP_MSR
+save_cr	+	0
+save_xer +	0
+save_ctr +	0
+save_lr	+	0
+save_register_0 +	0
+save_register(1) +	stack_top
+index	$do	30,save_register(index+1)	+	0
+	$do	IDLE_STACK/4,	+	0xa5a5a5a5:s
+stack_top
+	$root
+	$end
+
+p	$proc
+task_control_block_head*	$name
+*	$tree
+next	+	p(1, 1)
+priority +	p(1, 2)
+state	+	p(1, 3)
+base	+	p(1, 4)
+	$root
+	$end
+
+p	$proc
+tailx*	$name
+*	$tree
+
+next1	$set	qtailx(1)
+	$do	index<PRIORITIES,next1	$set	qtailx(index+1)
+	$do	index=PRIORITIES-1,next1 $set	itask(1)
+
+uplink	$set	qtailx(PRIORITIES)
+	$do	index>1,uplink		$set	qtailx(index-1)
+	$do	index=PRIORITIES,uplink	$set	itask(CPUS)
+
+
+h	task_control_block_head	next1, index-1, -1, uplink
+
+	$root
+	$end
+
+p	$proc
+idle_task* $name
+
+next1	$set	qtailx(PRIORITIES)
+	$do	index<CPUS,next1	$set	itask(index+1)
+
+*	task_control_block	idle	next1, PRIORITIES-1, 0, 0	
+	$end
+
+$(0:0x0C00)
+	mtspr	LOOKASIDE_R3, r3
+	mfspr	r3, LOOKASIDE_TCB
+
+	cmpi	0, 0, r3,0				# this task is deleted
+	beq	pick				# so skip saving + queueing
+
+	stw	r0, tcb.save_register_0
+index	$do	2,	stw	index,tcb.save_register(index)
+	mfspr	r0, LOOKASIDE_R3
+	stw	r0, tcb.save_register(3)
+
+	stmw	r4, tcb.save_register(4)
+
+        mfspr   r0, SRR0
+        stw     r0, tcb.save_srr0
+        mfspr   r0, SRR1
+        stw     r0, tcb.save_srr1
+
+	$if	__save_cr
+        mfcr    r0
+        stw     r0, tcb.save_cr
+	$endif
+
+        mfspr   r0, XER
+        stw     r0, tcb.save_xer
+        mfspr   r0, CTR
+        stw     r0, tcb.save_ctr
+        mfspr   r0, LR
+        stw     r0, tcb.save_lr
+
+	lwz	r2, tcb.h.priority
+	cmpi	0, 0, r2, 0
+	blt	qaside			# priority set out of range
+	cmpi	0, 0, r2, PRIORITIES
+	bge	qaside			# queue away for special treatment
+
+	rlwinm	r2, r2, 4, 31-4-flog(), 31-4
+	addi	r2, qtailx(1)
+
+	lwz	4, tcb.h.base(r2)
+	stw	3, tcb.h.next(r4)
+	stw	2, tcb.h.next(r3)
+	stw	3, tcb.h.base(r2)
+
+pick	lwz	r3, qtailx(PRIORITIES)
+next	mr	r2, r3
+	lwz	r3, tcb.h.next
+	lwz	r0, tcb.h.state
+	cmpi	0, 0, r0, 0
+	bne	next
+
+	lwz	r4, tcb.h.next
+	stw	r4, tcb.h.next(r2)
+
+	lwz	r0, tcb.h.state(r4)
+	cmpi	0, 0, r0, 0
+	bge	not_last
+
+	stw	r2, tcb.h.base(r4)
+not_last
+	mtspr	LOOKASIDE_TCB, R3
+
+	$if	__save_cr
+	lwz	r0, tcb.save_cr
+	mtcr	r0
+	$endif
+
+	lwz	r0, tcb.save_srr0
+	mtspr	SRR0
+	lwz	r1, tcb.save_srr1
+	mtspr	SRR1
+
+	lwz	r0, tcb.save_xer
+	mtspr	XER, r0
+	lwz	r0, tcb.save_ctr
+	mtspr	CTR, r0
+	mtspr	r0, tcb.save_lr
+	mtspr	LR, r0
+
+	lwz	r0, tcb.save_register_0
+
+index	$do	2,	lwz	index, tcb.save_register(index)
+
+	lmw	r4, tcb.save_register(4)
+	lwz	r3, tcb.save_register(3)
+	rfi
+$(0:4096)
+qaside	lwz	r2, qaside_h
+	cmpi	0, 0, r2, 0
+	beq	wfirst
+	lwz	r2, qaside_t
+	stw	r3, tcb.h.next(r2)
+	b	wlast
+wfirst	stw	r3, qaside_h
+wlast	stw	r3, qaside_t
+	li	r2, 0
+	stw	r2, tcb.h.next
+	b	pick
+
+$(67:,3)
+tcb	task_control_block
+$(3:*4)
+index	$do	PRIORITIES,qtailx(index)	tailx
+index	$do	CPUS,itask(index)		idle_task
+qaside_h* +	0
+qaside_t* +	0

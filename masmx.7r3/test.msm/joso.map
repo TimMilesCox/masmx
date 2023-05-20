@@ -1,0 +1,3 @@
+	$include		"map1.def"
+$(3:03000)
+	$include,$binary	"../test.o3/doso.txo"

@@ -1,0 +1,23 @@
+		$path		../smaragd.68k
+		$include	coldfire.def
+		$include	record_x.def
+		$path
+
+$(71::,a7)
+channel_status	$record
+active		1
+sense		3
+input_status	3
+output_status	3
+input_access_chain_head  16
+output_access_chain_head 16
+		$root
+
+$(0:64)
+
+	retrieve	channel_status.input_status
+	beq.b		no_input_traffic
+	retrieve	channel_status.input_access_chain_head d2
+	
+	
+no_input_traffic

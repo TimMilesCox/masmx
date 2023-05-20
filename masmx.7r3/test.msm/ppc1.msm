@@ -1,0 +1,30 @@
+__registers_by_name $set	1 
+        $include        "../aside.dem/ppc_603.def"
+        .cseg    $1000
+        lwz     r1, 0x96(r2)    # Yep
+        lwz     r3,12(r1)       #/* Nope */
+        stw     r4, $40(r3)     # zippons
+        b       .-4
+up	b	down
+	b	up
+down        
+        +       arrayloc(4).sequence        
+        +       arrayloc(6).t
+
+        .dseg   32768
+        +       99<<44
+HIGH_MEMORY $equ 0x0000C00000000000       
+
+vastmemp* $proc
+
+LOCO	$set	HIGH_MEMORY+(ARRAY-1)*0x0000010000000000
+
+$(5::*LOCO)
+arrayloc(ARRAY)* $tree
+sequence + ARRAY
+h       $res    48
+t       $res    144
+        $root
+        $end
+
+ARRAY	$do	8,	vastmemp

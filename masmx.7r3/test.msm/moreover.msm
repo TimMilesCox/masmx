@@ -1,0 +1,52 @@
+	$path		../smaragd.68k
+	$list		0
+	$include	coldfire.def
+	$include	record_x.def
+	$list
+	$path
+
+
+$(3:03000)
+first	$record,$branch	1 2 3
+one	4
+two	4
+three	4
+"O'Leary" 20
+	$root
+second	$record,$branch
+fill	4
+second1	$record,$branch	4 5 6
+one	4s
+two	4
+three	4
+	$root
+second2	$record,$branch	7 8
+one	4
+two	4
+	$root
+	$root
+third	$record,$branch	63
+longways 18
+	$root
+
+new	$record	10 6
+discriminator 4
+first	$record,$branch	"carpets"
+text	48
+	$root
+second	$record,$branch	10 11 12 13 14 15
+?	$do	9,quartet(?)	4
+	$root
+marker	4
+	$root
+
+sum	1.75
+	
+$(0:64)
+	retrieve	first.three
+	retrieve	second.fill		d1
+	retrieve	second.second1.one	d2
+	retrieve	second.second1.three	d3
+	retrieve	second.second2		d4
+	retrieves	new.second.quartet(5)	d5
+

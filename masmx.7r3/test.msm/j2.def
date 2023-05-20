@@ -1,0 +1,5 @@
+p       $proc
+jpad$*  $name
+loop    $do     p(),    j       p(loop)
+        $do     8-loop, fret   0
+        $end

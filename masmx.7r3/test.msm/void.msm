@@ -1,0 +1,4 @@
+	$word		32
+	$quantum	8
+	$awidth		32:64
+index	$do	72,$(index-1:*1)

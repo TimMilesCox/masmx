@@ -1,0 +1,216 @@
+HOST_DLE        EQU     16
+HOST_STX        EQU     2
+HOST_ACK        EQU     6
+HOST_NAK        EQU     21
+HOST_ETX        EQU     3
+
+host_pingflag  VAR     1
+
+HOST_Init:
+	mov     host_endbuf,#0
+	mov     host_lastchar,#0
+	clr     host_inpacket
+	ret
+
+HOST_Receive:
+HOST_Update:
+	call    EXAR_Read1
+	jc      HOST_Data
+	ret
+HOST_Data:
+	cjne    a,#HOST_DLE,HOST_RnotDLE
+HOST_rDLE
+	mov     host_lastchar,#HOST_DLE
+	jmp     HOST_Update                     ; loop for next input byte
+HOST_RnotDLE:
+	cjne    a,#HOST_STX,HOST_rDLESTXok
+	mov     a,host_lastchar
+	cjne    a,#HOST_DLE,HOST_Drop
+	setB    host_inpacket
+	mov     host_endbuf,#0
+	mov     host_actpktlen,#6
+	jmp     HOST_UpDate                     ; loop for next input byte
+HOST_Drop:
+	mov     host_endbuf,#0
+	mov     host_lastchar,#0
+	clr     host_inpacket
+HOST_Drop1:
+	call    EXAR_Read1
+	jc      HOST_DropData
+	ret
+HOST_DropData:
+	cjne    a,#HOST_DLE,Host_Drop1
+	jmp     HOST_rDLE                       ; loop for next input byte
+
+HOST_rDLESTXok:
+	jnb     host_inpacket,HOST_Update       ; loop for next input byte
+	mov     dph,#disney_buffer SHR 8
+	mov     dpl,host_endbuf
+	movx    @dptr,a
+	inc     host_endbuf
+
+	mov     a,host_endbuf
+	cjne    a,#2,HOST_rLenNot2
+
+	mov     dptr,#disney_buffer
+	call    HOST_HEX2Bin
+	add     a,#2
+	mov     host_actpktlen,a
+	jmp     HOST_Update
+
+HOST_rLenNot2:
+	cjne    a,host_actpktlen,HOST_Update
+	clr     host_inpacket
+	mov     host_lastchar,#0
+	
+	
+BUGLE4  EQU     0        
+	IF      BUGLE4
+	
+	clr     A
+	mov     dptr,#xcom1_buffer
+bugle4L:
+	push    acc
+	movx    a,@dptr
+	inc     dptr
+	mov     b,a
+	pop     acc
+	push    acc
+	add     a,#64+3
+	call    LCD_Bug1
+	pop     acc
+	inc     acc
+	cjne    a,host_endbuf,bugle4L
+	
+	ENDIF
+	
+	call    HOST_Disney_Chksum
+
+	
+	
+BUGLE3  EQU     0
+	
+	
+	IF      BUGLE3
+	push    b
+	push    acc
+	swap    a
+	call    hexchar
+	mov     b,a
+	call    LCD_BugA
+	pop     acc
+	push    acc
+	call    hexchar
+	mov     b,a
+	call    LCD_BugB
+	pop     acc
+	pop     b
+	ENDIF
+	
+	
+	jz      HOST_rCorrect
+	mov     a,#2
+	mov     dptr,#host_pingflag
+	movx    @dptr,a
+	jmp     HOST_Drop
+HOST_rCorrect:
+	CALL    HOST_Disney_DDS_Convert
+	mov     host_endbuf,#0
+	setB    C                               ; result = Yes
+	ret
+
+HOST_Hex2Bin:
+	push    B
+	movx    a,@dptr
+	inc     dptr
+	jnb     acc.6,HOST_HexDigit1
+	add     a,#9
+HOST_HexDigit1:
+	anl     a,#15
+	swap    a
+	mov     b,a
+	movx    a,@dptr
+	inc     dptr
+	jnb     acc.6,HOST_HexDigit2
+	add     a,#9
+HOST_HexDigit2:
+	anl     a,#15
+	orl     a,b
+	pop     B
+	ret
+
+SERIAL_FASTREL EQU 1        
+	
+HOST_TransmitPacket:
+	pushdph                           ; save DPTR, R7
+	pushdpl
+	mov     a,r7
+	push    acc
+	add     a,#3                      
+	mov     dptr,#host_buffer+2       ; write length in r7 + 3 to Buff+2
+	movx    @dptr,a
+	call    HOST_DDS_Disney_Convert
+	
+	IF      SERIAL_FASTREL=0
+	
+	mov     a,#HOST_DLE               ; xmit: DLE STX
+	call    EXAR_TxL
+	mov     a,#HOST_STX
+	call    EXAR_TxL
+	
+	ENDIF
+	
+	mov     dptr,#disney_buffer       ; read length from Disney format
+	call    HOST_Hex2Bin
+	add     a,#2
+	mov     r7,a                      ; xmit that many + 2 length bytes
+	mov     dptr,#disney_buffer
+	
+	IF      SERIAL_FASTREL
+	
+	call    EXAR_FTX
+	
+	ELSE
+
+HOST_TxL:
+	movx    a,@dptr
+	inc     dptr
+	call    EXAR_TxL
+	djnz    r7,HOST_TxL
+	
+	ENDIF
+	
+	pop     acc
+	mov     r7,a
+	pop     DPL
+	pop     DPH
+	ret
+
+	
+	
+SNOT    EQU     0        
+
+	IF      SERIAL_FASTREL=0
+
+HOST_Ping:
+	mov     a,HOST_ACK
+	call    EXAR_TxL
+	mov     a,HOST_ETX
+	call    EXAR_TxL
+	ret
+
+HOST_ErrPing:
+	mov     a,HOST_NAK
+	call    EXAR_TxL
+	mov     a,HOST_ETX
+	call    EXAR_TxL
+	ret
+	
+	ENDIF        
+	
+	
+	End                               ; Host3.ASM
+
+
+
+

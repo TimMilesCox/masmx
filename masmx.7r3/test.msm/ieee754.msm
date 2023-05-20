@@ -1,0 +1,51 @@
+        $word   32
+
+	$floating_point	192
+	$characteristic	24
+
+fieee754_64 $form 1, 11, 52
+
+p       $proc
+ieee754_64* $name 0
+
+tag     $set	p(1,1)
+.	$snap	2
+sign    $set    tag/*191
+        
+        $if     sign
+tag     $set    ^tag        
+        $endif
+
+characteristic $set (((tag/*180)**1024)++((tag/*168)**1023))-2
+mantissa $set   ((tag**(1*/168)-1)+(7*/112))/*115
+
+	. adjust rounding outflow
+	. indicated by a 54th mantissa bit
+
+	$if	mantissa**(1*/53)
+mantissa $set	mantissa/*1
+characteristic $set characteristic+1
+	$endif
+
+        . bb 166..115 rounded -> bb 51..0. Normalising Bit 167 Truncated
+        
+        fieee754_64 sign, characteristic, mantissa 
+        $end
+
+
+$(0:0)
+        ieee754_64 1.5
+        ieee754_64 1.0
+        ieee754_64 1.5e6
+        ieee754_64 1.0e6
+        ieee754_64 1.5e-6
+        ieee754_64 1.0e-6
+        ieee754_64 -1.5e100
+        ieee754_64 +1.5e100
+        ieee754_64 1.0e100
+        ieee754_64 1.5e-100
+        ieee754_64 1.0e-100
+        ieee754_64 1.5e300
+        ieee754_64 1.0e300
+        ieee754_64 1.5e-300
+        ieee754_64 1.0e-300

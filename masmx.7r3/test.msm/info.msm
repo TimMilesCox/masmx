@@ -1,0 +1,12 @@
+p       $proc        
+entrypoint* $name 1       
+module* $name   2
+        $if     $n=entrypoint
+        $info   >p(1,1)
+        $elseif $n=module
+        $info   :p(1,1)
+        $endif
+        $end
+xlabel* $equ    01c00000000001e0000000000
+        entrypoint 00010A00
+        module  APPLICATION1

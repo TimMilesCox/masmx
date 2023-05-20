@@ -1,0 +1,13 @@
+        $word   32
+        $quantum  8
+        $byte   8
+        $awidth 32
+        $quote  027
+        'ABC'
+        $data_code  'A', 0c1, 0c2, 0c3, 0c4, 0c5, 0c6, 0c7, 0c8, 0c9
+        $data_code  32, 64
+        'ABCDEF'
+        $ascii
+        'ABCDEF'
+        $data_code
+        'ABC'

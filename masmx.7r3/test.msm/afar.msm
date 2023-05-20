@@ -1,0 +1,20 @@
+p	$proc	$(4)
+generate* $name
+*	+	p(1, 1)
+	$end
+
+f       $func *
+Distant_Routine* $name '0'
+Distant_Destiny* $name '1'
+ $if     $t("f(1,1):f(0,1)")=0  . Non-existent?
+"f(1,1):f(0,1)"** generate f(1,1, $n)
+         . Generate Label and Data
+ $endif
+ $return "f(1,1):f(0,1)". return label value
+ $end
+
+$(4:04000)
+$(5:05000)
+ + Distant_Routine(ROUTINE)
+ + Distant_Destiny(AFAR)
+ $end

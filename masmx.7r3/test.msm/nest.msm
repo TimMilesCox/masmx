@@ -1,0 +1,21 @@
+o*      $proc
+noname    $equ    98
+        p
+	$note	shallow
+	$snap	2
+        +name
+        $end
+p*      $proc
+name    $equ    99
+        q
+	$note	medium
+	$snap	2
+        $end
+q*      $proc
+name**  $equ    100
+	$note	deep
+        $snap   2
+        +       name
+        $end
+        o
+

@@ -1,0 +1,51 @@
+p	$proc
+"$map"*	$name
+
+p	$proc
+word*	$name
+parts	$set	p(1,1:)
+"$data"	$set,$binary	p(1,1:parts)
+part	$do	parts-1,	relocate	p(1, 1:part)
+	$load,$bits	$data
+	$end
+
+p	$proc
+relocate* $name
+label1***	$pushrel	p(1,1)
+
+v	$set	label1
+
+bits	$set	label1\2
+scale	$set	label1\3
+offset	$set	label1\4
+descant	$set	label1\5
+
+	$if	$t(label1)=$equf
+limit	$set	1*/bits
+mask	$set	limit-1
+unmask	$set	^(mask*/scale)
+
+	$if	descant<0
+field	$set	v+offset
+        $info,$range_check1     field
+	$info,$offset		field
+field	$set	field*/descant
+	$else
+field	$set	v+(($data/*scale)**mask)
+	$info,$range_check1	field
+	$endif
+
+"$data"* $set	($net(field)*/scale)++($data**unmask)
+
+	$else
+
+	$flag	$pushrel label type
+	$trace	$t(label1)
+	$trace	label1
+	$endif
+
+	$end
+
+index	$do	p(),	word	p(index, 1)
+	$end
+

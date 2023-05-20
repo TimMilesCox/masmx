@@ -1,0 +1,6 @@
+	$include	"tribble.def"
+	$list		 2
+trabble $set             999998
+	$include,$binary tribble
+	$store		 trabble
+trabble $set		 999998

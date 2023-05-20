@@ -1,0 +1,29 @@
+        $list           -1
+        $include        "../aside.dem/ppc64map.def"
+        $include,$void "../result.txo/langobar.txo"
+
+	$list		2
+
+"$base(1)"      $set    00444400000a0000
+"$base(3)"      $set    00aaaa0000060000
+
+$(1::*"$base(1)")
+$(3::*"$base(3)")
+. $(36::*__end3)
+
+	$include,$binary	"../result.txo/gframe2.txo"	$(1, 3)
+. "$base(1)"	$set	$base(1)+$(1)
+. "$base(3)"	$set	$base(3)+$(3)
+	$include,$binary	"../result.txo/gscale23.txo"	$(1, 3)
+	$include,$binary 	"../result.txo/gscale24.txo"	$(1, 3)
+	$include,$binary	"../result.txo/gfurther.txo"	$(1, 3)
+	$store			"../test.o3/iscale2.txo"
+$(3)
+	$trace	$
+__end3
+$(36::*__end3)
+	$include,$binary	"../result.txo/gframe2.txo"	$(36)
+	$include,$binary	"../result.txo/gscale23.txo"	$(36)
+	$include,$binary	"../result.txo/gscale24.txo"	$(36) 
+	$include,$binary	"../result.txo/gfurther.txo"	$(36)
+	$end			yoohoo

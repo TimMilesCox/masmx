@@ -1,0 +1,18 @@
+	$include ../aside.dem/ppc_603.def
+	$include ieee754.def
+$(33:*8)                                  
+one	ieee754_64	1.5
+two	ieee754_64	1.75
+$(34:*8,30/.literals34)
+first	ieee754_64	-1.5
+second	ieee754_64	-1.75
+$(.text:131072)
+	bl	load_base30
+	+	.absolute(first)
+load_base30
+	mflr	r30
+	lwz	r30,,r30
+	lfd	0, second
+	lfd	2, two
+	lfd	4, .literals34(ieee754_64 37.5e-115)
+

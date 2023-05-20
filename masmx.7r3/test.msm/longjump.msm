@@ -1,0 +1,27 @@
+v*      $func	*
+        $if     $t("vector_entry:v(1,1)")=0
+"vector_entry:v(1,1)"**  vector v(1,1)
+        $endif
+        $return "vector_entry:v(1,1)"
+        $end
+
+vector* $proc   $(2)
+*       +       vector(1,1)
+        $end
+
+        $word   32
+fijump  $form   8, 24
+
+p       $proc
+ijump*   $name   12        
+        fijump  $n, p(1, 1)
+        $end
+        
+faraway_routine $equ 0e00000a   
+even_further    $equ 0e000010
+$(2:00200000)        
+$(0:64)
+        
+        ijump   v(faraway_routine)
+        ijump   v(even_further)
+        ijump   v(faraway_routine)

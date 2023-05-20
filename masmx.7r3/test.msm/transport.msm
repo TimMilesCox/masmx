@@ -1,0 +1,38 @@
+	$word	16
+	$quantum	8
+	$awidth	32
+
+p	$proc
+udp_datagram* $name
+sourcep	+	p(1,1)
+destp   +       p(1,2)
+length  +       p(1,3)
+checksum +      p(1,4)
+data
+	$end
+
+p	$proc
+tcp_segment*	$name
+sourcep	+	p(1,1)
+destp	+	p(1,2)
+sequence +	0:d
+ack	+	0:d
+hl_code	+	0
+window	+	0
+checksum +	0
+urgent	+	0
+data
+	$end
+
+pointer_register $equ	15
+
+$(67:,pointer_register)
+
+user_datagram	$branch
+		udp_datagram
+		$root
+
+tcp_segmentP	$branch
+		tcp_segment
+		$root
+

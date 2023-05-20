@@ -1,0 +1,12 @@
+$(15:2048:*0FFFF00000400,15)
+one
+two*
+	+	one
+	+	two
+	+	one\2
+	+	two\2
+$(16:2048,16)
+three	+	three
+four*	+	four
+	+	three\2
+	+	four\2

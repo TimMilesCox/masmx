@@ -1,0 +1,19 @@
+__registers_by_name	$set	1
+	$include	"../aside.dem/ppc_603.def"
+.buffer	$equ,"$directive"	"$res"
+
+$(.data:*4:-32768,r29)
+__start_data
+rimskiy	.buffer	32760
+index	$do	4,korsakov(index)	+	104-index
+
+$(.text:*4)
+	oris	r29, 0, .absolute(__start_data)@ha
+	lwz	r3, korsakov(2)
+	lwz	r4, korsakov(3)
+
+	li	r9, korsakov(1)
+	li	r10,korsakov(4)
+
+	bl	somewhere
+	blr

@@ -1,0 +1,6 @@
+	$list	0
+__relocatable	$set	1
+	$include	"ppc_603.def"
+	$list	2
+	$include	"vitest2.s"
+	$store		vitest2

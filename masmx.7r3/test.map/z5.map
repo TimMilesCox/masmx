@@ -1,0 +1,13 @@
+	$include	"map_ppc.def"
+	$include	"highest.def"
+
+	$if	$o('b')
+	$note	option b
+	$include,$binary z4		.	$(3,5,6,40,50,51,60,61,65,1)
+	$else
+	$include,$binary "z4.txo"	.	$(3,5,6,40,50,51,60,61,65,1)
+	$endif
+
+$($highest)
+
+	$include,$binary "zactor.txo"

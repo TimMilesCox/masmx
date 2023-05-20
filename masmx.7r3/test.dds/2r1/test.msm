@@ -1,0 +1,437 @@
+;******************************************************************************
+;
+; File     : TEST.ASM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains the main program for the test prom.
+;
+; System   : 80C51
+;
+; History  :
+;   Date     Who Ver  Comments
+;   ??/??/95 SSM 1.00 Original Release
+;   02/06/95 SSM 1.01 Added Test Printer Cut-out circuit.
+;                     All printer test routines now turn printer power on/off
+;                     Now setting bitmaplen from "printer test"
+;   13/07/95 SSM 1.02 Wiggle RAM Page bits
+;                     Form Feed
+;   18/09/95 SSM 1.03 Debug Menu added
+;                     Digital Scope Mode added.
+;                     Continous formfeed
+;                     Added cash drawer output test
+;   26/09/95 SSM 1.04 New sound and flashing leds at bootup
+;                     New sound test routine to cheer john up
+;   03/11/95 SSM 1.05 Re-compile to suit the other mods in other DT files.
+;                     (Mainly, code structure, interrupts, stack changes)
+;   13/11/95 SSM 1.06 Bootup now attempts to print as well, helping to test
+;                       more of the system before the keyboard is put on.
+;   16/02/96 SSM 1.07 Printer functions hopefully now jump back to the
+;                       right menu after they are exited.
+;                     Put in a battery backup test which must be run after
+;                       powerup following a cyclic ram test.
+;                     Fixed the bug which caused the test prom to say the
+;                       battery was dead at bootup from the bench supply only.
+;                 ( NEEDS TESTED )
+;   28/02/96 SSM 1.08 Fixed the I2C_Write problem, updated sound tests.
+;   02/10/96 SSM 2.50 Recompile with machine serial number at the new address
+;                       in the EEPROM to tally with the DDSNET options.
+;                     Changed sound routines (to upset tommy)
+;                     Added Set Print Intensity, Quality and Perf Offset.
+;                     Test Battery now warns if volts "seems high".
+;                     Added test customer display.
+;   24/10/96 SSM 2.51 Modified "Stepper Motor Tests" to work again. The old
+;                       one couldn't have worked since PRT_StartPrint was
+;                       recoded to calculate stepper delays. The new one leaves
+;                       printer power on until you return to the menu. Also
+;                       added on key 0 a 255 pulse feed based on stepdelay1 to
+;                       allow testing with the new fujitsu printer.
+;   06/11/96 SSM 2.52 Comms tests now in a menu, and all 3 ports are testable.
+;
+;******************************************************************************
+VT10		EQU 1
+PRT_CLAA	EQU 1
+PRT_CLBM	EQU 0
+DT10		EQU 1
+DT5		EQU 0
+DT_TEST         EQU 1
+USE_RS485	EQU 0
+USE_BARCODES	EQU 0
+
+DT_VERSION MACRO
+ DB 'TestP'
+ MACEND
+
+
+;*****
+	MEMTRAP Hi,7A00h	; EPROM goes from 0000h to 7FFFh
+	MEMTRAP VAR,Hi,7F00h	; XRAM goes from 0000h to 7FFFh
+				; (not overlapped, two separate areas)
+; NOTE , both limits set at 16K (not 32K) to give early warning of code
+; beginning to run out.
+	PRESET VARTYPE,ALIGN
+;POINTER PRESET 2
+;LONG	PRESET 4
+
+	INCLUDE vectors.asm
+
+	ORG VAR,0000h		; Base address of XRAM (external RAM)
+buffer:	VAR 4096	; misc work buffer, declare as largest area needed
+aud_first: VAR 4
+aud_last: VAR 4
+aud_uploadfrom:	VAR 4 ; guaranteed to be readable, even if nothing else is.
+aud_uploadto:	VAR 4 ;
+	INCLUDE sfr.inc
+	ALIGN ToPage
+font:
+	INCLUDE hfont.asm
+	INCLUDE ddslogo.asm
+	INCLUDE iram_map.inc
+	INCLUDE ee_map.inc
+	INCLUDE stack.asm
+	INCLUDE sbus.asm
+	INCLUDE memory.asm
+	INCLUDE math.asm
+	INCLUDE menu.asm
+	INCLUDE prt.asm
+	INCLUDE printer.asm
+	INCLUDE card.asm
+	INCLUDE cdrawer.asm
+	INCLUDE custdisp.asm
+	INCLUDE crc.asm
+	INCLUDE lcd2x24.asm
+	INCLUDE system.asm
+	INCLUDE sound.asm
+	INCLUDE leds.asm
+        INCLUDE number.asm
+        INCLUDE keyboard.asm
+        INCLUDE i2c.asm
+	INCLUDE comms.asm
+	IF USE_RS485
+	 INCLUDE rs485.asm
+	ELSE
+NODE_ID_INSTALL EQU 255
+	ENDIF
+	INCLUDE pplug.asm
+        INCLUDE login.asm
+	INCLUDE manager.asm
+	INCLUDE operator.asm
+	INCLUDE time.asm
+	INCLUDE rtc.asm
+	INCLUDE spotchck.asm
+	INCLUDE ticket.asm
+	INCLUDE tktprint.asm
+	INCLUDE receipt.asm
+	INCLUDE shift.asm
+	INCLUDE waybill.asm
+	INCLUDE diags.asm
+	INCLUDE audit.asm
+	INCLUDE complink.asm
+	INCLUDE cutter.asm
+	INCLUDE testcode.asm
+	INCLUDE ports.asm
+	INCLUDE Delay.asm
+;*******************************************************************************
+;
+;                          D E B U G   R O U T I N E S
+;
+;*******************************************************************************
+
+DBG_TxChar:
+	MOV	B,#COM_COM1
+	JMP	COM_TxChar
+
+DBG_TxStr:
+	MOV	B,#COM_COM1
+	JMP	COM_TxStr
+
+DBG_DumpXRAM:   ; DPTR=addr, R6/R7=len
+	PUSHB
+	PUSHACC
+        MOV	A,R5
+        PUSHACC
+        MOV	R5,#0
+
+	MOV	A,R7
+	JZ	DBG_DXRloop
+	INC	R6
+DBG_DXRloop:
+
+        MOV	A,R5
+        JNZ	DBG_DXRnoeol
+        CALL	TxCr
+	MOV	A,DPH
+	PUSHACC
+	SWAP	A
+	CALL	HexChar
+	CALL	DBG_TxChar
+	POP	ACC
+	CALL	HexChar
+	CALL	DBG_TxChar
+        MOV	A,DPL
+	PUSHACC
+	SWAP	A
+	CALL	HexChar
+	CALL	DBG_TxChar
+	POP	ACC
+	CALL	HexChar
+	CALL	DBG_TxChar
+        MOV	A,#':'
+        CALL	DBG_TxChar
+        MOV	A,#32
+        CALL	DBG_TxChar
+        MOV	R5,#16
+DBG_DXRnoeol:
+
+	MOVX	A,@DPTR
+	PUSHACC
+	SWAP	A
+	CALL	HexChar
+	CALL	DBG_TxChar
+	POP	ACC
+	CALL	HexChar
+	CALL	DBG_TxChar
+        MOV	A,#32
+        CALL	DBG_Txchar
+
+        INC	DPTR
+	DEC	R5
+        DJNZ	R7,DBG_DXRloop
+        DJNZ	R6,DBG_DXRloop
+
+        CALL	TxCr
+        POP	ACC
+        MOV	R5,ACC
+        POP	ACC
+        POP	B
+	RET
+
+;******************************************************************************
+; Main Program
+;******************************************************************************
+msg_wait:	DB 11,0,0,0,0,11,'Please Wait'
+msg_ready:	DB  5,0,0,0,0, 5,'Ready'
+msg_eewritefail:	DB 13,0,0,0,0,13,'EE write fail'
+msg_eewriteok:	DB 11,0,0,0,0,11,'EE write ok'
+msg_eereadfail:	DB 15,0,0,0,0,15,'PricePlug Error'
+msg_eereadok:	DB 16,0,0,0,0,16,'PricePlug Loaded'
+msg_dt10:	DB 18,'Totem Desktop DT10'
+msg_dds:	DB 24,'Directional Data Systems'
+msg_pleasewait:	DB 14,'Please Wait...'
+msg_testprom:	DB 24,'Test Prom V2.52    hh:mm'
+msg_unitserial:	DB 24,'Unit XXXXX      dd/mm/yy'
+
+tst_beep:
+        MOV	B,#75
+        CALL	SND_SoundOn
+        MOV	R0,#5
+        CALL	delay100us
+        CALL    SND_SoundOff
+        MOV	R0,#90
+        CALL	delay100us
+        RET
+tst_delay:
+	MOV	R0,#100
+        CALL	delay100us
+        RET
+DT_ColdBoot:
+DT_WarmBoot:
+	MOV	SP,#stackpointer
+	MOV	IEN0,#0			; disable all interrupts
+	MOV	IEN1,#0
+	MOV	IEN2,#0
+	CLR	F1			; select 13bit e2 addressing
+	CLR	F0			; select main i2c line
+
+	MOV	R0,#8
+	MOV	R1,#-8
+fillloop:
+	MOV	@R0,#0FFh
+	INC	R0
+	DJNZ	R1,fillloop
+  MOV	sys_intnest,#1
+        CLR     cdopen
+  MOV	lcd_delaybacklite,#0
+	CALL	SYS_UnitPowerOn
+	MOV	TMOD,#011h		; timers 0 and 1 in mode 1 (16 bit)
+	ORL	TCON,#050h		; timers 0 and 1 on
+	ORL	IEN0,#002h		; timers 0 and 1 interrupt enabled
+	CALL	KBD_InitKeyboard
+	CALL	AUD_InitAudit
+	CALL	COM_InitSerial
+	CALL	SND_InitSound
+	CALL	LCD_Init
+	CALL	SYS_DetectRAM
+	MOV	led_leds,#0			; all LEDS off
+        CALL	LED_LED1Off
+        CALL	LED_LED2Off
+        CALL	LED_LED3Off
+        CALL	LED_LED4Off
+
+  CALL	SYS_EnableInts			; turn master interrupts on
+
+;	CLR	F0
+;	SETB	F1
+;	MOV	R1,#EE_SLAVE
+;	MOV	DPTR,#EE_dtserial
+;	CALL	MEM_SetSource
+;	MOV	DPTR,#sys_dtserial
+;	CALL	MEM_SetDest
+;	MOV	R7,#4
+;	CALL	MEM_CopyEEtoXRAMsmall
+
+	CALL	SYS_ReadUnitInfo
+
+	CALL	LCD_Clear
+	MOV	DPTR,#msg_testprom
+	CALL	LCD_DisplayStringCODE
+	MOV	A,#64
+	CALL	LCD_GotoXY
+	MOV	DPTR,#msg_unitserial
+	CALL	LCD_DisplayStringCODE
+
+	MOV	A,#69
+	CALL	LCD_GotoXY
+	MOV	DPSEL,#0
+	MOV	DPTR,#sys_dtserial
+	MOV	DPSEL,#1
+	MOV	DPTR,#buffer
+	MOV	R5,#5
+	CALL	NUM_NewFormatDecimal32
+	MOV	DPTR,#buffer
+	MOV	R7,#5
+	CALL	LCD_DisplayStringXRAM
+
+	CALL	TIM_GetDateTime
+	MOV	DPSEL,#1
+	MOV	DPTR,#buffer
+	CALL	TIM_FormatDate
+	MOV	DPSEL,#1
+	MOV	DPTR,#buffer+8
+	CALL	TIM_FormatTime
+	MOV	A,#64+16
+	CALL	LCD_GotoXY
+	MOV	R7,#8
+	MOV	DPTR,#buffer
+	CALL	LCD_DisplayStringXRAM
+	MOV	A,#19
+	CALL	LCD_GotoXY
+	MOV	R7,#5
+	CALL	LCD_DisplayStringXRAM
+
+
+; assume some values for just now
+  CALL PRT_GetPrintOffset
+  CALL	PRT_GetPrintQuality
+	CLR	prt_paperout
+	SETB	prt_perfmode
+	MOV	prt_perfoffhigh,#01h
+	MOV	prt_perfofflow,#0 ; was #03dh
+	MOV	prt_perffailhigh,#07h ; was 03h
+	MOV	prt_perffaillow,#08h; was 084h
+	MOV	prt_perflinemin,#60 ; was #50
+	MOV	prt_perflinemax,#70 ; was #60
+	MOV	prt_perfskipminhigh,#0
+	MOV	prt_perfskipminlow,#225
+	MOV	prt_perfskipmaxhigh,#1
+	MOV	prt_perfskipmaxlow,#24
+
+	MOV	R1,#PRT_PHASE_SEQ
+	MOV	R2,#PRT_INPUT0_SEQ
+	MOV	R3,#PRT_INPUT1_SEQ
+	CALL	PRT_Initialise
+	CALL	PPG_InitPricePlug
+	CALL	TIM_InitialiseClock
+	CALL	TKT_Init
+
+	MOV	R7,#70
+maindelay:
+	CALL	tst_beep
+        CALL	LED_Led2On
+        CALL	LED_Led1Off
+	CALL	tst_delay
+        CALL	LED_Led3On
+        CALL	LED_Led2Off
+	CALL	tst_delay
+        CALL	LED_Led4On
+        CALL	LED_Led3Off
+	CALL	tst_delay
+        CALL	LED_Led1On
+        CALL	LED_Led4Off
+	CALL	KBD_ReadKey
+	JNZ	mainready
+	DJNZ	R7,maindelay
+mainready:
+	CALL	LCD_Clear
+	CALL	LED_Led3On
+
+        CALL    KBD_ScanKeyboard
+        JNZ     noprttest
+        CALL    PRT_StartPrint
+        MOV     R7,#30
+        CALL    PRT_LineFeed
+        JB      prt_paperout,mainready2
+        CALL    DIA_TestPrint
+        MOV     R7,#50
+        CALL    PRT_LineFeed
+mainready2:
+	CALL	PRT_EndPrint
+
+noprttest:
+  CALL	LCD_SetTimeout
+mainloop:
+	CALL	MNU_NewMenu
+mainmenuagain:
+	MOV	DPTR,#test_mainmenu
+	CALL	MNU_LoadMenuCODE
+	CALL	MNU_SelectMenuOption
+        JNB     ACC.7,mainmenuagain
+	JMP	mainloop
+
+test_mainmenu: DB 20
+	DB '=======Main Menu======'
+	DW 0
+	DB 'Switch Off            '
+	DW TST_SwitchOff
+        DB 'Light Up Everything   '
+        DW TST_LightUp
+	DB 'Test Sound            '
+	DW TST_Sound
+        DB 'Open Cash Drawer      '
+        DW TST_CashDrawer
+        DB 'Fire Paper Cutter     '
+        DW TST_PaperCutter
+        DB 'Test Customer Display '
+        DW TST_CustDisp
+	DB 'Test Printer          '
+	DW TST_Printer
+	DB 'Test Communications   '
+	DW TST_Comms
+	DB 'Test Keyboard         '
+	DW TST_Keyboard
+	DB 'Test Battery          '
+	DW TST_Battery
+	DB 'Test LEDs             '
+	DW TST_LEDs
+	DB 'Test LCD              '
+	DW TST_LCD
+	DB 'Test Real Time Clock  '
+	DW TST_RealTimeClock
+	DB 'Test EEPROMs          '
+	DW TST_EE
+	DB 'Test RAM              '
+	DW TST_RAMTests
+        DB 'Test Battery Backup   '
+        DW TST_TestBatteryBackup
+	DB 'Set Serial Number     '
+	DW TST_SetSerial
+	DB 'Initialise Machine    '
+	DW TST_InitialiseMachine
+        DB 'Debugging Utilities   '
+        DW TST_DebugUtils
+
+DT_KeyOk:
+	RET
+;****************************** End Of TEST.ASM *******************************

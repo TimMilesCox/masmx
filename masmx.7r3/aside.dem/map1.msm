@@ -1,0 +1,8 @@
+	$include	"map_ppc.def"
+$(0:000A0000)
+	$plist			7
+	$list			2
+	$include,$binary	soso
+	$include,$binary	factor
+
+	$store			image1

@@ -1,0 +1,10 @@
+formaggio* $proc
+cheese	$set	1
+$(cheese)
+	+	10
+cheese	$set	2
+$(cheese)
+	+	20
+	$end
+
+	formaggio

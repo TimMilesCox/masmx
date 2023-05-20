@@ -1,0 +1,28 @@
+pushd ../test.map
+./mverify	-wy
+cp z4.txo ../test.o3/z4left.txo
+cp z5.txo ../test.o3/z5left.txo
+./zferify	-w	-j
+cp z4.txo ../test.o3/z4right.txo
+cp z5.txo ../test.o3/z5right.txo
+#	cd ../test3.map
+#	./sure34	-wy
+#	cp p44.txo ../test.o3/p44left.txo
+#	./zure34	-w	-j
+#	cp p44.txo ../test.o3/p44right.txo
+cd ../test.gcc
+./dothis	-wy
+cp outerm.txo ../test.o3
+cd ../aside.dem
+./sgen		-wy
+cp image*.txo ../test.o3
+cp rel4.txo ../test.o3
+../masmx intune intune -wy
+../masmx detune detune -wy
+cp intune.txo ../test.o3
+cp detune.txo ../test.o3
+cd ../trabble
+./trabble	-w
+popd
+./bojo		-w
+

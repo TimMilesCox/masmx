@@ -1,0 +1,39 @@
+        $word   32
+i       $form   8, 24
+descriptor $form  32, 32, 64
+
+p       $proc
+call*   $name   10
+        i       $n, p(1, 1)
+        $end
+
+	$plist	7
+
+v*      $func	*
+        $if     $t(v(1,1))=0
+"v(1,1)"** vector v(1, 1)
+        $endif
+        $return v(1,1)
+        $end
+
+vector* $proc   $(2)
+        $if     $t(vector(1,1:1))=0
+"vector(1,1:1)"*** segment vector(1,1:1)
+        $endif
+*       +       vector(1,1:1)*/4++vector(1,1:2)
+        $end
+
+segment* $proc   $(62)
+*       descriptor +"load$:segment(1,1)", 0, "segment(1,1)"
+        $end
+
+$(2:020000)
+$(62:03e0000)
+$(0:64)
+
+        call    v(left:1)
+        call    v(right:1)
+        call    v(left:1)
+        call    v(left:2)
+        call    v(centre:7)
+

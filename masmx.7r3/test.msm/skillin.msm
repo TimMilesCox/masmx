@@ -1,0 +1,47 @@
+	$path		../smaragd.68k
+	$include	coldfire.def
+	$path
+	$include	ieee754.def
+
+$(8:65536)
+woodburning	$res	4
+
+$(2:16384)
+slowburning	$res	4
+
+$(53::,a5)
+	$res	12
+janglies	$res	4
+
+$(0:32768,pc/$azlit)
+	add	d6, d7
+	add	a4, d4
+	add	(a5), d4
+	add	(a3)+, d1
+	add	-(a3), d2
+	add	12(a5), d4
+	add	(12, a5), d4
+	add	janglies, d4
+	add	(10, a5,d1.l*4), d5
+	add	#0xFFFFC000, d6
+	add	(slowburning).l, d6
+	add	slowburning, d6
+	add	woodburning, d6
+
+	add	d4, (a5)
+	add	d1, (a3)+
+	add	d2, -(a3)
+	add	d4, 12(a5)
+	add	d4, (12, a5)
+	add	d4, janglies
+	add	d5, (10, a5,d1.l*4)
+	add	d6, (slowburning).l
+	add	d6, slowburning
+	add	d6, woodburning
+
+	eor	d7, janglies
+	eori	#99, d7
+
+	fmove.s	janglies, fp0
+	fadd.s	(a7)+, fp0
+	fmul.s	$azlit(ieee754_32 1.1), fp0

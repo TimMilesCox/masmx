@@ -1,0 +1,7 @@
+f       $func
+        $res    4
+        $return -8
+        $end
+
+        +       $, f:d
+        +       f, $:d

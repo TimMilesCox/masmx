@@ -1,0 +1,11 @@
+rm abs/*
+../../masmz master abs/master -zo
+../../imx abs/master.txo abs/master.hex
+../../masmx master abs/aside -yo
+../../imx abs/aside.txo abs/aside.hex
+#	../../../masmx.4r1/src/masmx master abs/aside2
+#	../../imx abs/aside2.txo abs/aside2.hex
+diff -ws --brief 2r1.hex abs/master.hex
+diff -ws --brief abs/master.hex abs/aside.hex
+#	cmp abs/master.hex abs/aside2.hex
+

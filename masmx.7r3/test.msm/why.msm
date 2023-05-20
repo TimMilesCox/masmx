@@ -1,0 +1,4 @@
+        $include        "8051_3r1.def"
+thing   var     100
+        var     100
+        +       100

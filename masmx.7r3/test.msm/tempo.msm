@@ -1,0 +1,30 @@
+centre*	$proc
+left*	$name	0f0
+right*	$name	00f
+
+p $proc
+one* $name 1
+two* $name 2
+base	$set	p(0,2)
+q $proc	$(base)
+three* $name 3
+four* $name 4
+ + q(0, 1), q(1, 1)
+ $end
+
+ $do $n=1, three p(1,1)
+ $do $n=2, four p(1,1)
+
+ $end
+	$do	centre(0,1)=left,	one,8	centre(1,1)
+	$do	centre(0,1)=right,	two,10	centre(1,1)
+ $end
+
+ $plist	4
+
+$(8:08000)
+$(10:0A000)
+$(0:256)
+
+ left 99
+ right 100

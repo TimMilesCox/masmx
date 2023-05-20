@@ -1,0 +1,42 @@
+	$plist	5
+
+
+
+m*	$proc
+	$end
+
+n*	$proc
+	$end
+
+o*	$proc
+	$end
+
+p*	$proc
+	+	p
+	q	p
+	+	p()
+	q	p()
+	+	p(1)
+	q	p(1)
+	+	p(1, 1)
+	q	p(1, 1)
+	+	p(1, 1:)
+	q	p(1, 1:)
+	+	p(1, 1:2)
+	q	p(1, 1:2)
+	$end
+
+u	$proc
+q*	$name	99
+	+	u
+	+	u(0, 1)
+	+	u()
+	+	u(1)
+	+	u(1, 1)
+	+	u(1, 1:)
+	+	u(1, 1:1)
+	$end
+
+$(4:04000)
+yasimi	p	8:7:6, 4	18	17	16	15
+

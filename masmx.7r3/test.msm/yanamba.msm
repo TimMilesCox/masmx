@@ -1,0 +1,38 @@
+	$set_option "xZ"
+	$plist	5
+
+p*	$func
+wilfrid* $name 99
+q*	$func
+r*	$proc
+	$end
+	$snap	2
+	$return	"r"
+	$end
+	$return	q
+	$end
+
+f*	$func
+g*	$func
+h*	$func
+	$end
+	$snap	2
+	$return	"h"
+	$end
+	$return	g
+	$end
+
+z*	$proc
+y*	$proc
+	$end
+	+	"y"
+	$snap	2
+	$end
+
+	+	p
+	+	f
+	+	"wilfrid"
+	+	wilfrid
+	z
+
+	+	$o('x'), $o('z'), $o('Z')

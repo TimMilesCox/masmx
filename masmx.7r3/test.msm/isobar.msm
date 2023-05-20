@@ -1,0 +1,7 @@
+	$include	"../aside.dem/ppc_603.def"
+$(0::*0x00CCE0000000A0000)
+	+	_four_cares:d
+	+	_three_cares:d
+	+	_two_cares:d
+	+	_one_care:d
+	$end	0x00CCE0000000A0000

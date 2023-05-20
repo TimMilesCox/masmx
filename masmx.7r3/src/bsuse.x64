@@ -1,0 +1,19 @@
+echo	build suse.x64
+
+if	[ "$1" == "-u" ]
+then
+	rm	../masmx.7r3/hosts/suse.x64/*
+	gcc -m64 -funsigned-char -o ../masmx.7r3/hosts/suse.x64/mmx mmx.c
+	gcc -m64 -funsigned-char -o ../masmx.7r3/hosts/suse.x64/imx imx.c
+	gcc -m64 -funsigned-char -o ../masmx.7r3/hosts/suse.x64/symbol symbol.c
+fi
+
+gcc -m64 -funsigned-char -DINTEL -DSUSE -DSUPERSET -o ../masmx.7r3/hosts/suse.x64/masmx masm.c
+gcc -m64 -funsigned-char -DINTEL -DSUSE -o ../masmx.7r3/hosts/suse.x64/masmz masm.c
+
+cp ../masmx.7r3/hosts/suse.x64/* ..
+echo	cd ../test.msm
+echo	chmod 0755 ugosuse
+echo	run ./ugosuse
+echo	run ./alltests
+

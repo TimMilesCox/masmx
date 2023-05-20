@@ -1,0 +1,6 @@
+t*      $proc
+first   $do     3,;
+second  $do     6,      +       first, second
+        $end
+
+        t

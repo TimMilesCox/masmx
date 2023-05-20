@@ -1,0 +1,8 @@
+p*      $proc        
+        +       f\p(1,1), p(1,1), 100-p(1)
+        $end
+f*      $func
+        $return f(1,1)*/1
+        $end
+
+        p       33(99)

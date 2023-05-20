@@ -1,0 +1,22 @@
+        $byte   24
+f1	$form	24, 24, 144
+ 
+        $data_code 'a', 06103, 06203, 06303, 06403
+	$data_code 'e', 0650001, 0660001, 0670001, 0680001
+
+        +      'abcd'
+        +      'c'
+		"abcd"
+		"c"
+
+	$if	$o('z')
+	$data_code 'd',06402
+	$data_code	'e',0650005
+	$else
+	$data_code	064,06402
+	$data_code	065,0650005
+	$endif
+
+	f1	-1, 0, "header"
+	f1	0, -2, 'header'
+        $end

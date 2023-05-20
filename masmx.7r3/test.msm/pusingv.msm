@@ -1,0 +1,59 @@
+__registers_by_name	$set	1
+__fewer_functions	$set	1
+        $include        "ppc_603.def"
+        $set_option     "u"
+        $plist  8
+        
+record* $proc        
+*       $tree
+h       +       record(1,1)
+t       $res    record(1,1)
+        $root
+        .align  2
+        $end
+        
+tree*   $proc
+*       $tree
+times   $do     3,dibber(times) record    tree(1,1)
+        $root
+        $end
+
+
+ARRAY   $equ    262144*24
+GRANULE $equ    22//4*4*2*3//8*8
+
+grains*	$proc
+	$do	index=2,	$list	0
+$(55:ARRAY+index*GRANULE-GRANULE)
+cluster(index)* $tree
+times   $do     2,raddle(times)  tree 18
+        $root
+	$do	index=20000/GRANULE-1,	$list	1
+        $end
+
+index	$do	20000/GRANULE,	grains
+
+VSEGMENT $equ    0
+
+$(56:VSEGMENT:,r12)
+.this_segment $equ $(55)
+times   $do     2,raddle(times) tree    18
+raddle2 tree    30
+$(0:32768/.lit)
+        oris    r12,0,cluster(40).raddle(1)@hi
+        ori     r12,r12,cluster(40).raddle(1)@l
+        lwz     r3,raddle(1).dibber(2)
+        lwz     r4,raddle(1).dibber(1)
+        lwz     r5,raddle(2).dibber(3)
+        lwz     r6,raddle(2)
+        lwz     r7,raddle2
+        mr      r11,r12
+
+	$if	1
+	stw	r7,raddle2(r11)
+	lhz	r7,raddle(2).dibber(3)(r11)
+	$else
+        stw     r7,raddle2(r11)
+        lhz     r7, raddle(2).dibber(3)(r11)
+	$endif
+        lwz     r12, .lit(cluster(20).raddle(2))

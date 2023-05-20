@@ -1,0 +1,5 @@
+	$set_option	"a"
+$(40:080000:*0cccccccc00)
+	$lit	40
+
+	+	(1.5)

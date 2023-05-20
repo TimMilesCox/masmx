@@ -1,0 +1,47 @@
+	$word	32
+
+p	$proc
+"$map"*	$name
+p	$proc
+superword* $name
+parts	$set	p(1,1:)
+data	$set,$binary	p(1,1:parts)
+part	$do	parts-1,	relocate	p(1,1:part)
+	$load,$bits	data
+	$end
+
+signed	$equ	128
+
+p	$proc
+relocate* $name
+label	$pushrel	p(1, 1)
+
+v	$set	label\1
+bits	$set	label\2
+scale	$set	label\3
+
+limit	$set	1*/bits
+mask	$set	limit-1
+antimask $set	^(mask*/scale)
+
+readout	$set	(data/*scale)**mask
+hook	$set	outer\p(1,1)
+
+	$do	hook=signed,;
+readout	$set	(readout*/(192-bits))*/(bits-192)
+
+field	$set	v+readout
+	$info,$range_check1	field
+data*	$set	((field**mask)*/scale)++(data**antimask)
+	$end
+
+f	$func
+outer*	$name
+"20+"   $equ,signed        32
+
+	$return	$t("f(2, 1)")
+	$end
+
+word	$do	p(),	superword	p(word, 1)
+	$end
+

@@ -1,0 +1,166 @@
+	$include	"68000.def"
+	$store	yield
+
+CPUS		$set	1
+PRIORITIES	$set	8
+IDLE_STACK	$set	64
+INTERRUPT_STACK	$set	128
+
+
+f	$func
+flog*	$name
+	$do	PRIORITIES=8,	$return	3+2-1
+	$do	PRIORITIES=64,	$return	6+2-1
+	$do	PRIORITIES=256,	$return	8+2-1
+	$flag	priorities may only be 8 or 64 or 256
+	$return	0
+	$end
+
+p	$proc
+activity_control_table*	$name
+*	$tree
+istac	task_i_stack
+tct	task_control_table	p(1,1)	p(2,1),p(2,2),p(2,3),p(2,4)
+	$root
+	$end
+
+p	$proc
+task_control_table* $name
+*	$tree
+frame	trap_return_frame	p(1, 1)
+tcb	task_control_block	p(2, 1), p(2, 2), p(2, 3), p(2, 4)
+	$root
+	$end
+
+p	$proc
+task_control_block*	$name
+*	$tree
+h	task_control_block_head	p(1,1),p(1,2),p(1,3),p(1,4)
+
+genregs
+	$do	16,				+	0:d
+save_usp					+	stack_top:d
+
+	$do	IDLE_STACK/4,			+	0xa5a5a5a5:d
+
+stack_top
+
+	$root
+	$end
+
+p	$proc
+trap_return_frame* $name
+*	$tree
+save_sr		+	0x4000
+format_offset	+	0
+transfer	+	p(1, 1):d
+	$root
+	$end
+
+p	$proc
+task_i_stack* $name
+*	$tree
+	$do	INTERRUPT_STACK/4,		+	0x7E7E7E7E:d
+	$root
+	$end
+
+
+p	$proc
+task_control_block_head*	$name
+*	$tree
+next	+	p(1, 1):d
+priority +	p(1, 2):d
+state	+	p(1, 3):d
+base	+	p(1, 4):d
+	$root
+	$end
+
+p	$proc
+tailx*	$name
+*	$tree
+
+next	$set	qtailx(1)
+	$do	index<PRIORITIES,next	$set	qtailx(index+1)
+	$do	index=PRIORITIES-1,next	$set	itask(1).tct.tcb.h
+
+uplink	$set	qtailx(PRIORITIES)
+	$do	index>1,uplink		$set	qtailx(index-1)
+	$do	index=PRIORITIES,uplink	$set	itask(CPUS).tct.tcb.h
+
+h	task_control_block_head	next, index-1, -1, uplink
+
+	$root
+	$end
+
+p	$proc
+idle_task* $name
+
+next	$set	qtailx(PRIORITIES)
+	$do	index<CPUS,next	$set	itask(index+1).tct.tcb.h
+
+*	activity_control_table	idle	next, PRIORITIES-1, 0, 0	
+	$end
+
+$(66:,3)
+tct	task_control_table
+$(67:,3)
+tcb	task_control_block
+
+$(3:*4)
+index	$do	PRIORITIES,qtailx(index)	tailx
+index	$do	CPUS,itask(index)		idle_task
+qaside_h* +	0
+qaside_t* +	0
+
+$(0:1024)
+	movem	d0-a7, tct.tcb.genregs(a7)
+	move	usp, a0
+	move	a0,tct.tcb.save_usp(a7)
+
+	lea	tct.tcb(a7), a0
+	move	tcb.h.priority(a0), d0
+
+	bmi	qaside
+	cmpi	#PRIORITIES-1, d0
+	bgt	qaside
+
+	lsl	#4, d0
+	move	#qtailx(1), a1
+
+	adda	d0, a1
+
+	move	tcb.h.base(a1), a2
+	move	a0, tcb.h.next(a2)
+	move	a1, tcb.h.next(a0)
+	move	a0, tcb.h.base(a1)
+	
+pick	move	#qtailx(PRIORITIES), a1
+next	move	a1, a0
+	move	tcb.h.next(a1), a1
+
+	tst	tcb.h.state(a1)
+	bne	next
+
+	move	tcb.h.next(a1), a2
+	move	a2, tcb.h.next(a0)
+
+	tst	tcb.h.state(a2)
+	bpl	not_last
+	move	a0, tcb.h.base(a2)
+not_last
+	lea	-8(a1), a7
+	move	tcb.save_usp(a1), a0
+	move	a0, usp
+	movem	tcb.genregs(a1), d0-a6
+	rte
+
+
+
+qaside	tst	qaside_h
+	beq	first
+	move	qaside_t, a1
+	move	a0, tcb.h.next(a1)
+	jmp	last
+first	move	a0, qaside_h 	
+last	move	a0, qaside_t
+	jmp	pick

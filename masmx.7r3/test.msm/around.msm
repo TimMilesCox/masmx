@@ -1,0 +1,55 @@
+
+	$word	48		. the word size of the target
+				. processor architecture
+
+	$floating_point 96	. the default size of a floating constant
+				. = 2 words
+
+	$characteristic,96	24	. the characteristic field width
+					. for a 2-word floating number
+					. 24 bits is the maximum characteristic
+
+	$characteristic,48	12	. the characteristic field width
+					. for a 1-word floating number
+
+one     $equ    1
+
+	+	1*-1		. expression sizes and rounds
+				. at current default floating size
+
+	+	1:s*-one	. expression sizes and rounds
+				. at one-word override
+
+	+	0.one		. linescan recognises floating
+				. but only digits are scanned
+
+	+	0.1		. linescan recognises 96 bits floating
+	+	0.1:s		. linescan recognises 48 bits floating
+
+	+	0.1:se0
+
+	+	+(one*-one)	. expression sizes and rounds
+				. at current default floating size
+
+	+	+(1:s*-1)	. expression sizes and rounds at
+				. at one-word override
+
+
+        +	(1:q*-one)	. four words
+
+	+	(1.0:s*-one)  	.
+
+	+	1:s*+0, 1:s*+1, 1:s*+2, 1:s*+3:q	. four words
+
+	+	(1:s*+0), (1:s*+1), (1:s*+2), (1:s*+3):q
+        +(1:s*+0), +(1:s*+1), +(1:s*+2), +(1:s*+3):q
+
+	$if	$o('E')
+        +       -1:s*+0, +1:s*+1, -1:s*+2, +1:s*+3:q
+	$else
+        +       -(1)s*+0, +(1:s*+1), -(1)s*+2, +(1:s*+3):q
+	$endif
+
+
+	$end
+

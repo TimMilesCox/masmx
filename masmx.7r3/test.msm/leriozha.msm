@@ -1,0 +1,14 @@
+	$byte 32
+	'ab'
+	"ab"
+	'ab'*/$byte++080000063
+	"ab":080000063
+
+mungle	$record	'ab'	"cd"	'mn'*/$byte++08000006f	"xy":08000007a 99
+	80
+	80
+	80
+	100
+	8
+	$root
+

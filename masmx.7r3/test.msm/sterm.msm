@@ -1,0 +1,27 @@
+        $word   16
+        $cont_char '\'
+        $lterm  ';'
+        $sterm  '.'
+p3      $equ    32
+p3.1    $equ    32+1
+
+p*      $proc
+*       $tree
+times   $do     p(1),branch(times)  q p(1, times), -p(1, times)
+        $root
+        $end
+
+q*      $proc
+*       $tree
+h       +       q(1,1)
+again   $do     2,leaf(again)   + q(1,again:1), q(1,again:2)
+        $root
+        $end
+
+trunk   p       p3.1, 10.9, 8.8
+
+        +       trunk.branch(3).leaf(2)
+        
+        	"First Line of Text".10."Second Line of Text".10.\
+        	"Third Line of Text".12
+

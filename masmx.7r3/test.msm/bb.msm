@@ -1,0 +1,35 @@
+	$plist	7
+
+p*	$proc
+?	$do	p(1, 1),name(?)	$equ	$a
+	+	name()
+	$snap	2
+	$end
+
+q*	$proc	$(60)
+?	$do	q(1, 1),name(?)	
+	+	name()
+	$end
+
+$(60:03C000)
+$(8:08000)
+one	$branch
+	p	7
+	$root
+two	$branch
+thassim	p	5
+	$root
+
+toldja	q	4
+
+$(7:64:0:,7)
+yasimi	p	12
+yasinim	q	18
+
+$(27:128:512,14)
+yoo	$res	64
+yissassim	p	6
+
+$(27)
+"isedduni? assim!" p	6
+

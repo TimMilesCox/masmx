@@ -1,0 +1,11 @@
+	$include	"map_ppc.def"
+$(0:000A0000)
+	$plist			7
+	$list			2
+
+	$path			test.txo
+
+	$include,$binary	soso
+	$include,$binary	factor
+
+	$store			test.txo/image1

@@ -1,0 +1,12 @@
+
+
+forthcoming*	$blank
+forthcoming	$tree
+left		$res	1
+where?*		$blank
+right		$res	1
+		$root
+
+where?		22
+
+

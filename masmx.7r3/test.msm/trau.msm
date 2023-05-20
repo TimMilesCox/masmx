@@ -1,0 +1,11 @@
+$(0:96)
+tree    $tree
+leaf    +1
+        +       leaf
+rustle  $set    leaf
+whisper	$set	leaf
+        +       rustle
+        $root
+        +       rustle
+        +       tree:leaf
+	+	whisper

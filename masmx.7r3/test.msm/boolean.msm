@@ -1,0 +1,16 @@
+	$path		../
+	$include	smaragd.68k/coldfire.def
+	$include	smaragd.68k/express.def
+	$path
+	$include	espresso.def
+
+$(3:03000)
+one	1
+two	2d
+three	3d
+$(0:32768)
+	$xqt_i,#	two+one w*4+three*/16++12*/20
+	$xqt_i		d2 w+d3+d4
+	$do	$<256,$(0:256)
+	$end
+

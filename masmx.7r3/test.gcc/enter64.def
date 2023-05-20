@@ -1,0 +1,125 @@
+__immediate	$equ	-16
+
+p	$proc	*
+
+enter64* $name
+
+__FRAME	$set	(p(1, 1)+31)**-32
+
+	$do	__FRAME<32,	$flag	frame size param 1 must be > 0
+
+#**************************************************************
+#
+#		$(36) is a base_displacement segment
+#		so that address constant literals are in reach
+#
+#		base_displacement references are never relocatable
+#
+#		a 64-bit constant of __base36 plus all its
+#		relocation information must be generated just below here.
+#
+#		masm7 internal function $a, called .absolute in ppc_*.def
+#		stops __base36 from being a base_displacement name
+#		and instead associates all its relocation information
+#
+#			+	.absolute(__base36):d
+#
+#		After linking,  that constant will contain the true
+#		address of the segment $(36) containing literals
+#
+#**************************************************************
+
+	stdu	1, -__FRAME(1)
+	mflr	0
+	std	31, __FRAME-8(1)	# save r31 just below
+				# the previous stack frame
+
+	std	0, __FRAME+8(1) 	# save LR in the second 64-bit word
+				# of the previous stack frame
+
+	mr	31, 1		# have a frame pointer in case
+				# the stack is pushed
+
+	std	30, __FRAME-16(31) # save the literals base register
+
+	bl	__haulup
+	+	.absolute(__base36):d
+__haulup
+	mflr	30		# .text segment holds literal table
+				# which is accessed base_displacement
+
+	ld	30,,30		# LR was pointing to the pointer
+	$end
+
+#*********************************************************************
+#
+#	the geography of the MINIMUM stack frame is
+#	LOW ADDRESS REPRESENTED HERE    ______________________________
+#	STACK TOP R31 points to ------> |   saved SP (r1) 8 bytes    |
+#					|............................|
+#				+ 8	| next LR save area 8 bytes  |
+#					|............................|
+#				+ 16	|     saved r30 8 bytes      |
+#					|............................|
+#				+ 24	|     saved r31 8 bytes      |
+#					|____________________________|
+#	PREVIOUS STACK FRAME ---------> | previous saved r1 8 bytes  |
+#					|............................|
+#				+ 40	|  actual saved LR 8 bytes   |
+#
+#*********************************************************************
+
+
+
+#********************************************************************
+#
+#	the geography of A SAMPLE stack frame WITH LOCAL VARIABLES is
+#	LOW ADDRESS REPRESENTED HERE    ______________________________
+#	STACK TOP R31 points to ------> |   saved SP (r1) 8 bytes    |
+#					|............................|
+#				+ 8	| next LR save area 8 bytes  |
+#					|............................|
+#	FOR EXAMPLE		+ 16	| var y 8 bytes              |
+#					|............................|
+#	FOR EXAMPLE		+ 24	| var x 4 bytes|/////////////|
+#					|..............|.............|
+#					|			     |
+#	per these examples
+#				y	$EQUF	16, r31
+#				x	$EQUF	24, r31
+
+
+
+#	PREVIOUS STACK FRAME - 16	|     saved r30 8 bytes      |
+#					|............................|
+#	PREVIOUS STACK FRAME - 8	|     saved r31 8 bytes      |
+#					|____________________________|
+#	PREVIOUS STACK FRAME ---------> | previous saved r1 8 bytes  |
+#					|............................|
+#	PREVIOUS STACK FRAME + 8	|  actual saved LR 8 bytes   |
+#
+#
+#*********************************************************************
+
+
+p	$proc
+
+return64* $name
+
+	$if	p(0, 2)=64	#	return64,64	something_64_bits
+	ld	3, p(1, 1)	# or
+	$elseif	p(0, 2)=__immediate #	return64,__immediate	something
+	li	3, p(1, 1)	# or
+	$else			#	return64	something_32_bits
+	lwa	3, p(1, 1)	# or
+	$endif			#	leave64
+
+leave64* $name
+	ld	1,,31		# old SP is 1st word of this frame
+	ld	0, 8, 1		# old LR is 2nd word of this other frame
+	mtlr	0
+	ld	30, -16, 1	# old base register is 2nd last word/frame
+	ld	31,  -8, 1	# old frame pointer is last word in frame
+	blr
+
+	$end

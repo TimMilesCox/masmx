@@ -1,0 +1,20 @@
+        $include        "../aside.dem/ppc_603.def"
+
+SEGMENT .equ    511*1024
+HARDWARE_LOADA .equ	511*32768
+
+$(48:SEGMENT:HARDWARE_LOADA,r15)
+part1   +       2048*2048d
+part2   +       100d
+part3   $res    2048*2048-16
+
+	+	.absolute(part3)
+
+$(0:3*65536)
+start   oris    r15,, .absolute(part1)@ha     
+        addi    r15, .absolute(part1)@l 
+        lwz     r3, part1
+        lwz     r4, part2
+        lwz     r5, part3
+        blr
+        $end    start

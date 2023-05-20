@@ -1,0 +1,17 @@
+.text   $equ    0        
+.data   $equ    1
+.lazy_symbol_pointer $equ 2
+.picsymbol_stub $equ 3
+.lcomm  $equ    4
+
+$(.lcomm:65536)        
+
+        $text   /.text/$(.text)/
+        $text   /.data/$(.data)/
+        $text   /.lazy_symbol_pointer/$(.lazy_symbol_pointer)/
+        $text   /.picsymbol_stub/$(.picsymbol_stub)/
+        $text   /.lcomm/$(.lcomm)/
+
+.indirect_symbol $equ,directive $nop
+
+

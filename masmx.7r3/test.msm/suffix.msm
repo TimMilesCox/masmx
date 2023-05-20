@@ -1,0 +1,24 @@
+	$suffix	2
+	$cont_char 0
+	$lterm ';'
+	$word	16
+	$quantum 8
+	$floating_point	80
+	$characteristic	16
+	$characteristic,64 12
+
+	123		; decimal notation, self-sizing
+	+(123d)h	; decimal notation, hexaword
+	123dh		; hex notation, self-sized
+	234		; decimal notation, self-sized
+	234o		; octal
+	234os		; single word octal
+	234ol
+	01dh:d		; hex double word
+
+	1.5q		; fraction string, no notation suffix, quad
+	010q*+0ah	; octal mantissa, hex exponent, default 80 bits
+	8*+10		; same thing, just testing
+	1.0h*+10b	; fraction string always decimal, hexaword
+			; but bit-pattern exponent, result = 100
+

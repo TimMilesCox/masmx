@@ -1,0 +1,16 @@
+echo this should be OSX PowerPC
+
+if	[ "$1" == "-u" ]
+then
+	rm ../masmx.7r3/hosts/osx.ppc/*
+	gcc -m32 -funsigned-char -o ../masmx.7r3/hosts/osx.ppc/mmx mmx.c
+	gcc -m32 -funsigned-char -o ../masmx.7r3/hosts/osx.ppc/imx imx.c
+	gcc -m32 -funsigned-char -o ../masmx.7r3/hosts/osx.ppc/symbol symbol.c
+fi
+
+gcc -m32 -funsigned-char -DSUPERSET -o ../masmx.7r3/hosts/osx.ppc/masmx masm.c
+gcc -m32 -funsigned-char -o ../masmx.7r3/hosts/osx.ppc/masmz masm.c
+
+cp ../masmx.7r3/hosts/osx.ppc/* ..
+echo	cd ../test.msm and run ./alltests
+

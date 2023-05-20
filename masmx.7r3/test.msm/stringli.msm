@@ -1,0 +1,16 @@
+	$byte   8
+	$data_code  'a', 0d1,0d2
+	+'abcd'
+	+"abcd"
+	$byte   7
+	+       "abcd":q
+	-       "abcd":q
+	^       "abcd":q
+	"abcd"
+	$byte   6
+	$ascii
+		"ab":;
+		5:;
+		"def"
+	+       "abcd"
+label   +       label

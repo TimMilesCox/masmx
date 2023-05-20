@@ -1,0 +1,15 @@
+	$set_option	"j"
+p*      $proc
+v       $set    p(1,1)
+rada(1,v)**
+rada(2,v)**
+rada(3)
+        +       rada(1,v)
+        +       rada(2,v)
+        +       lupu(1)
+        +       lupu(2)
+        $end
+$(0:12)
+lupu(1) p 1
+lupu(2) p 2
+        +       rada(1,3)

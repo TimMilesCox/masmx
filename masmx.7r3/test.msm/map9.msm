@@ -1,0 +1,8 @@
+	$include	"map_ppc.def"
+
+	$set_option	"b"
+
+	$include,$void		../result.txo/map2
+	$include,$binary	../result.txo/zactor
+
+	$store			image9

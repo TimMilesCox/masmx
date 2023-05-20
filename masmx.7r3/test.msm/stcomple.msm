@@ -1,0 +1,128 @@
+$(0:*8)
+PRIME	$res	4
+after_prime
+$(1:*8)
+FIRST	$res	4
+after_first
+$(2:*8) 
+SECOND	$res	4
+after_second
+$(3:*8)
+THIRD	$res	4
+after_third
+$(4::*000444000000)
+FOURTH	$res	16777216
+after_fourth	+	$:d
+		+	$a
+$(5::*000555000000)
+FIFTH	$res	16777216
+after_fifth	+	$:d
+		+	$a
+$(6::*000666000000)
+SIXTH   $res    16777216
+after_sixth	+	$:d
+		+	$a
+
+$(0)
+
+
+	+	$net(0FFFFFFFFFFFFFFFFFF)
+	+	$net(0ffffffffffffffffff**0ffffffff)
+        +       $net((00000000aaaaaaaa00000000bbbbbbbb/*0)**0ffffffffffffffff)
+	+	$net((00000000aaaaaaaa00000000bbbbbbbb/*64)**0ffffffffffffffff)
+
+one     $set    0FFFFFFFFFFFFFFFFFF
+two	$set	0ffffffffffffffffff**0ffffffff
+three	$set	(00000000aaaaaaaa00000000bbbbbbbb/*0)**0ffffffffffffffff
+four	$set	(00000000aaaaaaaa00000000bbbbbbbb/*64)**0ffffffffffffffff
+
+
+	+	$a(one)
+	+	$a(two)
+	+	$a(three)
+	+	$a(four)
+
+
+        +       $a(0FFFFFFFFFFFFFFFFFF)
+        +       $a(0ffffffffffffffffff**0ffffffff)
+        +       $a((00000000aaaaaaaa00000000bbbbbbbb/*0)**0ffffffffffffffff)
+        +       $a((00000000aaaaaaaa00000000bbbbbbbb/*64)**0ffffffffffffffff)
+
+
+	+	$a(PRIME)
+	+	$a(FIRST)
+	+	$a(SECOND)
+	+	$a(THIRD)
+	+	$a
+	+	$a($(0))
+	+	$
+	+	$a($(1))
+	+	$(1)
+        +       $a($(2))
+	+	$(2)
+        +       $a($(3))
+	+	$(3)
+
+	+	$a(FOURTH)
+	+	$a($(4))
+	+	$(4)
+        +       $a(FIFTH)
+        +       $a($(5))
+	+	$(5)
+        +       $a(SIXTH)
+        +       $a($(6))
+	+	$(6)
+
+$(1)
+	+	$a
+$(2)
+        +       $a
+$(3)
+        +       $a
+$(4)
+        +       $a
+$(5)
+        +       $a
+
+
+$(6)
+	+	$a
+	+	$a(0666666666666)
+$(7::*000777000000,7)
+	+	$a
+zaporogets*
+	+	$a(zaporogets)
+	+	zaporogets
+	+	$a(0777777777777)
+	+	$a(0fedcba987654321)
+	+	$a
+	+	$
+	+	$(7)
+	+	$a($)
+	+	$a($(7))
+	+	$(8)
+
+$(8:06000:*000888000000, 8)
+	$res	8
+sliwowjc
+	+	$a(sliwowjc)
+	+	$a(0123456789abcdef)
+	+	$a
+	+	$
+	+	$(8)
+	+	$(7)
+$(0)
+	+	$a(after_prime)
+        +       $a(after_first)
+        +       $a(after_second)
+        +       $a(after_third)
+        +       $a(after_fourth)
+        +       $a(after_fifth)
+        +       $a(after_sixth)
+
+weel	$equ	after_prime
+kent	$equ	$(0)
+
+	+	$a(weel)
+	+	$a(kent)
+

@@ -1,0 +1,31 @@
+__relocatable	$set	1
+__giant		$set	1
+
+	$include	"ppc_64.def"
+	$include	 enter64.def
+
+__litseg $set           36
+$(__litseg:*8,r30/__literal)
+__base36
+
+	$if	1
+$(.data)
+myword	.int		99
+	$endif
+
+$(.text)
+zactor*
+	enter64	32
+        ld	9, __literal(	__upper48	factor@ha)
+        lwz	0, factor@l(9)
+
+	$if	1
+	ld	10, __literal(	__upper48	myword@ha)
+	lwz	11, myword@l(10)
+	$endif
+
+	bl	soso
+
+	leave64
+
+	$store	gzactor

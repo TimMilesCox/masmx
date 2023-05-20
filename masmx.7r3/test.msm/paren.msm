@@ -1,0 +1,21 @@
+        $word   32
+instruction $form 8,24 
+
+p       $proc
+load*   $name   1
+add*    $name   2
+store*  $name   3
+return* $name   4
+        instruction     $n, p(1, 1)
+        $end
+
+        $set_option     "a"
+data    $equ    1
+code    $equ    0
+$(data:00400000)
+buffer  $res    120
+$(code:0100)
+        load    buffer
+        add     (07FFFFFFF)
+        store   buffer+1
+        return

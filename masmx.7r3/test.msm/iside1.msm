@@ -1,0 +1,18 @@
+	$include	"../aside.dem/ppc_603.def"
+$(.zero:1024)
+runtime	blr
+$(.text:*4)
+ntree*	bl	runtime
+	lwz	r3, here+here+here+here
+	bl	away_tae_the_moon
+	blr
+#	+	here-here
+#	+	here+here-here
+#	+	here+here+here-here
+here	+	here+here+here+here-here
+there	+	there+there-there, there+there-there:q
+	+       there+there+there+there-there:q
+	+	runtime+there
+	+	there+runtime
+	+	-here-there
+	$end

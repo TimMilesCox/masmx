@@ -1,0 +1,11 @@
+final*  $proc	$(1)
+        +       final(1,1)
+        $end
+
+first*  $func
+        final   first(1,1)
+        $return first(1,1)/2
+        $end
+
+        +       first(99)
+

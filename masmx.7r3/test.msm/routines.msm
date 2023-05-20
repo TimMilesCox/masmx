@@ -1,0 +1,38 @@
+	$path		../smaragd.68k
+	$list		0
+	$include	coldfire.def
+	$list
+	$path
+
+.data	$equ	5
+.text	$equ	0
+
+$(.data:0x5000)
+$(.text:16384)
+
+routineA	$tree
+$(.data)
+counter	+	30
+pointer	+	0x0a000L
+$(.text)
+	move.w	counter, d0
+	movea	pointer, a0
+
+	;
+	;
+	rts
+	$root
+
+routineB	$tree
+$(.data)
+counter	+	60
+pointer	+	0x0b000L
+$(.text)
+	move.w	counter, d0
+	movea	pointer, a0
+
+	;
+	;
+	rts
+	$root
+

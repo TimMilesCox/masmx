@@ -1,0 +1,3 @@
+	$include	"ppc_603.def"
+	$include	"vitest.s"
+	$include	"vitest2.s"

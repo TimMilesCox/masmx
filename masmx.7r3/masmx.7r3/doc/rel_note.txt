@@ -1,0 +1,289 @@
+Preliminary	masmx.7r3A	Build 8	Distribution 17 January 2019
+___________	__________	_______	____________________________
+
+			and	Build 9-64 Distribution 15 February 2019
+				________________________________________
+
+			and	Build 10 Distribution December 2020
+				___________________________________
+
+			and	Build 11 Build 11-64 Distribution 11 January 2021
+				_________________________________________________
+
+			and	Build 12 Build 12-64 31 March 2021
+				__________________________________
+
+
+
+
+	masmx.7r3A
+	__________
+
+	Build 12 / Build 12-64
+	______________________
+
+	$equf directive modified to allow macro language
+	to inherit base-displacement attributes from macro call 
+
+
+	Build 11 / Build 11-64
+	______________________
+
+        algorithm plotter directive $xqt_fp correction
+        handling of parenthesised sub-expressions corrected
+
+        new script test.msm/clean removes benchmark results
+        before backup or zip
+
+        these benchmarks apply when masmx toolchain is generated
+
+        the required results controls are kept
+        but the generated test results are dropped after comparison
+
+
+	build 10 / 10-64
+	________________
+
+        merged 64-bit / 32-bit sources
+        nothing is called long and all c language i32s are called int
+        correction to 1st / 2nd pass behaviour of $text translations
+
+	Build 9-64
+	__________
+
+	functionally identical to Build 8 but runs on 64-bit-only OS X platforms
+
+
+	Build 7
+	_______
+
+	fixed problem in $path directive where whitespace after the path was accidentally in the path
+
+	allows $TEXT,n to substitute text with command line positional argument
+
+	combines flags -ix to list all types of label table objects
+
+
+	Build 6
+	_______
+
+	added -X option: data binary computational values up to 192 bits in size
+	may be passed from one assembly to another as labels
+
+	it has always been possible to export non-address values
+	-X makes it possible to import them for the first time
+
+	Build 6 also corrects an omission in internal function $t() label type
+
+
+	Build 5
+	_______
+
+	displays errno if an input or an output file cannot be accessed
+	pointing to cause of problem
+
+	option flag -I legalises inline code generation from $func macros
+
+
+	Build 4
+	_______
+
+	Addition of :z tag to construct integer and floating constants seven storage words in size
+	Size tags exist already for [1|2|3|4|5|6||8|]-word number constants and they override
+	integer self-sizing and floating selectable default size
+
+	Floating exponent underflow / overflow now marks the assembly in error.
+	Exponent underflow / overflow in an assembled storage expression was previously remarked
+	but is now error-flagged
+
+	Earlier application code needs no changes
+
+	Earlier builds of 7r3A
+	______________________
+
+	revise and make more consistent the assembly of
+	hierarchically structured and named code and data
+
+	-H option allows unrounded floating constants
+
+	
+
+
+	Easy to Use Build Scripts for Updated or Ported masmx
+	_____________________________________________________
+
+	Directory src now has scripts for constructing updated masmx and masmz
+	on and for platforms osx.x86 osx.ppc ubuntu.x86 win32
+
+		./bosx86
+		./bisx64
+		./ppcbosx
+		./bsuse
+		./bsuse.x64
+		./bw32
+
+	These builds are all for 32-bit targets. They also display guidance
+	for executing test suites
+
+
+
+        _________________________________________________
+        |       Copyright Tim Cox, 2015			|
+	|	TimMilesCox@gmx.ch			|
+        |                                               |
+        |       This document describes the masmx.7r3A  |
+        |       target-independent meta-assembler       |
+        |                                               |
+        |       The masmx.7r3A meta-assembler is free   |
+        |       software licensed with the GNU General  |
+        |       Public Licence Version 3                |
+        |                                               |
+        |       The same licence encompasses all        |
+        |       accompanying software and documentation |
+        |                                               |
+        |       The full licence text is included with  |
+        |       these materials                         |
+        |                                               |
+        |       See also the licensing notice at the    |
+        |       foot of this document                   |
+        |_______________________________________________|
+
+
+
+
+Status of Delivered Documents
+_____________________________
+
+
+Documents in this directory masmx.7r3/doc are:
+
+	masmx.7r3/doc/masmx.html
+
+	this release note
+
+	GNU General Public Licence Version 3
+
+
+
+Status of Delivered Binaries
+____________________________
+
+
+	Proprietary Unix Platforms
+	__________________________
+
+	Mac OS X / PowerPC G4		DELIVERED IN THIS PACKAGE		Build 11
+
+	Mac OS X / x86			DELIVERED IN THIS PACKAGE		Build 11
+
+        Max OS X / x86-64		DELIVERED IN THIS PACKAGE		Build 11-64
+                                        for any Intel Mac
+                                        from Snow Leopard to Catalina
+
+
+	Sun Sparc Solaris		pending
+
+
+	Linux Platforms
+	_______________
+
+	openSUSE Linux / x86		DELIVERED IN THIS PACKAGE		Build 11
+
+	openSUSE Linux / x86-64		DELIVERED IN THIS PACKAGE		Build 11-64
+
+
+
+	Microsoft Platforms
+	___________________
+
+	extended memory MS DOS		pending
+
+	640K MS DOS			pending
+
+	MS Windows 32-bit		DELIVERED IN THIS PACKAGE		Build 8
+
+	________________________________________________________
+
+	all the DOS binaries run on all 32-bit Windows platforms
+
+
+
+Product Components
+__________________
+
+
+All the binaries delivered are standalone programs.
+
+	masmx is the assembler with all features
+
+	masmz is the assembler with a subset of features
+
+masmx.7r3a manual describes programming with masmx and the masmx command line
+
+	imx converts the output of masmx and masmz to 16-bit address I-Records
+
+		imx	file.txo irec_file
+
+	mmx converts the output of masmx and masmz to 32-bit address S-Records
+
+		mmx	file.txo srec_file
+
+	symbol extracts exported names from assembled programs
+	so that the names may be captured as environmental variables
+
+		symbol	< file.txo [export|set] > capture[.bat]
+		source	capture
+
+        one word like export or set may be output in front of each
+        extracted label. The keyword
+                
+                all
+        
+        causes externalised names of storage locations to be extracted.
+        By default symbol only extracts symbols which are not addresses.
+        Values are output in decimal
+
+
+masmx contains all the features described in the manual
+
+The masmx features absent from masmz are hierarchical data structure
+and runtime algorithm plotter
+
+The directives $TREE $BRANCH $ROOT $RECORD $XQT_I $XQT_FP
+are therefore absent from masmz.
+
+
+
+Assistance
+__________
+
+For assistance contact masmx@gmx.ch
+         Telephone +41 76 383 33 49
+
+_______________________________________________________________________________________
+
+
+LICENCE NOTE
+
+    Copyright Tim Cox, 2015
+    TimMilesCox@gmx.ch
+
+    This document describes the masmx.7r3A target-independent meta-assembler.
+
+    masmx.7r3A is free software. It is licensed
+    under the GNU General Public Licence Version 3
+
+    You can redistribute it and/or modify masmx.7r3
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    masmx.7r3A is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with masmx.7r3A.  If not, see <http://www.gnu.org/licenses/>.
+
+

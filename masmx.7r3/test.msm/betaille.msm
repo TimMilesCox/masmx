@@ -1,0 +1,42 @@
+	$path		../smaragd.68k
+	$list		0
+	$include	coldfire.def
+	$include	record_x.def
+	$list
+	$path
+
+p	$proc
+hameau*	$name
+*	$record	+p(1, 2) +p(1, 3) +p(1, 4)
+oies	18
+anes	12
+moutons	16
+	$root
+	$end
+
+p	$proc
+commune* $name
+*	$record
+?	$do	p(),"p(?, 1)"	hameau	p(?)
+ 	$root
+	$end
+
+
+$(5:050000)
+communes $record
+Vaux_les_Pres	commune	les_Cotards, 80, 5, 248	|
+			le_Charmelot, 660, 24, 79 |
+			village, 28, 2, 5
+	$plist	5
+Villers_Buzon	commune	centre, 10, 1, 30	|
+			Combe_au_Loup, 15,,315
+	$plist
+	$root
+
+$(0:16384)
+
+	retrieve	communes.Villers_Buzon.Combe_au_Loup.moutons
+	retrieves	communes.Vaux_les_Pres.le_Charmelot.anes	d1
+
+	lretrieve	communes.Villers_Buzon.Combe_au_Loup.oies	d2
+	lretrieve	communes.Villers_Buzon.centre.oies	d3

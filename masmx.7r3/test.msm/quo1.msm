@@ -1,0 +1,9 @@
+        $quote  027
+p*      $proc
+'name:p(1,1)'
+        +       'name:p(1,1)'+0c0000
+        +       name:no+0a0000
+        $snap    2
+        $end
+$(0:64)
+        p       no

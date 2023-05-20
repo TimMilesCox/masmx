@@ -1,0 +1,8 @@
+	$list		0
+__giant	$set		1
+	$include	"../aside.dem/ppc_603.def"
+	$list		2
+        $include        "hangobar.msm"
+$(60::*0x00444400000c0000)
+	$include	"tisobar.msm"
+	$store		"../test.o3/scale3.txo"

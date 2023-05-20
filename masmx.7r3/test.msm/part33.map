@@ -1,0 +1,6 @@
+	$include	"map_ppc.def"
+$(61:040000000)
+	$include,$binary	"../result.txo/submarine.txo"
+$(1:040004400)
+	$include,$binary	"../result.txo/o.txo"
+	$end	soso

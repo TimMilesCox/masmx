@@ -1,0 +1,30 @@
+	$cont_char	'|'
+	$include	fieee754.def
+
+left1	$set	fieee754_64(3.5e+300)
+right1	$set	07e54e7b4f70066e8
+left2   $set    fieee754_64(3.5e-300)
+right2  $set    001c2c05bca99d4ee
+left3   $set    fieee754_64(0.1e+100)
+right3  $set    0547d42aea2879f2e
+left4   $set    fieee754_64(0.1e-100)
+right4  $set    02af665bf1d3e6a8d
+left5   $set    fieee754_64(1.7e+300)
+right5  $set    07e444ecd0d33972b
+left6   $set    fieee754_64(1.7e-300)
+right6  $set    001b2373498ed353f
+
+	$do	left1--right1>1,	$note	1st pair more than a bit difference
+	$do	left2--right2>1,	$note	2nd pair more than a bit difference
+	$do	left3--right3>1,	$note	3rd pair more than a bit difference
+	$do	left4--right4>1,	$note	4th pair more than a bit difference
+	$do	left5--right5>1,	$note	5th pair more than a bit difference
+	$do	left6--right6>1,	$note	6th pair more than a bit difference
+
+	$do	left1--right1=1,	$note	1st pair single bit difference
+	$do	left2--right2=1,	$note	2nd pair single bit difference
+	$do	left3--right3=1,	$note	3rd pair single bit difference
+	$do	left4--right4=1,	$note	4th pair single bit difference
+	$do	left5--right5=1,	$note	5th pair single bit difference
+	$do	left6--right6=1,	$note	6th pair single bit difference
+

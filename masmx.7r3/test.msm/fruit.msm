@@ -1,0 +1,26 @@
+tree*   $proc   $(7)
+*       $tree
+times   $do     tree(1,1),;
+branch(times)   branch tree(1,1)
+        $root
+        $end
+
+branch* $proc
+*       $tree
+times   $do     branch(1,1)*2,fruit(7,times)   fruit branch(1,1)*3
+        $root
+        $end
+
+fruit*  $proc
+*       $tree
+times   $do     fruit(1,1),      +       100-times
+zes     $set    $
+yes     $set     $        
+	$do	$t(welly)=0,welly*** $equ    100,100      
+        $root
+        $end
+
+apple   tree  3
+        +       apple:branch(2):fruit(7,5)
+        +       apple:branch(2):fruit(7)
+       +       apple:branch()

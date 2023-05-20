@@ -1,0 +1,63 @@
+macro   $equ,$directive        $proc
+macend  $equ,$directive        $end
+if      $equ,$directive        $if
+else    $equ,$directive        $else
+endif   $equ,$directive        $endif
+
+org*    macro
+.procedure_name $set 1        
+        if      ($t(org(1,1))=$PROC)**(org(1,1)=VAR)
+saveloc $set    $r
+absolute $set   org(1, 2)
+$(1:absolute)
+.        $res    org(1,2)-$
+$(saveloc)        
+        else
+absolute $set   org(1, 1)
+$($r:absolute)
+.       $res    org(1,1)-$
+        endif
+        macend
+
+align*  macro
+topage  $set    256
+.procedure_name $set 1
+        if      ($t(align(1,1))=$PROC)**(align(1,1)=var)
+saveloc $set    $r
+grain   $set    align(1,2)
+        $if     $rel
+        $info   *align(1, 2)
+        $else
+        $res    ($+grain-1)**(-grain)-$
+        $endif
+$(saveloc)        
+        $else
+grain   $set    align(1,1)
+        $if     $rel
+        $info   *align(1,1)
+        $else
+        $res    ($+grain-1)**(-grain)-$
+        $endif
+        $endif
+        macend
+
+var*    $proc
+saveloc $set    $r
+$(1)
+*       $res    var(1,1)
+$(saveloc)
+        $end
+
+
+$(1:*080)
+$(0:*)
+thing   var      4
+        +        thing
+        align    040
+        align    var, 0100
+nugget  var      4
+        +        nugget:s
+        org      060
+        org      var, 0180
+thirdly var     4
+        +       thirdly

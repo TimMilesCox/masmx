@@ -1,0 +1,65 @@
+	$nop	__giant	$set		1
+	$include	"../aside.dem/ppc_64.def"
+	$include	"../aside.dem/enter64a.def"
+__giant	$set	0
+BASIS	$set	0x003FFC0000000040
+INCREMENT $set	0x0000000001000000
+
+$(.data::*BASIS, r3)
+funtime*
+	$res	32
+runtime*
+
+$(.data+40::*BASIS+INCREMENT, r3)
+uptime*
+	$res	32
+startime*
+
+$(.data+41::*BASIS+INCREMENT*2, r3)
+private_time
+        $res    32
+discreet_time
+
+$(.data+42::*BASIS+INCREMENT*3, r3)
+showtime*
+        $res    32
+partytime*
+
+$(.text:128:*BASIS)
+$(.literal:256:*BASIS,30/__literal)
+__base36 $equ	BASIS
+
+$(.text)
+entry1*	enter64	32
+	bl	routine3
+	bl	entry2
+	leave64
+
+entry2*	enter64	32
+	return64,64	__literal(BASIS:d)
+
+routine3
+	ld	4, __literal(-BASIS:D)
+	blr
+
+	$floating_point	64
+	$characteristic	16
+
+$(0x40::*2048/__lit64)
+prim1	ld	r3, __lit64(1.75)
+	blr
+
+$(0x40::*4096)
+prim2   ld      r3, __lit64(-1.75)
+        blr
+
+$(0x40::*6144)
+prim3   ld      r3, __lit64(1.5)
+        blr
+
+$(0x40::*8192)
+prim4   ld      r3, __lit64(-1.5)
+        blr
+
+
+#	$snap

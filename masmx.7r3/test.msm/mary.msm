@@ -1,0 +1,5 @@
+	$set_option	"c"
+        $byte   12
+        "Mary had a little\nLamb\012Its fleece was white as\xaSnow"
+        "Mary had a little\nLamb\0012Its fleece was white as\x00aSnow"
+        $end

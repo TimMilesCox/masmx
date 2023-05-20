@@ -1,0 +1,32 @@
+
+	$path		../smaragd.68k
+	$include	coldfire.def
+
+.text	$equ	0
+
+$(.text:524288,pc)
+
+;	translate a 32-bit unsigned integer in d0 to 12 decimal digits in d0:d1:d2 quickly
+;	three * 4-byte blocks are returned in registers without editing or truncation
+;	this routine may be called from others which action sign / edit / store
+;	the high order two digits of the 12 are guaranteed "00"
+
+i2string
+	divu.w	#10000, d0
+	moveq	#0, d1				; high-order half must be zero
+	move.w	d0, d1				; quotient of first divide may be > 10000
+	divu.w	#10000, d1
+	swap	d0				; remainder to ls half d0
+	move.l	(table, pc, d0.w*4), d2		; low-order 4 digits
+	move.l	(table, pc, d1.w*4), d0 	; high-order 4 digits
+	swap	d1				; remainder to ls half d1
+	move.l	(table, pc, d1.w*4), d1		; 5th..8th digits
+	rts
+
+table
+	$list	0
+thousands	$do	10,|
+hundreds	$do	10,|
+tens		$do	10,|
+units		$do	10,	'0'+thousands-1, '0'+hundreds-1, '0'+tens-1, '0'+units-1L
+

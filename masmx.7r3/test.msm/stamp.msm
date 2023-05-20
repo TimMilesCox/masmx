@@ -1,0 +1,12 @@
+	$word	16
+
+w*	$proc
+*	$record	w(1, 1)
+field2	5
+	$root
+	$end
+
+here	$record
+field	5
+r2	w	15
+	$root

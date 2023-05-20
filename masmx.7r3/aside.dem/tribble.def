@@ -1,0 +1,31 @@
+p	$proc
+"$map"*	$name
+p	$proc
+superword* $name
+parts	$set	p(1,1:)
+data	$set,$binary	p(1,1:parts)
+part	$do	parts-1,	relocate	p(1,1:part)
+	$load,$bits	data
+	$end
+
+p	$proc
+relocate* $name
+label	$pushrel	p(1, 1)
+v	$set	label\1
+bits	$set	label\2
+scale	$set	label\3
+
+limit	$set	1*/bits
+mask	$set	limit-1
+antimask $set	^(mask*/scale)
+
+field	$set	v+((data/*scale)**mask)
+.field	$set	v+((data*/(192-bits)*/-(192-bits)
+	$trace	field
+	$info,$range_check1	field
+data*	$set	((field**mask)*/scale)++(data**antimask)
+	$end
+
+word	$do	p(),	superword	p(word, 1)
+	$end
+

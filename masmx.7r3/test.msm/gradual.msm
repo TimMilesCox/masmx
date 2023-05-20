@@ -1,0 +1,24 @@
+	$path		../smaragd.68k
+	$include	coldfire.def
+	$include	express.def
+	$path
+	$include	espresso.def
+	$include	ieee754.def
+
+$(5:16384,a5)
+one	$res	2
+two	$res	2
+
+four	$res	2
+five	$res	2
+
+$(0:65536,pc/$azlit)
+	$plist	3
+;	move.l		$azlit($a(one)), a5
+	$xqt_i,#	one*two/3
+
+	muls		4(a5), d1
+	muls		(4, a5), d1
+
+	$xqt_i,#	four/3
+

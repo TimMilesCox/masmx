@@ -1,0 +1,11 @@
+p       $proc
+grungle* $name   0aabbccdd
+gringle* $name   0eeff0011
+grongle* $name   022334455
+        +       $n
+        +       p(1,1)
+        $end
+$(0:0)
+        grungle 0babababa
+        gringle 0cdcdcdcd
+        grongle 0efefefef

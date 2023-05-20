@@ -1,0 +1,5 @@
+mac     $proc
+        +       1,2,3
+        $end
+
+mac

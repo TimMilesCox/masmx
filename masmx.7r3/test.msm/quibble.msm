@@ -1,0 +1,21 @@
+	$if	8
+		$if	wobble
+			-	5
+		$elseif	blarney
+			$if	ono
+			$endif
+			-	6
+		$elseif	6
+			$note	six
+			+	6
+		$elseif	5
+			$note	five
+			+	5
+		$elseif	4
+			$note	four
+			+	4
+		$elseif	3
+			$note	three
+			+	3
+		$endif
+	$endif

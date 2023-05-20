@@ -1,0 +1,59 @@
+	$plist	8
+
+"$bdi"  $form   24, 24, 48
+
+"$v"*   $func	*
+
+
+vector* $proc   $(2)
+
+way	$set	vector(2, 1)+60
+
+
+segment* $proc  $(way)
+        $byte	6
+*       $bdi	+"load$:segment(1,1)", 0, "segment(1,1)"
+	$byte	8
+        $end
+
+vsegment* $proc	$(63)
+	$byte	6
+*	$bdi	0, 0, "vsegment(1,1)"
+	$byte	8
+	$end
+
+	$if	vector(2,1)<2
+*	+	"bank$:vector(1,1:1)"+vector(1,1:2)
+	$else
+        $if     $t("bank$:vector(1,1:1)")=0
+	$if	vector(2,1)=4
+"bank$:vector(1,1:1)"*** vsegment vector(1,1:1) 63
+	$else
+"bank$:vector(1,1:1)"*** segment vector(1,1:1) vector(2, 1)+60
+	$endif
+        $endif
+*       +	"bank$:vector(1,1:1)"**65535*/4;
+				++vector(1,1:2);
+				++vector(2,1)*/22:s
+	$endif
+        $end
+
+        $if     $t($v(1,1))=0
+	$if	$t("bank$:$v(1,1)")
+$(2)
+"$v(1,1)"**	+	"bank$:$v(1,1)":s
+$(0)
+	$else
+
+"$v(1,1)"** vector $v(1, 1)  $v(1,2)
+        $endif
+	$endif
+        $return $v(1,1)
+        $end
+
+
+$(2:02000)
+$(62:0780000)
+$(63:07c0000)
+
+bank$:print$	$equ	0400002

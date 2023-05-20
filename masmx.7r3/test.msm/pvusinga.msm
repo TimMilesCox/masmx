@@ -1,0 +1,67 @@
+__registers_by_name $set 1
+
+        $include        "../aside.dem/ppc_603.def"
+
+hi16*	$func
+	$return	hi16(1, 1)/*16
+	$end
+
+lo16*	$func
+	$return lo16(1, 1)**65535
+	$end
+
+record* $proc        
+*       $tree
+h       +       record(1,1)
+t       $res    record(1,1)*4
+        $root
+        $end
+
+tree*   $proc
+*       $tree
+times   $do     3,dibber(times) record    tree(1,1)
+        $root
+        $end
+
+SEGMENT $equ    55*1024+768
+GALACTASEGMENT $set 0x00FFCC007FFC0000
+
+$(55:SEGMENT:*GALACTASEGMENT,r12/GALACTAPOD)
+this_segment $equ .absolute	#	+GALACTASEGMENT
+times   $do     2,raddle1(times) tree    18
+raddle2 tree    30
+        +       GALACTAPOD(1*/120)
+$(1:118*1024,r2/.nbss)
+static  .equ    .      
+buffer1 $res    40
+buffer2 $res    15
+        .align  2
+$(0:120*1024)
+xibl
+        oris    r2, 0, hi16(GALACTASEGMENT)
+        ori     r2, r2,lo16(GALACTASEGMENT)
+yibl        
+        lwz     r24, .nbss(this_segment)
+        lwz     r3, raddle1(1).dibber(2)
+        li      r4, raddle2.dibber(3)
+        li      r5, raddle1(2)
+        lwz     r6, raddle2
+
+        lwz     r25, GALACTAPOD(1*/120)
+        lwz     r26, GALACTAPOD(3*/120)
+zibl
+	$trace	.(55)
+	$trace,1 .(55)
+oibl
+$(55, 11)
+voibl
+new_segment $equ .absolute	#	+GALACTASEGMENT
+jessalabel tree 6
+jumbly  tree    4
+$(0:.(0))
+	mr	r11, r2
+        lwz     r24, .nbss(new_segment)
+        lwz     r3, jumbly
+        lwz     r4, jumbly+4
+        stw     r3, jessalabel.dibber(3).h
+        stw     r4, jessalabel.dibber(3).t

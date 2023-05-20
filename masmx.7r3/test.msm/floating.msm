@@ -1,0 +1,49 @@
+
+	$word	48		. the word size of the target
+				. processor architecture
+
+	$floating_point 96	. the default size of a floating constant
+				. = 2 words
+
+	$characteristic		24	. the characteristic field width
+					. for a 2-word floating number
+					. 24 bits is the maximum characteristic
+
+	$characteristic,48	12	. the characteristic field width
+					. for a 1-word floating number
+
+one     $equ    1
+
+		1*-1		. floating recognised from operator
+				. current default floating size
+
+		1s*-one		. floating recognised from operator
+				. single-word override
+
+
+		0.1		. floating recognised from fraction string
+		0.1s		. floating recognised from fraction string
+				. single word override, 12-bit characteristic
+
+		1.0e-1		. fraction string followed by e+ e- punctuation
+
+	+	one*-one	. floating recognised from operator
+				. mantissa / exponent expressions
+				. contain any integer tokens
+
+		1s*-1		. expression sizes and rounds at
+				. one-word override
+
+
+        	1q*-one		. four-word override
+
+		1.0s*-one  	. exponent string can be any integer tokens
+
+		1s*+0, 1s*+1, 1s*+2, 1s*+3q	. four words,
+						. four floating numbers
+
+tagged	$equ	163.84e+2
+	+	tagged
+
+	$end
+

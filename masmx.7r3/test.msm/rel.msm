@@ -1,0 +1,21 @@
+$(3:*8)
+aspace  $res    100
+avalue  +       1023
+$(0)
+aref    $equ    avalue
+anumba  $equ    10        
+        +       aref
+        +       aref+anumba
+        +       avalue-avalue
+        +       avalue-anumba
+        +       anumba-avalue
+        +       aref+aref
+        +       aref>anumba
+        +       anumba=aref
+        +       aref*anumba
+        +       anumba*aref
+        +       aref++anumba
+        +       anumba++aref
+        +       aref**anumba
+        +       aref--anumba
+        +       avalue-aspace

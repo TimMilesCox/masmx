@@ -1,0 +1,42 @@
+        $word   32
+"$instru" $form	4, 4, 4, 4, 16
+
+b1      $equ    4
+b2      $equ    5
+b3      $equ    6
+b4      $equ    7
+
+immediate $equ  1
+h1      $equ    2
+h2      $equ    3
+
+r0      $equ    0
+r1      $equ    1
+r5      $equ    5
+r6      $equ    6
+r15     $equ    15
+
+p       $proc
+load*   $name   1
+add*    $name   2
+store*  $name   3
+        $instru	$n, p(0,2)++p(1,4), p(1, 1), p(1,3), p(1,2)
+        $end
+
+code    $equ    1
+static  $equ    2
+$(static:16384)
+buffer  $res    1024
+$(code:256)
+
+INPUT1  $equf   buffer+512, r5, b1
+INPUT2  $equf   buffer
+OUTPUT  $equf   buffer, r1, h2
+
+        load    r15, input1
+        add     r15, input2
+        store   r15, output
+
+        load    r6, INPUT1,,b3
+        store   r6, OUTPUT,r5
+        store   r6, OUTPUT+99

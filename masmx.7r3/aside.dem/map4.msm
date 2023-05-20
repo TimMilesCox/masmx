@@ -1,0 +1,7 @@
+	$include	"map_ppc.def"
+$(0:*4)
+	$list			2
+	$include,$binary	soso
+	$include,$binary	factor
+
+	$store			rel4

@@ -1,0 +1,11 @@
+        $word           16
+        $cont_char       0       . No Continuation
+        $lterm          ';'     . comment is ;
+        $sterm          '.'     ; sub.string is .
+        $set_option     "m"     ; Motorola Hex
+$(6:06000)                      ; Locator 6, base 24K
+"$handle"                       ;
+        $res    10              ; Buffer 10 Words
+.locator $equ,"$function" "$"   ; Alias Location Counter
+        +       .locator-"$handle"+$6
+

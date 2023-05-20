@@ -1,0 +1,23 @@
+sword   $equ    99
+        +       ahead
+        +       ahead+6d
+        +       sword    .
+        +       ahead-6q
+        ^       6q
+        -       6q
+ahead
+.        $DO     1
+        +       to_be
+        +       revealed+2
+        +       1,'a'
+        +       'a',1
+        +       'a',1,1
+        +       1,'a',1
+        +       'A'+1
+        +       'a'+'B'
+        +       ' '+$
+        +       '@'+$do        
+
+.        $ENDO
+to_be
+revealed

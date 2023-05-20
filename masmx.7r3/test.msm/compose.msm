@@ -1,0 +1,10 @@
+        $word   32
+        $quantum 8
+.        $space
+              "Stratum One":10;
+              :"Stratum Two":10:;
+		"Stratum Three":;
+              10
+.        $free
+        $end
+

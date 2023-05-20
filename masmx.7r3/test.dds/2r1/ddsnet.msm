@@ -1,0 +1,341 @@
+;******************************************************************************
+;
+; File     : DDSNET.ASM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains the DDSNET network definitions and DDSNET
+;            level 2 handling code.
+;
+; System   : 80C537
+;
+; History  :
+;   Date     Who Ver  Comments
+;
+;******************************************************************************
+
+; System Messages
+
+MSG_ANA EQU 255
+MSG_TST EQU 254
+MSG_SSL EQU 253
+MSG_SND EQU 252
+
+; DT Messages
+
+MSG_SSR EQU 128
+MSG_SSI EQU 128
+MSG_MBR EQU 129
+MSG_MBD EQU 129
+MSG_MBW EQU 130
+MSG_ATR EQU 131
+MSG_ARR EQU 132
+MSG_ARD EQU 132
+MSG_AMT EQU 133
+MSG_STN EQU 135
+MSG_SSN EQU 136
+MSG_PST EQU 137
+
+; RealTime Ticketing Application Messages
+
+MSG_PLOW EQU 74
+MSG_PO  EQU 73
+MSG_TKS EQU 72
+MSG_CRT EQU 71
+MSG_SUM EQU 70
+MSG_TSD EQU 69
+MSG_TSC EQU 68
+MSG_TPI EQU 67
+MSG_TSI EQU 66
+MSG_TSF EQU 65
+MSG_TSR EQU 64
+
+; Generic Applications Messages
+
+MSG_IDL EQU 2
+MSG_GRQ EQU 1
+
+;*******************************************************************************
+
+NODE_ID_INSTALL         EQU 255
+NODE_ID_ALLNODES        EQU 254
+NODE_ID_ALLTS           EQU 253
+NODE_ID_ALLDT           EQU 252
+NODE_ID_ALLST           EQU 251
+
+NODE_TYPE_TS            EQU 1
+NODE_TYPE_DT            EQU 2
+NODE_TYPE_TT            EQU 3
+NODE_TYPE_ST            EQU 4
+		   
+
+;       ****************************************************
+;       *  Very Extended Receive uses bigger timeouts than *
+;       *  Extended Receive                  T, 21x99      *
+;       ****************************************************
+
+
+NET_ReceivePacketVEx:
+	mov     r6,#255
+NET_RpvxL:
+	mov     a,RS485_Packets
+	jnz     NET_RPXtryAgain
+	jb      RS485_InPacket,NET_RpvxT
+	mov     r0,#240
+	call    delay100us
+	djnz    R6,NET_RpvxL
+	ret
+NET_RpvxT:                                  ; Packet Nose is Detected
+	mov     r6,#255
+NET_RpvxR:
+	MOV     DPTR,#buffer
+	CALL    RS485_ReceivePacket
+	JNZ     NET_RPsyscheck
+
+	mov     r0,#10
+	call    delay100us
+	djnz    r6,NET_RpvxR
+	ret
+
+NET_ReceivePacketEx:
+
+;       **********************************************************
+;       *       Tim     19viij99        ********Start*************
+;       **********************************************************
+;       *       Rapid Poll for a Packet Header                   *
+;       *       If that arrives, allow more time for the Trailer *
+;       **********************************************************
+
+	IF      NETCONFIGT
+	mov     dptr,#ctrl_head_tolerance
+	movx    a,@dptr
+	mov     r6,a
+	ELSE
+	mov     r6,#36
+	ENDIF
+
+NET_ReceivePacketNose:
+	mov     a,RS485_Packets  ; has a packet arrived while we
+	jnz     NET_NoseDetected ; fluffed about?
+
+	jb      RS485_InPacket,NET_NoseDetected
+
+;        mov     r0,#20
+	mov     r0,#1
+	call    delay100us
+	djnz    r6,NET_ReceivePacketNose
+	RET
+
+NET_NoseDetected:
+
+;       **********************************************************
+;       *       Tim     19viij99        ********End***************
+;       **********************************************************
+
+;       **********************************************************
+;       *       Tim     25viij99        **change to 100 retries***
+;       **********************************************************
+
+	IF      NETCONFIGT
+	mov     dptr,#ctrl_tail_tolerance
+	movx    a,@dptr
+	mov     r6,a
+	ELSE
+	mov     r6,#84
+	ENDIF
+
+NET_RPXtryagain:
+	MOV     DPTR,#buffer
+	CALL    RS485_ReceivePacket
+	JNZ     NET_RPsyscheck
+
+;       **********************************************************
+;       *       Tim     25viij99        *change to 12 * 100us*****
+;       **********************************************************
+
+;        mov     r0,#255
+;        mov     r0,#12
+	MOV     R0,#4
+	CALL    delay100us
+	DJNZ    R6,NET_RPXtryagain
+	JMP     NET_RPnopkt
+
+NET_ReceivePacket:
+	MOV     DPTR,#buffer
+	CALL    RS485_ReceivePacket
+	JZ      NET_RPnopkt
+NET_RPsyscheck:
+	MOV     DPTR,#buffer+5
+	MOVX    A,@DPTR
+
+;**************************
+; Check For System Messages
+;**************************
+
+	IF      UPROUTE
+	CJNE    a,#UPROUTE,NET_RPnotUpType
+
+	mov     r0,#2
+	call    ctrl_resetbuffer
+	movx    a,@dptr
+	inc     dptr
+	mov     dpsel,#0
+	mov     dptr,#host_buffer+2
+	add     a,#2
+	movx    @dptr,a
+	inc     dptr
+	mov     r7,a
+	mov     b,a
+OKjustOnce:
+	mov     dpsel,#3
+	movx    a,@dptr
+	inc     dptr
+	mov     dpsel,#0
+	movx    @dptr,a
+	inc     dptr
+	djnz    b,OKjustOnce
+	call    HOST_TransmitPacket
+
+
+	mov     dptr,#buffer+5                  ; leave it all
+	movx    a,@dptr                         ; how you found it
+NET_RPnotUpType:
+	ENDIF
+
+	CJNE    A,#MSG_ANA,NET_RPnotauto
+	JMP     NET_AutoResponse
+NET_RPnotauto:
+	CJNE    A,#MSG_TST,NET_RPnottest
+	JMP     NET_TestComms
+NET_RPnottest:
+	CJNE    A,#MSG_SSL,NET_RPnotssl
+	JMP     NET_SetSerial
+NET_RPnotssl:
+	CJNE    A,#MSG_SND,NET_RPnotsnd
+	JMP     NET_SetNode
+NET_RPnotsnd:
+NET_RPnopkt:
+
+; PUSHACC
+; CALL SND_SoundOff
+; POP ACC
+	RET             ; return A=msg type for application to check
+
+;*********************
+; System Message - SND
+;*********************
+
+NET_SetNode:
+	MOV     DPTR,#buffer+6                  ; ignore if its
+	MOVX    A,@DPTR                         ; not for a DT
+	CJNE    A,#NODE_TYPE_DT,NET_SNnotme     ;
+
+	MOV     DPTR,#buffer+7                  ; ignore if its
+	CALL    MEM_SetSource                   ; for a different
+	MOV     DPTR,#sys_dtserial              ; serial number
+	CALL    MEM_SetDest                     ; of machine
+	MOV     R7,#4                           ;
+NET_SNloop:                                     ;
+	MOV     DPH,srcDPH                      ;
+	MOV     DPL,srcDPL                      ;
+	MOVX    A,@DPTR                         ;
+	MOV     B,A                             ;
+	INC     DPTR                            ;
+	MOV     srcDPH,DPH                      ;
+	MOV     srcDPL,DPL                      ;
+	MOV     DPH,destDPH                     ;
+	MOV     DPL,destDPL                     ;
+	MOVX    A,@DPTR                         ;
+	INC     DPTR                            ;
+	MOV     destDPH,DPH                     ;
+	MOV     destDPL,DPL                     ;
+	CJNE    A,B,NET_SNnotme                 ;
+	DJNZ    R7,NET_SNloop                   ;
+
+	MOV     DPTR,#buffer+11                 ; its for me, save
+	MOVX    A,@DPTR                         ; the node information
+	MOV     sys_mynode,A                    ; in EE storage
+	CALL    SYS_WriteUnitInfo               ;
+	ANL     A,#1                            ;
+	XRL     A,#1                            ;
+	MOV     DPTR,#buffer+6                  ;
+	MOVX    @DPTR,A                         ; send the reply indicating
+	MOV     DPTR,#buffer+5                  ; whether we successfully
+	MOV     R7,#2                           ; stored our new node id
+	CALL    RS485_TransmitPacket            ;
+NET_SNnotme:
+	CLR     A
+	RET
+
+;******************************
+; System Message - AUTORESPONSE
+;******************************
+
+NET_AutoResponse:
+	MOV     DPTR,#buffer+6
+	MOVX    A,@DPTR
+	CJNE    A,#NODE_TYPE_DT,NET_ARnotme
+	MOV     DPTR,#buffer+11
+	MOVX    A,@DPTR
+	MOV     sys_mynode,A
+
+	MOV     DPTR,#sys_dtserial
+	CALL    MEM_SetDest
+	MOV     DPTR,#buffer+7
+	CALL    MEM_SetSource
+	MOV     R7,#4
+	CALL    MEM_CopyXRAMtoXRAMsmall
+
+	CALL    SYS_WriteUnitInfo
+	ANL     A,#1
+	XRL     A,#1
+	MOV     DPTR,#buffer+6
+	MOVX    @DPTR,A
+	MOV     DPTR,#buffer+5
+	MOV     R7,#2
+	CALL    RS485_TransmitPacket
+NET_ARnotme:
+	CLR     A
+	RET
+
+;***************************
+; System Message - TESTCOMMS
+;***************************
+
+NET_TestComms:
+	MOV     DPTR,#buffer+6
+	MOV     A,sys_mynode
+	XRL     A,#255
+	MOVX    @DPTR,A
+
+	MOV     DPTR,#buffer+5
+	MOV     R7,#2
+	CALL    RS485_TransmitPacket
+	CLR     A
+	RET
+
+;*********************
+; System Message - SSL
+;*********************
+
+NET_SetSerial:
+	MOV     DPTR,#buffer+6
+	CALL    MEM_SetSource
+	MOV     DPTR,#sys_dtserial
+	CALL    MEM_SetDest
+	MOV     R7,#4
+	CALL    MEM_CopyXRAMtoXRAMsmall
+	CALL    SYS_WriteUnitInfo
+	MOV     DPTR,#buffer+6
+	ANL     A,#1
+	XRL     A,#1
+	MOVX    @DPTR,A
+	MOV     R7,#2
+	MOV     DPTR,#buffer+5
+	CALL    RS485_TransmitPacket
+	CLR     A
+	RET
+
+;******************************* End Of DDSNET.ASM *********************a*******/

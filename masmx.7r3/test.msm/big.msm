@@ -1,0 +1,15 @@
+high    $equ    3*/90
+
+struttura*	$proc
+tree(times)*	$equ     high+1024*1024*(times-1)
+
+leaves  $do     2,;
+leaf(times,leaves)* $equ     tree(times)+64*(leaves-1)
+. leaf(times,leaves) $equ     tree(times)+64*$d
+        $end
+
+times	$do	2,	struttura
+        +       leaf(1,2)
+        +       leaf(2,1)
+
+

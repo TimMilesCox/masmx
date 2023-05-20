@@ -1,0 +1,13 @@
+$(3:03000)
+
+	$word		16
+
+outermost $record			'o' 1 1 1 10
+first_field	9
+?	$do	3,field(?)	9
+inner	$record				6 4 6 4
+?	$do	4,field(?)	3
+	$root
+trailing 12
+	$root
+

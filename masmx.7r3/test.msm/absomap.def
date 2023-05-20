@@ -1,0 +1,8 @@
+p	$proc
+"$map"*	$name
+word*	$proc
+data	$equ,250	word(1,1)
+	$load,"$bits"	data
+	$end
+index	$do	p(),	word	p(index, 1)
+	$end

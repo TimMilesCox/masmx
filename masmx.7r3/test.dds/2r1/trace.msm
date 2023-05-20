@@ -1,0 +1,21 @@
+TRACE4  EQU     0
+TRACE5  EQU     0
+TRACE6  EQU     0
+TRACE7  EQU     0
+
+ptrace  macro
+        lmacro  list
+        push    acc
+        push    dph
+        push    dpl
+        mov     stackcheck,sp
+        jb      stackcheck7,ptrace_ok
+        jmp     DT_ColdBoot
+ptrace_ok:
+        mov     dptr,#ppg_oper_text!1
+        mov     a,#255
+        movx    @dptr,a
+        pop     dpl
+        pop     dph
+        pop     acc
+        macend

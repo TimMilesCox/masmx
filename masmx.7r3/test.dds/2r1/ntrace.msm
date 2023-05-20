@@ -1,0 +1,37 @@
+NTRACE_ON EQU   0
+
+ntrace  MACRO
+        LMACRO  LIST
+
+        IF      NTRACE_ON
+
+        mov     dptr,#buffer
+        mov     a,!1
+        movx    @dptr,a
+        mov     r7,#1
+        lcall   RS485_TransmitPacket
+
+        ENDIF
+
+        MACEND
+
+retrace MACRO
+        LMACRO  LIST
+
+        IF      NTRACE_ON
+
+        mov     dptr,#buffer
+        mov     r0,sp
+        mov     a,@r0
+        movx    @dptr,a
+        dec     r0
+        mov     a,@r0
+        inc     dptr
+        movx    @dptr,a
+        mov     dptr,#buffer
+        mov     r7,#2
+        lcall   RS485_TransmitPacket
+
+        ENDIF
+
+        MACEND

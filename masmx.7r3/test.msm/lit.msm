@@ -1,0 +1,29 @@
+        $word   32
+        $quantum 8
+        $set_option     "a"
+
+instruction     $form   8, 4, 4, 16
+
+r11     $equ    11
+
+p       $proc
+load*   $name   99
+        instruction     $n, p(1,1), p(1,3), p(1, 2)
+        $end
+
+with_a_very_high_address $equ   00fffc0000000000
+
+$(7:07000)
+$(0:64)
+
+        $lit    7
+
+        load    r11, (with_a_very_high_address)
+        load    r11,,r11
+
+        +       00fffc0000000000
+        +	+(00fffc0000000000)
+        +       (00fffc0000000000)
+        +       (00fffc0000000000), 15
+        +       +(0ffee), (0ffee)
+

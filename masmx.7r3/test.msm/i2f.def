@@ -1,0 +1,62 @@
+p       $proc	*
+i72f*   $name
+
+from    $equf   p(2)
+to      $equf   p(1)
+
+        la      from            . load i71..48
+        dsa     48              
+        sa      to              . store at output
+        da      from+1          . convert to 1s complement by adding to sign
+        ds      to+2            . store converted i47..0 at temp+2
+        sc      a               . capture carry
+        aa      to              . add to sign
+        aa      from            . and to i71..48
+        lb      to+2            . and place back in temp+1
+        dlsc    a               . and scale i71..24
+        sa      to+1            . output mantissa upper bits 71..48
+        la, i   24              . see if it's off the scale 1..24 signs
+        ana     6               . by subtracting scale from 24
+        jc      three_words     . if scale is more than 24,
+        dlsc    to+2            . there are only 48 significant bits
+        ds      to+1            . promote 3rd, 4th word
+        la      to
+        sa      to+3            . write signs to 4th word
+        la      $64(0400030)    . start from 48 + midpoint
+        j       characteristic
+three_words
+        dl      to+2            . if not, continue
+        dsl     *6              . shift i47..0 left by scaling count
+        sa      to+2            . output mantissa bits 47..24
+        la      to+3            . shift i24..0::signs left by scaling count
+        lb      to
+        dsl     *6              . 
+        sa      to+3            . output mantissa bits 23..0
+        la      $64(0400048)    . starting from 72 + midpoint
+characteristic
+        ana     6               . calculate normalising count
+        xor     to              . 1s complement the characteristic if minus
+        sa      to              . output the characteristic
+        $end
+
+p       $proc
+i48f*   $name
+
+        $if     p(2)
+        dl      p(2)
+        $endif
+
+to      $equf   p(1)
+
+        ds      to+1            . set aside
+        dsa     48              . make 48 signs
+        sa      to+3            . write mantissa ls word
+        da      to+1            . convert to 1s complement
+        dlsc    a               . scale
+        ds      to+1            . output mantissa bits 71..48
+        la      $64(0400030)    . starting 48 + midpoint
+        ana     6               . calculate characteristic
+        xor     to+3            . and sign it
+        sa      to              . and store it
+        
+        $end

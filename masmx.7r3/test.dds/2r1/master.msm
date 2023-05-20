@@ -1,0 +1,2096 @@
+	$list   0
+	$include "8051.def"
+	$list   2
+;******************************************************************************
+;
+; File     : DT.MSM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains the main program for DT5/DT10
+;
+; System   : 80C537
+;
+; History  :
+;
+;
+;***************************************************************************
+
+; Declare which customer (use DDS if  generating the standard version)
+
+       
+	INCLUDE stack.MSM
+
+
+USE_UPLOAD      EQU 0 ; define if  this DT is connected to an RS485 network
+
+SLAVISH         EQU     0
+
+
+FAIL_SALE_RESUME EQU 0
+PAPER           EQU 0
+LDSP            EQU 0
+LCD_BUG         EQU 0
+BIGFONT         EQU 0
+TRACE_RASTER    EQU 0
+MASTER          EQU 1
+VT10            EQU 1
+
+
+
+USE_DDS         EQU 1
+USE_PAIGNTON    EQU 0
+USE_METROLAND   EQU 0
+USE_BEDFORD     EQU 0
+USE_POWERSCOURT EQU 0
+
+PRT_CLAA        EQU 1 ; --\ define either CLAA or CLBM printer mech
+PRT_CLBM        EQU 0 ; --/ (CLBM has not been maintained...needs mods)
+DT10            EQU 1 ; --\ define either DT10 or DT5 or DT10W
+DT5             EQU 0 ; --| depending on the
+;                $note Equating DT10W
+DT10W           EQU 0 ; --/ type of machine
+VT1             EQU 0 ; define if  machine is a vending machine (DT10 only)
+DT_TEST         EQU 0 ; define only for TEST PROM
+USE_BARCODES    EQU 0 ; define if  machine is capable of printing barcodes
+USE_SLAVE       EQU 0 ; define if  this DT is controlling another machine
+USE_SEATS       EQU 0 ; define if  seat allocation is required
+USE_ALTONCOMMS  EQU 0 ; define if  alton towers style time delay comms req'd
+USE_TKTCTRL     EQU 0
+USE_RS485       EQU 1
+USE_HOST        EQU 1
+USE_SERVANT     EQU 0
+USE_TMACHS      EQU 0
+
+USE_CARD        EQU 0
+USE_CDRAWER     EQU 0
+
+
+RIDE_TIME_GATED                 EQU     1
+
+PACKED                          EQU     1
+BINARY72                        EQU     2
+ASCII21                         EQU     3
+ASCII17                         EQU     4
+DMS_SYMBOLIC_FORMAT             EQU     ASCII17
+NETCONFIGT                      EQU     0
+
+DMS                             EQU     1
+SPEAKER                         EQU     0
+LEDS                            EQU     0
+
+DMSFAST                         EQU     0
+UPROUTE                         EQU     0      ; Nothing notified to HOST
+HOST_LENGTH_ENCODING_DECIMAL    EQU     0
+REMOTE_MONITOR                  EQU     1
+NO_HOT_NOISE                    EQU     0
+MINUTES_AHEAD                   EQU     1
+HOST_BUFFER_TRACE               EQU     0
+THEATRE                         EQU     0
+THEATRE_IDEMPOTENT EQU  1       ; when this is set, theatre schedule
+				; download message part 2 contains
+				; a replacement total # shows, not a
+				; supplementary total. This makes it
+				; safe to iterate the message
+THEATRE_ZLOAD                   EQU     0
+DISNEY                          EQU     0
+TPPTALLY                        EQU     0
+NATIONALITY                     EQU     053h
+
+DT_VERSION* macro
+	DB      '2r1  '
+	macend
+
+;*******************************************************************************
+; Stack Macros - Detects Stack Overflow & Reboots Machine
+;*******************************************************************************
+
+; 20/5/99 SSM removed these since Tony obviously never realised that you
+; cannot push registers by their absolute locations in this way when other
+; functions and interrupts are using register banks. All locations using
+; these broken macros have been altered to use MOV A,R? PUSHACC instead,
+; which is what all SSM code has always done. Likewise, all POPs have been
+; fixed.
+
+; 10ij2000 stack.MSM changed to contain correct macros for register banks. T.
+
+QTRACE_ON EQU   0
+;        INCLUDE qtrace.MSM
+	INCLUDE fastmath.MSM
+
+
+;*******************************************************************************
+; Define Memory Configuration
+; Customer Specific
+; Limits set low to give early indication of code/data shortage
+;*******************************************************************************
+	MEMTRAP Hi,0E000h       ; *** 64k EPROM *** goes from 0000h to FFFFh
+	MEMTRAP VAR,Hi,08000h    ; XRAM goes from 0000h to 7FFFh
+
+	PRESET VARTYPE,ALIGN
+POINTER PRESET 2
+LONG    PRESET 4
+
+;******************************************************************************
+; Restart and interrupt vector initialisation
+;******************************************************************************
+
+;        INCLUDE vectrace.MSM
+	INCLUDE vectors.MSM
+
+	ORG VAR,0100h           ; Base address of XRAM (external RAM)
+
+buffer: VAR 2048                ; Misc buffer (declare as largest area needed)
+				; ABSOLUTELY MUST BE FIRST THING IN VAR SPACE
+
+	if       USE_HOST
+disney_buffer: VAR 256
+host_buffer: VAR 256
+xcom1_buffer: VAR 256
+	endif
+
+	if       USE_RS485
+rs485_buffer: VAR 256
+	endif
+
+aud_first:      VAR 4 ; these four are declared here so that when a machine
+aud_last:       VAR 4 ; has its eprom revision changed, the audit memory is
+aud_uploadfrom: VAR 4 ; guaranteed to be readable, even if  nothing else  is.
+aud_uploadto:   VAR 4 ;
+
+;**************
+; INCLUDE Files
+;**************
+
+	INCLUDE sfr.inc
+	ALIGN ToPage
+font:
+	if  DT10W
+	 INCLUDE vfont.MSM
+	else 
+	 INCLUDE hfont.MSM
+	endif
+	INCLUDE ddslogo.MSM
+	INCLUDE iram_map.inc
+	INCLUDE ee_map.inc
+	INCLUDE delay.MSM
+	INCLUDE i2c.MSM
+	INCLUDE ports.MSM
+	INCLUDE sbus.MSM
+	INCLUDE crc.MSM
+	INCLUDE number.MSM
+	INCLUDE memory.MSM
+	INCLUDE math.MSM
+	INCLUDE arith.MSM
+;        
+	if       PAPER
+	INCLUDE prt.MSM
+	INCLUDE printer.MSM
+	else 
+FIELD_HEADER EQU 7
+PRT_MAX_HORIZ_CHARS EQU 32
+sys_pulsecount VAR 4        
+	endif
+	
+	INCLUDE erp.MSM
+
+	if       USE_CARD
+	INCLUDE card.MSM
+	else 
+CRD_ClearCardNumber:
+	ret
+	endif
+
+	if       USE_CDRAWER
+	INCLUDE cdrawer.MSM
+	endif
+
+	INCLUDE custdisp.MSM
+	INCLUDE lcd2x24.MSM
+	INCLUDE system.MSM
+
+
+	if       SPEAKER
+	INCLUDE sound.MSM
+	endif
+
+	if       LEDS
+	INCLUDE leds.MSM
+	endif
+
+	INCLUDE keyboard.MSM
+	INCLUDE comms.MSM
+
+	if  USE_RS485
+	 INCLUDE rs485x.MSM
+	else 
+NODE_ID_INSTALL EQU 255
+	endif
+
+	if  USE_HOST
+	if  REMOTE_MONITOR
+	INCLUDE dmon.MSM
+	endif
+	 INCLUDE host.MSM
+	 INCLUDE host3.MSM
+	 INCLUDE EXAR2550.MSM
+	 INCLUDE conv.MSM
+	endif
+
+	INCLUDE pplug.MSM
+	
+	if       SLAVISH
+	INCLUDE login.MSM
+	else 
+PPG_CHNK_MENU16TICKETS EQU 4
+	endif
+
+	if       NATIONALITY=46h
+	INCLUDE patron.MSM
+	INCLUDE ouvrier.MSM
+	else 
+	INCLUDE manager1.MSM
+	INCLUDE operatr1.MSM
+	endif
+
+
+	INCLUDE rtc.MSM
+	INCLUDE time.MSM
+	
+	if       DMS
+	INCLUDE dms.MSM
+	endif        
+	
+	if       PAPER
+	INCLUDE spotchck.MSM
+	endif        
+
+	
+	if       PAPER
+pushr0  macro 
+	push    0
+	macend
+	INCLUDE ..\..\slave\v1r44\ticket.MSM
+	INCLUDE tktprint.MSM
+	INCLUDE receipt.MSM
+	else 
+tkt_printstatus VAR     1
+tkt_hotkey_tickets VAR   1        
+tkt_groupqty    VAR     4        
+tkt_value       VAR     4        
+tkt_discount    VAR     4
+tkt_number      VAR     4        
+	endif
+
+	INCLUDE shift.MSM
+
+	
+	if       PAPER
+	INCLUDE waybill.MSM
+	endif
+	
+	INCLUDE diags.MSM
+	
+	if       PAPER
+	INCLUDE audit.MSM
+	INCLUDE audith.MSM
+	endif
+	
+	INCLUDE upload.MSM
+	INCLUDE menu.MSM
+	INCLUDE barcode.MSM
+
+	if  USE_RS485
+	 INCLUDE ddsnet.MSM
+	endif
+
+	
+	if       PAPER
+	INCLUDE void.MSM
+	INCLUDE cutter2.MSM
+	endif
+	
+	if  USE_SLAVE
+	 INCLUDE pktcomms.MSM
+	 INCLUDE slave.MSM
+	endif
+	if  USE_TKTCTRL
+	 INCLUDE tktctrl.MSM
+	endif
+	if  USE_TMACHS
+	 INCLUDE loudoun.MSM
+	endif
+	INCLUDE configur.MSM
+	INCLUDE control.MSM
+	
+;        $snap
+;        $end
+	
+	INCLUDE poll.MSM
+	INCLUDE act.MSM
+	
+	
+	IF      LDSP
+;        INCLUDE leddisp.MSM
+	ENDIF
+
+	if       THEATRE
+	INCLUDE theatre.MSM
+	endif
+
+;*******************************************************************************
+;
+;                          D E B U G   R O U T I N E S
+;
+;*******************************************************************************
+
+TxCr:
+	MOV     B,#COM_COM1
+	MOV     A,#13
+	CALL    COM_TxChar
+	MOV     A,#10
+	CALL    COM_TxChar
+	RET
+
+DBG_TxChar:
+	MOV     B,#COM_COM1
+	JMP     COM_TxChar
+
+DBG_TxStr:
+	MOV     B,#COM_COM1
+	JMP     COM_TxStr
+
+DBG_DumpXRAM:   ; DPTR=addr, R6/R7=len
+	PUSHB
+	PUSHACC
+	MOV     A,R5
+	PUSHACC
+	MOV     R5,#0
+
+	MOV     A,R7
+	JZ      DBG_DXRloop
+	INC     R6
+DBG_DXRloop:
+
+	MOV     A,R5
+	JNZ     DBG_DXRnoeol
+	CALL    TxCr
+	MOV     A,DPH
+	PUSHACC
+	SWAP    A
+	CALL    HexChar
+	CALL    DBG_TxChar
+	POP     ACC
+	CALL    HexChar
+	CALL    DBG_TxChar
+	MOV     A,DPL
+	PUSHACC
+	SWAP    A
+	CALL    HexChar
+	CALL    DBG_TxChar
+	POP     ACC
+	CALL    HexChar
+	CALL    DBG_TxChar
+	MOV     A,#':'
+	CALL    DBG_TxChar
+	MOV     A,#32
+	CALL    DBG_TxChar
+	MOV     R5,#16
+DBG_DXRnoeol:
+
+	MOVX    A,@DPTR
+	PUSHACC
+	SWAP    A
+	CALL    HexChar
+	CALL    DBG_TxChar
+	POP     ACC
+	CALL    HexChar
+	CALL    DBG_TxChar
+	MOV     A,#32
+	CALL    DBG_Txchar
+
+	INC     DPTR
+	DEC     R5
+	DJNZ    R7,DBG_DXRloop
+	DJNZ    R6,DBG_DXRloop
+
+	CALL    TxCr
+	POP     ACC
+	MOV     R5,ACC
+	POP     ACC
+	POP     B
+	RET
+
+DT_KeypressTimeout:
+	;CALL   SND_Warning
+DT_KTloop:
+	CALL    KBD_ReadKey
+	JNZ     DT_KTdone
+	MOV     R0,#1
+	CALL    delay100ms
+	DJNZ    R7,DT_KTloop
+DT_KTdone:
+	RET
+;******************************************************************************
+;
+; Function:     DT_HelloMessage
+; Input:        ?
+; Output:       ?
+; Preserved:    ?
+; Destroyed:    ?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+DT_HelloMessage:
+	MOV     A,#9
+	CALL    DIS_GotoXY
+	MOV     DPTR,#msg_totem1
+	CALL    DIS_DisplayStringCODE
+	MOV     A,#64
+	CALL    DIS_GotoXY
+	MOV     DPTR,#msg_totem2
+	CALL    LCD_LanguageStringSelect
+	CALL    DIS_DisplayStringCODE
+	RET
+
+;******************************************************************************
+;
+; Function:     DT_DisplayCustomerName
+; Input:        ?
+; Output:       ?
+; Preserved:    ?
+; Destroyed:    ?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+	if  DT10W
+msg_customer:   DB 255,21,1,0,0,0,21,'                     '
+	else 
+msg_customer:   DB 255,21,0,0,0,0,21,'                     '
+	endif
+
+DT_DisplayCustomerName:
+	MOV     DPTR,#msg_customer
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#FIELD_HEADER+21
+	CALL    MEM_CopyCODEtoXRAMsmall
+
+	MOV     DPTR,#buffer+FIELD_HEADER
+	CALL    MEM_SetDest
+	MOV     DPTR,#ppg_fixhdr_custname
+	CALL    MEM_SetSource
+	MOVX    A,@DPTR
+	JZ      DT_DCNskip
+	INC     DPTR
+	MOV     R7,A
+	CALL    MEM_SetSource
+	CALL    MEM_CopyXRAMtoXRAMsmall
+	
+	if       PAPER
+	MOV     A,#16
+	CALL    PRT_SetBitmapLenSmall
+	CALL    PRT_ClearBitmap
+	MOV     DPTR,#buffer
+	CALL    PRT_FormatXRAMField
+	endif
+	
+	if  DT10W
+	else 
+	 if      PAPER
+	 CALL    PRT_PrintBitmap
+	
+	 endif
+	endif
+DT_DCNskip:
+	RET
+
+;******************************************************************************
+;
+; Function:     DT_DisplayUserName
+; Input:        ?
+; Output:       ?
+; Preserved:    ?
+; Destroyed:    ?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+	if  DT10W
+msg_user:       DB 255,21,1,0,2,0,21,'User:                '
+	else 
+msg_user:       DB 255,21,0,0,0,0,21,'User:                '
+	endif
+
+DT_DisplayUserName:
+	MOV     DPTR,#msg_user
+	CALL    MEM_SetSource
+	MOV     DPTR,#buffer
+	CALL    MEM_SetDest
+	MOV     R7,#FIELD_HEADER+21
+	CALL    MEM_CopyCODEtoXRAMsmall
+
+	MOV     DPTR,#buffer+FIELD_HEADER+6
+	CALL    MEM_SetDest
+	MOV     DPTR,#ppg_hdr_username
+	MOVX    A,@DPTR
+	JZ      DT_DUNskip
+	INC     DPTR
+	MOV     R7,A
+	CALL    MEM_SetSource
+	CALL    MEM_CopyXRAMtoXRAMsmall
+	
+	if       PAPER
+	if  DT10W
+	else 
+	 MOV     A,#16
+	 CALL    PRT_SetBitmapLenSmall
+	 CALL    PRT_ClearBitmap
+	endif
+	MOV     DPTR,#buffer
+	CALL    PRT_FormatXRAMField
+	if  DT10W
+	else 
+	 CALL    PRT_PrintBitmap
+	endif
+	endif
+
+DT_DUNskip:
+	RET
+
+;******************************************************************************
+;
+; Function:     DT_CheckPowerUpMessages
+; Input:        None
+; Output:       A=zero if  messages enabled
+; Preserved:    ?
+; Destroyed:    ?
+; Description:
+;   etc
+;
+;******************************************************************************
+
+DT_CheckPowerUpMessages:
+	MOV     A,#1
+
+;       MOV     DPTR,#man_misc2
+;       MOVX    A,@DPTR
+;       ANL     A,#MAN_INHIBITPOWERUPMSG
+
+	RET
+
+;******************************************************************************
+; Main Program
+;******************************************************************************
+
+	if  DT10W
+msg_please:     DB 255, 6,1,0,3,48, 6,'Please'
+msg_wait:       DB 255, 7,1,0,4,48, 7,'Wait...'
+	endif
+msg_pleasewait: DB 255,14,0,0,0, 0,14,'Please Wait...'
+msg_ready:      DB 255, 5,0,0,0, 0, 5,'Ready'
+msg_eereadfail: DB 255,15,0,0,0, 0,15,'PricePlug Error'
+msg_eereadok:   DB 255,16,0,0,0, 0,16,'PricePlug Loaded'
+msg_ClearDown:     DB 16,'Clearing Memory!'
+
+msg_product:            ;language dependent message
+	if  DT10W
+
+	 DB 24, ' Totem Wristbander '
+	 DT_VERSION;
+	 DB 24, '  KIS Wristbander  '
+	 DT_VERSION;
+
+	endif
+	if  DT10
+	 if  VT1
+
+	  DB 24, 'Totem Vending VT1  '
+	  DT_VERSION;
+	  DB 24, ' KIS Vending VT1   '
+	  DT_VERSION;
+
+	 else 
+
+	  DB 24, 'XQ10 Master        '
+	  DT_VERSION;
+	  DB 24, 'XQ10 Master        '
+	  DT_VERSION;
+
+	 endif
+	endif
+
+msg_totem1:     DB 3,'DDS'
+
+msg_totem2:     DB 20,' Totem Desktop DT10 '
+		DB 20,'  KIS Desktop DT10  '
+
+	if  DT10W
+msg_manplug:    DB 255,12,1,0,4,0,12,'Manager Mode'
+	else 
+msg_manplug:    DB 255,12,0,0,0,0,12,'Manager Mode'
+	endif
+
+msg_issuemethods:
+	if  DT10W
+	 DB 255,21,1,0,6,0,21,'Instant Issue        '
+	 DB 255,21,1,0,6,0,21,'Full Subtotalling    '
+	 DB 255,21,1,0,6,0,21,'Instant Subtotalling '
+	else 
+	 DB 255,21,0,0,0,0,21,'Instant Issue        '
+	 DB 255,21,0,0,0,0,21,'Full Subtotalling    '
+	 DB 255,21,0,0,0,0,21,'Instant Subtotalling '
+	endif
+
+;***************************************************************************
+
+DT_ColdBoot:
+	MOV     IEN0,#0                 ; disable all interrupts
+	MOV     IEN1,#0
+	MOV     IEN2,#0
+;
+	CLR     F1                      ; select 13bit e2 addressing
+	CLR     F0                      ; select main i2c line
+	JMP     DIA_SaveBootInfo
+
+;************
+
+DT_WarmBoot:
+	MOV     SP,#stackpointer
+
+	MOV     A,#SYS_AREA_WARMBOOT
+	CALL    SYS_SetAreaCode
+
+	MOV     R0,#2                   ; clear internal ram
+	MOV     R1,#254                 ; (except first two bytes
+DT_ClearIRAM:                           ;  which are R0 and R1)
+	MOV     @R0,#0FFh               ;
+	INC     R0                      ;
+	DJNZ    R1,DT_ClearIRAM         ;
+
+	MOV     sys_intnest,#1          ; nested interrupt en/disable counter
+
+
+	mov     r0,#PortMirrorA
+	mov     @r0,#0
+	mov     r0,#PortMirrorB
+	mov     @r0,#0
+	mov     r0,#PortMirrorC
+	mov     @r0,#0
+	mov     r0,#PortMirrorD
+	mov     @r0,#0
+	mov     r0,#PortMirrorE
+	mov     @r0,#0
+
+SELECT_INITIAL_ROUTINES                     EQU 0
+
+	CALL    SYS_ReadSystemStats
+;       MOV     kbd_rxpkt_state,#0
+	CLR     cdopen
+	CLR     sys_ppon
+	CLR     sys_aon
+	CLR     sys_prnon
+	CLR     SYS_overheating
+;       MOV     com_txok,#0
+	MOV     A,#0
+	CALL    MTH_LoadOp1Acc
+	MOV     DPTR,#sys_pulsecount
+	CALL    MTH_StoreLong
+;       MOV     lcd_delaybacklite,#0
+
+	CALL    CTRL_GetDTCount
+
+
+	MOV     R0,#2
+	CALL    delay100ms
+	CALL    SYS_UnitPowerOn
+	MOV     R0,#2
+	CALL    delay100ms
+	CALL    SYS_IntPriority         ; Set interrupt priorities
+	MOV     TMOD,#011h              ; timers 0 and 1 in mode 1 (16 bit)
+	ORL     TCON,#050h              ; timers 0 and 1 on
+	ORL     IEN0,#002h              ; timers 0 and 1 interrupt enabled
+	CALL    KBD_InitKeyboard
+	
+	if       PAPER
+	CALL    AUD_InitAudit
+	endif
+
+	CALL    COM_InitSerial
+	if  USE_SLAVE
+	CALL    COM_InitPacketComms
+	endif
+	if  USE_RS485
+	 CALL   COM_InitRS485
+	endif
+	if  USE_HOST
+	 CALL   HOST_Init
+	endif
+
+	if       SPEAKER
+	CALL    SND_InitSound
+	endif
+
+	CALL    LCD_Init
+	CALL    CTRL_InitDTInfo
+	CALL    SYS_DetectRAM
+
+	if       LEDS
+	MOV     led_leds,#0             ; all LEDS off
+	CALL    LED_LED1On
+	CALL    LED_LED2Off
+	CALL    LED_LED3Flash
+	CALL    LED_LED4Off
+	endif
+
+	CLR     A
+	MOV     DPTR,#act_closed        ; "Attraction closed" = FALSE on startup
+	MOVX    @DPTR,A
+	MOV     DPTR,#act_tppzero       ; "Tickets per period" = FALSE on startup
+	MOVX    @DPTR,A
+	
+	CALL    KBD_ScanKeyboard
+	CJNE    A,#20,ClearDownMost     ; formerly skipcleardown
+	MOV     DPTR,#msg_ClearDown
+	CALL    LCD_DisplayStringCODE
+	CALL    testdelay
+
+	mov     dptr,#8000h
+	clr     a
+	jmp     ClearDownRapid
+
+;
+; These two flags control "attraction closed" and display blanking. if  either or
+; both is true, the displays should be blanked and SLAVE tickets issue refused.
+;
+ClearDownMost:
+	jmp     skipcleardown
+	cjne    a,#10,skipcleardown
+
+	if       THEATRE
+	MOV     DPTR,#theatre_cursor-1
+	else 
+	MOV     dptr,#32767
+	endif
+
+	mov     a,dpl
+	jz      ClearDownRapid
+	clr     a
+ClearDownLoop:
+	MOVX    @DPTR,A
+	djnz    dpl,ClearDownLoop
+ClearDownRapid:
+	cjne    a,dph,ClearDough
+	jmp     SkipClearDown
+ClearDough:
+	djnz    dph,ClearDownLoop
+
+SkipClearDown:
+
+
+	MOV     R0,#mth_operand1
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_StoreWord
+
+	if       THEATRE=0
+	MOV     DPTR,#ctrl_periodcount
+	CALL    MTH_StoreWord
+	endif
+;
+	CALL    CTRL_GetPL
+	CALL    CTRL_GetTPP
+	CALL    CTRL_GetQTL     ; added later by SSM
+	CALL    CTRL_GetPA      ; Added by RS
+	CALL    CTRL_GetMA      ;
+	CALL    CTRL_GetTXDelay
+	CALL    CTRL_GetRXDelay
+	
+	CALL    CTRL_GetHeadTolerance
+	CALL    CTRL_GetTailTolerance
+	
+	CALL    CTRL_Getldspaddr        ; Added by RS
+;
+	MOV     DPTR,#act_attclosetimelh
+	MOV     A,#99           ; Null time value for attraction closing
+	MOVX    @DPTR,A
+	INC     DPTR
+	MOVX    @DPTR,A         ; (99:99) => att close switched off
+
+	mov     dptr,#act_attclosetime
+	mov     a,#127
+	movx    @dptr,a
+	inc     dptr
+	movx    @dptr,a
+
+;
+	if       LDSP
+	MOV     DPTR,#ldsp_QAbuffer     ; 4 ASCII bytes
+	MOV     A,#'9'          ; Null time value for Queue At display
+	MOVX    @DPTR,A
+	INC     DPTR
+	MOVX    @DPTR,A
+	INC     DPTR
+	MOVX    @DPTR,A
+	INC     DPTR
+	MOVX    @DPTR,A         ; ("9999") => display will be updated on 1st cycle.
+;
+	MOV     DPTR,#ldsp_QUbuffer     ; 2 binary bytes
+	MOV     A,#99           ; Null time value for Queue Until display
+	MOVX    @DPTR,A
+	INC     DPTR
+	MOVX    @DPTR,A         ; (99:99) => display will be updated on 1st cycle.
+	endif
+;
+	CLR     ctrl_checktickettime
+
+
+	if  USE_TMACHS
+	 CALL   LOU_TurnstileClickSetup
+	endif
+
+	if  USE_SERVANT
+	MOV     B,#1
+	CALL    COM_TxStatus            ; transmit initial status
+	endif
+
+	CALL    SYS_EnableInts          ; turn master interrupts on
+
+	if  DT5
+	else 
+
+	 MOV    DPTR, #msg_product
+	 CALL   LCD_LanguageStringSelect
+	 CALL   LCD_DisplayStringCODE
+	 MOV    A,#64
+	 CALL   LCD_GotoXY
+	 MOV    DPTR,#bcd_name
+	 CALL   LCD_DisplayStringCODE
+	endif
+
+	CALL    DIS_Init
+	CALL    DT_HelloMessage
+	CALL    SYS_ReadUnitInfo
+
+	
+	if       PAPER
+	MOV     DPSEL,#0
+	MOV     DPTR,#aud_entry_switchon
+	CALL    AUD_AddEntry
+	endif
+
+; assume some values for just now
+	
+	if       PAPER
+	
+	CALL    PRT_GetPrintOffset
+	CALL    PRT_GetPrintQuality
+	CLR     prt_paperout
+	SETB    prt_perfmode
+	if  DT10W
+	 MOV     prt_perfoffhigh,#00h ; now duplicated in GetPerfOffset
+	 MOV     prt_perfofflow,#0f8h ;
+	 CALL    PRT_GetPerfOffset
+	 CALL    PRT_TweakPerfOffset
+	 MOV     prt_perfmarkhigh,prt_perfoffhigh
+	 MOV     prt_perfmarklow,prt_perfofflow
+	 MOV     prt_perffailhigh,#07h
+	 MOV     prt_perffaillow,#08h
+	 MOV     prt_perflinemin,#60    ; duplicated in GetPerfLineSize
+	 MOV     prt_perflinemax,#70    ;
+	 CALL    PRT_GetPerfLineSize
+	else 
+	 MOV     prt_perfoffhigh,#01h ; now duplicated in GetPerfOffset
+	 MOV     prt_perfofflow,#03ah ;
+	 CALL    PRT_GetPerfOffset
+	 CALL    PRT_TweakPerfOffset
+	 MOV     prt_perfmarkhigh,prt_perfoffhigh
+	 MOV     prt_perfmarklow,prt_perfofflow
+	 MOV     prt_perffailhigh,#03h
+	 MOV     prt_perffaillow,#0E8h ; was 084h
+	 MOV     prt_perflinemin,#50    ; duplicated in GetPerfLineSize
+	 MOV     prt_perflinemax,#60
+	 CALL    PRT_GetPerfLineSize
+	endif
+	MOV     prt_perfskipminhigh,#0
+	MOV     prt_perfskipminlow,#215
+	MOV     prt_perfskipmaxhigh,#1
+	MOV     prt_perfskipmaxlow,#10
+
+	MOV     R1,#PRT_PHASE_SEQ
+	MOV     R2,#PRT_INPUT0_SEQ
+	MOV     R3,#PRT_INPUT1_SEQ
+	CALL    PRT_Initialise
+
+	MOV     A,#MAN_EXT_POWERUP
+	CALL    PRT_SetPrintDevice
+
+	endif
+	
+	
+	CALL    DIA_CheckBootInfo
+
+	CALL    DT_CheckPowerUpMessages
+	JNZ     DT_nomsg1
+
+;       CALL    PRT_StartPrint                  ; initial formfeed to see if 
+;       CALL    PRT_FormFeed                    ; there is any paper in and
+;       CALL    PRT_EndPrint                    ; if  its perfed or plain
+	
+	
+	if       PAPER
+	
+	CALL    DIA_TestPrint
+	CALL    SYS_PowerUpMessage
+	CALL    DIA_TestPrint
+
+	endif
+
+
+DT_nomsg1:
+	CALL    PPG_InitPricePlug
+	CALL    TIM_InitialiseClock
+	
+	
+	
+	if       PAPER
+	CALL    TKT_Init
+	CALL    PRT_StartPrint
+
+	endif
+
+	if  DT5                                  ; display please wait
+	else                                     ; message on DT10/DT10W
+	 CALL   LCD_Clear2                      ;
+	 MOV    A,#64                           ;
+	 CALL   LCD_GotoXY                      ;
+	 MOV    DPTR,#msg_pleasewait+6          ;
+	 CALL   LCD_DisplayStringCODE           ;
+	endif                                   ;
+
+	CALL    DT_CheckPowerUpMessages
+	JNZ     DT_nomsg2
+	
+	if       PAPER
+	MOV     R7,#8
+	CALL    PRT_LineFeed
+	if  DT10W                                ; print please wait message
+	 MOV    A,#96                           ;
+	 CALL   PRT_SetBitmapLenSmall           ;
+	 CALL   PRT_ClearBitmap                 ;
+	 MOV    DPTR,#msg_please                ;
+	 CALL   PRT_FormatCODEField             ;
+	 MOV    DPTR,#msg_wait                  ;
+	 CALL   PRT_FormatCODEField             ;
+	 CALL   PRT_PrintBitmap                 ;
+	else                                     ;
+	 MOV    DPTR,#msg_pleasewait            ;
+	 CALL   PRT_DisplayMessageCODE          ;
+	 CALL   PRT_FormFeed                    ;
+	endif                                   ;
+
+
+	endif
+
+DT_nomsg2:
+
+	CALL    DIS_PowerOnMessage
+
+	if       SLAVISH
+	CALL    LOG_NewLogin
+	endif
+
+	if  DT10W                                ;
+	 MOV    A,#(21*6)                       ;
+	 CALL   PRT_SetBitmapLenSmall           ;
+	 CALL   PRT_ClearBitmap                 ;
+	endif                                   ;
+
+	CALL    DT_CheckPowerUpMessages
+	JNZ     DT_nomsg3
+	CALL    DT_DisplayCustomerName          ; print the customer name
+	CALL    DT_DisplayUserName              ; print the user name
+DT_nomsg3:
+
+	MOV     DPTR,#ppg_fixhdr_plugtype
+	MOVX    A,@DPTR
+	CJNE    A,#PPG_OPERATOR,DTnotop
+	
+	
+	if       PAPER
+	CALL    TKT_CalcTicketCounts
+	endif
+	
+	
+	CALL    OPR_LoadOperatorConfig
+	JMP     DTnotman
+DTnotop:
+	CJNE    A,#PPG_MANAGER,DTnotman
+	CALL    DT_CheckPowerUpMessages
+	JNZ     DT_nomsg4
+	
+	if       PAPER
+	MOV     DPTR,#msg_manplug
+	if  DT10W
+	 CALL   PRT_FormatCODEField
+	else 
+	 CALL   PRT_DisplayMessageCODE
+	endif
+	endif
+DT_nomsg4:
+DTnotman:
+	CALL    DT_CheckPowerUpMessages
+	JNZ     DT_nomsg5
+	
+	if       PAPER
+	if  DT10W
+	 MOV    A,#(21*6)
+	 CALL   PRT_SetBitmapLenSmall
+	else 
+	 MOV    A,#8
+	 CALL   PRT_SetBitmapLenSmall
+	 CALL   PRT_ClearBitmap
+	endif
+	MOV     DPTR,#man_issuemethod
+	MOVX    A,@DPTR
+	DEC     A
+	MOV     B,#28
+	MUL     AB
+	MOV     DPTR,#msg_issuemethods
+	CALL    AddABtoDPTR
+	CALL    PRT_FormatCODEField
+	CALL    PRT_PrintBitmap
+
+	endif
+DT_nomsg5:
+
+;****************
+	
+	
+	if       PAPER
+	CALL    PRT_EndPrint
+	endif
+
+
+	if  DT5                                  ; force instant
+	 MOV    DPTR,#man_issuemethod           ; issue if 
+	 MOV    A,#1                            ; compiling for
+	 MOVX   @DPTR,A                         ; DT5
+	 MOV    DPTR,#ppg_chunk_manager         ;
+	 CALL   CRC_GenerateChecksum            ;
+	endif                                   ;
+
+	if  DT5
+	else 
+	 CALL   LCD_Clear
+	 
+	 CALL   DIS_IdleMessage
+
+	endif
+	
+	if       PAPER
+	CALL    DT_CheckPowerUpMessages
+	JNZ     DT_nomsg6
+	CALL    PRT_StartPrint
+	CALL    PRT_FormFeed
+	CALL    PRT_EndPrint
+DT_nomsg6:
+	CLR     A
+	CALL    PRT_SetPrintDevice
+
+	CALL    CUT_FireCutter
+	
+	else 
+;        mov     a,#CutPaper
+;        call    PortSetB
+	mov     a,#CutPaper
+	call    PortClrB
+
+	endif
+	
+	if  USE_SLAVE
+	 CALL   SLV_SendFullConfig
+	endif
+	
+	if       PAPER
+	CALL    TKT_DisplaySubtotal
+	endif
+
+	CALL    LCD_SetTimeout
+					if   SELECT_INITIAL_ROUTINES
+
+					endif   ; Select Initial Routines
+
+
+	if       LEDS
+	CALL    LED_Led3On
+	endif
+
+	if  USE_UPLOAD
+	 CALL    UPL_WaitToUpload
+	endif
+
+	if  USE_TKTCTRL
+	 CALL   RS485_EnableReceive
+	 CALL   TKC_ReceiveStartupMessage
+	endif
+
+	if       USE_HOST
+	call    HOST_Init
+	call    EXAR_Start
+	endif
+
+	if       QTRACE_ON
+	mov     dptr,#qtrack
+	clr     a
+	mov     b,#32
+DT_IniTrace:
+	movx    @dptr,a
+	inc     dptr
+	djnz    b,DT_IniTrace
+	endif
+
+	if       DMS
+	if       DMSFAST
+	else 
+	call    TIM_GetDateTime
+	call    DMS_Schema                      ; Access Area Control Page
+	mov     a,#4                            ; Read Initialisation Date
+	mov     b,#2
+	call    DMS_RField
+	mov     a,#8
+	mov     b,#2
+	call    DMS_WField
+	mov     dptr,#datebuffer                ; Is it today?
+	movx    a,@dptr
+	cjne    a,dms_rda0,DT_DMS_Initialise    ; No, Initialise
+	inc     dptr
+	movx    a,@dptr
+	xrl     a,dms_rda1
+	jz      DT_DMS_DontInitialise           ; Yes, Don't
+DT_DMS_Initialise:
+	call    DMS_Init
+DT_DMS_DontInitialise:
+	endif
+	endif
+	
+	
+	if       THEATRE
+	call    THEATRE_IfGrandEntrance
+	jnz     DT_MainLoop
+	call    THEATRE_DayStart
+
+	endif
+
+
+;**************************
+;
+; T h e   M a i n   L o o p
+;
+;**************************
+DT_MainLoop:
+;
+
+	if       LCD_BUG>1
+;        mov     dptr,#host_mib_chars
+	mov     dptr,#host_mib_expected
+	movx    a,@dptr
+	clr     c
+	clr     ac
+	da      a
+	anl     a,#15
+	orl     a,#'0'
+
+	mov     b,a
+	call    lcd_buga
+
+
+	mov     dptr,#host_mib_delimiter
+	movx    a,@dptr
+	mov     b,a
+
+	call    lcd_bugb
+
+;        mov     dptr,#host_mib_packets
+	mov     dptr,#host_mib_received
+	movx    a,@dptr
+	clr     c
+	clr     ac
+	da      a
+	anl     a,#15
+	orl     a,#'0'
+
+	mov     b,a
+	call    lcd_bugc
+	endif
+
+	if  USE_HOST
+	 CALL   HOST_ProcessHostCommand
+	endif
+;
+;       MOV     DPTR,#act_closed        ;@@@ DEBUG
+;       MOVX    A,@DPTR                 ;@@@ DEBUG
+;       CALL    ACT_Debug2              ;@@@ DEBUG
+; Test to see if  a ping should be sent to the HOST machine
+
+
+	if       USE_HOST
+	MOV     DPTR,#host_pingflag
+	MOVX    A,@DPTR
+	JZ      DT_MLnoping             ; flag = 0 - don't send a ping
+	CJNE    A,#1,DT_MLerrping
+	CALL    HOST_Ping               ; flag = 1 - send good ping
+	JMP     DT_MLpingsent
+;
+DT_MLerrping:
+	CALL    HOST_ErrPing            ; flag > 1 - send error ping
+;       
+DT_MLpingsent:
+	MOV     DPTR,#host_pingflag
+	CLR     A
+	MOVX    @DPTR,A                 ; Zero the flag
+;
+DT_MLnoping:
+	endif
+
+	MOV     A,#SYS_AREA_MAINLOOP
+	CALL    SYS_SetAreaCode
+	CALL    PPG_CheckPricePlug
+;
+	CALL    CTRL_PollDT
+;
+
+;       *****************************************************************
+;       *       Tim, 9ix99 (Ca the Polis)                            ****
+;       *****************************************************************
+;       *       Give priority to host traffic before display refresh ****
+;       *****************************************************************
+
+	if  USE_HOST
+;         CALL   HOST_ProcessHostCommand
+	endif
+
+;       *****************************************************************
+;       *       Tim, 9ix99 (Orricht, send the Polis awa)             ****
+;       *****************************************************************
+
+	CALL    TIM_DisplayDateTime     ; INCLUDEs LED displays update
+
+	CALL    KBD_ReadKey
+	JZ      DT_MainLoop
+
+DT_MLkeypress:
+	
+	if       PAPER
+	PUSHACC
+	MOV     DPTR,#tkt_idlestate
+	MOVX    A,@DPTR
+	JZ      DT_NotIdle
+	CALL    LCD_Clear
+	CALL    TKT_DisplayIdleState
+DT_NotIdle:
+	CLR     A
+	MOVX    @DPTR,A
+	POP     ACC
+	endif
+	
+	
+	JB      kbd_functionkey,DT5_DoFunctionKey
+	if  DT5
+	JB      kbd_managerkey,DT5_DoManagerKey
+	endif
+;******************
+; Normal keypresses
+;******************
+DT5_DoNormalKey:
+	CALL    DT5_NormalKey
+	JMP     DT5_Continue
+DT5_NormalKey:
+	MOV     DPTR,#normalkeytable
+	DEC     A
+	RL      A
+	RL      A
+	JMP     @A+DPTR
+;**************
+; Function Keys
+;**************
+DT5_DoFunctionKey:
+	CALL    DT5_FunctionKey
+	CLR     kbd_functionkey
+	JMP     DT5_Continue
+DT5_FunctionKey:
+	MOV     DPTR,#functionkeytable
+	DEC     A
+	RL      A
+	RL      A
+	JMP     @A+DPTR
+
+	if  DT5
+;*************
+; Manager Keys
+;*************
+DT5_DoManagerKey:
+	CALL    DT5_ManagerKey
+	CLR     kbd_managerkey
+	JMP     DT5_Continue
+DT5_ManagerKey:
+	MOV     DPTR,#managerkeytable
+	DEC     A
+	RL      A
+	RL      A
+	JMP     @A+DPTR
+	endif
+
+DT5_Continue:
+	JB      kbd_functionkey,DT5_FuncLed
+	JB      kbd_managerkey,DT5_ManLed
+	JB      kbd_shiftkey,DT5_FuncLed
+
+	if       LEDS
+	CALL    LED_Led2Off
+	endif
+
+	
+	if       PAPER
+	MOV     DPTR,#tkt_idlestate
+	MOVX    A,@DPTR
+	JNZ     DT_NoClear
+	CALL    LCD_Clear
+DT_NoClear:
+	CALL    TKT_DisplayIdleState
+	endif
+
+	
+	SETB    tim_timerupdate
+	SETB    tim_timerenabled
+	JMP     DT_MainLoop
+DT5_ManLed:
+
+	if       LEDS
+	CALL    LED_Led2Flash
+	endif
+
+	CLR     tim_timerenabled
+	JMP     DT_MainLoop
+DT5_FuncLed:
+
+	if       LEDS
+	CALL    LED_Led2On
+	endif
+
+	JMP     DT_MainLoop
+
+DT_Unused:
+	RET
+;*******************************************************************************
+;       ALIGN   7FFh
+normalkeytable:
+	LJMP    DT_Key0
+	NOP
+	LJMP    DT_NumberKey
+	NOP
+	LJMP    DT_NumberKey
+	NOP
+	LJMP    DT_NumberKey
+	NOP
+	LJMP    DT_NumberKey
+	NOP
+	LJMP    DT_NumberKey
+	NOP
+	LJMP    DT_NumberKey
+	NOP
+	LJMP    DT_NumberKey
+	NOP
+	LJMP    DT_NumberKey
+	NOP
+	LJMP    DT_NumberKey
+	NOP
+	LJMP    DT_Retard               ;A
+	NOP
+	LJMP    DT_Advance              ;B
+	NOP
+	LJMP    DT_NumberKey            ;C
+	NOP
+	LJMP    DT_NumberKey            ;D
+	NOP
+	LJMP    DT_LowerTPP             ;E
+	NOP
+	LJMP    DT_HigherTPP            ;F
+	NOP
+	LJMP    DT_MuchLowerTPP         ;G
+	NOP
+	LJMP    DT_MuchHigherTPP        ;H
+	NOP
+	LJMP    DT_KeyCancel
+	NOP
+	LJMP    DT_KeyOk
+	NOP
+;
+;***
+DT_MuchLowerTPP:
+	MOV     DPTR,#ctrl_ticketsperperiod     ; if  TPP = FFFFh (zero), don't change
+	MOVX    A,@DPTR
+	INC     A
+	JNZ     DT_MLTPPnotzero
+	INC     DPTR
+	MOVX    A,@DPTR
+	INC     A
+	JNZ     DT_MLTPPnotzero
+	RET
+;
+DT_MLTPPnotzero:
+	SETB    tim_timerupdate
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_LoadOp1Word
+	MOV     R0,#mth_operand2
+	CALL    MTH_ClearOperand
+	MOV     mth_op2ll,#18   ; TPP is stored as one less than displayedf value
+	CALL    MTH_TestGTWord
+	JC      DT_MLTPPcarryon
+; Fall-through - TPP (stored value) is 19 or less. Set it to FFFFh (=0 displayed)
+	MOV     A,#0FFh
+	MOV     DPTR,#ctrl_ticketsperperiod
+	MOVX    @DPTR,A
+	INC     DPTR
+	MOVX    @DPTR,A
+	CALL    CTRL_WriteTPP
+	RET
+;
+DT_MLTPPcarryon:
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_LoadOp1Word
+	MOV     R0,mth_operand2
+	CALL    MTH_ClearOperand
+	MOV     mth_op2ll,#20
+	CALL    MTH_SubWords
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_StoreWord
+	CALL    CTRL_WriteTPP
+	RET
+;
+DT_LowerTPP:
+	MOV     DPTR,#ctrl_ticketsperperiod     ; if  TPP = FFFFh (zero), don't change
+	MOVX    A,@DPTR
+	INC     A
+	JNZ     DT_LTPPnotzero
+	INC     DPTR
+	MOVX    A,@DPTR
+	INC     A
+	JNZ     DT_LTPPnotzero
+	RET
+;
+DT_LTPPnotzero:
+	SETB    tim_timerupdate         ; Displayed value has changed, update.
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_DecWord
+	CALL    CTRL_WriteTPP
+	RET
+
+DT_MuchHigherTPP:
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_LoadOp1Word
+	MOV     R0,mth_operand2
+	CALL    MTH_ClearOperand
+	MOV     mth_op2ll,#20
+	CALL    MTH_AddWords
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_StoreWord
+	CALL    CTRL_WriteTPP
+	RET
+
+DT_HigherTPP:
+	MOV     DPTR,#ctrl_ticketsperperiod
+	CALL    MTH_IncWord
+	CALL    CTRL_WriteTPP
+	SETB    tim_timerupdate
+	RET
+
+
+
+ctrl_oldpl:     VAR 2
+
+DT_LowerPL:
+	MOV     DPTR,#ctrl_periodlength
+	CALL    MTH_LoadOp1Word
+	MOV     DPTR,#ctrl_oldpl
+	CALL    MTH_StoreWord
+	MOV     R0,#mth_operand2
+	CALL    MTH_ClearOperand
+	MOV     mth_op2ll,#5
+	CALL    MTH_TestGTWord
+	JC      DT_LPLcarryon1
+	RET
+DT_LPLcarryon1:
+	CALL    MTH_SubWords
+	MOV     DPTR,#ctrl_periodlength
+	CALL    MTH_StoreWord
+	JMP     DT_LPLAdjustPeriodAhead
+
+DT_HigherPL:
+	MOV     DPTR,#ctrl_periodlength
+	CALL    MTH_LoadOp1Word
+	MOV     DPTR,#ctrl_oldpl
+	CALL    MTH_StoreWord
+	MOV     R0,#mth_operand2
+	CALL    MTH_ClearOperand
+	MOV     mth_op2ll,#55
+	CALL    MTH_TestGTWord
+	JNC     DT_HPLcarryon1
+	RET
+DT_HPLcarryon1:
+	MOV     mth_op2ll,#5
+	CALL    MTH_AddWords
+	MOV     DPTR,#ctrl_periodlength
+	CALL    MTH_StoreWord
+
+DT_LPLAdjustPeriodAhead:
+
+	if       MINUTES_AHEAD=0
+	MOV     DPTR,#ctrl_oldpl
+	CALL    MTH_LoadOp1Word
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_LoadOp2Word
+	CALL    MTH_Multiply32by16
+	MOV     DPTR,#ctrl_periodlength
+	CALL    MTH_LoadOp2Word
+	CALL    MTH_Divide32by16
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_StoreWord          
+	
+	CALL    CTRL_WritePL           
+	endif
+
+	SETB    tim_timerupdate
+	RET
+
+DT_Retard:
+	SETB    tim_timerupdate
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_LoadOp1Word
+	MOV     R0,#mth_operand2
+	CALL    MTH_ClearOperand
+	CALL    MTH_TestGTWord
+	JC      DT_Rcarryon
+DT_OntGoBackwardsOrForwards:
+	RET
+DT_THEATRE_ReMinute:
+	jmp     DT_ReMinute
+DT_Rcarryon:
+
+	if       MINUTES_AHEAD
+
+	if       THEATRE
+	call    THEATRE_IfGrandEntrance
+	jnz     DT_THEATRE_ReMinute
+
+	mov     dptr,#theatre_shows
+	movx    a,@dptr
+	jz      DT_OntGoBackwardsOrForwards
+
+	mov     dptr,#act_closed
+	movx    a,@dptr
+	jnz     DT_OntGoBackwardsOrForwards
+	mov     dptr,#theatre_cursor
+	movx    a,@dptr
+	jz      DT_OntGoBackwardsOrForwards
+	add     a,#-3
+
+	push    acc                  ; subtract the time quantum
+	mov     dptr,#theatre_show   ; of the current show
+	add     a,dpl                ; and the one you're going back to
+	mov     dpl,a                ; because THEATRE_NextShow will
+	clr     a                    ; add back in the one you're
+	addc    a,dph                ; going back to
+	mov     dph,a
+	movx    a,@dptr
+	mov     b,a
+	clr     a
+
+	push    dph
+	push    dpl
+	qdans   theatre_realtime
+	pop     dpl
+	pop     dph
+
+	inc     dptr
+	inc     dptr
+	inc     dptr
+	movx    a,@dptr
+	mov     b,a
+	clr     a
+	qdans   theatre_realtime
+	jnb     acc.7,DT_RnoUnderFlow
+	mov     a,#5                ; add back 24 hours in minutes
+	mov     b,#0A0h
+	qads    theatre_realtime
+DT_RnoUnderFlow:
+	pop     acc
+;        call    THEATRE_ProbeShow       ; does not attempt to correct
+	call    THEATRE_NextShow       ; underflow
+	jmp     DT_RemNisce
+	endif
+DT_ReMinute:
+
+	mov     dptr,#ctrl_periodlength
+	movx    a,@dptr
+	mov     b,a
+	inc     dptr
+	movx    a,@dptr
+	qdans   ctrl_periodahead
+DT_RemNisce:
+	else 
+
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_DecWord
+
+	endif
+
+	CALL    CTRL_CorrectAdvance
+DT_OntEvenThinkAboutGoingBackwardsOrForwards:
+	RET
+
+DT_Advance:
+	if       MINUTES_AHEAD
+
+	if       THEATRE
+	call    THEATRE_IfGrandEntrance
+	jnz     DT_AdMinutes
+	mov     dptr,#theatre_shows
+	movx    a,@dptr
+	jz      DT_OntEvenThinkAboutGoingBackwardsOrForwards
+
+	mov     dptr,#act_closed
+	movx    a,@dptr
+	jnz     DT_OntEvenThinkAboutGoingBackwardsOrForwards
+
+	mov     dptr,#theatre_cursor
+	movx    a,@dptr
+	add     a,#3                            ; advance the cursor
+	cpl     a
+	mov     b,a
+	mov     dptr,#theatre_shows             ; must not be more than SHOWS
+	movx    a,@dptr
+	setB    c
+	addc    a,b
+	jnc     DT_AdUlate
+	mov     a,b
+	cpl     a
+	call    THEATRE_NextShow                ; counter-natural, and leads
+	jmp     DT_AdUlate                      ; to confusion
+DT_AdMinutes:
+	endif
+
+	mov     dptr,#ctrl_periodlength
+	movx    a,@dptr
+	mov     b,a
+	inc     dptr
+	movx    a,@dptr
+	qads    ctrl_periodahead
+DT_AdUlate:
+	else 
+
+	MOV     DPTR,#ctrl_periodahead
+	CALL    MTH_IncWord
+
+	endif
+
+	SETB    tim_timerupdate
+	RET
+
+DT_Key0:
+	
+	if       PAPER
+	MOV     DPTR,#tkt_qtystrlen
+	MOVX    A,@DPTR
+	JZ      DT_Key0Func
+	CLR     A
+	JMP     DT_NumberKey
+
+	endif
+
+DT_Key0Func:
+;       MOV     DPTR,#tkt_idlestate
+;       CLR     A
+;       MOVX    @DPTR,A
+	SETB    kbd_functionkey
+
+	if       LEDS
+	CALL    LED_Led2On
+	endif
+
+	RET
+DT_NumberKey:
+	RET
+
+;       RR      A
+;       JMP     TKT_SetQuantity
+
+DT_TicketKey:
+	RET
+
+;       RR      A
+;       CLR     C
+;       SUBB    A,#10
+;       JMP     DT_Ticket
+
+DT_KeyOk:
+	
+	if       PAPER
+	CALL    TKT_PrintTickets
+	CALL    TKT_ClearQuantity
+	CALL    TKT_ClearSubTotal
+	CALL    TKT_DisplaySubtotal
+	
+	endif
+	
+	
+	RET
+
+DT_KeyCancel:
+
+	if       LEDS
+	CALL    LED_Led2On
+	endif
+
+	CALL    KBD_WaitKey                     ; read first keystroke
+	CJNE    A,#KBD_CANCEL,DT_KCnotcancel    ; HERE
+	
+	if       PAPER
+	CALL    TKT_ClearQuantity
+	CALL    TKT_ClearSubTotal
+	CALL    DIS_Clear
+	CALL    TKT_DisplaySubTotal
+	CLR     A
+	MOV     DPTR,#tkt_idlestate
+	MOVX    @DPTR,A
+	endif
+	
+	
+	JMP     DT_KCabort
+DT_KCnotcancel:
+	CJNE    A,#18,DT_KCnotH                 ; work out if  its
+	JMP     DT_KChotkey                     ; a hotkey or a numbered
+DT_KCnotH:                                      ; ticket
+	JNC     DT_KCabort                      ;
+	CJNE    A,#11,DT_KCnotA                 ;
+	JMP     DT_KChotkey                     ;
+DT_KCnotA:                                      ;
+	JNC     DT_KChotkey                     ;
+
+	DEC     A                               ; its a number, store it
+	JZ      DT_KCmenustart                  ; (possible jump straight
+	
+	
+	
+	if       PAPER
+	MOV     DPTR,#tkt_type                  ;  into menu from here)
+	MOVX    @DPTR,A                         ;
+
+	CALL    KBD_WaitKey                     ; read next keystroke
+	CJNE    A,#11,DT_KCnotA2                ; HERE
+	endif
+	
+	
+	JMP     DT_KCabort
+DT_KCnotA2:
+	if       PAPER=0
+DT_KCmenustart:
+DT_KChotKey:        
+	jmp     DT_KCabort
+	else 
+
+	JNC     DT_KCabort
+
+	DEC     A                               ; its a number, append it
+	PUSHACC                                 ; to the previous one to
+	MOV     DPTR,#tkt_type                  ; generate a 2 digit number
+	MOVX    A,@DPTR                         ;
+	MOV     B,#10
+	MUL     AB
+	POP     B
+	ADD     A,B                             ;
+	DEC     A
+DT_KCmenustart:
+	if  DT5
+	else 
+	CALL    TKT_MenuTicket
+	endif
+	JMP     DT_KCdone
+
+DT_KChotkey:                                    ; its a hotkey ticket
+	PUSHACC                                 ;
+;        CALL   LCD_Clear                       ;
+	POP     ACC                             ;
+	CLR     C                               ;
+	SUBB    A,#3                            ;
+	CALL    DT_Ticket                       ;
+	
+	
+	endif
+	
+	
+	JMP     DT_KCdone
+
+DT_KCabort:
+	CALL    LCD_Clear
+DT_KCdone:
+
+	if       LEDS
+	CALL    LED_Led2Off
+	endif
+
+	RET
+
+DT_Ticket:
+	MOV     B,A
+	CALL    PPG_TestChunkHotkeyTickets
+	JZ      DT_TktNone
+	MOV     A,B
+	
+	if       PAPER
+	
+	CALL    TKT_IssueTicket
+	
+	endif
+	
+	RET
+DT_TktNone:
+	RET
+
+;*******************************************************************************
+;       ALIGN   ToPage
+functionkeytable:
+	LJMP    DT5_Func0
+	NOP
+	LJMP    DT5_Func1
+	NOP
+	LJMP    DT5_Func2
+	NOP
+	LJMP    DT5_Func3
+	NOP
+	LJMP    DT5_Func4
+	NOP
+	LJMP    DT5_Func5
+	NOP
+	LJMP    DT5_Func6
+	NOP
+	LJMP    DT5_Func7
+	NOP
+	LJMP    DT5_Func8
+	NOP
+	LJMP    DT5_Func9
+	NOP
+	LJMP    DT5_FuncA
+	NOP
+	LJMP    DT5_FuncB
+	NOP
+	LJMP    DT5_FuncC
+	NOP
+	LJMP    DT5_FuncD
+	NOP
+	LJMP    DT5_FuncE
+	NOP
+	LJMP    DT5_FuncF
+	NOP
+	LJMP    DT5_FuncG
+	NOP
+	LJMP    DT5_FuncH
+	NOP
+	LJMP    DT5_FuncCancel
+	NOP
+	LJMP    DT5_FuncOk
+	NOP
+;
+DT5_Func0:
+;       MOV     DPTR,#ppg_fixhdr_plugtype
+;       MOVX    A,@DPTR
+;       CJNE    A,#PPG_MANAGER,DT5_OkNoMan
+	if  DT5
+	 SETB   kbd_managerkey
+
+	 if       LEDS
+	 CALL   LED_Led2Flash
+	 endif
+
+	else 
+	 CALL   MAN_ManagerMenu
+	endif
+	RET
+DT5_OkNoMan:
+
+	if       SPEAKER
+	CALL    SND_Warning
+	endif
+
+	RET
+DT5_Func1:
+	MOV     DPTR,#man_mancashup
+	MOVX    A,@DPTR
+	JZ      DT5_Func1Ok
+;       MOV     DPTR,#ppg_fixhdr_plugtype
+;       MOVX    A,@DPTR
+;       CJNE    A,#PPG_MANAGER,DT5_Func1NoMan
+DT5_Func1Ok:
+	if       PAPER
+	CALL    WAY_PrintWaybill
+	endif
+
+DT5_Func1NoMan:
+	RET
+DT5_Func2:
+	CALL    SYS_UnitPowerOff
+	RET
+DT5_Func3:
+	if       PAPER
+	CALL    PRT_PaperFeed
+	endif
+	RET
+DT5_Func4:
+	if  DT5
+	else 
+	if       PAPER
+	CALL    VOI_Void
+	endif
+	endif
+	RET
+DT5_Func5:
+	if  DT5
+	else 
+	if       PAPER
+	CALL    REC_Receipt
+	endif
+	endif
+	RET
+DT5_Func6:
+DT5_Func7:
+DT5_Func8:
+DT5_Func9:
+	if       PAPER
+	MOV     A,#MAN_EXT_POWERUP
+	CALL    PRT_SetPrintDevice
+	CALL    PRT_FormFeed
+	MOV     A,#0
+	CALL    PRT_SetPrintDevice
+	endif
+	RET
+DT5_FuncA:
+DT5_FuncB:
+DT5_FuncC:
+DT5_FuncD:
+DT5_FuncE:
+DT5_FuncF:
+DT5_FuncG:
+DT5_FuncH:
+DT5_FuncCancel:
+DT5_FuncOk:
+	RET
+
+;*******************************************************************************
+
+	if  DT5
+managerkeytable:
+	LJMP    DIA_Diagnostics                 ; Manager 0
+	NOP
+	if       PAPER
+	LJMP    AUD_FullAudit                   ; Manager 1
+	else 
+	ljmp    DT_unused
+	endif
+	NOP
+	LJMP    SPT_SpotCheck                   ; Manager 2
+	NOP
+	LJMP    TIM_ChangeDate                  ; Manager 3
+	NOP
+	LJMP    TIM_ChangeTime                  ; Manager 4
+	NOP
+	LJMP    PRT_SetPrintIntensity           ; Manager 5
+	NOP
+	LJMP    PRT_SetPrintQuality             ; Manager 6
+	NOP
+	LJMP    PRT_SetPerfOffset               ; Manager 7
+	NOP
+	LJMP    PRT_SetPerfLineSize             ; Manager 8
+	NOP
+	LJMP    DT_Unused                       ; Manager 9
+	NOP
+	LJMP    DT_Unused                       ; Manager A
+	NOP
+	LJMP    DT_Unused                       ; Manager B
+	NOP
+	LJMP    DT_Unused                       ; Manager C
+	NOP
+	LJMP    DT_Unused                       ; Manager D
+	NOP
+	LJMP    DT_Unused                       ; Manager E
+	NOP
+	LJMP    DT_Unused                       ; Manager F
+	NOP
+	LJMP    DT_Unused                       ; Manager G
+	NOP
+	LJMP    DT_Unused                       ; Manager H
+	NOP
+	LJMP    DT_Unused                       ; Manager Cancel
+	NOP
+	LJMP    DT_Unused                       ; Manager OK
+	NOP
+
+	endif
+
+	if       0
+DT_Debug3
+	pushdph
+	pushdpl
+	pushacc
+	
+	mov     a,#18
+	call    LCD_GotoXY
+	pop     acc
+	pushacc
+	add     a,#'0'
+	call    LCD_WriteData
+
+	pop     acc
+	pop     dpl
+	pop     dph
+	ret
+	endif
+
+	if       HOST_BUFFER_TRACE
+	org     VAR, ((@+255) AND (-256))-2
+host_trace_intracursor: VAR 1
+host_trace_ptype:       VAR 1
+host_trace_b            VAR 256
+	endif
+
+	if       QTRACE_ON
+qtrack  VAR     32
+	endif
+
+	if       LDSP
+	INCLUDE LEDDISP.MSM
+	endif
+
+
+;        $snap
+
+
+
+	$End
+
+;----------------------------------------------------------------------
+
+
+
+
+
+
+
+
+

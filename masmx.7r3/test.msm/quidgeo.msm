@@ -1,0 +1,7 @@
+	$include	"quidgeo.def"
+$(0:*4)
+	$list			2
+	$include,$binary	../result.txo/soso
+	$include,$binary	../result.txo/factor
+
+	$store			quidgeo

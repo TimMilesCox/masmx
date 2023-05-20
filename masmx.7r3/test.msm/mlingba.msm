@@ -1,0 +1,32 @@
+p*      $proc   $(5)
+        "":p(1,1)
+        +       lit("":p(1,1))
+ $end
+$(5:05000)
+$(4:04000/lit)
+$(0:256)
+	p	"aaaa"
+	p	"bbbb"
+        +       1.5
+	$byte	7
+        p       "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef":;
+                "0123456789abcdef0123456789abcdef0123456789abcdef"
+	$byte	8
+	+	1.75
+	p	"yyyy"
+	p	"zzzz"
+ $end

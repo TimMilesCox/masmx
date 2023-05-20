@@ -1,0 +1,27 @@
+text    $equ    0
+static  $equ    2
+ram     $equ    1
+$(text:0100/$string)
+$(static:16384)
+$(ram:32768)
+        $list   2
+        $include        "1st.msm"
+        $include        "2nd.msm"
+        $include        "3rd.msm"
+hadya   $equ    1536
+        +       022dd
+waq     +       waq, waq, 10q
+        +       waq,  10, waq
+        +       10,  waq, waq
+        +       waq
+        +       10q
+        +       07d
+        +(07)d
+        +       07:d
+        +       7d
+chips   +       "hadya"+chips
+        +       'hadya'+chips
+        +       "hadya":q
+        +       'hadya':q
+        +       "hadya"p
+        +       chips+'hadya'p

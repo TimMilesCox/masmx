@@ -1,0 +1,23 @@
+        $if     $o('z')
+	$data_code  255, '@','a'
+
+	$data_code  07e,02700
+        $else
+        $data_code  255,'@'
+        $endif
+
+        $set_option "cD"
+
+        "\377"
+
+	$if	$o('z')
+	"\777"
+
+	"\x1FF"
+
+	$byte	16
+	$zero_code_point	0x27000000
+
+	"~"
+	$endif
+

@@ -1,0 +1,5 @@
+.	$set_option	"c"
+        $byte   12
+        "Mary had a little":10:"Lamb":10:"Its fleece was white as":0a:"Snow"
+        "Mary had a little":10:"Lamb":10:"Its fleece was white as":0a:"Snow"
+        $end

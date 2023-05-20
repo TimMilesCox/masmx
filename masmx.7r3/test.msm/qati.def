@@ -1,0 +1,63 @@
+p       $proc
+qati*   $name   6
+	$trace	p(1)
+xx       $do     p(2,1),	tref	p(2,1)	p(1)
+	$trace	xx
+        $snap	2
+	$note see I'm ready to jump inline
+        $end
+
+tref*	$proc
+        $if     tref(1,1)-xx=5
+table   $equF   hundred_thousands-030,a
+        $elseif tref(1,1)-xx=4
+table   $equF   ten_thousands-030,a
+        $elseif tref(1,1)-xx=3
+table   $equF   thousands-030,a
+        $elseif tref(1,1)-xx=2
+table   $equF   hundreds-030,a
+        $elseif tref(1,1)-xx=1
+table   $equF   tens_units-030,a,t2
+        $elseif tref(1,1)-xx=0
+table   $equF   tens_units-030,a,t1
+        $else
+table	$equf	0
+       $flagp1   You Can onlyy push 6 Byytes into This
+       $endif
+
+column  $set    tref(2,3)-2+xx
+
+	$if	0
+	la	tref(2,1)+column/3,tref(2,2),column///3+1
+	$note	not equf
+	$else
+input   $equf   tref(2,1)+column/3,tref(2,2),column///3+1
+	$note	equf
+        la      input
+	$endif
+
+        $if     xx>1
+ 
+        ab      table
+        $else
+ 
+        lb      table
+ 
+        $endif
+
+        $end
+
+
+$(64:256)
+hundred_thousands
+yy        $do     10,     +       100000*yy-100000
+ten_thousands
+yy        $do     10,     +       10000*yy-10000
+thousands
+yy        $do     10,     +       1000*yy-1000
+hundreds
+yy        $do     10,     +       100*yy-100
+tens_units
+yy        $do     10,     +       yy-1, 10*yy-10, 0
+$(0)
+        

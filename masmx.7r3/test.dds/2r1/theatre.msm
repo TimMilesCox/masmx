@@ -1,0 +1,26 @@
+
+ARITH_MinutesNow:
+	mov     dptr,#timebuffer        ; Compute Ordinal Actual Minute 
+	movx    a,@dptr                 ; read xxxx xHHH
+	anl     a,#7                    ;      0000 0hhh
+	push    acc                     ;                       SP+1
+	swap    a                       ;      0hhh 0000
+	mov     b,a
+	inc     dptr
+	movx    a,@dptr                 ; read HHmm mmmm
+	push    acc                     ;                       SP+2
+	swap    a                       ;      mmmm HHmm
+	anl     a,#0Ch                  ;      0000 hh00
+	orl     a,b                     ;      0hhh hh00
+	cpl     a                       ;     -0HHH HH00 ones complement
+	mov     b,a                     
+	pop     acc                     ;      hhMM MMMM        SP+1
+	setB    c                       ; subtraction will be twos complement
+	addc    a,b                     
+	mov     b,a                     ; set aside LSBytes ordinal minute
+	pop     acc                     ;      0000 0hhh        SP+0
+	addc    a,#255                  ; subtract zero with borrow
+	ret
+
+
+	END             ; Theatre.Asm

@@ -1,0 +1,152 @@
+        $cont_char      0
+        $lterm          ';'
+        $sterm          '.'
+        $word   16
+        $awidth 32
+        $quantum 8
+
+.dreg   $equ    128
+.areg   $equ    129
+.aregp   $equ    130
+.sreg   $equ    131
+
+
+d0      $equ,.dreg    0
+d1      $equ,.dreg    1
+d2      $equ,.dreg    2
+d3      $equ,.dreg    3
+
+d4      $equ,.dreg    4
+d5      $equ,.dreg    5
+d6      $equ,.dreg    6
+d7      $equ,.dreg    7
+
+a0      $equ,.areg    0
+a1      $equ,.areg    1
+a2      $equ,.areg    2
+a3      $equ,.areg    3
+
+a4      $equ,.areg    4
+a5      $equ,.areg    5
+a6      $equ,.areg    6
+a7      $equ,.areg    7
+
+sp      $equ,.areg    7
+
+a0@     $equ,.aregp    0
+a1@     $equ,.aregp    1
+a2@     $equ,.aregp    2
+a3@     $equ,.aregp    3
+
+a4@     $equ,.aregp    4
+a5@     $equ,.aregp    5
+a6@     $equ,.aregp    6
+a7@     $equ,.aregp    7
+
+sp@     $equ,.aregp    7
+
+
+usp     $equ,.sreg    0
+ssp     $equ,.sreg    1
+
+        $text   /-(a0)/a0@-/
+        $text   /-(a1)/a1@-/
+        $text   /-(a2)/a2@-/
+        $text   /-(a3)/a3@-/
+        $text   /-(a4)/a4@-/
+        $text   /-(a5)/a5@-/
+        $text   /-(a6)/a6@-/
+        $text   /-(a7)/a7@-/
+
+        $text   /(a0)+/a0@+/
+        $text   /(a1)+/a1@+/
+        $text   /(a2)+/a2@+/
+        $text   /(a3)+/a3@+/
+        $text   /(a4)+/a4@+/
+        $text   /(a5)+/a5@+/
+        $text   /(a6)+/a6@+/
+        $text   /(a7)+/a7@+/
+
+
+f       $func
+microdecipher* $name        
+v       $set    0        
+        $sterm  '-'             ; separate text-strings by -
+range   $set    f(1,1:)         ; count if there is one or-two
+from    $set    f(1,1:1)        ; capture before-the-dash
+to      $set    f(1,1:2)        ; capture after-the-dash-if-any
+        
+ftyp    $set    $t(f(1,1:1))    ; capture the label type of left  
+ttyp    $set    $t(f(1,1:2))    ; capture the label type of right  
+        
+        $sterm  '.'             ; make sure labels containing period
+                                ; can.be.recognised
+        $if     ftyp=.dreg      ; such as .dreg
+        $elseif ftyp=.areg      ;     and .areg
+from    $set    from+8          ; if address register, bias its
+        $else                   ; bit mask corresponding position
+	$trace	f(1, 1:1)
+        $flag   Left of Range Not A General Register
+        $endif
+        
+        $if     range>1         ; if these was a dash between two
+        $if     ttyp=.dreg      ; register tags
+        $elseif ttyp=.areg      ; then test the type of the second one
+to      $set    to+8            ; and bias its bit mask position
+        $else                   ; if it was an address register
+        $flag   Right of Range Not A General Register
+        $endif
+        $endif
+
+        $if     (range>1)**(to<from)
+        $flag   Range Must be Low to High
+        $endif
+
+        $if     range>1         ; if it's a range loop through the range
+position $do     to-from+1,v $set v++1*/(from+position-1)  ; and set those bits
+        $else
+v       $set    v++1*/from      ; if it's one register set its one bit
+        $endif
+
+        $sterm  '/'             ; change back to chopping with '/'
+
+        $return v
+        $end
+        
+
+decipher* $func
+v       $set    0
+	$plist	7
+        $sterm  '/'             ; chop the text/strings with '/' 
+parts   $set    decipher(1,1:)   
+this    $do     parts,v $set v++microdecipher(decipher(1,1:this))
+        $sterm  '.'             ; go back to standard sub.string 
+        $return v
+        $end
+
+reverse* $func
+	$plist	7
+x       $set    reverse(1, 1)
+y       $set    0
+place   $do     16,y $set y++((x**(1*/(place-1))*/(16-place))/*(place-1))
+        $return y
+        $end
+
+
+f1      $form   10, 3, 3, 16
+
+p*      $proc
+movem.l* $name 048c0/*6
+movem.w* $name 04880/*6
+
+        $if     $t(p(1, 1))=.aregp
+        f1      $n++16, 3, p(1, 1), decipher(p(1,2))
+        $else
+        f1      $n,     4, p(1, 2), reverse(decipher(p(1,1)))
+        $endif
+        $end
+
+        movem.l d0-d7/a1-a7, a0@-
+        movem.l a7@+, d0-a6
+        movem.l (a4)+, d0-a3/a5/a6/a7
+        movem.l d0-d7/a0-a3/a5-a7, -(a4)

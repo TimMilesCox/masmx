@@ -1,0 +1,5 @@
+        $include        "8051_3r1.def"
+        mov     a, 99
+        mov     a, #99
+        mov     r1, 44
+        mov     r1, #44

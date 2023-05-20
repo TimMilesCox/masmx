@@ -1,0 +1,38 @@
+	$path		../smaragd.68k
+	$include	coldfire.def
+	$include	express.def
+	$include	fpxpress.def
+	$path
+	$include	espresso.def
+	$include	ieee754.def
+	$path
+
+$(3:03000/$literal)
+one	$res	8
+two	$res	8
+first	$res	4
+second	$res	4
+
+$(0:64,pc/$azlit)
+        $xqt_fp		(one+two)-(two*one)
+	$xqt_fp		+(one+two)
+	$xqt_fp		-(one+two)
+	$xqt_fp,$ieee64	-(one+two)*2.0
+	$xqt_fp		-one+two
+	$xqt_fp,$ieee64	0.0-(one+two)
+	$xqt_fp,$ieee64	0.0-one+two
+
+	$xqt_i		(first+second)*(second+first)
+	$xqt_i		+(first+second)
+	$xqt_i,#	-(first+second)
+	$xqt_i,#	-(first+second)/1000
+	$xqt_i,#	-first+second
+	$xqt_i,#	0:d-(first+second)
+	$xqt_i,#	0L-first+second
+
+	$xqt_fp,$ieee64	33.6*44.7
+
+	$xqt_fp,$ieee64	+(33.6*44.7)
+
+	$trace	$r($literal)
+

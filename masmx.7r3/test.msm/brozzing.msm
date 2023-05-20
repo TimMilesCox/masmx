@@ -1,0 +1,92 @@
+p	$proc
+one*	$name
+*	$tree
+nerk	two1
+index	$do	6,grark(index)	two2
+	$root
+	$end
+
+p	$proc
+two1*	$name
+*	$branch
+index	$do	4,zerk(index)	three1
+        $root
+rename*	$branch
+zark	three2
+	$root
+	$end
+
+two2*	$proc
+*	$tree
+index	$do	12,bzong(index)	+	24-index
+	$root
+	$end
+
+three1*	$proc
+*	$tree
+index	$do	4,bzang(index)	+	100
+	$root
+	$end
+
+three2*	$proc
+*	$tree
+index	$do	8,brozzings(index)	-	100
+	$root
+	$end
+
+$(2:02000)
+index	$do	3,grerk(index)	one
+$(3:03000)
+	+	grerk()
+first_high_index $set	grerk()
+	+	first_high_index
+	+	grerk(first_high_index)
+	+	grerk(first_high_index):nerk:zerk()
+second_high_index $set grerk(first_high_index):nerk:zerk()
+	+	second_high_index
+	+	grerk(first_high_index):nerk:zerk(second_high_index)
+
+	+	grerk(first_high_index):nerk:zerk(second_high_index):;
+		bzang()
+
+third_high_index $set	;
+		grerk(first_high_index):nerk:zerk(second_high_index):;
+		bzang()
+
+	+	third_high_index
+
+	+	grerk(first_high_index):nerk:zerk(second_high_index):;
+		bzang(third_high_index)
+
+	+	grerk(first_high_index):grark()
+second_high_index $set grerk(first_high_index):grark()
+	+	second_high_index
+	+	grerk(first_high_index):grark(second_high_index)
+
+	+	grerk(first_high_index):grark(second_high_index):bzong()
+
+third_high_index $set	;
+		grerk(first_high_index):grark(second_high_index):bzong()
+
+	+	third_high_index
+	+	;
+ grerk(first_high_index):grark(second_high_index):bzong(third_high_index)
+
+	+	grerk(first_high_index):grark()
+second_high_index $set grerk(first_high_index):grark()
+	+	second_high_index
+
+	+	grerk(first_high_index):grark(second_high_index)
+	+	grerk(first_high_index):grark(second_high_index):bzong()
+
+third_high_index $set	;
+		grerk(first_high_index):grark(second_high_index):bzong()
+
+	+	third_high_index
+
+ + grerk(first_high_index):grark(second_high_index):bzong(third_high_index)
+
+	+	grerk(first_high_index):rename:zark:brozzings()
+second_high_index $set grerk(first_high_index):rename:zark:brozzings()
+	+	second_high_index
+	+ grerk(first_high_index):rename:zark:brozzings(second_high_index)

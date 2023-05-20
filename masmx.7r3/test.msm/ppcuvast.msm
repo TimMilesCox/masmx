@@ -1,0 +1,96 @@
+__giant	$set	1
+__registers_by_name $set 1 
+        $include        "../aside.dem/ppc_64.def"
+	$include	../aside.dem/enter64a.def
+
+__base36* $equ	__end0+7**-8
+$(.literal::*__base36, r30/.lit)
+
+        $set_option     "u"
+        $plist  8
+
+record* $proc        
+*       $tree
+h       +       record(1,1)
+t       $res    record(1,1)
+        $root
+        .align  2
+        $end
+        
+tree*   $proc
+*       $tree
+times   $do     3,dibber(times) record    tree(1,1)
+        $root
+        $end
+
+
+ARRAY   $equ    (262144*24)++2047*/48
+GRANULE $equ    22//4*4*2*3//8*8
+
+nclustr*	$proc
+locator55 $set	ARRAY+index*GRANULE-GRANULE
+$(54::*locator55)
+cluster(index)* $tree
+        $do	index=2,	$list   0
+times   $do     2,raddle(times)  tree 18
+        $do	index=20000/GRANULE-1,	$list   1
+        $root
+	$end
+
+index	$do	20000/GRANULE,	nclustr
+
+
+i_o_segment	$set	0xFFFFFFFFFFFC0000
+
+$(71::*i_o_segment,r24)
+register1	$res	4
+register2	$res	4
+
+
+$(55:0:,r12)
+
+times   $do     2,raddle(times) tree    18
+raddle2 tree    30
+
+runseg	$set	0x00aa00000000+16384
+$(0:16384:*runseg)
+run*	enter64	32
+
+        ld     r12, .lit(cluster(20).raddle(2))
+
+	ld	r24,.lit(i_o_segment:d)
+	lwz	r2, register1
+	stw	r2, register2
+        lwz     r3,raddle(1).dibber(2)
+        lwz     r4,raddle(1).dibber(1)
+        lwz     r5,raddle(2).dibber(3)
+        lwz     r6,raddle(2)
+        lwz     r7,raddle2
+        mr      r11,r12
+
+	$if	1
+	stw	r7,raddle2(r11)
+	lhz	r7,raddle(2).dibber(3)(r11)
+	$else
+        stw     r7,raddle2(r11)
+        lhz     r7,"raddle(2).dibber(3)"(r11)
+	$endif
+
+	lwz	r17, .lit(0xaaaabbbbccccddddeeeeffff00001111:q)
+	lwz	r18, .lit(cluster(20).raddle(2))
+
+        leave64
+
+longseg	$set	0x000c000000000100
+
+$(1:0:*longseg)
+outahere blr
+	+	101
+longo	b	bongo
+	+	99
+bongo	b	tango
+	+	100
+tango	b	outahere
+
+$(0)
+__end0

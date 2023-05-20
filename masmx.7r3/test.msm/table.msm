@@ -1,0 +1,2 @@
+        $list   0
+hu      $do     10,te $do 10,un $do 10, + hu-1+'0', te-1+'0', un-1+'0'

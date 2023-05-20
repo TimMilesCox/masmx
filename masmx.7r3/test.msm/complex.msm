@@ -1,0 +1,96 @@
+	$word	32
+
+p	$proc
+one*	$name
+*	$tree
+way	two1
+index	$do	6,spray(index)	two2
+	$root
+	$end
+
+p	$proc
+two1*	$name
+*	$tree
+left	$branch
+index	$do	4,bud(index)	three1
+        $root
+right	$branch
+cusp	three2
+	$root
+	$root
+	$end
+
+two2*	$proc
+*	$tree
+index	$do	12,tendril(index)	+	24-index
+	$root
+	$end
+
+three1*	$proc
+*	$tree
+index	$do	4,shoot(index)	+	100
+	$root
+	$end
+
+three2*	$proc
+*	$tree
+index	$do	8,blossom(index)	-	100
+	$root
+	$end
+
+$(2:02000)
+index	$do	3,stem(index)	one
+$(3:03000)
+	+	stem()
+first_high_index $set	stem()
+	+	first_high_index
+	+	stem(first_high_index)
+	+	stem(first_high_index):way:left:bud()
+second_high_index $set stem(first_high_index):way:left:bud()
+	+	second_high_index
+	+	stem(first_high_index):way:left:bud(second_high_index)
+
+	+	stem(first_high_index):way:left:bud(second_high_index):;
+		shoot()
+
+third_high_index $set	;
+		stem(first_high_index):way:left:bud(second_high_index):;
+		shoot()
+
+	+	third_high_index
+
+	+	stem(first_high_index):way:left:bud(second_high_index):;
+		shoot(third_high_index)
+
+	+	stem(first_high_index):spray()
+second_high_index $set stem(first_high_index):spray()
+	+	second_high_index
+	+	stem(first_high_index):spray(second_high_index)
+
+	+	stem(first_high_index):spray(second_high_index):tendril()
+
+third_high_index $set	;
+		stem(first_high_index):spray(second_high_index):tendril()
+
+	+	third_high_index
+	+	;
+ stem(first_high_index):spray(second_high_index):tendril(third_high_index)
+
+	+	stem(first_high_index):spray()
+second_high_index $set stem(first_high_index):spray()
+	+	second_high_index
+
+	+	stem(first_high_index):spray(second_high_index)
+	+	stem(first_high_index):spray(second_high_index):tendril()
+
+third_high_index $set	;
+		stem(first_high_index):spray(second_high_index):tendril()
+
+	+	third_high_index
+
+ + stem(first_high_index):spray(second_high_index):tendril(third_high_index)
+
+	+	stem(first_high_index):way:right:cusp:blossom()
+second_high_index $set stem(first_high_index):way:right:cusp:blossom()
+	+	second_high_index
+	+ stem(first_high_index):way:right:cusp:blossom(second_high_index)

@@ -1,0 +1,4 @@
+$(2:0200)
+q       $set    grobags
+r       $equ    grobags
+        +       q,r

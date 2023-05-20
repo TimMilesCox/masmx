@@ -1,0 +1,65 @@
+__registers_by_name	$set	1
+record* $proc        
+*       $tree
+h       +       record(1,1)
+times   $do     record(1,1),t(times)       $res  4
+        $root
+        $end
+
+        $include        "../aside.dem/ppc_603.def"
+tree*   $proc
+*       $tree
+times   $do     3,dibber(times) record    tree(1,1)
+        $root
+        $end
+
+inline*	$proc
+        lwz	r8, raddle1(1).dibber(3).t(index)
+        add	r0,0,r8
+	$end
+
+SEGMENT $set    55*4096+768
+
+$(49::SEGMENT,r12)
+this_segment    $equ    .
+times   $do     2,raddle1(times) tree    18
+raddle2 tree    30
+
+$(0:980*1024)
+        oris    r12,,SEGMENT/*16
+        ori     r12,r12,SEGMENT
+        lwz     r3, raddle1(1).dibber(2)
+        lwz     r4, raddle1(2).dibber(3).h
+        lwz     r5, raddle1(2).dibber(3).t(12)
+        lwz     r6, raddle2
+        mr      r11, r12
+
+	$if	0
+	lwz	r7, raddle2.dibber(1).t(9), r11
+	$else
+        lwz     r7, raddle2.dibber(1).t(9)(r11)
+	$endif
+
+index   $do     raddle1(1).dibber(3).t(),	inline
+
+SEGMENT	$set	.(49)+SEGMENT
+$(50::SEGMENT,r11)
+new_segment $equ .
+jessalabel tree 6
+jumbly  tree    4
+
+$(.ZERO)
+        oris    r11,,SEGMENT/*16
+        ori     r11,r11,SEGMENT
+        lwz     r3, jumbly
+        lwz     r4, jumbly+4
+        stw     r3, jessalabel.dibber(3).h
+        stw     r4, jessalabel.dibber(3).t()
+        lwz     r5, 0x4000(r3)
+        li      r4, raddle2.dibber(3)
+        li      r5, raddle1(2)
+down
+	b	up
+	b	down
+	b	up
+up

@@ -1,0 +1,1314 @@
+	$do	$o('V'),	$list	2
+	$do	$o('V'),	$note	snapshot start of coldfire.def
+
+	$word	16
+	$awidth	32
+	$quantum 8
+	$byte	 8
+
+	$cont_char	'|'
+	$lterm		';'
+	$sterm		'.'
+
+	$set_option	"c"
+
+"$d_reg" 	$equ	128
+"$a_reg" 	$equ	129
+"$a_reg_@"	$equ	130
+"$a_reg_@+" 	$equ	131
+"$a_reg_@-"	$equ	132
+"$special_reg"	$equ	133
+"$fp_reg"	$equ	134
+
+d0	$equ,"$d_reg"	0
+d1	$equ,"$d_reg"	1
+d2	$equ,"$d_reg"	2
+
+	$list
+
+d3	$equ,"$d_reg"   3
+d4	$equ,"$d_reg"	4
+d5	$equ,"$d_reg"	5
+d6	$equ,"$d_reg"	6
+d7	$equ,"$d_reg"	7
+
+a0	$equ,"$a_reg"	0
+a1	$equ,"$a_reg"	1
+a2	$equ,"$a_reg"	2
+a3	$equ,"$a_reg"	3
+
+a4	$equ,"$a_reg"	4
+a5	$equ,"$a_reg"	5
+a6	$equ,"$a_reg"	6
+a7	$equ,"$a_reg"	7
+
+"(a0)"	$equ,"$a_reg_@"	0
+"(a1)"	$equ,"$a_reg_@"	1
+"(a2)"	$equ,"$a_reg_@"	2
+"(a3)"	$equ,"$a_reg_@"	3
+
+"(a4)"	$equ,"$a_reg_@"	4
+
+	$do	$o('V'),	$list	2
+	$do	$o('V'),	$note	snapshot equates in coldfire.def
+
+"(a5)"	$equ,"$a_reg_@"	5
+"(a6)"	$equ,"$a_reg_@"	6
+"(a7)"	$equ,"$a_reg_@"	7
+
+"-(a0)"	$equ,"$a_reg_@-"	0
+"-(a1)"	$equ,"$a_reg_@-"	1
+"-(a2)"	$equ,"$a_reg_@-"	2
+
+	$list
+
+"-(a3)"	$equ,"$a_reg_@-"	3
+
+"-(a4)"	$equ,"$a_reg_@-"	4
+"-(a5)"	$equ,"$a_reg_@-"	5
+"-(a6)"	$equ,"$a_reg_@-"	6
+"-(a7)"	$equ,"$a_reg_@-"	7
+
+"(a0)+"	$equ,"$a_reg_@+"	0
+"(a1)+"	$equ,"$a_reg_@+"	1
+"(a2)+"	$equ,"$a_reg_@+"	2
+"(a3)+"	$equ,"$a_reg_@+"	3
+
+"(a4)+"	$equ,"$a_reg_@+"	4
+"(a5)+"	$equ,"$a_reg_@+"	5
+"(a6)+"	$equ,"$a_reg_@+"	6
+"(a7)+"	$equ,"$a_reg_@+"	7
+
+"a0@"	$equ,"$a_reg_@"	0
+"a1@"	$equ,"$a_reg_@"	1
+"a2@"	$equ,"$a_reg_@"	2
+"a3@"	$equ,"$a_reg_@"	3
+
+"a4@"	$equ,"$a_reg_@"	4
+"a5@"	$equ,"$a_reg_@"	5
+"a6@"	$equ,"$a_reg_@"	6
+"a7@"	$equ,"$a_reg_@"	7
+
+"a0@-"	$equ,"$a_reg_@-"	0
+"a1@-"	$equ,"$a_reg_@-"	1
+"a2@-"	$equ,"$a_reg_@-"	2
+"a3@-"	$equ,"$a_reg_@-"	3
+
+"a4@-"	$equ,"$a_reg_@-"	4
+"a5@-"	$equ,"$a_reg_@-"	5
+"a6@-"	$equ,"$a_reg_@-"	6
+"a7@-"	$equ,"$a_reg_@-"	7
+
+"a0@+"	$equ,"$a_reg_@+"	0
+"a1@+"	$equ,"$a_reg_@+"	1
+"a2@+"	$equ,"$a_reg_@+"	2
+"a3@+"	$equ,"$a_reg_@+"	3
+
+"a4@+"	$equ,"$a_reg_@+"	4
+
+	$do	$o('V'),	$list	2
+	$do	$o('V'),	$note	snapshot equates in coldfire.def
+
+"a5@+"	$equ,"$a_reg_@+"	5
+"a6@+"	$equ,"$a_reg_@+"	6
+"a7@+"	$equ,"$a_reg_@+"	7
+
+fp0	$equ,"$fp_reg"		0
+fp1	$equ,"$fp_reg"		1
+fp2	$equ,"$fp_reg"		2
+
+	$list
+
+fp3	$equ,"$fp_reg"		3
+fp4	$equ,"$fp_reg"		4
+fp5	$equ,"$fp_reg"		5
+fp6	$equ,"$fp_reg"		6
+fp7	$equ,"$fp_reg"		7
+
+sr	$equ,"$special_reg"	0
+"$8_bits" $equ,"$special_reg"	2
+pc	$equ,"$special_reg"	255
+
+"w"	$equ,"$special_reg"	0*/2
+"w*1"	$equ,"$special_reg"	0*/2
+"w*2"	$equ,"$special_reg"	0*/2++1
+"w*4"	$equ,"$special_reg"	0*/2++2
+"w*8"	$equ,"$special_reg"	0*/2++3
+
+"l"	$equ,"$special_reg"	1*/2
+"l*1"	$equ,"$special_reg"	1*/2
+
+	$do	$o('V'),	$list	2
+	$do	$o('V'),	$note	snapshot equates in coldfire.def
+
+"l*2"	$equ,"$special_reg"	1*/2++1
+"l*4"	$equ,"$special_reg"	1*/2++2
+"l*8"	$equ,"$special_reg"	1*/2++3
+
+;	[ w l ] are only encoded [ 0 1 ]
+;	in the index width construct (a0, d0.w[ *1 *2 *4 *8])
+
+;	and otherwise get their encoding values
+;	from instruction names, for example  move.[b w l]
+
+;	however their values here combined with type $special_reg
+;	can be used for recognition in macro language
+;	and are used in the set [ b w l s d ]
+
+b	$equ,$special_reg	2*/2
+s	$equ,$special_reg	3*/2
+d	$equ,$special_reg	4*/2
+
+	$list
+
+
+"$i_rr"	$form	4, 3, 3, 3, 3
+"$i_rm"	$form	4, 3, 3, 3, 3, 16
+"$i_rl"	$form	4, 3, 3, 3, 3, 32
+"$i_rx"	$form	4, 3, 3, 3, 3, 4, 3, 1, 8
+"$i_fp"	$form	4, 3, 3, 3, 3, 3, 3, 3, 7
+"$i_fm"	$form	4, 3, 3, 3, 3, 3, 3, 3, 7, 16
+"$i_mq"	$form	4, 3, 1, 8
+
+"$b_cs"	$form	8, 8
+"$b_cl"	$form	8, 8, 16
+
+"$type2"* $func
+;	$note	type 2 ?
+;	$trace	$type2(1, 2)
+	$return	$t($type2(1, 2))
+	$end
+
+"$id2"*	$func
+	$return	$id2(1, 2)
+	$end
+
+	$do	$o('V'),	$list	2
+	$do	$o('V'),	$note	operand attribute scan in coldfire.def
+
+f	$func
+;
+;	when no displacement is coded outside the parentheses
+;
+"$inside"*	$name
+	$return	f(1)
+
+"$displacement8"*	$name
+	$do	f(1, 1)<-128,	$flag	displacement too low
+	$do	f(1, 1)>127,	$flag	displacement too high
+"$displacement"*	$name
+	$return	f(1, 1)
+
+"$base_a"*	$name
+	$do	$t(f(1, 2))^=$a_reg,	$flag base register not a0..a7
+	$do	$t(f(1, 2))^=$a_reg,	$trace f(1, 2)
+	$return	f(1, 2)
+
+"$idx_c"*	$name
+	$return	f(1, 3:)	; how many substrings are after (disp, a0,.
+
+"$idx_d"*	$name		; d-register
+	$do	$t(f(1, 3:1))=$a_reg,		$return	8++f(1, 3:1)
+	$do	$t(f(1, 3:1))^=$d_reg,		$flag	index not d0..d7/a0..a7
+	$return	f(1, 3:1)
+
+"$idx_w"*	$name		; width++scale
+	$do	f(1, 3:)=1,	$return	"l*1"
+	$do	$t("f(1, 3:2)")^=$special_reg,	$flag	scale not in scale
+	$return	"f(1, 3:2)"
+
+	$end
+
+	$list
+
+f	$func
+;
+;	when there is a displacement and then parentheses
+;
+"$icount"*	$name
+	$return	f(1)
+
+"$itype"*	$name
+	$return	$t("f(1, 1)")
+
+"$ibase"*	$name
+	$return	f(1, 1)
+
+	$end
+
+f	$func
+$iform*	$name
+	$do	$t(f(1, 1))=$d_reg,	$return	0++f(1, 1)*/3
+	$do	$t(f(1, 1))=$a_reg,	$return	1++f(1, 1)*/3
+	$do	$t("f(1, 1)")=$a_reg_@,	$return	2++f(1, 1)*/3		;	$ibase\f(1, 1)*/3
+	$do	$t("f(1, 1)")="$a_reg_@+",	$return 3++f(1, 1)*/3	;	$ibase\f(1, 1)*/3
+	$do	$t("f(1, 1)")="$a_reg_@-",	$return 4++"f(1, 1)"*/3	;	$ibase\f(1, 1)*/3
+	$do	$inside\f(1, 1)=2,	$do     $type2\f(1, 1:1)=$special_reg,	|
+					$do	$id2\f(1, 1)=pc,	$return 7++2*/3
+	$do	$inside\f(1, 1)=2,	$return	5++$base_a\f(1, 1)*/3
+	$do	$itype\f(1, 1)=$a_reg,	$return	5++$ibase\f(1, 1)*/3
+	$do	$inside\f(1, 1)=3,	$do	$type2\f(1, 1:1)=$special_reg,	|
+					$do	$id2\p(1, 1:1)=pc,	$return	7++3*/3
+	$do	$inside\f(1, 1)=3,	$return	6++$base_a\f(1, 1)*/3
+"$O"	$equ	f(1, 1)
+"$X"	$equ	f(1, 2)
+	$do	$o('V'),	$trace	$O
+	$do	$o('V'),	$trace	$X
+	$do	$X=pc,							$return	7++2*/3
+	$do	$X^=0,			$return	5++$X*/3
+
+	$do	f(1, #1),						$return	7++4*/3
+
+	$do	($t(f(1, 1:2))=$special_reg)**(f(1, 1:2)=l)++|
+		($net($O)<-32768)++|
+		($net($O)>32767),					$return 7++1*/3
+
+									$return 7
+	$end
+
+
+
+p	$proc
+
+bra*	$name	0x60
+bsr*	$name	0x61
+bhi*	$name	0x62
+bls*	$name	0x63
+
+bcc*	$name	0x64
+bcs*	$name	0x65
+bne*	$name	0x66
+beq*	$name	0x67
+
+bvc*	$name	0x68
+bvs*	$name	0x69
+bpl*	$name	0x6A
+bmi*	$name	0x6B
+
+bge*	$name	0x6C
+blt*	$name	0x6D
+bgt*	$name	0x6E
+ble*	$name	0x6F
+
+"$target" $set	p(1, 1)-$-2
+
+	$if	p(2, 1)=$8_bits
+	$b_cs	p(0, 0), $target
+	$do	$target<-128,	$flag	short branch too low
+	$do	$target>127,	$flag	short branch too high
+	$elseif	($target<-128)++($target>127)++($target=0)++|
+		(($t(p(1, 1:2))=$special_reg)**(p(1, 1:2)=w))
+	$b_cl	p(0, 0), 0, $target
+	$else
+	$b_cs	p(0, 0), $target
+	$endif
+
+	$do	($target<-32768)++($target>32767),|
+	$flag	branch out of range
+
+	$end
+
+p	$proc
+
+bra.b*    $name   0x60
+bsr.b*    $name   0x61
+bhi.b*    $name   0x62
+bls.b*    $name   0x63
+
+bcc.b*    $name   0x64
+bcs.b*    $name   0x65
+bne.b*    $name   0x66
+beq.b*    $name   0x67
+
+bvc.b*    $name   0x68
+bvs.b*    $name   0x69
+bpl.b*    $name   0x6A
+bmi.b*    $name   0x6B
+
+bge.b*    $name   0x6C
+blt.b*    $name   0x6D
+bgt.b*    $name   0x6E
+ble.b*    $name   0x6F
+
+"$target" $set	p(1, 1)-$-2
+
+	$do	$target<-128,   $flag   short branch too low
+	$do	$target>127,	$flag	short branch too high
+	$do	$target**255=255, $flag	short branch locked window
+	$do	$target**255=0,	$flag	short branch locked window
+
+	$b_cs	p(0, 0), $target
+	$end
+
+p	$proc
+moveq.l* $name	7
+moveq*	$name	moveq.l
+	$do	p(1, #1)=0,	$note	#immediate value assumed
+	$i_mq	p(0, 0), p(1, 2), 0, p(1, 1)
+	$end
+
+
+p	$proc	;	treat [l|w] as radically different instructions
+divs.w*	$name	8++7*/4
+divu.w*	$name	8++3*/4
+muls.w*	$name	12++7*/4
+mulu.w*	$name	12++3*/4
+
+mulu*	$name	mulu.w
+muls*	$name	muls.w
+divu*	$name	divu.w
+divs*	$name	divs.w
+
+"$FO"	$equ	$iform(p(1, 1))
+"$MO"	$equ	$FO**7
+"$RO"	$equ	$FO/*3
+
+	$if	$t(p(1, 2))=$d_reg
+	$if	$MO=0
+		$i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, 0, p(1, 1)
+	$elseif	$MO=1
+		$flag	divisor may not be a0..a7
+	$elseif	($MO=2)++|
+		($MO=3)++|
+		($MO=4)
+		$i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, $MO, $RO
+	$elseif	$MO=5
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $RO, p(1, 1)
+	$elseif	$MO=6
+		$i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 6, $RO,|
+							 $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
+							 $displacement8\p(1, 1:1)
+	$elseif	$FO=7++4*/3
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 4, p(1, 1)
+	$elseif	$FO=7++1*/3
+		$i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
+	$elseif	$FO=7
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, p(1, 1)
+	$elseif	$FO=7++2*/3
+		$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, p(1, 1)-$-2
+	$elseif	$FO=7++3*/3
+		$i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 3, |
+							 $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
+							 $displacement8\p(1, 1:1)-$-2
+	$else
+		$flag	no style of sending operand could be selected
+	$endif
+	$else
+	$flag	->d0..7 only
+	$endif
+	$end
+
+p	$proc	;	some integer instructions dregister<->store
+		;	long only
+add*	$name	13
+sub*	$name	9
+or*	$name	8
+and*	$name	12
+eor*	$name	11	; eor is only in store mode
+			; with d_reg sending
+			; no a_reg or immediate on receive side
+			; can use eori ->d_reg
+
+	$if	($t(p(1, 2))="$d_reg")**(p(0, 0)^=eor)
+
+	  $if 1
+
+"$FO"	$set	$iform(p(1, 1))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+
+	$if	($MO=0)++($MO=1)++($MO=2)++($MO=3)++($MO=4)
+	$i_rr	p(0,0), p(1, 2), 2, $MO, $RO
+	$elseif	$MO=5
+	$i_rm	p(0,0), p(1, 2), 2, 5, $RO, p(1, 1)
+	$elseif	$MO=6
+	$i_rx p(0, 0), p(1, 2), 2, 6, $RO,		|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,	|
+		$displacement8\p(1, 1:1)
+	$elseif	$FO=7
+	$i_rm	p(0,0), p(1, 2), 2, 7, 0, p(1, 1)
+	$elseif	$FO=7++1*/3
+	$i_rl	p(0,0), p(1, 2), 2, 7, 1, p(1, 1)
+	$elseif	$FO=7++4*/3
+	$i_rl	p(0,0), p(1, 2), 2, 7, 4, p(1, 1)
+	$elseif	$FO=7++2*/3
+	$i_rm	p(0,0), p(1, 2), 2, 7, 2, p(1, 1)-$-2
+	$elseif	$FO=7++3*/3
+	$i_rx	p(0,0), p(1, 2), 2, 7, 3,		|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,	|
+		$displacement8\p(1, 1:1)-$-2
+	$else
+	$flag	style of addend operand not resolved
+	$endif
+
+
+	  $else
+
+	  $if	$t(p(1, 1))**128
+	  $i_rr	p(0, 0), p(1, 2), 2, $t("p(1, 1)")**7, p(1, 1)
+	  $elseif ($t("p(1, 1)")="$a_reg_@")|
+		++($t("p(1, 1)")="$a_reg_@-")|
+		++($t("p(1, 1)")="$a_reg_@+")
+	  $i_rr	p(0, 0), p(1, 2), 2, $t("p(1, 1)")**7, $ibase\p(1, 1)
+	  $elseif $inside\p(1, 1)=2
+	  $i_rm	p(0, 0), p(1, 2), 2, 5, $base_a\p(1, 1), $displacement\p(1, 1)
+	  $elseif $inside\p(1, 1)=3
+	  $i_rx	p(0, 0), p(1, 2), 2, 6, $base_a\p(1, 1:1),|
+					$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
+					$displacement8\p(1, 1:1)
+	  $elseif p(1, #1)
+	  $i_rl	p(0, 0), p(1, 2), 2, 7, 4, p(1, 1)
+
+	  $elseif $itype\p(1, 1)="$a_reg"
+	  $do	$o('V'-'A'),	$note SX
+	  $i_rm	p(0, 0), p(1, 2), 2, 5, $ibase\p(1, 1), p(1, 1)
+	  $elseif $t(p(1, 1))=$equf
+	  $do	$o('V'-'A'),	$note	SQ
+	  $i_rm p(0, 0), p(1, 2), 2, 5, +"p(1, 1)"\2, p(1, 1)
+
+	  $elseif (p(1, 1)<-32768)++(p(1, 1)>32767)++(p(1, 1:2)=l)
+	  $i_rl p(0, 0), p(1, 2), 2, 7, 1, p(1, 1)
+          $else
+	  $do	$o('V'-'A'),	$note	SO
+	  $i_rm p(0, 0), p(1, 2), 2, 7, 0, p(1, 1)
+	  $endif
+
+
+
+	  $endif
+
+	$elseif	$t(p(1, 1))="$d_reg"
+	  $if	$t(p(1, 2))="$a_reg"
+	  $flag	dR->aR not possible
+	  $elseif ($t("p(1, 2)")="$a_reg_@")|
+		++($t("p(1, 2)")="$a_reg_@+")|
+		++($t("p(1, 2)")="$a_reg_@-")
+	  $i_rr	p(0, 0), p(1, 1), 6, $t("p(1, 2)")**7, $ibase\p(1, 2)
+	  $elseif $inside\p(1, 2)=2
+	  $i_rm	p(0, 0), p(1, 1), 6, 5, $base_a\p(1, 2), $displacement\p(1, 2)
+	  $elseif $inside\p(1, 2)=3
+	  $i_rx	p(0, 0), p(1, 1), 6, 6, $base_a\p(1, 2:1),|
+					$idx_d\p(1, 2:1), $idx_w\p(1, 2:1), 0,|
+					$displacement8\p(1, 2:1)
+	  $elseif p(1, #2)
+	  $flag	write to immediate impossible
+	  $elseif  $itype\p(1, 2)="$a_reg"
+	  $i_rm	p(0, 0), p(1, 1), 6, 5, $ibase\p(1, 2), p(1, 2)
+	  $elseif  $t(p(1, 2))=$equf
+	  $i_rm	p(0, 0), p(1, 1), 6, 5, +"p(1, 2)"\2, p(1, 2)
+	  $elseif (p(1, 2)<-32768)++(p(1, 2)>32767)++(p(1, 2:2)=l)
+	  $i_rl	p(0, 0), p(1, 1), 6, 7, 1, p(1, 2)
+	  $else
+	  $i_rm	p(0, 0), p(1, 1), 6, 7, 0, p(1, 2)
+	  $endif
+	$else
+	$flag	source or destination must be d0..d7
+	$do	p(0, 0)=eor,	$note	eor must have d0..d7 source. See eori instruction
+	$endif
+	$end
+
+
+
+p	$proc	;	some floating instructions [b|w|l|s|d]->fp
+
+fmove.l* $name	0
+fmove.s* $name	0++1*/7
+fmove.w* $name	0++4*/7
+fmove.d* $name	0++5*/7
+fmove.b* $name	0++6*/7
+fmove*	$name	fmove.d
+
+fadd.l*	$name	34++0*/7	; 000 0100010 -> 1111 001 000 [000=l] 0100010
+fadd.s*	$name	34++1*/7	; 001 0100010 -> 1111 001 000 [001=s] 0100010
+fadd.w*	$name	34++4*/7	; 100 0100010 -> 1111 001 000 [100=w] 0100010
+fadd.d*	$name	34++5*/7	; 101 0100010 -> 1111 001 000 [101=d] 0100010
+fadd.b*	$name	34++6*/7	; 110 0100010 -> 1111 001 000 [110=b] 0100010
+fadd*	$name	fadd.d
+
+fsub.l*	$name	40
+fsub.s*	$name	40++1*/7
+fsub.w* $name   40++4*/7
+fsub.d* $name   40++5*/7
+fsub.b* $name   40++6*/7
+fsub*	$name	fsub.d
+
+fmul.l*	$name	35
+fmul.s*	$name	35++1*/7
+fmul.w* $name   35++4*/7
+fmul.d* $name   35++5*/7
+fmul.b* $name   35++6*/7
+fmul*	$name	fmul.d
+
+fdiv.l*	$name	32
+fdiv.s*	$name	32++1*/7
+fdiv.w* $name   32++4*/7
+fdiv.d* $name   32++5*/7
+fdiv.b* $name   32++6*/7
+fdiv*	$name	fdiv.d
+
+	$if	1
+
+	$if	$t(p(1, 2))=$fp_reg
+
+	$if	$t(p(1, 1))=$fp_reg
+	$i_fp	15, 1, 0, 0, 0, 0, p(1, 1), p(1, 2), p(0, 0)
+	$else
+
+"$FO"	$set	$iform(p(1, 1))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+
+	$do	$o('V'),	$trace	$FO
+
+	$if	$MO=0
+	$i_fp	15, 1, 0, 0, p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0)
+	$elseif	$MO=1
+	$flag	a0..a7 may not be floating source operand
+	$elseif	($MO=2)++($MO=3)++($MO=4)
+	$i_fp	15, 1, 0, $MO, $RO, 2, p(0, 0)/*7, p(1, 2), p(0, 0)
+	$elseif	$MO=5
+	$i_fm	15, 1, 0, 5, $RO, 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)
+	$elseif	$MO=6
+	$flag	floating source operand may not be double-index addressed
+	$elseif	($FO=7)++($FO=7++1*/3)
+	$flag	floating source operand may not be plain direct addressed
+	$note	may be disp16(a?) or (disp16, a?/pc) or $equf disp, a?/pc
+	$elseif	$FO=7++4*/3
+	$flag	floating source operand may not be immediate
+	$note	may be literal at displacement, pc
+	$elseif	$FO=7++2*/3
+	$i_fm	15, 1, 0, 7, 2, 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)-$-2
+	$elseif	$FO=7++3*/3
+	$flaf	floating source operand may not be double-index addressed
+	$else
+	$flag	unknown style of floating source operand
+	$endif
+	$endif
+
+	$elseif	p(0, 0)**127=fmove.l
+	$if	$t(p(1, 1)=$fp_reg
+
+"$FO"	$set	$iform(p(1, 2))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+
+	$if	$MO=0
+	$i_fp	15, 1, 0, 0, p(1, 2), 2, p(0, 0)/*7, p(1, 1), p(0, 0)
+	$elseif	$MO=1
+	$flag	a0..a7 may not be floating store target
+	$elseif	($MO=2)++($MO=3)++($MO=4)
+	$i_fp	15, 1, 0, $MO, $RO, 2, p(0, 0)/*7, p(1, 1), p(0, 0)
+	$elseif	$MO=5
+	$i_fp	15, 1, 0, 5, $RO, 2, p(0, 0)/*7, p(1, 1), p(0, 0), p(1, 2)
+	$elseif	$MO=6
+	$flag	floating store target may not be double-index addressed
+	$elseif	($FO=7)++($FO=7++1*/3)
+	$flag	floating store target may not be plain direct addressed
+	$note	may be disp16(a?) or (disp16, a?/pc) or $equf disp, a?/pc
+	$elseif	$FO=7++4*/3
+	$flag	store targets are never immediate operands
+	$elseif	($FO=7++2*/3)**($FO=7++3*/3)
+	$flag	store targets may not be in pc-relative constant pool
+	$else
+	$flag	unknown style of floating store target
+	$endif
+
+
+
+
+	$else
+	$flag	fmove must be to or from fp0..fp7
+	$endif
+	$else
+	$flag	floating arithmetic destination must be fp0..fp7
+	$endif
+
+	$else
+
+
+	$if	$t(p(1, 2))=$fp_reg
+	$if	$t(p(1, 1))=$fp_reg
+	$i_fp	15, 1, 0, 0, 0, 0, p(1, 1), p(1, 2), p(0, 0)
+	$elseif	$t(p(1, 1))=$d_reg
+	$i_fp	15, 1, 0, 0, p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0)
+	$elseif	$t(p(1, 1))=$a_reg
+	$flag	a0..a7 may not be floating source operand
+	$elseif	($t("p(1, 1)")="$a_reg_@")++|
+		($t("p(1, 1)")="$a_reg_@+")++|
+		($t("p(1, 1)")="$a_reg_@-")
+	$if	$itype\p(1, 1)=$a_reg
+	$i_fp	15, 1, 0, $t("p(1, 1)")**7, $ibase\p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0)
+	$else
+	$i_fp	15, 1, 0, $t("p(1, 1)")**7, p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0)
+	$endif
+	$elseif	$inside\p(1, 1)=2
+	$if	$base_a\p(1, 1)=pc
+	$i_fm	15, 1, 0, 7, 2, 2, p(0, 0)/*7, p(1, 2), p(0, 0), $displacement\p(1, 1)-$
+	$else
+	$i_fm	15, 1, 0, 5, $base_a\p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0), $displacement\p(1, 1)
+	$endif
+	$elseif	$inside\p(1, 1)=3
+	$flag	operand double index format disallowed for floating operation
+	$elseif	p(1, #1)
+	$flag	floating immediate operand disallowed
+	$elseif	$itype\p(1, 1)="$a_reg"
+	$i_fm	15, 1, 0, 5, $ibase\p(1, 1), 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)
+	$elseif	$t(p(1, 1))=$equf
+	$if	("p(1, 1)"\2)=pc
+	$i_fm	15, 1, 0, 7, 2, 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)-$-2
+	$else
+	$i_fm	15, 1, 0, 5, +("p(1, 1)"\2), 2, p(0, 0)/*7, p(1, 2), p(0, 0), p(1, 1)
+	$endif
+	$elseif	$t(p(1, 1))=123		; literal table tag
+"$_AR"	$equf	p(1, 1)			; force generate the literal, label its reference
+	p(0,0)	$_AR, p(1, 2)		; recurse in order that the p(1, 1) is $_AR
+	$else
+	$flag	operand not within recognised category
+	$endif
+	$elseif	p(0, 0)**127=fmove.l
+	$if	$t(p(1, 1))=$fp_reg
+
+	$trace	$t("p(1, 2)")
+	$if	($t("p(1, 2)")="$a_reg_@")++|
+		($t("p(1, 2)")="$a_reg_@+")++|
+		($t("p(1, 2)")="$a_reg_@-")
+	$if	$itype\p(1, 2)=$a_reg
+	$note	(a)
+	$i_fp	15, 1, 0, $t("p(1, 2)")**7, $ibase\p(1, 2), 3, p(0, 0)/*7, p(1, 1), p(0, 0)
+	$else
+	$note	a@
+	$i_fp	15, 1, 0, $t("p(1, 2)")**7, p(1, 2), 3, p(0, 0)/*7, p(1, 1), p(0, 0)
+	$endif
+
+;	elseifs go here for other storage targets
+
+	$endif
+
+        $else
+	$flag	fmove must be to or from fp0..fp7
+	$endif
+	$else
+	$flag	floating arithmetic destination must be fp0..fp7
+	$endif
+
+
+	$endif
+
+
+	$end
+
+
+	$if	1	
+
+
+p	$proc
+pea*	$name
+	$PEA	p(1), a1
+	$end
+
+
+p	$proc
+lea*	$name	7*/4++4
+"$PEA"*	$name	1*/4++4
+
+	$if	$t(p(1, 2))=$a_reg
+
+"$FO"	$set	$iform(p(1, 1))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+
+	$if	$MO=0
+	$flag	d0..d7 cannot have an effective address
+	$elseif	$MO=1
+	$flag	a0..a7 cannot have an effective address
+	$elseif	$MO=2
+	$i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, 2, p(1, 1)
+	$elseif	($MO=3)++($MO=4)
+	$flag	lea instruction may not update a0..a7
+	$elseif	$MO=5
+	$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $RO, p(1, 1)
+	$elseif	$MO=6
+	$i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 6,	|
+		$base_a\p(1, 1:1), $idx_d\p(1, 1:1),	|
+		$idx_w\p(1, 1:1), 0, $displacement8\p(1, 1:1)
+	$elseif	$FO=7
+	$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, p(1, 1)
+	$elseif	$FO=7++1*/3
+	$i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
+	$elseif	$FO=7++4*/3
+	$flag	effective address is already immediate
+	$elseif	$FO=7++2*/3
+	$i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, p(1, 1)-$-2	
+	$elseif	$FO=7++3*/3
+	$i_rx   p(0, 0), p(1, 2), p(0, 0)/*4, 7, 3,	|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0, $displacement8\p(1, 1:1)-$-2 
+	$endif
+
+	$else
+	$flag	receiving operand must be a0..a7
+	$endif
+
+	$end
+
+	$else
+
+p	$proc
+lea*	$name	7*/4++4
+	$if		$t(p(1, 2))=$a_reg
+	  $if		$t(p(1, 1))=$a_reg_@
+	    $i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, 2, p(1, 1)
+	  $elseif	$inside\p(1, 1)=2
+	    $if		$base_a\p(1, 1)=pc
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, p(1, 1)-$-2
+	    $else
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $base_a\p(1, 1), p(1, 1)
+            $endif
+	  $elseif	$t(p(1, 1))=$equf
+	    $if		("p(1, 1)"\2)=pc
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, p(1, 1)-$-2
+	    $else
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, +"p(1, 1)"\2, p(1, 1)
+	    $endif	
+	  $elseif	$itype\p(1, 1)=$a_reg
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $ibase\p(1, 1),|
+			p(1, 1)
+	  $elseif	$inside\p(1, 1)=3
+	$note	3
+            $i_rx       p(0, 0), p(1, 2), p(0, 0)/*4, 6,        |
+                        $base_a\p(1, 1:1), $idx_d\p(1, 1:1),    |
+                        $idx_w\p(1, 1:1), 0, $displacement8\p(1, 1:1)
+	  $else
+	  $if	(p(1, 1)<32768)**(p(1, 1)>32767)
+	    $i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
+	  $else
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, p(1, 1)
+	  $endif
+	  $endif
+	$else
+	  $flag	receiving operand must be a0..a7
+	$endif
+	$end
+
+	$endif
+
+p	$proc
+movea.w* $name	3
+movea.l* $name	2
+movea*	$name	movea.l
+
+	$if	$t(p(1, 2))=$a_reg
+"$FO"	$set	$iform(p(1, 1))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+	$if	($MO=0)++($MO=1)++($MO=2)++($MO=3)++($MO=4)
+	$i_rr	p(0, 0), p(1, 2), 1, $MO, $RO
+	$elseif	$MO=5
+	$i_rm	p(0, 0), p(1, 2), 1, 5, $RO, p(1, 1)
+	$elseif	$MO=6
+	$i_rx	p(0, 0), p(1, 2), 1, 6, $base_a\p(1, 1:1),	|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0, 		|
+		$displacement8\p(1, 1:1)
+	$elseif	$FO=7
+	$i_rm	p(0, 0), p(1, 2), 1, 7, 0, p(1, 1)
+	$elseif	$FO=7++1*/3
+	$i_rl	p(0, 0), p(1, 2), 1, 7, 1, p(1, 1)
+	$elseif	$FO=7++4*/3
+	  $if	p(0, 0)=movea.w
+	  $i_rm	p(0, 0), p(1, 2), 1, 7, 4, p(1, 1)
+	  $else
+	  $i_rl	p(0, 0), p(1, 2), 1, 7, 4, p(1, 1)
+	  $endif
+	$elseif	$FO=7++2*/3
+	  $i_rm	p(0, 0), p(1, 2), 1, 7, 2, p(1, 1)-$-2
+	$elseif	$FO=7++3*/3
+	  $i_rx	p(0, 0), p(1, 2), 1, 7, 3,	|
+	  $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
+	  $displacement8\p(1, 1:1)-$-2
+	$else
+	$flag	anomaly no operand style
+	$endif
+	$else
+	$flag	movea destination must be a0..a7
+	$endif
+	$end
+
+
+p	$proc
+
+adda.w*	$name	3*/4++13
+suba.w*	$name	3*/4++9
+cmpa.w	$name	3*/4++11
+
+adda.l*	$name	7*/4++13
+suba.l*	$name	7*/4++9
+cmpa.l*	$name	7*/4++11
+
+adda*	$name	adda.l
+suba*	$name	suba.l
+cmpa*	$name	cmpa.l
+
+	$if		$t(p(1, 2))=$a_reg
+
+"$type"	  $set		$t("p(1, 1)")
+
+	  $if		$type**128	; register direct or indirect[+-]
+
+	    $i_rr	p(0, 0), p(1, 2), p(0, 0)/*4, $type, +"p(1, 1)"
+
+	  $elseif	$itype\p(1, 1)=$a_reg	; displacement_outside(a_)
+
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, $ibase\p(1, 1),|
+			p(1, 1)
+
+	  $elseif	$inside\p(1, 1:1)=2	; (displacement_inside, a_)
+
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5,	|
+			$base_a\p(1, 1:1), $displacement\p(1, 1:1)
+
+	  $elseif	$t("p(1, 1)")=$equf
+	$note EQUF
+	    $if		("p(1, 1)"\2)=pc
+	$note PC
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 2, p(1, 1)-$-2
+	    $else
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 5, +"p(1, 1)"\2, p(1, 1)
+	    $endif
+
+	  $elseif	$inside\p(1, 1:1)=3	; (displacement, a_, d_[.])
+
+	    $i_rx	p(0, 0), p(1, 2), p(0, 0)/*4, 6,	|
+			$base_a\p(1, 1:1), $idx_d\p(1, 1:1),	|
+			$idx_w\p(1, 1:1), 0, $displacement8\p(1, 1:1)
+
+	  $elseif	p(1, #1)			; immediate
+	    $if	p(0, 0)/*4=3
+	    $i_rm	p(0, 0), p(1, 2), 3, 7, 4, p(1, 1)
+	    $else
+	    $i_rl	p(0, 0), p(1, 2), 7, 7, 4, p(1, 1)
+	    $endif
+
+	  $elseif	($t(p(1, 1:1))=$special_reg)**(p(1, 1)=l)++|
+			($net(p(1, 1))<-32768)++|
+			($net(p(1, 1))>32767)
+	$note	a32
+	    $i_rl	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 1, p(1, 1)
+	  $else
+	$note	a16
+	    $i_rm	p(0, 0), p(1, 2), p(0, 0)/*4, 7, 0, p(1, 1)
+	  $endif
+	$else
+	  $flag	receiving operand must be a0..a7
+	$endif
+	$end
+
+p	$proc
+jmp*	$name	7*/7++3*/4++4
+jsr*	$name	4++7*/7++2*/4
+
+	$if	1
+
+"$FO"	$set	$iform(p(1, 1))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+
+	$if	$MO=0
+	$flag	d0..d7 are not jump targets
+	$elseif	$MO=1
+	$flag	a0..a7 are not jump targets
+	$elseif	($MO=2)++($MO=3)++($MO=4)
+	$i_rr	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, $MO, $RO, p(1, 1)
+	$elseif	$MO=5
+	$i_rm	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 5, $RO, p(1, 1)
+	$elseif	$MO=6
+	$i_rx	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 6, $RO,|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,	|
+		$displacement8\p(1, 1:1)
+	$elseif	$FO=7
+	$i_rm	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 0, p(1, 1)
+	$elseif	$FO=7++1*/3
+	$i_rl	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 1, p(1, 1)
+	$elseif	 $FO=7++4*/3
+	$flag	effective address is already immediate
+	$elseif	$FO=7++2*/3
+	$i_rm	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 2, p(1, 1)-$-2
+	$elseif	$FO=7++3*/3
+	$i_rx	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 3,	|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,	|
+		$displacement8\p(1, 1:1)-$-2
+	$else
+	$flag	style of effective address not fixed
+	$endif
+
+	$else
+
+	  $if		$t(p(1, 1))=$d_reg
+	    $flag	d0..d7 may not be jump targets
+	  $elseif	$t(p(1, 1))=$a_reg
+	    $flaf	d0..d7 may not be jump targets
+	  $elseif	$t(p(1, 1))=$a_reg_@
+	    $i_rr	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 2, p(1, 1)
+	  $elseif	$itype\p(1, 1)=$a_reg
+	    $i_rm	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 5,|
+			$ibase\p(1, 1), p(1, 1)
+
+          $elseif       $inside\p(1, 1:1)=2
+            $i_rm       p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 5,|
+			$base_a\p(1, 1:1),|
+                        $displacement\p(1, 1)
+
+          $elseif       $inside\p(1, 1:1)=3
+            $i_rx       p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 6,|
+			$base_a\p(1, 1:1),|
+                        $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
+                        $displacement8\p(1, 1:1)
+	  $else
+	    $i_rl	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 1, p(1, 1)
+	  $endif
+
+	$endif
+
+	$end
+
+
+p	$proc
+tst.b*	$name	5*/7++0*/4++4
+tst.w*	$name	5*/7++1*/4++4
+tst.l*	$name	5*/7++2*/4++4
+tst*	$name	tst.l
+
+"$type"	$set	$t("p(1,1)")
+
+	  $if		$type**128
+	    $i_rr	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, $type, "p(1, 1)"
+
+	  $elseif	$itype\p(1, 1)=$a_reg
+	    $i_rm	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 5,|
+			$ibase\p(1, 1), p(1, 1)
+
+          $elseif       $inside\p(1, 1:1)=2
+            $i_rm       p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 5,|
+			$base_a\p(1, 1:1),|
+                        $displacement\p(1, 1)
+
+          $elseif       $inside\p(1, 1:1)=3
+            $i_rx       p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 6,|
+			$base_a\p(1, 1:1),|
+                        $idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
+                        $displacement8\p(1, 1:1)
+
+	  $elseif	p(1, #1)
+	    $i_rl	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 4, p(1, 1)
+	  $else
+	    $i_rl	p(0, 0), p(0, 0)/*7, p(0, 0)/*4, 7, 1, p(1, 1)
+	  $endif
+	$end
+
+p	$proc
+lsr*	$name	2*/4++14++1*/8	
+lsl*	$name	6*/4++14++1*/8
+asr*	$name	2*/4++14
+asl*	$name	6*/4++14
+
+	$if		$t(p(1, 2))=$d_reg
+	$if		p(1, #1)
+	  $do	p(1, 1)>8,	|
+	  $flag	immediate shift count may be 1..8
+	  $i_rr		p(0, 0), p(1, 1), p(0, 0)/*4, 0++p(0, 0)/*8, p(1, 2)
+	$elseif		$t(p(1, 1))=$d_reg
+	  $i_rr		p(0, 0), p(1, 1), p(0, 0)/*4, 4++p(0, 0)/*8, p(1, 2)
+	$else
+	  $flag		shift count must be 1..8 or d0..d7
+	$endif
+	$else
+	  $flag		only d0..d7 can get shifted
+	$endif
+
+	$end
+
+p	$proc
+rts*	$name	0x4e75
+rte*	$name	0x4e73
+	+	p(0, 0)
+	$end
+
+p	$proc				; 4,3,3,3,3,32
+cmpi*	$name	6*/4++2*/7++0*/10++0	; 000 010 110 0000 -> 0000 110 010 000 rrr
+andi*	$name	1*/4++2*/7++0*/10++0	; 000 010 001 0000 -> 0000 001 010 000 rrr
+ori*	$name	0++0*/4++2*/7++0*/10	; 000 010 000 0000 -> 0000 000 010 000 rrr
+eori*	$name	0++5*/4++2*/7++0*/10	; 000 010 101 0000 -> 0000 101 010 000 rrr
+addi*	$name	0++3*/4++2*/7++0*/10	; 000 010 011 0000 -> 0000 011 010 000 rrr
+subi*	$name	0++2*/4++2*/7++0*/10	; 000 010 010 0000 -> 0000 010 010 000 rrr
+
+	$do	$t(p(1, 2))^=$d_reg,	$flag must subtract from d0..d7
+	$do	p(1, #1)=0,		$flag must subtract immediate
+
+	$i_rl	p(0, 0), p(0, 0)/*4, p(0, 0)/*7, p(0, 0)/*10,|
+		p(1, 2), p(1, 1)
+
+	$end
+
+p	$proc
+
+move.b*	$name	1
+move.w*	$name	3
+move.l*	$name	2
+
+move*	$name	move.l
+
+"$frot"	$set	$t("p(1,1)")
+"$tot"	$set	$t("p(1,2)")
+
+	$if	$frot**128
+
+"$from"	  $set	$frot**7
+"$fror"	  $set	"p(1, 1)"
+
+	  $if	$tot**128
+
+"$tom"	    $set	$tot**7	
+"$tor"	    $set	"p(1, 2)"
+
+	    $i_rr	p(0, 0), $tor, $tom, $from, $fror
+
+
+	  $elseif	$itype\p(1, 2)=$a_reg
+
+	    $i_rm	p(0, 0), $ibase\p(1, 2), 5, $from, $fror, p(1, 2)
+
+	  $elseif	$inside\p(1, 2:1)=2
+
+	    $i_rm 	p(0, 0), $base_a\p(1, 2:1), 5, $from, $fror,|
+			$displacement\p(1, 2)
+
+	  $elseif	($t(p(1, 2))="$equf")**(p(1, 3)^=0)
+	    $i_rm	p(0, 0), p(1, 3), 5, $from, $fror, p(1, 2)
+
+
+	  $elseif	$inside\p(1, 2:1)=3
+	    $i_rx	p(0, 0), $base_a\p(1, 2:1), 6, $from, $fror,|
+			$idx_d\p(1, 2:1), $idx_w\p(1, 2:1), 0,|
+			$displacement8\p(1, 2:1)
+
+	  $else
+
+"$AW"	$set	16
+	$do	$t(p(1, 2:2))=$special_reg,	|
+	$do	p(1, 2:2)=l,"$AW"	$set	32
+
+	  $if	($AW=32)++($net(p(1, 2))<-32768)++($net(p(1, 2))>32767)
+	    $i_rl	p(0, 0), 1, 7, $from, $fror, p(1, 2)
+	  $else
+	    $i_rm	p(0, 0), 0, 7, $from, $fror, p(1, 2)
+	  $endif
+	  $endif
+
+	$elseif	$tot**128
+
+"$tom"	    $set	$tot**7	
+"$tor"	    $set	p(1, 2)
+"$last"	    $set	p(1)
+
+	$if	$t(p(1, 1))=$equf
+"$unload"	$equf	p(1, 1)
+	$else
+"$unload"	$equf	0
+	$endif
+
+	  $if		p(1, #1)
+
+	    $if		p(0, 0)=move.l
+	    $i_rl	p(0, 0), $tor, $tom, 7, 4, p(1, 1)
+	    $else
+	    $i_rm	p(0, 0), $tor, $tom, 7, 4, p(1, 1)
+	    $endif
+
+	  $elseif	$itype\p(1, 1)=$a_reg
+
+	    $i_rm	p(0, 0), $tor, $tom, 5, $ibase\p(1, 1), p(1, 1) 
+
+	  $elseif	$inside\p(1,1:1)=2
+
+	    $i_rm	p(0, 0), $tor, $tom, 5, $base_a\p(1, 1:1),|
+			$displacement\p(1, 1:1)
+
+	  $elseif	($t(p(1, 1))=$equf)**($unload\2^=0)
+
+	    $i_rm	p(0, 0), p(1, $last), $tom, 5, $unload\2, $unload\1
+
+	  $elseif $inside\p(1, 1:1)=3
+	    $if	($type2\p(1, 1)=$special_reg)**($id2\p(1, 1)=pc)
+	    $i_rx	p(0, 0), $tor, $tom, 7, 3, |
+			$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
+			 $displacement8\p(1, 1:1)
+	    $else
+	    $i_rx	p(0, 0), $tor, $tom, 6, $base_a\p(1, 1:1),|
+			$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,|
+			$displacement8\p(1, 1:1)
+	    $endif
+	  $else
+
+"$AW"	$set	16
+	$do	$t(p(1, 1:2))=$special_reg,	|
+	$do	p(1, 1:2)=l,"$AW"	$set	32
+
+	  $if	($AW=32)++($net(p(1, 1))<-32768)++($net(p(1, 1))>32767)
+	    $i_rl	p(0, 0), $tor, $tom, 7, 1, p(1, 1)
+	  $else
+	    $i_rm	p(0, 0), $tor, $tom, 7, 0, p(1, 1)
+	  $endif
+	  $endif
+	$else
+	  $flag	two-address version not yet macro-coded
+	$endif
+
+	$end	
+
+
+"$movem_i"	$form	10, 3, 3, 16
+"$movem_im"	$form	10, 3, 3, 16, 16
+
+; coldfire doesn't have so many movem variations as 68k
+
+p	$proc
+
+movem.w*	$name	0x0122
+movem.l*	$name	0x0123
+movem*		$name	movem.l
+
+
+	$if	$t("p(1, 1)")="$a_reg_@"
+	$movem_i	p(0, 0)++16, 2, p(1, 1), right2left(p(1, 2))
+
+	$elseif	$t("p(1, 2)")="$a_reg_@"
+	$movem_i	p(0, 0), 2, p(1,2), right2left(p(1, 1))
+
+	$elseif	$itype\p(1,1)=$a_reg
+	$movem_im	p(0, 0)++16, 5, $ibase\p(1, 1),|
+			right2left(p(1, 2)), p(1, 1)
+
+	$elseif	$itype\p(1,2)=$a_reg
+	$movem_im	p(0, 0), 5, $ibase\p(1, 2),|
+			right2left(p(1, 1)), p(1, 2)
+
+	$elseif	$type2\p(1, 1:1)=$a_reg	;	$inside\p(1, 1:1)=2
+	$movem_im	p(0, 0)++16, 5, $base_a\p(1, 1:1),|
+			right2left(p(1, 2)),|
+			$displacement\p(1, 1)
+
+
+	$elseif	$type2\p(1, 2:1)=$a_reg	;	$inside\p(1, 2:1)=2
+	$movem_im	p(0, 0), 5, $base_a\p(1, 2:1),|
+			right2left(p(1, 1)),|
+			$displacement\p(1, 2)
+ 
+	$else
+
+
+	$flag	movem variant not in ColdFire set
+
+	$endif
+	$end
+
+; removal of movem-predecrement means only one bitmask direction is needed
+
+f	$func
+right2left*	$name
+mask	$set	0
+	$sterm	'/'
+x	$do	f(1, 1:),mask	$set	mask++range_up(f(1, 1:x))
+	$sterm	'.'
+	$return	mask
+	$end
+
+f	$func
+range_up*	$name
+mask	$set	0
+	$sterm	'-'
+	$if	f(1,1:)=1
+	$if	$t(f(1, 1:1))=$d_reg
+mask	$set	1*/f(1, 1:1)
+	$elseif	$t(f(1, 1:1))=$a_reg
+mask	$set	256*/f(1, 1:1)
+	$else
+	$flag	tag not data register or address register
+	$endif
+	$elseif	f(1,1:)=2
+	$if	  ($t(f(1, 1:1))=$d_reg)|
+		**($t(f(1, 1:2))=$d_reg)|
+		**(f(1, 1:2)>f(1, 1:1))
+
+mask	$set	((1*/f(1, 1:1))-1)--((2*/f(1, 1:2))-1)
+
+	$elseif	  ($t(f(1, 1:1))=$a_reg)|
+		**($t(f(1, 1:2))=$a_reg)|
+		**(f(1, 1:2)>f(1, 1:1))
+
+mask	$set	((256*/f(1, 1:1))-1)--((512*/f(1, 1:2))-1)
+
+	$elseif	($t(f(1, 1:1))=$d_reg)**($t(f(1, 1:2))=$a_reg)
+
+mask	$set	((1*/f(1, 1:1))-1)--((512*/f(1, 1:2))-1)
+	$else
+	$flag	bad range
+	$endif
+	$else
+	$flag	too many ranges in range
+	$endif
+	$sterm	'/'
+	$return	mask
+	$end
+
+p	$proc
+swap*	$name		4++4*/4++1*/8++0*/12
+neg.l*	$name		4++2*/4++2*/8++0*/12
+neg*	$name		neg.l
+	$do	$t(p(1, 1))^="$d_reg",	$flag	 argument must be d0..d7
+	$i_rr		p(0, 0), p(0, 0)/*4, p(0, 0)/*8, p(0, 0)/*12, p(1, 1)
+	$end
+
+p	$proc
+cmp.b*	$name	0
+cmp.w*	$name	1
+cmp.l*	$name	2
+cmp*	$name	cmp.w
+
+	$if	$t(p(1, 2))=$d_reg
+"$FO"	$set	$iform(p(1, 1))
+"$MO"	$set	$FO**7
+"$RO"	$set	$FO/*3
+
+	$if	($MO=0)++($MO=1)++($MO=2)++($MO=3)++($MO=4)
+	$i_rr	11, p(1, 2), p(0, 0), $MO, $RO
+	$elseif	$MO=5
+	$i_rm	11, p(1, 2), p(0, 0), 5, $RO, p(1, 1)
+	$elseif	$MO=6
+	$i_rx	11, p(1, 2), p(0, 0), 6, $RO, 		|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,	|
+		$displacement8\p(1, 1:1)
+	$elseif	$FO=7
+	$i_rm	11, p(1, 2), p(0, 0), 7, 0, p(1, 1)
+	$elseif	$FO=7++1*/3
+	$i_rl	11, p(1, 2), p(0, 0), 7, 1, p(1, 1)
+	$elseif	$FO=7++4*/3
+	  $if	p(0, 0)=cmp.l
+	  $i_rl	11, p(1, 2), p(0, 0), 7, 4, p(1, 1)
+	  $else
+	  $i_rm	11, p(1, 2), p(0, 0), 7, 4, p(1, 1)
+	  $endif
+	$elseif	$FO=7++2*/3
+	$i_rm	11, p(1, 2), p(0, 0), 7, 2, p(1, 1)-$-2
+	$elseif	$FO=7++3*/3
+	$i_rx	11, p(1, 2), p(0, 0), 7, 3,		|
+		$idx_d\p(1, 1:1), $idx_w\p(1, 1:1), 0,  |
+		$displacement8\p(1, 1:1)-$-2
+	$else
+	$flag	anomaly no operand style selected
+	$endif
+
+	$else
+	$flag	must be comparand,d0..d7
+	$endif
+	$end
+
+	$do	$o('V'),	$note	end of include coldfire.def
+

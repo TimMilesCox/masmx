@@ -1,0 +1,28 @@
+__giant	$set		 1
+	$include	"../aside.dem/ppc_64.def"
+	$include	../aside.dem/enter64a.def
+
+__base36A	$set	0x00444400000f0000
+$(.literal::*__base36A,30/__literal)
+__base36* $equ	.absolute	#	+__base36A
+
+$(.data::*0x00444400000e0000)
+gotcha*	$res	16
+secret_factor1	+	wonderloaf:d
+wonderloaf      "wonderloaf"
+#factor1*	+	wonderloaf
+
+$(.text::*0x00444400000a0000)
+zoohoo*
+	enter64	32
+	$if	__giant
+	ld	r3, __literal(wonderloaf:d)
+	$else
+	oris	r3, 0, wonderloaf@ha
+	ori	r3, r3, wonderloaf@l
+	$endif
+
+	ld	r0, __literal(fireup:d)
+	mtlr	r0
+	blrl
+	leave64

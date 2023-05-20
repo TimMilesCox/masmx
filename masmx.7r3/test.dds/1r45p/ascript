@@ -1,0 +1,8 @@
+rm abs/*
+../../masm7a dt.asm abs/dt
+../../imx abs/dt.txo abs/dt.hex
+../../masm7x dt.asm abs/aside
+../../imx abs/aside.txo abs/aside.hex
+diff -w 1r45pq.hex abs/dt.hex
+cmp abs/dt.hex abs/aside.hex
+

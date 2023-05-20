@@ -1,0 +1,114 @@
+
+p	$proc
+retrieve* $name		1	. signed if field is flag signed
+retrieves* $name	2	. signed override
+retrieveu* $name	0	. unsigned override 
+
+SIGNED	$equ	p(1, *5)+p(0, 0)/*1
+BITS	$equ	p(1, 5)**0x7FFFFFFF	. -c option is in coldfire.def
+OFFSET	$equ	p(1, 4)
+D_REG	$equ,"$d_reg"	d0+p(2, 1)
+
+	$do	BITS>$word,	$flag	use lretrieve for fields > $word bits
+
+p	$proc
+SHIFT_LEFT* $name
+	$do	p(1, 1)/8,	lsl	#8, p(2, 1)
+	$do	p(1, 1)**7^=0,	lsl	#p(1, 1)**7, p(2, 1)
+	$end
+
+p	$proc
+SHIFT_RIGHT* $name
+	$do	p(1, 1)/8,	lsr	#8, p(2, 1)
+	$do	p(1, 1)**7^=0,	lsr	#p(1, 1)**7, p(2, 1)
+	$end
+
+p	$proc
+SHIFT_ALGEBRAIC* $name
+	move.w	#p(1, 1),	p(2, 1)
+	asr	p(2, 1),	p(2, 1)
+	$end
+
+	$if	(SIGNED=0)**((OFFSET**7)+BITS<9)
+		move.b	p(1)++OFFSET**8/*3,	D_REG
+		$do	BITS+(OFFSET**7)<8, SHIFT_RIGHT	8-BITS-(OFFSET**7) D_REG
+		andi	#+(1*/BITS)-1,	D_REG
+	$elseif	BITS+OFFSET>$word
+		move.l	p(1),	D_REG
+		$if	SIGNED
+		SHIFT_LEFT	OFFSET	D_REG
+		SHIFT_ALGEBRAIC	$word*2-BITS D_REG
+		$else
+		SHIFT_RIGHT	$word*2-BITS-OFFSET	D_REG
+		$do	BITS<$word,	andi	#+(1*/BITS)-1, D_REG
+		$endif
+	$else
+		$if	SIGNED
+		move.w	p(1),	D_REG
+		swap	D_REG
+		SHIFT_LEFT	OFFSET	D_REG
+		SHIFT_ALGEBRAIC $word*2-BITS D_REG
+		$else
+		move.w	p(1),	D_REG
+		SHIFT_RIGHT	$word-BITS-OFFSET	D_REG
+		$do	BITS<$word,	andi	#+(1*/BITS)-1, D_REG
+		$endif
+	$endif
+	$end
+
+
+p	$proc
+lretrieve* $name	1	. signed if field is flag signed
+lretrieves* $name	2	. signed override
+lretrieveu* $name	0	. unsigned override
+
+SIGNED	$equ	p(1, *5)+p(0, 0)/*1
+BITS	$equ	p(1, 5)
+OFFSET	$equ	p(1, 4)
+D_REG	$equ,"$d_reg"	d0+p(2, 1)
+D_REGA	$equ,"$d_reg"	D_REG+1**7
+
+	$do	BITS<$word+1,	$flag	use retrieve for fields <= $word bits
+
+p	$proc
+SHIFT_LEFT* $name
+	$do	p(1, 1)/8,	lsl	#8, p(2, 1)
+	$do	p(1, 1)**7^=0,	lsl	#p(1, 1)**7, p(2, 1)
+	$end
+
+p	$proc
+SHIFT_RIGHT* $name
+	$do	p(1, 1)/8,	lsr	#8, p(2, 1)
+	$do	p(1, 1)**7^=0,	lsr	#p(1, 1)**7, p(2, 1)
+	$end
+
+p	$proc
+SHIFT_ALGEBRAIC* $name
+	$do	p(1, 1)/8,	asr	#8, p(2, 1)
+	$do	p(1, 1)**7^=0,	asr	#p(1, 1)**7, p(2, 1)
+	$end
+
+	$if	BITS+OFFSET>$word*2
+		$note		neighbouring d_register is also used
+		move.l	p(1)+1,	D_REGA
+		SHIFT_RIGHT	48-BITS-OFFSET	D_REGA
+		move.l	p(1),	D_REG
+		SHIFT_LEFT	OFFSET	D_REG
+		$if		SIGNED
+		SHIFT_ALGEBRAIC	$word*2-BITS	D_REG
+		$else
+		SHIFT_RIGHT	$word*2-BITS	D_REG
+		$endif
+		move.w		D_REGA, D_REG
+	$else
+		move.l	p(1),	D_REG
+		$if	SIGNED
+		SHIFT_LEFT	OFFSET	D_REG
+		SHIFT_ALGEBRAIC	$word*2-BITS	D_REG
+		$else
+		SHIFT_LEFT	OFFSET	D_REG
+		SHIFT_RIGHT	$word*2-BITS	D_REG
+		$endif
+	$endif
+
+	$end

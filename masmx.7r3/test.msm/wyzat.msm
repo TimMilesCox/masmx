@@ -1,0 +1,8 @@
+	$include "8051_3r1.def"
+DT_VERSION* macro
+	$notef rawiair
+	db	'different'
+;	DB	'2r8  '
+	macend
+	$notef rawihir
+	DT_VERSION

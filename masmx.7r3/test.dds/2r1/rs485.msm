@@ -1,0 +1,629 @@
+;******************************************************************************
+;
+; File     : RS485.ASM
+;
+; Author   : Stephen Macdonald
+;
+; Project  : Desktop range of ticket printers
+;
+; Contents : This file contains the serial communications code
+;
+; System   : 80C537
+;
+; History  :
+;   Date     Who Ver  Comments
+;
+
+;       ************************************************************
+;       *       Tim     19viij99        **********Start*************
+;       ************************************************************
+;       * RS485_TIME_STAMP                                         *
+;       * When Asserted, append 1/16th-sec sys_tick to all xmit    *
+;       *                packets & include it in length and CRC    *
+;       ************************************************************
+
+RS485_TIME_STAMP EQU    0
+ASYNCNET        equ     0
+
+;******************************************************************************
+;
+; Function:     COM_InitRS485
+; Input:        None
+; Output:       None
+; Preserved:    ?
+; Destroyed:    ?
+; Description:
+;
+;******************************************************************************
+
+COM_InitRS485:
+	MOV     rs485_lastchar,#0
+;;      MOV     rs485_inpacket,#0
+	CLR     rs485_inpacket
+	MOV     rs485_curpktlen,#0
+	MOV     rs485_packets,#0
+	MOV     rs485_startbuf,#0
+	MOV     rs485_endbuf,#0
+	RET
+
+RS485_EnableReceive:
+	IF      VT10
+	orl     IEN2,#1
+	ELSE
+	SETB    ES0                     ; enable serial 0 interrupt
+	ENDIF
+	RET
+
+RS485_DisableReceive:
+	IF      VT10
+	anl     IEN2,#-2
+	ELSE
+	CLR     ES0                     ; disable serial 0 interrupt
+	ENDIF
+	RET
+;
+;******************************************************************************
+;
+DLE EQU 175
+STX EQU 174
+
+RS485_BUFSIZE EQU 256
+
+; ALIGN VAR,ToPage
+;rs485_buffer    VAR     RS485_BUFSIZE ; the rs485 character buffer
+; The following two buffers are used in HOST.ASM, but are declared here to
+;save RAM space wasted in an ALIGN operation.
+;HOST_BUFSIZE    EQU     256
+;disney_buffer   VAR     HOST_BUFSIZE    ; the Disney character buffer
+;host_buffer     VAR     HOST_BUFSIZE    ; the host (DDS) character buffer
+;
+; These two buffers are used in COMMS.ASM
+;com_ser1buffer: VAR     256             ; serial port 1
+;com_tx1buffer:  VAR     256
+
+;******************************************************************************
+;
+AddCRCByte: ; R0=crcaddr, A=byte
+	PUSHB
+	MOV     B,A
+	MOV     A,@R0
+	ADD     A,B
+	MOV     @R0,A
+	INC     R0
+	MOV     A,@R0
+	ADDC    A,#0
+	MOV     @R0,A
+	DEC     R0
+	POP     B
+	RET
+
+AddCRCBytes: ; DPTR=addr, R7=count, R0=crcaddr
+	MOVX    A,@DPTR
+	INC     DPTR
+	CALL    AddCRCByte
+	DJNZ    R7,AddCRCBytes
+	RET
+
+
+MTH_IncLongIRAM: ; R0=iramaddr
+MTH_ILIinc:
+	INC     @R0
+	MOV     A,@R0
+	JZ      MTH_ILIagain
+	RET
+MTH_ILIagain:
+	INC     R0
+	JMP     MTH_ILIinc
+
+;**********************************************************************
+
+RS485_Rx:
+	PUSHPSW
+	pushacc
+
+	IF      VT10
+	mov     a,S1CON
+	ANL     S1CON,#-4
+	jb      acc.1,RS485_RRx
+	ELSE
+	JB      RI0,RS485_RRx           ; Only process Rx ints
+	ENDIF
+	pop     acc
+	POP     PSW
+	RETI
+;
+RS485_RRx:
+;        PUSHACC
+	PUSHB
+	PUSHDPH
+	PUSHDPL
+	MOV    A,R0
+	PUSHACC
+;
+	IF      VT10
+	mov     a,S1BUF
+	ELSE
+	MOV     A,S0BUF
+	ENDIF
+
+	MOV     rs485_ch,A
+;
+	MOV     B,#1                            ; insert = TRUE;
+;
+	CJNE    A,#DLE,RS485_Rnotdle            ; if (rs485_ch == DLE)
+	MOV     A,rs485_lastchar                ; {
+	CJNE    A,#DLE,RS485_Rlastnotdle        ;  if (rs485_lastchar == DLE)
+	MOV     rs485_lastchar,#0               ;   rs485_lastchar = 0;
+	JMP     RS485_Rdlestxok                 ;  else
+;
+RS485_Rlastnotdle:                              ;  {
+	MOV     rs485_lastchar,#DLE             ;   rs485_lastchar = DLE;
+	MOV     B,#0                            ;   insert = FALSE;
+	JMP     RS485_Rdlestxok                 ;  }
+;                                               ; }
+RS485_Rnotdle:
+	CJNE    A,#STX,RS485_Rdlestxok          ; if (rs485_ch == STX)
+	MOV     A,rs485_lastchar                ; {
+	CJNE    A,#DLE,RS485_Rdlestxok          ;  if (rs485_lastchar == DLE)
+	MOV     B,#0                            ;  {
+	MOV     A,rs485_curpktlen               ;   insert = FALSE;
+	JZ      RS485_Rpktfinished              ;   if (rs485_curpktlen)
+	MOV     rs485_endbuf,rs485_pktpos       ;    rs485_endbuf = rs485_pktpos;
+RS485_Rpktfinished:                             ;   }
+	CLR     A                               ;   rs485_curpktlen = 0;
+	MOV     rs485_curpktlen,A               ;   rs485_actpktlen = 0;
+	MOV     rs485_actpktlen,A               ;   rs485_inpacket = TRUE;
+	SETB    rs485_inpacket
+	MOV     rs485_pktpos,rs485_endbuf       ;   rs485_lastchar = 0;
+	MOV     rs485_lastchar,A                ;   rs485_flyingcrc = 0;
+	MOV     rs485_flyingcrcl,A              ;  }
+	MOV     rs485_flyingcrch,A              ; }
+
+RS485_Rdlestxok:
+	MOV     A,B                             ; if (insert && rs485_inpacket)
+	JZ      RS485_Rnoinsert2                ; {
+	JNB     rs485_inpacket,RS485_Rnoinsert2
+	MOV     A,rs485_lastchar                ;   rs485_rxerrors++;
+	CJNE    A,#DLE,RS485_Rvalidch           ;   rs485_lastchar = 0;
+	MOV     rs485_lastchar,#0               ; else
+	JMP     RS485_Rnoinsert                 ;
+RS485_Rnoinsert2:
+	JMP     RS485_Rnoinsert
+RS485_Rvalidch:
+	MOV     A,rs485_endbuf                  ; if (((rs485_endbuf +1) &
+	INC     A                               ;  RS485_BUFSIZE-1) ==
+	CJNE    A,rs485_startbuf,RS485_Rbufok   ;  rs485_startbuf)
+	MOV     B,#0                            ;   insert = FALSE;
+	JMP     RS485_Rnoinsert                 ; }
+RS485_Rbufok:                                   ; else {
+	MOV     A,rs485_curpktlen               ;  switch (rs485_curpktlen)
+	CJNE    A,#0,RS485_Rlennot0             ;  {
+	MOV     rs485_actpktcrcl,rs485_ch       ;   case 0:
+
+	IF      ASYNCNET
+	inc     rs485_pktlen                    ; ***CRCL***
+	jmp     RS485_Rnoinsert
+	ELSE
+	JMP     RS485_Rstore                    ;    rs485_actpktcrc = (UWORD)rs485_ch;
+	ENDIF
+
+RS485_Rlennot0:                                 ;    break;
+	CJNE    A,#1,RS485_Rlennot1             ;   case 1:
+	MOV     rs485_actpktcrch,rs485_ch       ;    rs485_actpktcrc = (((UWORD)rs485_ch)<<8)+rs485_actpktcrc;
+
+	IF      ASYNCNET                        ; ***CRCU***
+	inc     rs485_curpktlen
+	jmp     RS485_Rnoinsert
+	ELSE
+	JMP     RS485_Rstore                    ;    rs485_actpktcrc = (UWORD)rs485_ch;
+	ENDIF
+
+RS485_Rlennot1:                                 ;   case 2:
+	CJNE    A,#2,RS485_Rlennot2             ;    rs485_actpktlen = rs485_ch;
+	MOV     rs485_actpktlen,rs485_ch        ;    break;
+
+	IF      ASYNCNET                        ; ***LENGTH**
+	inc     rs485_curpktlen
+	jmp     RS485_Rnoinsert
+	ELSE
+	JMP     RS485_Rstore                    ;    rs485_actpktcrc = (UWORD)rs485_ch;
+	ENDIF
+
+RS485_Rlennot2:                                 ;    rs485_to = rs485_ch;
+
+	IF      ASYNCNET                        ; ***DEST****
+	cjne    a,#3,RS485_RLenNot3
+	ELSE
+	CJNE    A,#3,RS485_Rstore               ;    if ((rs485_to != sys_mynode)
+	ENDIF
+
+	MOV     A,rs485_ch ; A=rs485_to
+	CJNE    A,#MASTERNODE,RS485_Rtryins     ;      && (rs485_to != NODE_ID_ALLTS)
+
+	IF      ASYNCNET
+	jmp     RS485_RstoreDest
+	ELSE
+	JMP     RS485_Rstore                    ;    rs485_actpktcrc = (UWORD)rs485_ch;
+	ENDIF
+
+RS485_Rtryins:                                  ;
+						;     rs485_inpacket = FALSE;
+						;    }
+	CJNE    A,#NODE_ID_ALLNODES,RS485_Rtrytyp ;  break;
+
+	IF      ASYNCNET
+	jmp     RS485_RstoreDest
+	ELSE
+	JMP     RS485_Rstore                    ;    rs485_actpktcrc = (UWORD)rs485_ch;
+	ENDIF
+
+RS485_Rtrytyp:
+	CJNE    A,#NODE_ID_ALLTS,RS485_Rwrongid ;
+
+	IF      ASYNCNET
+	jmp     RS485_RstoreDest
+	ELSE
+	JMP     RS485_Rstore                    ;    rs485_actpktcrc = (UWORD)rs485_ch;
+	ENDIF
+
+RS485_Rwrongid:                                 ;
+;;      MOV     rs485_inpacket,#0               ;
+	CLR     rs485_inpacket
+
+	IF      ASYNCNET
+RS485_RstoreDest:
+	mov     rs485_flyingcrcl,a              ; save to_address as
+	inc     rs485_curpktlen                 ; crc seed
+	jmp     RS485_Rnoinsert
+
+RS485_RLenNot3:
+	cjne    a,#4,RS485_Rstore               ; packet body
+
+	mov     a,rs485_ch                      ; ***SOURCE**
+	anl     a,#7                            ; isolate slave index
+	swap    a                               ; create buffer offset
+	rl      a                               ; granularity 32 bytes
+	mov     #dptr,rs485_buffer              ; prepare to write storage
+	mov     dpl,a                           ; queue 1 message deep per dt
+
+	mov     a,rs485_actpktcrcl              ; the received CRC
+	movx    @dptr,a                         ; is not included in
+	inc     dptr                            ; the computed CRC
+	mov     a,rs485_actpktcrch              ; the received CRC
+	movx    @dptr,a                         ; is not included in
+	inc     dptr                            ; the computed CRC
+
+	mov     a,rs485actpktlen                ; everything else is
+	movx    @dptr,a
+	inc     dptr
+
+	mov     a,rs485_flyingcrcl              ; recover the dest address
+	movx    @dptr,a
+	inc     dptr
+
+	add     a,rs485actpktlen                ; sum embryo CRC
+	mov     rs485_flyingcrcl,a
+	mov     a,#0
+	addc    a,#0                            ; this will almost never
+	mov     rs485_flyingcrch,a              ; carry, unless dest = FF
+						 
+;       **************************************************************
+;       *                                    _______________________ *
+;       *       at this point we have stored ÝCRCLÝCRCHÝLENGÝDESTÝ   *
+;       *                                    Ý____Ý____Ý____Ý____Ý__ *  
+;       *       and DPTR is pointing here-------------------------^  *
+;       *       flying CRC = LENG+DEST.                              *
+;       *                                                            *
+;       *       The layout of rs485_endbuf represented in DPL is     *
+;       *               _________________________________            *
+;       *               Ý a Ý a Ý a Ý 0 Ý 0 Ý 1 Ý 0 Ý 0 Ý            *
+;       *               Ý___Ý___Ý___Ý___Ý___Ý___Ý___Ý___Ý            *
+;       *                                                            *
+;       *       where     a___a___a    is the source node index.     *
+;       *                                                            *
+;       *       The input character representing the source node     *
+;       *       address has just been received and resides in        *
+;       *       rs485_ch where it will now be processed like the     *
+;       *       remainder of the packet body. First rs485_endbuf     *
+;       *       must be set to BUFFER+4 (=DPL) :                             *
+;       **************************************************************
+
+	mov     a,dpl   ; buffer[node]+4
+	mov     rs485_endbuf,a
+
+	ENDIF
+
+RS485_Rstore:                                   ;  }
+
+	MOV     DPTR,#rs485_buffer              ;  rs485_buffer[rs485_endbuf++] = rs485_ch;
+	MOV     DPL,rs485_endbuf                ;
+	MOV     A,rs485_ch                      ;
+	MOVX    @DPTR,A                         ;
+	INC     rs485_endbuf                    ;  rs485_endbuf &= RS485_BUFSIZE - 1;
+	MOV     A,B                             ;  if (insert)
+	JZ      RS485_Rnoinsert2                ;  {
+	INC     rs485_curpktlen;                ;   rs485_curpktlen++;
+
+	IF      ASYNCNET
+	;       The following rubbish isn't needed because you don't
+	;       get here until CRCL_CRCH_LENG_DEST_SRCE are assembled
+	;       and rs485_curpktlen = 5
+	ELSE
+
+	MOV     A,rs485_curpktlen               ;   if (rs485_curpktlen > 2)
+	CJNE    A,#2,RS485_Rcheckcrc            ;    addcrcbyte (rs485_flyingcrc,rs485_ch);
+	JMP     RS485_Rnocrc                    ;
+RS485_Rcheckcrc:                                ;
+	JC      RS485_Rnocrc                    ;
+
+	ENDIF
+
+	MOV     R0,#rs485_flyingcrcl            ;
+	MOV     A,rs485_ch                      ;
+	CALL    AddCRCByte                      ;
+RS485_Rnocrc:
+
+	MOV     A,rs485_curpktlen                 ; if (rs485_curpktlen ==
+	CJNE    A,rs485_actpktlen,RS485_Rnoinsert ;   rs485_actpktlen)
+	MOV     A,rs485_actpktcrcl                ;
+	CJNE    A,rs485_flyingcrcl,RS485_Rcrcfail ; if (rs485_actpktcrc ==
+	MOV     A,rs485_actpktcrch                ;   rs485_flyingcrc)
+	CJNE    A,rs485_flyingcrch,RS485_Rcrcfail ;
+	INC     rs485_packets                   ;    rs485_packets++;
+
+	JMP     RS485_Rnopacket                 ;   else
+;
+RS485_Rcrcfail:                                 ;   {
+	MOV     rs485_endbuf,rs485_pktpos       ;   }
+;
+RS485_Rnopacket:
+	CLR     rs485_inpacket
+	MOV     rs485_curpktlen,#0              ;   rs485_curpktlen = 0;
+	MOV     rs485_lastchar,#0               ;   rs485_lastchar = 0;
+RS485_Rnoinsert:
+	CLR     RI0
+;
+RS485_Rtx:
+	POP     ACC
+	MOV     R0,A
+	POP     DPL
+	POP     DPH
+	POP     B
+;        POP     ACC
+	POP     PSW
+	RETI
+
+RS485_RxChar:
+	MOV     A,rs485_endbuf
+	CJNE    A,rs485_startbuf,RS485_RCbufok
+	CLR     C
+	RET
+;
+;***********************************************************************
+;
+RS485_RCbufok:
+	PUSHDPH
+	PUSHDPL
+	MOV     DPTR,#rs485_buffer
+	MOV     DPL,rs485_startbuf
+	MOVX    A,@DPTR
+	INC     rs485_startbuf
+	SETB    C
+	POP     DPL
+	POP     DPH
+	RET
+;
+;***********************************************************************
+;
+RS485_ReceivePacket: ;DPTR=packet
+	MOV     A,rs485_packets
+	JZ      RS485_RPnopkts3
+	DEC     rs485_packets
+
+	PUSHDPH
+	PUSHDPL
+
+	MOV     R7,#5
+RS485_RPloop1:
+	CALL    RS485_RxChar
+	JNC     RS485_RPnopkts2
+	MOVX    @DPTR,A
+	INC     DPTR
+	DJNZ    R7,RS485_RPloop1
+
+	POP     DPL
+	POP     DPH
+	INC     DPTR
+	INC     DPTR
+	MOVX    A,@DPTR
+	CLR     C
+	SUBB    A,#5
+	MOVX    @DPTR,A
+	INC     DPTR
+	INC     DPTR
+	INC     DPTR
+
+	MOV     R7,A
+RS485_RPloop2:
+	CALL    RS485_RxChar
+	JNC     RS485_RPnopkts
+	MOVX    @DPTR,A
+	INC     DPTR
+	DJNZ    R7,RS485_RPloop2
+
+	MOV     A,#1
+	RET
+
+RS485_RPnopkts2:
+	POP     DPL
+	POP     DPH
+
+RS485_RPnopkts:
+RS485_RPnopkts3:
+	CLR     A
+	RET
+
+;/*******************************************************************************
+;
+;        R S 4 8 5   T r a n s m i t   R o u t i n e s
+;
+;*******************************************************************************/
+
+MYNODE EQU 1
+MASTERNODE EQU 0
+
+;DPTR=data, R7=len, R6=nodeto
+
+RS485_TransmitPacket:
+
+;       ********************************************************
+;       *       Tim     26viij99        *******Start************
+;       ********************************************************
+;       *       append timestamp (approx 15th sec) to packet   *
+;       ********************************************************
+
+	IF      RS485_TIME_STAMP
+	mov     a,sys_tick
+	cjne    a,#DLE,RS485_NotAnotherDLE
+	mov     a,#DLE-1        ; an approximation is fine
+RS485_NotAnotherDLE:
+	pushacc                 ; save to append to packet
+	mov     rs485_txcrcl,a  ; and prime the CRC with it
+	ENDIF
+
+;       ********************************************************
+;       *       Tim     26viij99        *******End**************
+;       ********************************************************
+
+	PUSHDPH
+	PUSHDPL
+	MOV     A,R7
+	PUSHACC
+
+	IF      VT10
+	anl     IEN2,#-2
+	ELSE
+	ANL     P6,#0F7h                ; CLR P6.3 => enable rs485 tx
+	CLR     REN0                    ; disable rx
+	ENDIF
+
+
+;       ********************************************************
+;       *       Tim     26viij99        *Lower CRC already set**
+;       ********************************************************
+
+	IF      RS485_TIME_STAMP EQ 0
+	MOV     rs485_txcrcl,#0         ; clear transmit crc
+	ENDIF
+
+	MOV     rs485_txcrch,#0         ;
+
+	MOV     A,R7                    ; set "len" = len+headerlen
+
+
+;       ********************************************************
+;       *       Tim     26viij99        *Include the timestamp**
+;       ********************************************************
+
+	IF      RS485_TIME_STAMP
+	ADD     A,#6                    ; include the timestamp length
+	ELSE
+	ADD     A,#5                    ;
+	ENDIF
+
+	MOV     rs485_txlen,A           ;
+
+;       MOV     rs485_txto,#MASTERNODE  ; set "to"
+	MOV     rs485_txto,R6           ; set "to"
+;       MOV     rs485_txfrom,sys_mynode ; set "from"
+	MOV     rs485_txfrom,#MASTERNODE; set "from"
+
+	MOV     R0,#rs485_txcrcl
+	MOV     A,rs485_txlen
+	CALL    AddCRCByte
+	MOV     A,rs485_txto
+	CALL    AddCRCByte
+	MOV     A,rs485_txfrom
+	CALL    AddCRCByte
+
+	POP     ACC
+	MOV     R7,A
+	POP     DPL
+	POP     DPH
+
+	PUSHDPH
+	PUSHDPL
+	MOV     A,R7
+	PUSHACC
+
+	CALL    AddCRCBytes             ; add len data bytes to crc
+
+	MOV     B,#COM_COM0             ; transmit a DLE
+
+	MOV     A,#DLE                  ;
+	CALL    COM_TxChar              ;
+;       CALL    CTRL_DebugTX
+
+	MOV     A,#STX                  ; transmit a STX
+	CALL    COM_TxChar              ;
+;       CALL    CTRL_DebugTX
+
+	MOV     R0,#rs485_txcrcl        ; transmit the header
+	MOV     R7,#5                   ; (duplicate any DLEs)
+RS485_TPhloop:                          ;
+	MOV     A,@R0                   ;
+	INC     R0                      ;
+	CJNE    A,#DLE,RS485_TPhnotdle  ;
+	CALL    COM_TxChar              ;
+;       CALL    CTRL_DebugTX
+	MOV     A,#DLE                  ;
+RS485_TPhnotdle:                        ;
+	CALL    COM_TxChar              ;
+;       CALL    CTRL_DebugTX
+	DJNZ    R7,RS485_TPhloop        ;
+
+	POP     ACC
+	MOV     R7,A
+	POP     DPL
+	POP     DPH
+
+RS485_TPdloop:                          ; transmit the data
+	MOVX    A,@DPTR                 ; (duplicate any DLEs)
+	INC     DPTR                    ;
+	CJNE    A,#DLE,RS485_TPdnotdle  ;
+	CALL    COM_TxChar              ;
+;       CALL    CTRL_DebugTX
+	MOV     A,#DLE                  ;
+RS485_TPdnotdle:                        ;
+	CALL    COM_TxChar              ;
+;       CALL    CTRL_DebugTX
+	DJNZ    R7,RS485_TPdloop        ;
+
+;       ********************************************************
+;       *       Tim     26viij99        *******Start************
+;       ********************************************************
+;       *       append timestamp (approx 15th sec) to packet   *
+;       ********************************************************
+
+	IF      RS485_TIME_STAMP
+	pop     acc                     ; recover the timestamp
+	call    COM_TxChar              ; from the stack
+	ENDIF
+
+;       ********************************************************
+;       *       Tim     26viij99        *******End**************
+;       ********************************************************
+
+
+	IF      VT10
+	anl     S1CON,#-4
+	orl     IEN2,#1
+	ELSE
+	ORL     P6,#8                   ; disable rs485 tx (SETB P6.3)
+	CLR     RI0                     ; lose any bytes that came in
+	SETB    REN0                    ; re-enable rx
+	ENDIF
+
+	RET
+;
+	END     ;***** End Of RS485.ASM *****

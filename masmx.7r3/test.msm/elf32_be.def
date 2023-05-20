@@ -1,0 +1,174 @@
+	$word	32
+	$quantum 8
+	$awidth	32
+	$byte	 8
+
+"$text"		$equ	1
+"$rela_text"	$equ	2
+"$data"		$equ	3
+"$rela_data"	$equ	4
+"$bss"		$equ	5
+"$sdata"	$equ	6
+"$comment"	$equ	7
+"$shstrtab"	$equ	8
+"$symtab"	$equ	9
+"$strtab"	$equ	10
+
+__sections $equ	11
+
+ELFCLASS32 $equ	1
+ELFDATA2MSB $equ 2
+
+ET_REL	$equ	2
+EM_PPC	$equ	20
+
+
+
+
+p	$proc
+elf32_ehdr* $name
+target	$set	p(1,1)
+	"":127:"ELF":ELFCLASS32:ELFDATA2MSB:1:0:;
+	0:0:0:0:0:0:0:0
+	+	ET_REL, target
+	+	1
+	+	0
+	+	0
+	+	$section(1)
+	+	0
+	+	52, 0
+	+	0, 40
+	+	__sections, $shstrtab
+	$end
+
+"$section_names"* $proc	"":0:;
+			".text":0;
+			".rela.text":0;
+			".data":0;
+			".rela.data":0;
+			".bss":0;
+			".sdata":0;
+			".comment":0;
+			".shstrtab":0;
+			".symtab":0;
+			".strtab":0
+
+"$STB_LOCAL"       $equ	0*/4
+"$STB_GLOBAL"      $equ	1*/4
+"$STB_WEAK"        $equ	2*/4
+"$STB_LOPROC"      $equ	13*/4
+"$STB_HIPROC"      $equ	15*/4
+
+"$STT_NOTYPE"      $equ	0
+"$STT_OBJECT"      $equ	1
+"$STT_FUNC"        $equ	2
+"$STT_SECTION"     $equ	3
+"$STT_FILE"        $equ	4
+"$STT_LOPROC"      $equ	13
+"$STT_HIPROC"      $equ	15
+
+"$SHN_ABS"	$equ	0fff1
+
+p	$proc
+elf32_sym*	$name
+"$i_o_sxi"	$form	8, 8, 16
+		+		$($strtab)
+		$nominate	p(1,1)
+		+		p(2,1)	.value
+		+		p(8,1)	.size
+		$i_o_sxi	p(3,1), 0, p(3,2)	
+		$end
+
+p	$proc	$($symtab)
+"$plus"* $name
+
+type	$set		$STT_OBJECT
+
+	$do		p(3, 1)=$text,;
+type	$set		$STT_FUNC
+
+	elf32_sym	p(1, 1) p(2, 1) $STB_GLOBAL++type,p(3, 1) 
+	$end
+
+p	$proc	$($symtab)
+"$minus"* $name
+	elf32_sym	p(1, 1) 0 $STB_GLOBAL++$STT_NOTYPE
+	
+	$end
+
+__symbolic_name(1)	$equ	0
+__symbolic_name(2)	$equ	1
+__symbolic_name(3)	$equ	7
+__symbolic_name(4)	$equ	18
+__symbolic_name(5)	$equ	24
+__symbolic_name(6)	$equ	35
+__symbolic_name(7)	$equ	40
+__symbolic_name(8)	$equ	47
+__symbolic_name(9)	$equ	56
+__symbolic_name(10)	$equ	66
+__symbolic_name(11)	$equ	74
+
+
+__section_type(2)	$set	$PROGBITS
+__section_type(3)	$set	$RELA
+__section_type(4)	$set	$PROGBITS
+__section_type(5)	$set	$RELA
+__section_type(6)	$set	$NOBITS
+__section_type(7)	$set	$PROGBITS
+__section_type(8)	$set	$PROGBITS
+__section_type(9)	$set	$STRTAB
+__section_type(10)	$set	$SYMTAB
+__section_type(11)	$set	$STRTAB
+
+$WRITE	$equ	1
+$ALLOC	$equ	2
+$EXECI	$equ	4
+
+__section_flags(2)	$set	$ALLOC++$EXECI
+__section_flags(4)	$set	$ALLOC++$WRITE	
+__section_flags(7)	$set	$ALLOC++$WRITE
+__section_flags(8)	$set	$ALLOC++$WRITE
+
+__section_address(1)	$set	0
+__section_offset(1)	$set	0
+
+__section_link(10)	$set	10	. section index of strings (11)
+
+
+__section_info(3)	$set	0	. entries in rela_text
+__section_info(5)	$set	3	. entries in rela_data
+__section_info(10)	$set	12	. accumulate value of
+
+__section_alignment(2)	$set	4
+__section_alignment(3)	$set	4
+__section_alignment(4)	$set	4
+__section_alignment(5)	$set	4
+__section_alignment(6)	$set	4
+__section_alignment(7)	$set	4
+__section_alignment(8)	$set	4
+__section_alignment(9)	$set	4
+__section_alignment(10)	$set	4
+__section_alignment(11)	$set	4
+
+__section_entry_size(3)	$set	12
+__section_entry_size(5)	$set	12
+__section_entry_size(10) $set	16
+
+p	$proc
+elf32_shdr* $name
+			+	__symbolic_name(index)
+			+	__section_type(index)
+			+	__section_flags(index)
+			+	__section_address(index)
+			+	__section_offset(index)
+			+	__section_size(index)
+			+	__section_link(index)
+			+	__section_info(index)
+			+	__section_alignment(index)
+			+	__section_entry_size(index)
+	$end
+
+"$sections"	$proc
+index	$do	__sections,section(index)	$elf32_shdr
+		$end
+

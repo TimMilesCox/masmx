@@ -1,0 +1,14 @@
+../script
+echo	start diff test.o3
+diff -w --brief ../result.txo ../test.o3
+echo	end diff test.o3
+pushd ../test.dds/2r1
+./script
+cd ../1r45p
+./script
+popd
+../zscript
+echo	start diff test.zo3
+diff -w --brief ../result.zo3 ../test.zo3
+echo	end diff test.zo3
+

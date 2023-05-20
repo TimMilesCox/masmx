@@ -1,0 +1,163 @@
+p	$proc
+$i_load*	$name
+	LOAD	p(1)
+	$end
+
+p	$proc
+$i_load_negative*	$name
+	LOAD_NEGATIVE	p(1)
+	$end
+
+$i_testequal*	$name
+	TEST_EQUAL	p(1)
+	$end
+
+p	$proc
+$i_testunequal*	$name
+	TEST_NE	p(1)
+	$end
+
+p	$proc
+$i_testgreater*	$name
+	TEST_GREATER	p(1)
+	$end
+
+p	$proc
+$i_testless*	$name
+	TEST_LESS	p(1)
+	$end
+
+p	$proc
+$i_shift*	$name
+	SHIFT	p(1)
+	$end
+
+p	$proc
+$i_shift_right*	$name
+	SHIFT_RIGHT	p(1)
+	$end
+
+p	$proc
+$i_or*	$name
+	OR	p(1)
+	$end
+
+p	$proc
+$i_and*	$name
+	AND	p(1)
+	$end
+
+p	$proc
+$i_xor*	$name
+	XOR	p(1)
+	$end
+
+p	$proc
+$i_add*	$name
+	ADD	p(1)
+	$end
+
+p	$proc
+$i_subtract*	$name
+	SUBTRACT	p(1)
+	$end
+
+p	$proc
+$i_multiply*	$name
+	MULTIPLY	p(1)
+	$end
+
+p	$proc
+$i_divide*	$name
+	DIVIDE	p(1)
+	$end
+
+p	$proc
+$i_covered_quotient*	$name
+	DIVIDE_ROUNDED	p(1)
+	$end
+
+p	$proc
+$i_remainder*	$name
+	MODULO	p(1)
+	$end
+
+p	$proc
+$i_reserve*	$name
+	PUSH
+	$end
+
+$i_retrieve_testequal*	$proc
+	TEST_EQUAL	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_testunequal*	$proc
+	TEST_NE	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_testgreater*	$proc
+	TEST_GREATER	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_testless*	$proc
+	TEST_LESS	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_shift*	$proc
+	SHIFT	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_shift_right*	$proc
+	SHIFT_RIGHT	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_or*	$proc
+	OR	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_and*	$proc
+	AND	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_xor*	$proc
+	XOR	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_add*	$proc
+	ADD	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_subtract*	$proc
+	SUBTRACT	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_multiply*	$proc
+	MULTIPLY	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_divide*	$proc
+	DIVIDE	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_covered_quotient*	$proc
+	DIVIDE_ROUNDED	STACK_TOP
+	POP
+	$end
+
+$i_retrieve_remainder*	$proc
+	MODULO	STACK_TOP
+	POP
+	$end
